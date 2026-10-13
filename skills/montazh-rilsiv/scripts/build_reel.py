@@ -26,7 +26,7 @@ edit.json (written by auto_edit.py, then Claude marks accents and adds cards):
                                                      a HyperFrames sub-composition written for this reel (own motion design
                                                      on a phrase or sentence, or a full-screen takeover). Everything in the
                                                      src file's folder is copied along (fonts, js). Default box = full frame.
-     overlay {src: "overlays/<file or asset id>", mode: "small-r"|"small-l"|"big"|"full", effect: "soft"|"slide"|"polaroid"|"glass"|"zoom"}
+     overlay {src: "overlays/<file or asset id>", mode: "small-r"|"small-l"|"big"|"full", effect: "soft"|"slide"|"polaroid"|"glass"|"zoom", box?: [x,y,w,h]}
                                                      an image or video they uploaded on the review page (or dropped in the folder):
                                                      a small card top right/left, a wide panel above the head, or full screen; video muted
      follow {words: [{text, accent}], framing: "wide"}   caption-camera-follow in brand colours/font: one sentence
@@ -206,9 +206,10 @@ for i, c in enumerate(edit.get("cards", [])):
             or next(iter(sorted((reel / Path(c["src"]).parent).glob(Path(c["src"]).name + ".*"))), None)
         if not src: print(f"warning: overlay not found: {c['src']} (download it first)"); continue
         mode = {"box": "big"}.get(c.get("mode", "big"), c.get("mode", "big"))
-        x, y, ow, oh = {"full": (0, 0, 1080, 1920), "big": (90, 150, 900, 640), "small-r": (600, 170, 400, 500),
-                        "small-l": (80, 170, 400, 500)}.get(mode, (90, 150, 900, 640))
-        full = mode == "full"
+        x, y, ow, oh = c.get("box") or {"full": (0, 0, 1080, 1920), "big": (90, 150, 900, 640), "small-r": (600, 170, 400, 500),
+                        "small-l": (80, 170, 400, 500)}.get(mode, (90, 150, 900, 640))   # "box": where they dragged it on the page
+        full = ow >= 1080 and oh >= 1920
+        if not full and y < CAP_Y + 150 and y + oh > CAP_Y - 60: quiet.append((a, b))   # sits on the caption line: captions step aside
         fx = c.get("effect", "soft")
         if full and fx in ("polaroid", "glass"): fx = "soft"                 # a frame needs a border around it: not on a full screen
         frame = {"polaroid": "padding:14px 14px 48px;background:#fff;border-radius:6px;box-shadow:0 30px 70px rgba(0,0,0,.35)",
@@ -231,7 +232,7 @@ for i, c in enumerate(edit.get("cards", [])):
             f'<div id="{cid}" style="position:absolute;left:{x}px;top:{y}px;width:{ow}px;height:{oh}px;box-sizing:border-box;{frame};opacity:0;visibility:hidden">'
             f'<div class="m" style="width:100%;height:100%;overflow:hidden;border-radius:{inner_r}">{media}</div></div>')
         show(f"#{cid}", a, b, 0.15)
-        side = -1 if mode == "small-l" else 1
+        side = -1 if x + ow / 2 < 540 else 1                               # flies in / tilts from the side of the frame it sits on
         js.append({
             "slide": f'tl.fromTo("#{cid}",{{x:{side * 760},rotation:{side * 6}}},{{x:0,rotation:0,duration:0.55,ease:"back.out(1.3)"}},{q(a)});',
             "polaroid": f'tl.fromTo("#{cid}",{{y:-260,rotation:{-side * 16},scale:0.9}},{{y:0,rotation:{-side * 4},scale:1,duration:0.6,ease:"back.out(1.5)"}},{q(a)});',

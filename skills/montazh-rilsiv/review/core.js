@@ -93,7 +93,7 @@
     }).concat((d.overlays || []).map(o => {   // overlays they added on the page: an uploaded image/video from a word, for o.dur seconds
       const state = ((d.board || {})[o.id] || {}).state || "k", a = firstKeptFrom(o.w0);
       const g = { id: o.id, type: "overlay", kind: "Накладення", what: o.name, mode: o.mode, effect: o.effect || "soft", media: o.kind, assetId: o.assetId,
-                  place: OVERLAY_PLACE[o.mode] || OVERLAY_PLACE.big, imgUrl: o.kind === "image" ? o.url : null, w0: o.w0, user: true };
+                  place: o.place || OVERLAY_PLACE[o.mode] || OVERLAY_PLACE.big, box: o.place || undefined, imgUrl: o.kind === "image" ? o.url : null, w0: o.w0, user: true };
       if (a === null) return { ...g, state, gone: true };
       const start = P.toCut(W[a].s);
       return { ...g, state, start, end: Math.min(start + (o.dur || 3), P.cutDur), moved: a !== o.w0 };

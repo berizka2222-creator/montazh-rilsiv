@@ -2,6 +2,7 @@
 """Bridge between a reel folder and the Reel Review page.
   export <reel> <proposal.json> <out-dir>   build reel.json (the page's data) + assets to upload
   import <reel> <review.json>               turn the person's decisions into edl.json + edit.json for cut.py/render.sh
+  overlays <reel> <review.json>             list the overlays they placed (round 1), so Claude's graphics go around them
 The cut timeline is computed by review/core.js (run with node), the same file the page uses, so review and render agree.
 
 proposal.json (Claude writes this per reel):
@@ -123,6 +124,32 @@ def export(reel, proposal, out):
     json.dump(reel_json, open(out / "reel.json", "w"))
     return reel_json
 
+def _overlap(a, b):   # two graphics clash when they share screen time AND screen area (full-screen ones clash with everything)
+    if a["start"] >= b["end"] or b["start"] >= a["end"]: return False
+    (ax, ay, aw, ah), (bx, by, bw, bh) = a.get("place") or [0, 0, 1080, 1920], b.get("place") or [0, 0, 1080, 1920]
+    return ax < bx + bw and bx < ax + aw and ay < by + bh and by < ay + ah
+
+def list_overlays(reel, review):
+    """Round 1 of the review: they place their own photos/videos first. This prints each one in cut time and source
+    time (with the word it hangs on), so the graphics plan in proposal.json can leave those moments and areas free."""
+    reel_json = json.load(open(reel / "review_reel.json"))
+    d = json.load(open(review)) if Path(review).exists() else {}
+    d = {"restoredFillers": [], "restoredPauses": [], "trimmedPauses": [], "board": {}, "sfxOff": {}, "overlays": [], **d}
+    if d.get("cut") is None: d["cut"] = reel_json["proposedCut"]
+    if d.get("captions") is None: d["captions"] = reel_json["captions"]
+    P = node(reel_json, d)
+    W = reel_json["words"]
+    mine = [g for g in P["graphics"] if g.get("user") and not g.get("gone") and g["state"] != "d"]
+    for g in mine:
+        w = W[g["w0"]]
+        print(f"OVERLAY {g['id']}: cut {g['start']:.1f}-{g['end']:.1f}s, from word \"{w['text']}\" (source {w['s']:.1f}s), "
+              f"box {g.get('place')}, {g.get('mode')}/{g.get('effect')}, {g.get('what', '')}")
+    for g in P["graphics"]:
+        if g.get("user") or g.get("gone") or g["state"] == "d": continue
+        for o in mine:
+            if _overlap(g, o): print(f"CONFLICT: {g['id']} ({g.get('kind')}) overlaps their overlay {o['id']} at cut {max(g['start'], o['start']):.1f}s: move or drop it")
+    print(f"{len(mine)} overlay(s) placed")
+
 def do_import(reel, review):
     reel_json = json.load(open(reel / "review_reel.json"))
     d = json.load(open(review)) if Path(review).exists() else {}
@@ -160,6 +187,11 @@ def do_import(reel, review):
     print(f"cut {P['cutDur']:.1f}s from {len(P['spans'])} spans; {len(caps)} captions; {len(cards)} graphics; hash {P['hash']}")
     for c in changes: print("CHANGE REQUESTED:", c)
     for o in overlays: print("OVERLAY:", o)
+    users = [g for g in P["graphics"] if g.get("user") and not g.get("gone") and g["state"] != "d"]
+    for g in P["graphics"]:
+        if not g.get("user") and not g.get("gone") and g["state"] != "d":
+            for o in users:
+                if _overlap(g, o): print(f"CONFLICT: {g['id']} ({g.get('kind')}) overlaps their overlay {o['id']} at cut {max(g['start'], o['start']):.1f}s: move or drop it before rendering")
     for k, n in (d.get("notes") or {}).items():
         if n.strip(): print(f"NOTE ({k}):", n.strip())
     if (d.get("brandRequest") or "").strip(): print("BRAND CHANGE REQUESTED (only apply if confirmed):", d["brandRequest"].strip())
@@ -171,4 +203,5 @@ if __name__ == "__main__":
         r = export(reel, json.load(open(sys.argv[3])), Path(sys.argv[4]))
         json.dump(r, open(reel / "review_reel.json", "w"))
     elif cmd == "import": do_import(reel, sys.argv[3])
+    elif cmd == "overlays": list_overlays(reel, sys.argv[3])
     else: sys.exit(__doc__)
