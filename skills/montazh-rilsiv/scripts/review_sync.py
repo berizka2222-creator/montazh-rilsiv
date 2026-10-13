@@ -17,6 +17,23 @@ CORE = HERE.parent / "review" / "core.js"
 HOME = Path(os.environ.get("REELS_HOME", "~/reels")).expanduser()
 norm = lambda s: re.sub(r"[\W_]", "", s.lower())
 
+def _rgb(h):
+    h = h.lstrip("#"); return tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
+def _theme(brand):
+    """Review page colours from the brand: dark brands get a dark page, light brands a light one."""
+    c = brand.get("colors", {}); main = c.get("main", "#141414"); pop = c.get("pop", "#ED84B0")
+    light = c.get("light", "#FFFFFF"); soft = c.get("soft", pop); deep = c.get("deep")
+    r, g, b = _rgb(main); dark = (0.299 * r + 0.587 * g + 0.114 * b) < 128
+    pr, pg, pb = _rgb(pop); rgba = lambda a: f"rgba({pr},{pg},{pb},{a})"
+    if dark:
+        lr, lg, lb = _rgb(light); ink = lambda a: f"rgba({lr},{lg},{lb},{a})"
+        return {"scheme": "dark", "bg": main, "surface": deep or ink(.06), "ink": light, "muted": ink(.62),
+                "line": ink(.16), "pink": pop, "pink-soft": rgba(.12), "now": rgba(.22), "glow": rgba(.28),
+                "cut-bg": pop, "cut-fg": main, "auto": ink(.45), "keep": soft, "on-accent": main}
+    return {"scheme": "light", "bg": light, "surface": "#FFFFFF", "ink": main, "muted": "rgba(0,0,0,.55)",
+            "line": rgba(.25), "pink": pop, "pink-soft": rgba(.10), "now": rgba(.18), "glow": rgba(.25),
+            "cut-bg": main, "cut-fg": light, "on-accent": main}
+
 def raw_clip(reel):   # the raw clip's name keeps its extension (raw.mov from an iPhone, raw.mp4 from Android)
     return next(iter(sorted(reel.glob("raw.*"))), reel / "raw.mov")
 
@@ -93,7 +110,7 @@ def export(reel, proposal, out):
         board.append(g)
     reel_json = {"title": proposal["title"], "srcDur": float(subprocess.run(["ffprobe", "-v", "error", "-show_entries",
                  "format=duration", "-of", "csv=p=0", str(raw_clip(reel))], capture_output=True, text=True).stdout),
-                 "speed": pacing(brand)["speed"], "pacing": pacing(brand), "words": words, "proposedCut": proposed_cut, "keepPauses": keep_pauses,
+                 "theme": _theme(brand), "speed": pacing(brand)["speed"], "pacing": pacing(brand), "words": words, "proposedCut": proposed_cut, "keepPauses": keep_pauses,
                  "captions": caps, "board": board,
                  "style": {"capSize": brand["captions"].get("size", 104), "capY": brand["captions"].get("y", 1250),
                            "mode": mode, "editorial": brand["captions"].get("style") == "editorial",
