@@ -18,6 +18,13 @@ A private page on the person's claude.ai account where they approve the edit bef
 5. Upload the assets to the page (`asset: true`, up to 25 per call), then write `reel/current` = `reel.json` plus `srcUrl`, per-graphic `thumbUrl`/`imgUrl`, `assets` {audioOriginal, audioCleaned, colourBefore, colourAfter, sfx{name:url}}, `fonts` {body, accent}. Delete `review/current` and `builds/latest` from the previous reel (ask first if they hold notes).
 6. Send the link. Tell them: type the hook and CTA in the fields on «Графіка» (or approve yours), tap words to cut, use the «Накладення» tab to add their own photo/video at the current rough-cut moment and drag it into place and pull its corner to any size, sticker-small up to full screen (or tick «На весь екран»); effect: soft, slide, polaroid, glass, zoom; up to 20 MB; or pick one from «Мої файли», or add text; tick «За мною» to put it behind them), tap ⏸ / grey "um"s to keep them, Play rough cut to watch the live cut, then Build preview.
 
+## Effects they ask for («Ефекти» tab)
+
+On «Ефекти» they pick a moment of the rough cut, describe an effect (a HyperFrames catalog name such as `count-up`, or their own words) and can attach photos/videos for it. The «Відкрити бібліотеку ефектів» button opens the catalog: the public one at hyperframes.heygen.com/catalog, or their own gallery page when brand.json `"page"` has `"library": "<url>"`. `review_sync.py import` and `overlays` print each as `EFFECT REQUESTED @ cut …s for …s, from word "…": <text> | files: <name> -> DOWNLOAD asset <id> into <reel>/effects`.
+- Download each file with `Artifact` `action: "read"`, `path` = the asset id, `out_dir` = `<reel>/effects`.
+- A catalog name: `cd engine/hf && npx hyperframes add <name>` if it isn't installed yet, add it to `references/motions.md`, then a `motion` card at that moment with their files as `images`/vars. Their own words: build it as a `custom` motion (see SKILL.md «Own motion design on phrases»).
+- It goes on «Графіка» as their item (like an overlay), so plan your cards around it. If a description is unclear, ask one short question before building.
+
 ## Two rounds: their overlays first, then Claude's graphics
 
 Their own photos/videos come before Claude's cards and motion, so the graphics plan goes around them instead of under them.

@@ -117,7 +117,8 @@
   function hash(d) {
     const s = JSON.stringify([d.cut, d.restoredFillers, d.restoredPauses, d.trimmedPauses, d.captions, d.board, d.sfxOff, d.voiceClean === false]
       .concat((d.overlays || []).length ? [d.overlays] : [])   // later fields only when set, so older builds keep their hash
-      .concat((d.hook || "").trim() ? [d.hook.trim()] : []).concat(((d.cta || {}).text || "").trim() ? [d.cta] : []));
+      .concat((d.hook || "").trim() ? [d.hook.trim()] : []).concat(((d.cta || {}).text || "").trim() ? [d.cta] : [])
+      .concat((d.effects || []).length ? [d.effects] : []));
     let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0;
     return (h >>> 0).toString(36);
   }

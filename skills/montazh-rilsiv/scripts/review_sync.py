@@ -199,6 +199,12 @@ def do_import(reel, review):
         if not g.get("user") and not g.get("gone") and g["state"] != "d":
             for o in users:
                 if _overlap(g, o): print(f"CONFLICT: {g['id']} ({g.get('kind')}) overlaps their overlay {o['id']} at cut {max(g['start'], o['start']):.1f}s: move or drop it before rendering")
+    W = reel_json["words"]
+    for e in sorted(d.get("effects") or [], key=lambda e: e.get("at", 0)):   # effects they asked for on the page («Ефекти»)
+        w = W[e["w0"]] if 0 <= e.get("w0", -1) < len(W) else {"text": "?", "s": 0}
+        files = "; ".join(f"{f['name']} -> DOWNLOAD asset {f['id']} into {reel / 'effects'}" for f in e.get("files") or [])
+        print(f"EFFECT REQUESTED @ cut {e.get('at', 0):.1f}s for {e.get('dur', 3)}s, from word \"{w['text']}\" (source {w['s']:.1f}s): {e['text']}"
+              + (f" | files: {files}" if files else ""))
     for k, n in (d.get("notes") or {}).items():
         if n.strip(): print(f"NOTE ({k}):", n.strip())
     if (d.get("brandRequest") or "").strip(): print("BRAND CHANGE REQUESTED (only apply if confirmed):", d["brandRequest"].strip())

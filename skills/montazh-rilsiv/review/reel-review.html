@@ -171,6 +171,9 @@ textarea,input[type=text],input[type=number],.ovform select,.reelpick select{bor
 .lib button{border:1px solid var(--line);background-color:var(--surface)}
 .lib button[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--now)}
 .gbox .rz{background:var(--accent)}
+.efthumb{width:56px;height:70px;border-radius:10px;border:1px solid var(--line);background:var(--surface) center/contain no-repeat;display:grid;place-items:center;color:var(--muted)}
+.libbtn{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:14px;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:8px 16px;text-decoration:none}
+.libbtn:hover{background:var(--accent);color:var(--on-accent)}
 .by{margin:6px 0 0;font:500 11px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .by a{color:var(--accent);text-decoration:none;border-bottom:1px solid currentColor}
 </style>
@@ -204,6 +207,7 @@ textarea,input[type=text],input[type=number],.ovform select,.reelpick select{bor
     <div class="tabs" role="tablist">
       <button class="tab" role="tab" data-tab="cuts">Нарізка <span class="dot" hidden></span></button>
       <button class="tab" role="tab" data-tab="overlays">Накладення <span class="dot" hidden></span></button>
+      <button class="tab" role="tab" data-tab="effects">Ефекти <span class="dot" hidden></span></button>
       <button class="tab" role="tab" data-tab="graphics">Графіка <span class="dot" hidden></span></button>
       <button class="tab" role="tab" data-tab="captions">Субтитри <span class="dot" hidden></span></button>
       <button class="tab" role="tab" data-tab="sound">Звук і колір <span class="dot" hidden></span></button>
@@ -238,6 +242,20 @@ textarea,input[type=text],input[type=number],.ovform select,.reelpick select{bor
     </details>
       <div class="tally" id="otally"></div>
       <div class="cards" id="ovcards"></div>
+    </section>
+
+    <section data-p="effects" hidden>
+      <p class="lede">Постав чорновий монтаж на потрібну секунду, опиши ефект або встав назву з бібліотеки. Якщо для ефекту потрібні фото, додай їх тут.</p>
+      <p><a class="libbtn" id="eflib" href="https://hyperframes.heygen.com/catalog" target="_blank" rel="noopener">Відкрити бібліотеку ефектів ↗</a></p>
+      <div class="panel" id="efbox">
+        <label for="eftext">Ефект на <span class="tc" id="efat">0:00.0</span></label>
+        <textarea id="eftext" placeholder="Напр.: count-up від 0 до 20 клієнтів, або: фото вилітають віялом з-за мене"></textarea>
+        <div class="row ctl" style="margin-top:8px"><label for="efdur" style="margin:0">Скільки секунд</label><input type="number" id="efdur" value="3" min="0.5" max="30" step="0.5" style="width:80px"></div>
+        <label for="effiles">Фото чи відео для ефекту (необов'язково)</label>
+        <input type="file" id="effiles" multiple accept="image/png,image/jpeg,image/webp,video/mp4,video/quicktime">
+        <div class="ctl" style="margin-top:10px"><button class="b primary" id="efadd" type="button">Додати ефект</button><span class="mode" id="efmsg" aria-live="polite"></span></div>
+      </div>
+      <div class="cards" id="eflist"></div>
     </section>
 
     <section data-p="graphics" hidden>
@@ -302,7 +320,7 @@ const v = $("#v"), ov = $("#ov");
 const fmt = t => `${Math.floor(t / 60)}:${(Math.max(0, t) % 60).toFixed(1).padStart(4, "0")}`;
 let R = null, B = null, S = blank(), P = null, CAPS = [], GFX = [];
 let tab = "cuts", ref = null, saving = Promise.resolve(), timer = null, undo = [], mode = "idle", loop = null;
-function blank() { return { cut: null, restoredFillers: [], restoredPauses: [], trimmedPauses: [], captions: null, board: {}, sfxOff: {}, overlays: [], notes: {}, brandRequest: "", revisions: [], buildRequest: null }; }
+function blank() { return { cut: null, restoredFillers: [], restoredPauses: [], trimmedPauses: [], captions: null, board: {}, sfxOff: {}, overlays: [], effects: [], notes: {}, brandRequest: "", revisions: [], buildRequest: null }; }
 
 // ---------- saving, undo ----------
 const pill = (t, err) => { $("#save").textContent = t; $("#save").classList.toggle("err", !!err); $("#retry").hidden = !err; };
@@ -338,7 +356,7 @@ function showTab(t) {
   tab = t;
   $$(".tab").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t));
   $$("section[data-p]").forEach(s => s.hidden = s.dataset.p !== t);
-  $("#notetab").textContent = { cuts: "нарізка", overlays: "накладення", graphics: "графіка", captions: "субтитри", sound: "звук і колір", preview: "чернетка" }[t];
+  $("#notetab").textContent = { cuts: "нарізка", overlays: "накладення", effects: "ефекти", graphics: "графіка", captions: "субтитри", sound: "звук і колір", preview: "чернетка" }[t];
   $("#notes").value = S.notes[t] || ""; $("#resetbox").hidden = t === "preview";
   stopPlay();
   if (t !== "overlays" && placing && !placing.id) stopPlacing();
@@ -362,6 +380,7 @@ $("#reset").addEventListener("click", () => {
     if (tab === "captions") S.captions = null;
     if (tab === "sound") S.sfxOff = {};
     if (tab === "overlays") S.overlays = [];
+    if (tab === "effects") S.effects = [];
   }); back(); });
   no.addEventListener("click", back); msg.append(yes, no); box.append(msg);
 });
@@ -374,7 +393,7 @@ function setPos(c) {
   pos = Math.max(0, Math.min(c, P.cutDur - 0.05));
   $("#scrub").max = P.cutDur.toFixed(1); $("#scrub").value = pos.toFixed(1);
   $("#pos").textContent = `${fmt(pos)} / ${fmt(P.cutDur)}`; $("#clock").textContent = `монтаж ${fmt(pos)} / ${fmt(P.cutDur)}`;
-  $("#ovat").textContent = fmt(pos);
+  $("#ovat").textContent = fmt(pos); $("#efat").textContent = fmt(pos);
 }
 function seekCut(c) {   // jump within the rough cut; keeps playing if it was playing, else shows that frame
   setPos(c); v.currentTime = P.toSrc(pos); $("#clock").hidden = false;
@@ -675,6 +694,49 @@ $("#ovadd").addEventListener("click", async () => {
   finally { btn.disabled = false; }
 });
 
+// ---------- effects they ask for: a moment, what to do (a library name or their words) and files for it ----------
+function renderEffects() {
+  const box = $("#eflist"); box.textContent = "";
+  const list = [...(S.effects || [])].sort((a, b) => a.at - b.at);
+  if (!list.length) { box.innerHTML = `<div class="empty">Ефектів ще немає.</div>`; return; }
+  for (const e of list) {
+    const el = document.createElement("div"); el.className = "card"; el.style.gridTemplateColumns = "1fr";
+    const body = document.createElement("div");
+    const kind = document.createElement("div"); kind.className = "kind"; kind.textContent = "Ефект";
+    const what = document.createElement("div"); what.className = "what"; what.textContent = e.text;
+    const meta = document.createElement("div"); meta.className = "meta";
+    const t = document.createElement("button"); t.className = "ts"; t.type = "button"; t.innerHTML = `<span class="tc">${fmt(e.at)}</span>`;
+    t.title = "Дивитись чорновий монтаж з цього місця"; t.addEventListener("click", () => playRough(e.at)); meta.append(t);
+    const d = document.createElement("span"); d.textContent = `${e.dur} с`; meta.append(d);
+    const del = document.createElement("button"); del.type = "button"; del.className = "b quiet"; del.textContent = "Прибрати";
+    del.addEventListener("click", () => mutate(() => { S.effects = S.effects.filter(x => x.id !== e.id); })); meta.append(del);
+    body.append(kind, what, meta);
+    if ((e.files || []).length) {
+      const fl = document.createElement("div"); fl.className = "lib";
+      for (const f of e.files) { const b = document.createElement("span"); b.className = "efthumb"; b.title = f.name;
+        if (f.kind === "image") b.style.backgroundImage = `url(${JSON.stringify(f.url)})`; else b.textContent = "▶"; fl.appendChild(b); }
+      body.appendChild(fl);
+    }
+    el.appendChild(body); box.appendChild(el);
+  }
+}
+$("#efadd").addEventListener("click", async () => {
+  const msg = $("#efmsg"), btn = $("#efadd"), text = $("#eftext").value.trim();
+  if (!text) { msg.textContent = "Опиши ефект або встав його назву."; $("#eftext").focus(); return; }
+  const w0 = wordAtCut(pos); if (w0 === null) { msg.textContent = "Тут немає жодного слова в нарізці."; return; }
+  const files = [...$("#effiles").files], at = pos, dur = Math.min(30, Math.max(0.5, +$("#efdur").value || 3));
+  if (files.length && !assets) { msg.textContent = "Файли тут не завантажуються: кинь їх у папку рілса й напиши Claude."; return; }
+  if (files.some(f => f.size > 20 * 1024 * 1024)) { msg.textContent = "Один з файлів більший за 20 МБ. Кинь його в папку рілса."; return; }
+  btn.disabled = true; msg.textContent = files.length ? "Завантажую файли…" : "";
+  try {
+    const up = [];
+    for (const f of files) { const u = await assets.upload(f); up.push({ id: u.id, url: u.url, name: f.name, kind: f.type.startsWith("video") ? "video" : "image" }); }
+    mutate(() => { S.effects = [...(S.effects || []), { id: "ef" + Date.now().toString(36), w0, at: +at.toFixed(2), dur, text, files: up }]; });
+    $("#eftext").value = ""; $("#effiles").value = ""; msg.textContent = `Додано на ${fmt(at)}.`;
+  } catch (e) { msg.textContent = "Не вдалося завантажити (" + (e?.code || "помилка") + "). Спробуй ще раз."; }
+  finally { btn.disabled = false; }
+});
+
 // ---------- hook + CTA typed on the page ----------
 function syncHookCta() {
   const hook = GFX.find(g => g.type === "title");
@@ -826,8 +888,8 @@ $("#revadd").addEventListener("click", () => {
 });
 
 function renderAll() {
-  renderCuts(); renderGraphics(); renderCaptions(); renderSound(); renderPreview(); syncHookCta();
-  const sent = { cuts: S.cut != null, overlays: (S.overlays || []).length, graphics: Object.keys(S.board).length || (S.hook != null) || !!S.cta, captions: S.captions != null, sound: Object.keys(S.sfxOff).length || S.voiceClean === false };
+  renderCuts(); renderGraphics(); renderEffects(); renderCaptions(); renderSound(); renderPreview(); syncHookCta();
+  const sent = { cuts: S.cut != null, overlays: (S.overlays || []).length, effects: (S.effects || []).length, graphics: Object.keys(S.board).length || (S.hook != null) || !!S.cta, captions: S.captions != null, sound: Object.keys(S.sfxOff).length || S.voiceClean === false };
   $$(".tab").forEach(b => { const d = b.querySelector(".dot"); if (d) d.hidden = !sent[b.dataset.tab]; });
 }
 
@@ -859,6 +921,7 @@ async function load(id) {
       const rt = document.documentElement;
       for (const [k, val] of Object.entries(R.theme)) if (k !== "scheme" && k !== "label") rt.style.setProperty("--" + k, val);
       if (R.theme.label) $("#eyebrow").textContent = R.theme.label;
+      if (R.theme.library) $("#eflib").href = R.theme.library;
       rt.setAttribute("data-theme", R.theme.scheme || "light"); rt.style.colorScheme = R.theme.scheme || "light";
     }
     if (R.fonts && !document.getElementById("brandfonts")) {   // brand fonts, so the caption preview uses the real faces
@@ -884,7 +947,7 @@ async function load(id) {
     recompute();
     $("#reelname").textContent = `${R.title} · оригінал ${fmt(R.srcDur)} → рілс ${fmt(P.cutDur)}`; setPos(0);
     $("#brand").value = S.brandRequest || "";
-    renderAll(); showTab(["cuts", "overlays", "graphics", "captions", "sound", "preview"].includes(location.hash.slice(1)) ? location.hash.slice(1) : tab || "cuts");
+    renderAll(); showTab(["cuts", "overlays", "effects", "graphics", "captions", "sound", "preview"].includes(location.hash.slice(1)) ? location.hash.slice(1) : tab || "cuts");
     pill(rv.exists ? "Збережені рішення завантажено" : "Готово");
   } catch (e) { if (live()) pill("Не вдалося завантажити рілс (" + (e?.code || "error") + "). Онови сторінку.", true); }
 }
