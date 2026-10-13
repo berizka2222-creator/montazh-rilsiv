@@ -355,14 +355,16 @@ function capEl(cap) {
   const el = document.createElement("div"); el.className = "capov" + (st.editorial && !one ? " ed" : "");
   const base = st.capSize / 1080 * W * (one ? 1.35 : 1);
   Object.assign(el.style, { top: st.capY / 19.2 + "%", fontFamily: "rb, var(--f-body)", fontSize: base + "px", color: st.cap });
+  let k = st.acc2 ? accBefore(cap) : 0;   // two accent colours alternate across the reel, as in the render
   for (const w of cap.words) {
     const s = document.createElement("span");
-    if (w.accent) { s.className = "a"; Object.assign(s.style, { fontFamily: "ra, Georgia, serif", fontStyle: "italic", color: st.acc, fontSize: (st.editorial ? 1.7 : 1.12) + "em" }); }
+    if (w.accent) { s.className = "a"; Object.assign(s.style, { fontFamily: "ra, Georgia, serif", fontStyle: "italic", color: st.acc2 && k++ % 2 ? st.acc2 : st.acc, fontSize: (st.editorial ? 1.7 : 1.12) + "em" }); }
     const t = w.text.replace(/[.,!?;:]+$/, "");   // captions carry no punctuation
     s.textContent = (st.case === "lower" ? t.toLowerCase() : t) + " "; el.appendChild(s);
   }
   return el;
 }
+function accBefore(cap) { let n = 0; for (const c of CAPS) { if (c === cap) break; if (!c.gone) n += c.words.filter(w => w.accent).length; } return n; }
 function fitCap(el) {   // shrink until the widest word fits the frame, measured in the real fonts (the render does the same)
   let fs = parseFloat(el.style.fontSize);
   for (let i = 0; i < 25 && el.scrollWidth > el.clientWidth + 1; i++) { fs *= 0.92; el.style.fontSize = fs + "px"; }
@@ -654,7 +656,7 @@ function renderAll() {
     ref.onSnapshot(s => {
       if (!s.exists || !R) return;
       const d = s.data(); if (d.updatedAt === mine || dirty) return;
-      if (JSON.stringify(d) === JSON.stringify({ ...S })) return;
+      if (JSON.stringify({ ...blank(), ...JSON.parse(JSON.stringify(d)) }) === JSON.stringify({ ...S })) return;   // same decisions (fields blank() adds included): nothing changed
       S = { ...blank(), ...JSON.parse(JSON.stringify(d)) }; undo = []; $("#undo").disabled = true;
       recompute(); renderAll(); setPos(pos); pill("Оновлено Claude");
     }, () => {});
