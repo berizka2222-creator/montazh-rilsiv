@@ -1,9 +1,11 @@
 ---
 name: montazh-rilsiv
-description: Монтаж рілсів з говорячою головою у власному стилі людини (українська мова) - нарізка, прибирання «ем» і пауз, субтитри, хук-заголовок, графіка, власний моушн на фразах, сторінка перевірки перед рендером. ТРИГЕРИ - «змонтуй рілс», «зроби з цього рілс», «монтаж рілса», «обріж відео», «додай субтитри», «виріж паузи й ем», «налаштуй мій бренд для рілсів», а також будь-яке сире відео-говоряча голова, яке людина дає для монтажу. Based on getgitgirl's claude-reel-editor (MIT).
+description: Скіл від @inna_berezova (Інна Березова). Монтаж рілсів з говорячою головою у власному стилі людини (українська мова) - нарізка, прибирання «ем» і пауз, субтитри, хук-заголовок, графіка, власний моушн на фразах, сторінка перевірки перед рендером. ТРИГЕРИ - «змонтуй рілс», «зроби з цього рілс», «монтаж рілса», «обріж відео», «додай субтитри», «виріж паузи й ем», «налаштуй мій бренд для рілсів», а також будь-яке сире відео-говоряча голова, яке людина дає для монтажу. Based on getgitgirl's claude-reel-editor (MIT).
 ---
 
 # Reel editor
+
+*Монтаж рілсів від [@inna_berezova](https://instagram.com/inna_berezova) (Інна Березова).*
 
 Turns a raw talking-head clip into a finished, on-brand vertical reel. Every brand choice (colours, fonts, caption style, sounds, CTA) comes from the person's **brand file**, never from defaults baked into this skill. You do the editing; they only make the calls that are theirs.
 
