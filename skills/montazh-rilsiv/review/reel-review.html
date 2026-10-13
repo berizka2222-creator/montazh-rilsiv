@@ -957,7 +957,9 @@ async function load(id) {
   assets = await window.claude?.use?.("assets");   // only editors get it; others don't see the overlay button
   $("#ovbox").hidden = !assets; $("#ovnone").hidden = !!assets;
   libRef = DB.doc("library/files");   // «Мої файли» live across reels
-  try { const l = await libRef.get(); LIB = l.exists ? (l.data().items || []) : []; } catch (e) { LIB = []; }
+  try { const l = await libRef.get(); LIB = l.exists ? (l.data().items || []) : [];
+    if (l.exists && /^https:\/\//.test(l.data().libraryUrl || "")) $("#eflib").href = l.data().libraryUrl;   // their own effects gallery, for every reel
+  } catch (e) { LIB = []; }
   renderLib();
   const idx = DB.doc("reel/index");   // a batch of reels; without it the page shows reel/current as before
   try { const x = await idx.get(); LIST = x.exists ? (x.data().items || []) : []; } catch (e) { LIST = []; }
