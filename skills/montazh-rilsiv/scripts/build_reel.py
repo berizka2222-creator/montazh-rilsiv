@@ -26,7 +26,7 @@ edit.json (written by auto_edit.py, then Claude marks accents and adds cards):
                                                      a HyperFrames sub-composition written for this reel (own motion design
                                                      on a phrase or sentence, or a full-screen takeover). Everything in the
                                                      src file's folder is copied along (fonts, js). Default box = full frame.
-     overlay {src: "overlays/<file or asset id>", mode: "small-r"|"small-l"|"big"|"full", effect: "soft"|"slide"|"polaroid"|"glass"|"zoom", box?: [x,y,w,h]}
+     overlay {src: "overlays/<file or asset id>", mode: "tiny"|"small-r"|"small-l"|"big"|"full", effect: "soft"|"slide"|"polaroid"|"glass"|"zoom", box?: [x,y,w,h]}
                                                      an image or video they uploaded on the review page (or dropped in the folder):
                                                      a small card top right/left, a wide panel above the head, or full screen; video muted
      bigtext {text: "big / words", y?: 330, size?, color?}   huge words in the head font; with "behind": true they sit behind the person
@@ -225,7 +225,7 @@ for i, c in enumerate(edit.get("cards", [])):
         if not src: print(f"warning: overlay not found: {c['src']} (download it first)"); continue
         mode = {"box": "big"}.get(c.get("mode", "big"), c.get("mode", "big"))
         x, y, ow, oh = c.get("box") or {"full": (0, 0, 1080, 1920), "big": (90, 150, 900, 640), "small-r": (600, 170, 400, 500),
-                        "small-l": (80, 170, 400, 500)}.get(mode, (90, 150, 900, 640))   # "box": where they dragged it on the page
+                        "small-l": (80, 170, 400, 500), "tiny": (760, 260, 200, 200)}.get(mode, (90, 150, 900, 640))   # "box": where they dragged it on the page
         full = ow >= 1080 and oh >= 1920
         if not full and y < CAP_Y + 150 and y + oh > CAP_Y - 60: quiet.append((a, b))   # sits on the caption line: captions step aside
         fx = c.get("effect", "soft")

@@ -76,7 +76,7 @@
 
   // where an uploaded overlay sits on the 1080x1920 frame, per size choice (build_reel.py uses the same boxes)
   const OVERLAY_PLACE = { full: [0, 0, 1080, 1920], big: [90, 150, 900, 640], box: [90, 150, 900, 640],
-                          "small-r": [600, 170, 400, 500], "small-l": [80, 170, 400, 500] };
+                          "small-r": [600, 170, 400, 500], "small-l": [80, 170, 400, 500], tiny: [760, 260, 200, 200] };
 
   // graphics anchored to source words -> cut-time windows; a card ends with its phrase unless endWord is set
   function graphics(reel, d, P) {

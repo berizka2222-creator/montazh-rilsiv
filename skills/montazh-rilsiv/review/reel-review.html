@@ -1,6 +1,6 @@
 <title>Перегляд рілса</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Caveat:wght@700&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@1,9..144,300;1,9..144,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 /* layout: sticky phone-shaped player on the left (stacks at phone width), the active review step on the right */
 :root{
@@ -8,7 +8,8 @@
   --pink:#ED84B0; --pink-soft:#FFEEF5; --now:#FCE3EE; --glow:rgba(237,132,176,.25); --on-accent:#141414;
   --cut-bg:#141414; --cut-fg:#FFEEF5; --auto:#9A7F8B;
   --keep:#2F7D5B; --change:#B8741A; --drop:#B4234F; --warn:#9C5B00;
-  --f-display:"Caveat",cursive; --f-body:"Manrope",system-ui,-apple-system,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,monospace;
+  --f-display:"Fraunces",Georgia,serif; --f-body:"Manrope",system-ui,-apple-system,sans-serif; --f-mono:"IBM Plex Mono",ui-monospace,monospace;
+  --accent:var(--pink); --glow1:transparent; --glow2:transparent; --grid:transparent;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161013;--surface:#21181C;--ink:#FFEEF5;--muted:#C9A9B7;--line:#3A2A31;--pink-soft:#2C1D24;--now:#3A2430;--cut-bg:#ED84B0;--cut-fg:#141414;--auto:#A88E9A;--keep:#6FCF9F;--change:#F2B45C;--drop:#FF7A9C;--warn:#F2B45C;color-scheme:dark}}
 :root[data-theme="dark"]{--bg:#161013;--surface:#21181C;--ink:#FFEEF5;--muted:#C9A9B7;--line:#3A2A31;--pink-soft:#2C1D24;--now:#3A2430;--cut-bg:#ED84B0;--cut-fg:#141414;--auto:#A88E9A;--keep:#6FCF9F;--change:#F2B45C;--drop:#FF7A9C;--warn:#F2B45C;color-scheme:dark}
@@ -40,7 +41,7 @@ h1{font-family:var(--f-display);font-size:44px;line-height:1;margin:0;color:var(
 .tab{font:inherit;font-weight:700;font-size:14px;border:2px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer;display:flex;gap:7px;align-items:center}
 .tab[aria-selected="true"]{border-color:var(--pink);background:var(--pink);color:var(--on-accent)}
 .tab .dot{width:8px;height:8px;border-radius:50%;background:var(--keep)}
-.lede{margin:0 0 10px;color:var(--muted);font-size:15px;max-width:66ch}
+.lede{margin:0 0 8px;color:var(--muted);font-size:14px;max-width:62ch}
 .tally{font:500 13px var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums;margin-bottom:10px;display:flex;gap:6px 14px;flex-wrap:wrap}
 .tally b{color:var(--ink)}
 button.b{font:inherit;font-weight:700;font-size:14px;border-radius:999px;padding:7px 14px;border:2px solid var(--pink);background:var(--surface);color:var(--ink);cursor:pointer}
@@ -124,24 +125,59 @@ summary{cursor:pointer;font-weight:700}
 .ovform{margin-top:0}
 .ovform .row{display:flex;gap:6px 14px;flex-wrap:wrap;align-items:center;margin-top:8px;font-size:14px}
 .ovform input[type=number]{width:80px}
+.reelpick{display:flex;gap:8px;align-items:center;font-size:14px;font-weight:700}
+.reelpick select{font:inherit;font-size:14px;font-weight:600;border-radius:10px;border:2px solid var(--line);background:var(--surface);color:var(--ink);padding:5px 8px;flex:1;min-width:0}
 .ovform select{font:inherit;font-size:14px;border-radius:10px;border:2px solid var(--line);background:var(--surface);color:var(--ink);padding:5px 8px;max-width:100%}
 .ovform input[type=file]{font:inherit;font-size:13px;max-width:100%}
-.gbox.place{pointer-events:auto;cursor:grab;touch-action:none;border:3px solid var(--pink);background-color:var(--now);font-size:12px;align-items:center}
+.gbox.place{background-size:contain;background-repeat:no-repeat;background-position:center;pointer-events:auto;cursor:grab;touch-action:none;border:3px solid var(--pink);background-color:var(--now);font-size:12px;align-items:center}
 .gbox.place:active{cursor:grabbing}
+.gbox .rz{position:absolute;right:-9px;bottom:-9px;width:22px;height:22px;border-radius:50%;background:var(--pink);border:3px solid #fff;cursor:nwse-resize;touch-action:none}
 .who{display:inline-block;font:700 11px var(--f-body);letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:2px 8px;margin-right:6px;background:var(--pink-soft);color:var(--pink)}
 .who.mine{background:var(--keep);color:var(--on-accent)}
 .panel{border:2px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:14px;background:var(--surface)}
 .panel label{font-weight:700;font-size:14px;display:block;margin:8px 0 4px}
 .lib{display:flex;flex-wrap:wrap;gap:8px}
-.lib button{width:64px;height:80px;border-radius:10px;border:2px solid var(--line);background:#222 center/cover;color:#fff;font:600 10px var(--f-body);padding:2px;cursor:pointer;overflow:hidden;text-shadow:0 1px 2px #000}
+.lib button{width:64px;height:80px;border-radius:10px;border:2px solid var(--line);background:#222 center/contain no-repeat;color:#fff;font:600 10px var(--f-body);padding:2px;cursor:pointer;overflow:hidden;text-shadow:0 1px 2px #000}
 .lib button[aria-pressed="true"]{border-color:var(--pink);box-shadow:0 0 0 3px var(--pink-soft)}
 .sr{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
 .sr input{max-width:200px}
+
+/* look: the brand's page tokens (brand.json "page"): grid + soft glows on the background, accent pill buttons, mono labels */
+body{position:relative;isolation:isolate}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:72px 72px;-webkit-mask-image:radial-gradient(ellipse 80% 70% at 50% 40%,#000 25%,transparent 80%);mask-image:radial-gradient(ellipse 80% 70% at 50% 40%,#000 25%,transparent 80%)}
+body::after{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;background:radial-gradient(520px 520px at 0% 0%,var(--glow1),transparent 70%),radial-gradient(480px 480px at 100% 100%,var(--glow2),transparent 70%)}
+.eyebrow{font:500 12px var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--accent);display:inline-flex;align-items:center;gap:10px}
+.eyebrow::before{content:"";width:22px;height:1px;background:currentColor}
+h1{font-family:var(--f-body);font-weight:600;font-size:36px;letter-spacing:-.045em;line-height:1;color:var(--ink)}
+h1 em{font-family:var(--f-display);font-style:italic;font-weight:300;letter-spacing:-.02em;color:var(--pink)}
+h2{font-weight:600;letter-spacing:-.025em}
+.player{border:1px solid var(--line);border-radius:28px;box-shadow:0 24px 60px -24px rgba(0,0,0,.6)}
+.tab{border:1px solid var(--line);font-weight:600}
+.tab[aria-selected="true"]{border-color:var(--accent);background:var(--accent);color:var(--on-accent)}
+button.b{border:1px solid var(--line);font-weight:600;transition:transform .3s cubic-bezier(.2,.7,.2,1),background .2s}
+button.b:hover:not(:disabled){transform:translateY(-2px)}
+button.b.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);box-shadow:0 14px 36px -16px var(--accent)}
+.card,.panel,details{border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,var(--surface),transparent)}
+.card.now{border-color:var(--accent)}
+.card .kind{font:500 11px var(--f-mono);letter-spacing:.14em;color:var(--accent)}
+.tc{color:var(--accent);font-family:var(--f-mono)}
+.tally,.ts,.clock,.pz,.tools button{font-family:var(--f-mono)}
+.pill{display:inline-flex;align-items:center;gap:8px;background:var(--pink-soft);border:1px solid var(--line)}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent)}
+.pill.err::before{background:var(--drop);box-shadow:none}
+textarea,input[type=text],input[type=number],.ovform select,.reelpick select{border:1px solid var(--line);background:var(--surface)}
+.seg{border:1px solid var(--line)}
+.seg button[aria-pressed="true"].k{background:var(--accent);color:var(--on-accent)}
+.lib button{border:1px solid var(--line);background-color:var(--surface)}
+.lib button[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--now)}
+.gbox .rz{background:var(--accent)}
 </style>
 
 <div class="wrap">
   <aside class="side">
-    <h1>перегляд рілса</h1>
+    <div class="eyebrow" id="eyebrow">монтаж · перевірка</div>
+    <h1>Перегляд <em>рілса</em></h1>
+    <label class="reelpick" id="reelpick" hidden>Рілс <select id="reelsel" aria-label="Який рілс перевіряєш"></select></label>
     <p class="reel-name" id="reelname">Завантажую рілс…</p>
     <div class="player" id="player">
       <video id="v" playsinline preload="metadata"></video>
@@ -154,7 +190,7 @@ summary{cursor:pointer;font-weight:700}
       <button class="b quiet" id="fwd5" type="button" aria-label="Вперед на 5 секунд">+5s</button>
     </div>
     <div class="scrub"><input type="range" id="scrub" min="0" max="60" step="0.1" value="0" aria-label="Позиція в чорновому монтажі"><span class="tc" id="pos">0:00.0</span></div>
-    <p class="mode" id="mode">Чорновий монтаж грає оригінальне відео одразу з твоїми рішеннями, на таймлайні <b>монтажу</b>. Склейки тут не згладжені, а графіка показана приблизними рамками.</p>
+    <p class="mode" id="mode">Чорновий монтаж: твої рішення одразу на відео. Склейки ще не згладжені, графіка показана рамками.</p>
     <div class="savebar">
       <span class="pill" id="save" aria-live="polite">Не завантажено</span>
       <button class="b quiet" id="retry" type="button" hidden>Зберегти ще раз</button>
@@ -172,27 +208,26 @@ summary{cursor:pointer;font-weight:700}
     </div>
 
     <section data-p="cuts">
-      <p class="lede">Закреслені слова вирізані. Тапни слово, щоб вирізати або повернути його; проведи по фразі, щоб змінити всю. Тапни час <b>оригіналу</b>, щоб послухати цей рядок з необробленого відео.</p>
-      <p class="lede">Прибрано автоматично, і це можна повернути: слова-паразити на кшталт «ем» (сірі, з крапками) і паузи між словами (позначки ⏸, скорочені приблизно до 0,1 с). Тапни, щоб залишити. Паузу після питання або довгу паузу після речення залишено за замовчуванням. Повтори фраз система не прибирає, поки ти їх не виріжеш.</p>
+      <p class="lede">Тапни слово, щоб вирізати або повернути. Проведи по фразі, щоб змінити всю. Тапни час, щоб послухати рядок.</p>
+      <p class="lede">Сірі «ем» і паузи ⏸ прибрано автоматично. Тапни, щоб залишити.</p>
       <div class="tally" id="ctally"></div>
       <div id="tx"><div class="empty">Текст з'явиться тут, коли рілс завантажиться.</div></div>
     </section>
 
     <section data-p="overlays" hidden>
-      <p class="lede"><b>Крок 2: твої накладення.</b> Спершу розстав свої фото, скріни й відео, а графіку й моушн Claude додасть уже навколо них, щоб нічого не налазило. Постав чорновий монтаж на потрібну секунду, обери файл, розмір і ефект, перетягни рамку на відео. Коли все розставиш, напиши Claude «графіка».</p>
-      <p class="lede" id="ovnone" hidden>Завантаження тут недоступне: кинь файли в папку рілса й напиши Claude, на яких секундах.</p>
+      <p class="lede"><b>Крок 2.</b> Розстав свої фото й відео, графіку Claude додасть навколо. Потім напиши Claude «графіка».</p>
+      <p class="lede" id="ovnone" hidden>Завантаження недоступне: кинь файли в папку рілса й напиши секунди.</p>
       <details class="ovform" id="ovbox" open>
       <summary>+ Накладення тут <span class="tc" id="ovat">0:00.0</span></summary>
-      <p class="mode">Фото, скрін або відео з цього моменту чорнового монтажу (від найближчого слова). До 20 МБ; більший файл кинь у папку рілса й напиши Claude.</p>
+      <p class="mode">Фото, скрін або відео до 20 МБ з цієї секунди.</p>
       <div class="row" role="radiogroup" aria-label="Що додаємо"><label><input type="radio" name="ovkind" value="file" checked> Фото / відео</label><label><input type="radio" name="ovkind" value="text"> Текст</label></div>
       <div class="row" id="ovtextrow" hidden><input type="text" id="ovtext" placeholder="Напр.: ТАРГЕТ або без / клієнтів (/ = новий рядок)" aria-label="Текст накладення"></div>
       <div class="row" id="ovfilerow"><input type="file" id="ovfile" accept="image/png,image/jpeg,image/webp,video/mp4,video/quicktime" aria-label="Файл накладення"></div>
       <div class="row" id="ovsaverow"><label><input type="checkbox" id="ovsave"> Зберегти в «Мої файли» для наступних рілсів</label></div>
       <div class="row"><label><input type="checkbox" id="ovbehind"> <b>За мною</b>: поставити за тобою (Claude виріже тебе тільки на ці секунди й покладе поверх; рендер на ~1 хв довший)</label></div>
       <div id="libbox" hidden><p class="mode" style="margin-top:8px"><b>Або з «Моїх файлів»:</b> тапни, щоб обрати.</p><div class="lib" id="lib"></div></div>
-      <p class="mode" style="margin-top:8px"><b>Місце:</b> перетягни рамку на відео вище, куди хочеш.</p>
-      <div class="row"><label for="ovmode">Розмір</label>
-        <select id="ovmode"><option value="small-r">Маленьке, праворуч</option><option value="small-l">Маленьке, ліворуч</option><option value="big">Велике, вгорі</option><option value="full">На весь екран</option></select></div>
+      <p class="mode" style="margin-top:8px"><b>Місце:</b> перетягни рамку. <b>Розмір:</b> тягни кружечок у кутку.</p>
+      <div class="row"><label><input type="checkbox" id="ovfull"> На весь екран</label></div>
       <div class="row"><label for="oveffect">Ефект</label>
         <select id="oveffect"><option value="soft">Плавна поява</option><option value="slide">Виліт збоку</option><option value="polaroid">Полароїд (рамка з нахилом)</option><option value="glass">Скло (як твої картки)</option><option value="zoom">Повільне наближення</option></select></div>
       <div class="row"><label for="ovdur">Скільки секунд</label><input type="number" id="ovdur" value="3" min="0.5" max="30" step="0.5"></div>
@@ -203,7 +238,7 @@ summary{cursor:pointer;font-weight:700}
     </section>
 
     <section data-p="graphics" hidden>
-      <p class="lede">Усе, що з'явиться поверх відео, за часом: <b>твої накладення</b> і <b>графіка від Claude</b>, на таймлайні <b>монтажу</b>. Мініатюра показує приблизне розташування на кадрі з цього моменту, а не фінальну анімацію. Залиш її, попроси змінити (твоя нотатка лишиться при цій графіці) або прибери.</p>
+      <p class="lede">Усе поверх відео за часом. Залиш, попроси змінити або прибери.</p>
       <div class="panel">
         <label for="hooktext">Хук: заголовок на початку</label>
         <input type="text" id="hooktext" placeholder="Напр.: Чому не / виходить / заробляти? (/ = новий рядок)">
@@ -216,7 +251,7 @@ summary{cursor:pointer;font-weight:700}
     </section>
 
     <section data-p="captions" hidden>
-      <p class="lede">Субтитри йдуть за нарізкою: якщо слова вирізано, субтитр зникає, а час зсувається разом з монтажем. Тапни слово, щоб зробити його акцентом. <b>правити</b> виправляє текст, ±0,1 зсуває початок, <b>об'єднати</b> склеює з наступним. У плеєрі статичне прев'ю стилю твоїми шрифтами; у фінальному відео субтитри ще й анімовані.</p>
+      <p class="lede">Тапни слово, щоб зробити його акцентом. <b>правити</b> змінює текст, ±0,1 зсуває початок, <b>об'єднати</b> склеює з наступним.</p>
       <div class="sr"><input type="text" id="srfind" placeholder="Знайти слово" aria-label="Знайти слово"><input type="text" id="srrepl" placeholder="Замінити на" aria-label="Замінити на"><button class="b" id="srgo" type="button">Замінити всюди</button><span class="mode" id="srmsg" aria-live="polite"></span></div>
       <div class="tally" id="captally"></div>
       <div class="caps" id="caps"><div class="empty">Субтитри з'являться тут, коли рілс завантажиться.</div></div>
@@ -224,19 +259,19 @@ summary{cursor:pointer;font-weight:700}
 
     <section data-p="sound" hidden>
       <h2>Чистка голосу</h2>
-      <p class="lede">Ті самі 10 секунд до і після: легке прибирання шуму, де-есер, еквалайзер і компресія, гучність під стандарт Instagram.</p>
+      <p class="lede">Ті самі 10 секунд до і після чистки.</p>
       <div class="ctl" id="voiceclean" style="margin-bottom:12px"></div>
       <div class="pair" id="audio"></div>
       <h2>Колір</h2>
       <p class="lede">Один кадр до і після кольорокорекції.</p>
       <div class="pair" id="colour"></div>
       <h2>Звукові ефекти</h2>
-      <p class="lede">Кожен звук стоїть на появі графіки, у вказаний момент монтажу. Натисни «Слухати», щоб почути; вимкни ті, що не потрібні. Це звуки для прев'ю; у варіанті з CapCut їх замінять звуки з бібліотеки CapCut.</p>
+      <p class="lede">Звуки на появі графіки. Вимкни зайві.</p>
       <div id="cues"></div>
     </section>
 
     <section data-p="preview" hidden>
-      <p class="lede">«Зібрати чернетку» рендерить відео з твоїми поточними рішеннями (приблизно 3 хвилини). Переглянь і залиш нотатки на конкретних секундах перед фінальним експортом.</p>
+      <p class="lede">Збирає відео з твоїми рішеннями (~3 хв). Потім залиш нотатки на потрібних секундах.</p>
       <div class="state" id="bstate">Чернетку ще не зібрано.</div>
       <div class="ctl"><button class="b primary" id="build" type="button">Зібрати чернетку</button></div>
       <h2>Нотатки до чернетки</h2>
@@ -250,7 +285,7 @@ summary{cursor:pointer;font-weight:700}
       <div class="ctl"><span id="resetbox"><button class="b quiet" id="reset" type="button">Скинути цей розділ</button></span></div>
       <details>
         <summary>Змінити налаштування бренду (для всіх наступних рілсів)</summary>
-        <p class="lede">Заповнюй тільки для постійної зміни, наприклад «субтитри завжди на розмір менші». Нотатки вище стосуються лише цього рілса.</p>
+        <p class="lede">Тільки для постійних змін, напр. «субтитри завжди менші».</p>
         <textarea id="brand" placeholder="Залиш порожнім, якщо не хочеш змінювати всі наступні рілси."></textarea>
       </details>
     </div>
@@ -304,7 +339,7 @@ function showTab(t) {
   $("#notes").value = S.notes[t] || ""; $("#resetbox").hidden = t === "preview";
   stopPlay();
   if (t !== "overlays" && placing && !placing.id) stopPlacing();
-  if (t === "overlays" && assets && $("#ovbox").open && !placing) setTimeout(() => startPlacing(OV_PLACE[$("#ovmode").value]), 0);
+  if (t === "overlays" && assets && $("#ovbox").open && !placing) setTimeout(() => startPlacing(OV_PLACE[ovMode()]), 0);
   if (t === "preview") { if (B?.url && v.getAttribute("src") !== B.url) { v.setAttribute("src", B.url); v.load(); } $("#rough").hidden = $("#back5").hidden = $("#fwd5").hidden = true; $(".scrub").hidden = true; v.controls = true; }
   else { if (v.getAttribute("src") !== R.srcUrl) { v.setAttribute("src", R.srcUrl); v.load(); } $("#rough").hidden = $("#back5").hidden = $("#fwd5").hidden = false; $(".scrub").hidden = false; v.controls = false; }
   overlay(pos);
@@ -384,6 +419,7 @@ function box(g, label) {
   const el = document.createElement("div"); el.className = "gbox";
   Object.assign(el.style, { left: x / 10.8 + "%", top: y / 19.2 + "%", width: w / 10.8 + "%", height: h / 19.2 + "%" });
   if (g.imgUrl) el.style.backgroundImage = `linear-gradient(rgba(237,132,176,.15),rgba(237,132,176,.15)),url(${JSON.stringify(g.imgUrl)})`;
+  if (g.imgUrl && g.user) Object.assign(el.style, { backgroundSize: "contain", backgroundRepeat: "no-repeat", backgroundPosition: "center" });   // their own pictures: shown whole
   if (label) el.textContent = g.kind;
   return el;
 }
@@ -489,7 +525,7 @@ function renderGraphics() {
   const n = cardList($("#cards"), all), m = cardList($("#ovcards"), mine);
   $("#gtally").innerHTML = `<span>усього: <b>${all.length}</b></span><span>твоїх: <b>${own}</b></span><span>від Claude: <b>${all.length - own}</b></span><span>змінити: <b>${n.c}</b></span><span>прибрати: <b>${n.d}</b></span>`;
   $("#otally").innerHTML = mine.length ? `<span>твоїх накладень: <b>${mine.length}</b></span>` : "";
-  if (!mine.length) $("#ovcards").innerHTML = `<div class="empty">Накладень ще немає. Додай перше формою вище або переходь до «Графіки».</div>`;
+  if (!mine.length) $("#ovcards").innerHTML = `<div class="empty">Накладень ще немає.</div>`;
 }
 function cardList(box, list) {
   box.textContent = ""; const n = { k: 0, c: 0, d: 0 };
@@ -542,7 +578,8 @@ const box_ = g => box(g, false);
 // ---------- overlays they upload: an image or video from the current rough-cut moment ----------
 let assets = null;
 // where an overlay goes: a box they drag on the player (1080x1920 frame units); size presets set its width and height
-const OV_PLACE = { "small-r": [600, 170, 400, 500], "small-l": [80, 170, 400, 500], big: [90, 150, 900, 640], full: [0, 0, 1080, 1920], text: [40, 360, 1000, 280] };
+const ovMode = () => $("#ovfull").checked ? "full" : "box";
+const OV_PLACE = { box: [600, 170, 400, 500], tiny: [760, 260, 200, 200], "small-r": [600, 170, 400, 500], "small-l": [80, 170, 400, 500], big: [90, 150, 900, 640], full: [0, 0, 1080, 1920], text: [40, 360, 1000, 280] };
 const ovKind = () => document.querySelector('input[name="ovkind"]:checked').value;
 document.querySelectorAll('input[name="ovkind"]').forEach(r => r.addEventListener("change", () => {
   const txt = ovKind() === "text"; $("#ovtextrow").hidden = !txt; $("#ovfilerow").hidden = txt; $("#ovsaverow").hidden = txt; $("#libbox").hidden = txt || !LIB.length;
@@ -554,6 +591,16 @@ function startPlacing(place, id) {
   stopPlay(); placing = { place: [...place], id, img: placing?.img }; mode = "roughPaused"; $("#clock").hidden = false;
   v.currentTime = P.toSrc(pos); overlay(pos); renderGraphics();
   if (id) setTimeout(() => $("#player").scrollIntoView({ block: "center" }), 0);   // narrow screens: the player is not sticky, bring it to the box
+}
+function fitToImage(url) {   // the box takes the picture's proportions, so nothing gets cropped
+  if (!url || !placing) return;
+  const im = new Image(); im.onload = () => {
+    if (!placing || !im.naturalWidth) return;
+    const p = placing.place; if (p[2] >= 1080 && p[3] >= 1920) return;
+    const cx = p[0] + p[2] / 2, cy = p[1] + p[3] / 2, r = im.naturalHeight / im.naturalWidth;
+    let w = p[2], h = Math.round(w * r); if (h > 1800) { h = 1800; w = Math.round(h / r); }
+    placing.place = [Math.round(clamp(cx - w / 2, 0, 1080 - w)), Math.round(clamp(cy - h / 2, 0, 1920 - h)), w, h]; overlay(pos);
+  }; im.src = url;
 }
 function stopPlacing() { placing = null; overlay(pos); renderGraphics(); }
 function placeBox() {
@@ -570,17 +617,27 @@ function placeBox() {
       if (placing?.id) { const id = placing.id, np = [...p]; mutate(() => { const o = (S.overlays || []).find(x => x.id === id); if (o) o.place = np; }); } };
     el.addEventListener("pointermove", mv); el.addEventListener("pointerup", up);
   });
+  if (p[2] < 300 || p[3] < 160) el.style.fontSize = "0";   // a sticker-sized box: no label, just the picture and the corner
+  const rz = document.createElement("div"); rz.className = "rz"; rz.title = "Тягни, щоб змінити розмір"; el.appendChild(rz);
+  rz.addEventListener("pointerdown", e => {   // the corner: any size from a sticker (~80 px) up to the whole frame
+    e.preventDefault(); e.stopPropagation(); rz.setPointerCapture(e.pointerId);
+    const k = 1080 / $("#player").clientWidth, sx = e.clientX, sy = e.clientY, w0 = p[2], h0 = p[3];
+    const mv = ev => { p[2] = Math.round(clamp(w0 + (ev.clientX - sx) * k, 80, 1080 - p[0])); p[3] = Math.round(clamp(h0 + (ev.clientY - sy) * k, 80, 1920 - p[1]));
+                       el.style.width = p[2] / 10.8 + "%"; el.style.height = p[3] / 19.2 + "%"; };
+    const up = () => { rz.removeEventListener("pointermove", mv); rz.removeEventListener("pointerup", up);
+      if (placing?.id) { const id = placing.id, np = [...p]; mutate(() => { const o = (S.overlays || []).find(x => x.id === id); if (o) o.place = np; }); } };
+    rz.addEventListener("pointermove", mv); rz.addEventListener("pointerup", up);
+  });
   return el;
 }
-$("#ovbox").addEventListener("toggle", () => { if ($("#ovbox").open) startPlacing(OV_PLACE[$("#ovmode").value]); else if (placing && !placing.id) stopPlacing(); });
-$("#ovmode").addEventListener("change", () => {   // new size, same centre
-  const [w, h] = OV_PLACE[$("#ovmode").value].slice(2), p = placing ? placing.place : OV_PLACE.big, cx = p[0] + p[2] / 2, cy = p[1] + p[3] / 2;
-  const np = w >= 1080 ? [0, 0, 1080, 1920] : [Math.round(clamp(cx - w / 2, 0, 1080 - w)), Math.round(clamp(cy - h / 2, 0, 1920 - h)), w, h];
+$("#ovbox").addEventListener("toggle", () => { if ($("#ovbox").open) startPlacing(OV_PLACE[ovMode()]); else if (placing && !placing.id) stopPlacing(); });
+$("#ovfull").addEventListener("change", () => {   // full screen on/off; any other size is the box they drag and resize
+  const np = [...OV_PLACE[ovMode()]];
   if (placing) { placing.place = np; overlay(pos); } else startPlacing(np);
 });
 $("#ovtext").addEventListener("input", () => { if (placing && !placing.id) overlay(pos); });
 $("#ovfile").addEventListener("change", () => { const f = $("#ovfile").files[0];
-  if (placing) { placing.img = f && f.type.startsWith("image") ? URL.createObjectURL(f) : null; overlay(pos); } });
+  if (placing) { placing.img = f && f.type.startsWith("image") ? URL.createObjectURL(f) : null; overlay(pos); fitToImage(placing.img); } });
 function wordAtCut(c) {   // the kept word nearest this rough-cut moment: overlays hang on words so they move with the cut
   const src = P.toSrc(c); let best = null;
   for (const i of P.kept) if (!R.words[i].filler && (best === null || Math.abs(R.words[i].s - src) < Math.abs(R.words[best].s - src))) best = i;
@@ -601,7 +658,7 @@ $("#ovadd").addEventListener("click", async () => {
   if (!assets) { msg.textContent = "Завантаження тут недоступне. Кинь файл у папку рілса й напиши Claude."; return; }
   if (f && f.size > 20 * 1024 * 1024) { msg.textContent = "Файл більший за 20 МБ. Кинь його в папку рілса й напиши Claude, на якій секунді."; return; }
   const w0 = wordAtCut(pos); if (w0 === null) { msg.textContent = "Тут немає жодного слова в нарізці."; return; }
-  const at = pos, mode = $("#ovmode").value, effect = $("#oveffect").value, dur = Math.min(30, Math.max(0.5, +$("#ovdur").value || 3));
+  const at = pos, mode = ovMode(), effect = $("#oveffect").value, dur = Math.min(30, Math.max(0.5, +$("#ovdur").value || 3));
   btn.disabled = true; msg.textContent = "Завантажую…";
   try {
     const up = pick ? { id: pick.id, url: pick.url } : await assets.upload(f);
@@ -633,7 +690,7 @@ function renderLib() {
     const b = document.createElement("button"); b.type = "button"; b.title = it.name; b.setAttribute("aria-pressed", libPick?.id === it.id);
     if (it.kind === "image") b.style.backgroundImage = `url(${JSON.stringify(it.url)})`; else b.textContent = "▶ " + it.name;
     b.addEventListener("click", () => { libPick = libPick?.id === it.id ? null : it; $("#ovfile").value = "";
-      if (placing) { placing.img = libPick && libPick.kind === "image" ? libPick.url : null; overlay(pos); } renderLib(); });
+      if (placing) { placing.img = libPick && libPick.kind === "image" ? libPick.url : null; overlay(pos); fitToImage(placing.img); } renderLib(); });
     box.appendChild(b);
   }
 }
@@ -743,9 +800,9 @@ function renderPreview() {
   const h = ReelCore.hash(decisions()), st = $("#bstate");
   st.className = "state";
   if (B?.url && B.hash === h) { st.textContent = `Чернетка актуальна (зібрано ${new Date(B.at).toLocaleString("uk-UA")}). Натисни play на відео.`; st.classList.add("ok"); }
-  else if (B?.url) { st.textContent = "Чернетка застаріла: ти змінила рішення після збірки. Збери ще раз, щоб їх побачити."; st.classList.add("out"); }
-  else if (S.buildRequest?.hash === h) st.textContent = "Запит на збірку збережено. Напиши Claude в чаті «збери чернетку»: сама сторінка рендер не запускає.";
-  else st.textContent = "Чернетку ще не зібрано. Збери, коли рішення виглядатимуть правильно.";
+  else if (B?.url) { st.textContent = "Чернетка застаріла: рішення змінились. Збери ще раз."; st.classList.add("out"); }
+  else if (S.buildRequest?.hash === h) st.textContent = "Запит збережено. Напиши Claude «збери чернетку».";
+  else st.textContent = "Чернетку ще не зібрано.";
   const revs = $("#revs"); revs.textContent = "";
   S.revisions.forEach((r, k) => {
     const row = document.createElement("div"); row.className = "rev";
@@ -756,7 +813,7 @@ function renderPreview() {
     del.addEventListener("click", () => mutate(() => S.revisions.splice(k, 1)));
     row.append(t, x, del); revs.appendChild(row);
   });
-  if (!S.revisions.length) revs.innerHTML = `<div class="empty">Нотаток ще немає. Зупини чернетку там, де щось не так, опиши й додай нотатку.</div>`;
+  if (!S.revisions.length) revs.innerHTML = `<div class="empty">Нотаток ще немає.</div>`;
 }
 $("#build").addEventListener("click", () => mutate(() => { S.buildRequest = { hash: ReelCore.hash(decisions()), at: new Date().toISOString() }; }));
 $("#revadd").addEventListener("click", () => {
@@ -772,48 +829,78 @@ function renderAll() {
 }
 
 // ---------- load ----------
-(async () => {
-  const db = await window.claude?.use?.("db");
-  if (!db) { pill("Тут рілс не завантажиться. Відкрий сторінку за посиланням з claude.ai.", true); $("#reelname").textContent = "Немає з'єднання."; return; }
+// One reel: docs reel/current, review/current, builds/latest. A batch: reel/index lists them, and each has reel/<id>, review/<id>, builds/<id>.
+let DB = null, subs = [], LIST = [], loadNo = 0;   // loadNo: listeners of a reel we switched away from ignore their events
+const docsFor = id => ({ reel: "reel/" + id, review: "review/" + id, build: id === "current" ? "builds/latest" : "builds/" + id });
+function pickReel() { let id = null; try { id = localStorage.getItem("reelPick"); } catch (e) {} return LIST.some(x => x.id === id) ? id : (LIST.find(x => !/фінал/i.test(x.status || "")) || LIST[0]).id; }
+function renderPick(cur) {
+  const sel = $("#reelsel"); sel.textContent = ""; $("#reelpick").hidden = LIST.length < 2;
+  LIST.forEach((x, k) => { const o = document.createElement("option"); o.value = x.id; o.textContent = `${k + 1}. ${x.title || x.id}${x.status ? " · " + x.status : ""}`; o.selected = x.id === cur; sel.appendChild(o); });
+}
+$("#reelsel").addEventListener("change", async e => {
+  try { localStorage.setItem("reelPick", e.target.value); } catch (er) {}
+  if (dirty) { clearTimeout(timer); saveNow(); }
+  await saving.catch(() => {});
+  load(e.target.value);
+});
+async function load(id) {
+  for (const u of subs) if (typeof u === "function") try { u(); } catch (e) {}
+  subs = []; stopPlay(); placing = null; R = null; B = null; S = blank(); undo = []; $("#undo").disabled = true; dirty = false; mine = null; pos = 0;
+  renderPick(id); $("#reelname").textContent = "Завантажую рілс…"; pill("Завантажую…");
+  const d = docsFor(id), my = ++loadNo, live = () => my === loadNo;
   try {
-    const rs = await db.doc("reel/current").get();
+    const rs = await DB.doc(d.reel).get(); if (!live()) return;
     if (!rs.exists) { $("#reelname").textContent = "Рілс ще не завантажено. Попроси Claude його завантажити."; pill("Нічого переглядати", true); return; }
     R = rs.data();
     if (R.theme) {   // brand colours from brand.json
       const rt = document.documentElement;
-      for (const [k, val] of Object.entries(R.theme)) if (k !== "scheme") rt.style.setProperty("--" + k, val);
+      for (const [k, val] of Object.entries(R.theme)) if (k !== "scheme" && k !== "label") rt.style.setProperty("--" + k, val);
+      if (R.theme.label) $("#eyebrow").textContent = R.theme.label;
       rt.setAttribute("data-theme", R.theme.scheme || "light"); rt.style.colorScheme = R.theme.scheme || "light";
     }
-    if (R.fonts) {   // brand fonts, so the caption preview uses the real faces
+    if (R.fonts && !document.getElementById("brandfonts")) {   // brand fonts, so the caption preview uses the real faces
       const css = [["rb", R.fonts.body], ["ra", R.fonts.accent]].filter(f => f[1]).map(([n, u]) => `@font-face{font-family:${n};src:url(${u});font-display:swap}`).join("");
-      document.head.appendChild(Object.assign(document.createElement("style"), { textContent: css }));
+      document.head.appendChild(Object.assign(document.createElement("style"), { id: "brandfonts", textContent: css }));
       const rt = document.documentElement;   // the brand's fonts for the whole page
       if (R.fonts.accent) rt.style.setProperty("--f-display", '"ra", Georgia, serif');
       if (R.fonts.body) rt.style.setProperty("--f-body", '"rb", system-ui, sans-serif');
     }
-    assets = await window.claude?.use?.("assets");   // only editors get it; others don't see the overlay button
-    $("#ovbox").hidden = !assets; $("#ovnone").hidden = !!assets;
-    libRef = db.doc("library/files");   // «Мої файли» live across reels
-    try { const l = await libRef.get(); LIB = l.exists ? (l.data().items || []) : []; } catch (e) { LIB = []; }
-    renderLib();
-    ref = db.doc("review/current");
-    const rv = await ref.get(); if (rv.exists) S = { ...blank(), ...JSON.parse(JSON.stringify(rv.data())) };
+    ref = DB.doc(d.review);
+    const rv = await ref.get(); if (!live()) return; if (rv.exists) S = { ...blank(), ...JSON.parse(JSON.stringify(rv.data())) };
     // someone else (Claude, another tab) changed the decisions: take theirs instead of saving a stale copy over it
-    ref.onSnapshot(s => {
-      if (!s.exists || !R) return;
+    subs.push(ref.onSnapshot(s => {
+      if (!live() || !s.exists || !R) return;
       const d = s.data(); if (d.updatedAt === mine || dirty) return;
       if (JSON.stringify({ ...blank(), ...JSON.parse(JSON.stringify(d)) }) === JSON.stringify({ ...S })) return;   // same decisions (fields blank() adds included): nothing changed
       S = { ...blank(), ...JSON.parse(JSON.stringify(d)) }; undo = []; $("#undo").disabled = true;
       recompute(); renderAll(); setPos(pos); pill("Оновлено Claude");
-    }, () => {});
+    }, () => {}));
     let firstReel = true;
-    db.doc("reel/current").onSnapshot(() => { if (firstReel) { firstReel = false; return; } pill("Claude завантажив нове відео: онови сторінку", true); }, () => {});
-    db.doc("builds/latest").onSnapshot(s => { B = s.exists ? s.data() : null; if (R) renderPreview(); if (tab === "preview") showTab("preview"); }, () => {});
+    subs.push(DB.doc(d.reel).onSnapshot(() => { if (!live()) return; if (firstReel) { firstReel = false; return; } pill("Claude оновив цей рілс: онови сторінку", true); }, () => {}));
+    subs.push(DB.doc(d.build).onSnapshot(s => { if (!live()) return; B = s.exists ? s.data() : null; if (R) renderPreview(); if (tab === "preview") showTab("preview"); }, () => {}));
     recompute();
     $("#reelname").textContent = `${R.title} · оригінал ${fmt(R.srcDur)} → рілс ${fmt(P.cutDur)}`; setPos(0);
     $("#brand").value = S.brandRequest || "";
-    renderAll(); showTab(["cuts", "overlays", "graphics", "captions", "sound", "preview"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "cuts");
+    renderAll(); showTab(["cuts", "overlays", "graphics", "captions", "sound", "preview"].includes(location.hash.slice(1)) ? location.hash.slice(1) : tab || "cuts");
     pill(rv.exists ? "Збережені рішення завантажено" : "Готово");
-  } catch (e) { pill("Не вдалося завантажити рілс (" + (e?.code || "error") + "). Онови сторінку.", true); }
+  } catch (e) { if (live()) pill("Не вдалося завантажити рілс (" + (e?.code || "error") + "). Онови сторінку.", true); }
+}
+(async () => {
+  DB = await window.claude?.use?.("db");
+  if (!DB) { pill("Тут рілс не завантажиться. Відкрий сторінку за посиланням з claude.ai.", true); $("#reelname").textContent = "Немає з'єднання."; return; }
+  assets = await window.claude?.use?.("assets");   // only editors get it; others don't see the overlay button
+  $("#ovbox").hidden = !assets; $("#ovnone").hidden = !!assets;
+  libRef = DB.doc("library/files");   // «Мої файли» live across reels
+  try { const l = await libRef.get(); LIB = l.exists ? (l.data().items || []) : []; } catch (e) { LIB = []; }
+  renderLib();
+  const idx = DB.doc("reel/index");   // a batch of reels; without it the page shows reel/current as before
+  try { const x = await idx.get(); LIST = x.exists ? (x.data().items || []) : []; } catch (e) { LIST = []; }
+  if (!LIST.length) LIST = [{ id: "current" }];
+  const first = pickReel(); load(first);
+  idx.onSnapshot(s => {   // Claude adds the next reel or changes a status while they review: refresh the picker only
+    const items = s.exists ? (s.data().items || []) : []; if (!items.length) return;
+    const added = items.length > LIST.length; LIST = items; renderPick($("#reelsel").value || first);
+    if (added) pill("Наступний рілс готовий до перевірки: обери його зверху");
+  }, () => {});
 })();
 </script>

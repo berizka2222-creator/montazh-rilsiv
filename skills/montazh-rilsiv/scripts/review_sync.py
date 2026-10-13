@@ -21,7 +21,12 @@ norm = lambda s: re.sub(r"[\W_]", "", s.lower())
 def _rgb(h):
     h = h.lstrip("#"); return tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
 def _theme(brand):
-    """Review page colours from the brand: dark brands get a dark page, light brands a light one."""
+    """Review page colours from the brand: dark brands get a dark page, light brands a light one.
+    brand.json "page" (optional) overrides any token, e.g. their website look: {"bg", "surface", "accent", "on-accent",
+    "pink", "grid", "glow1", "glow2", "label"}; "label" is the small line above the page title."""
+    t = _theme_base(brand); t.update(brand.get("page") or {}); return t
+
+def _theme_base(brand):
     c = brand.get("colors", {}); main = c.get("main", "#141414"); pop = c.get("pop", "#ED84B0")
     light = c.get("light", "#FFFFFF"); soft = c.get("soft", pop); deep = c.get("deep")
     r, g, b = _rgb(main); dark = (0.299 * r + 0.587 * g + 0.114 * b) < 128
