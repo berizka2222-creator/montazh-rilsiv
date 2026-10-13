@@ -176,6 +176,26 @@ textarea,input[type=text],input[type=number],.ovform select,.reelpick select{bor
 .libbtn:hover{background:var(--accent);color:var(--on-accent)}
 .by{margin:6px 0 0;font:500 11px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .by a{color:var(--accent);text-decoration:none;border-bottom:1px solid currentColor}
+
+/* clarity: numbered steps, one-row player controls, legend, quieter caption tools */
+.tabs{gap:5px}
+.tab{padding:6px 12px 6px 7px;font-size:13.5px;gap:6px}
+.tab .num{font:500 11px var(--f-mono);width:18px;height:18px;border-radius:50%;display:inline-grid;place-items:center;border:1px solid currentColor;opacity:.75}
+.tab[aria-selected="true"] .num{opacity:1}
+.side .ctl{flex-wrap:nowrap}
+.side .ctl #rough{flex:1;min-width:0}
+.noprev{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;background:rgba(7,12,7,.86);color:#F3F4EC;font-weight:600;font-size:15px;line-height:1.5}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;font-size:13px;color:var(--muted);margin:0 0 12px}
+.legend>span{display:inline-flex;align-items:center;gap:6px}
+.legend .w{cursor:default}
+.step{font:500 11px var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:16px 0 2px;padding-top:12px;border-top:1px solid var(--line)}
+.ovform .step:first-of-type{border-top:0;padding-top:0}
+input[type=file]{color:var(--muted);font:inherit;font-size:13px}
+input[type=file]::file-selector-button{font:600 14px var(--f-body);border:1px solid var(--accent);background:transparent;color:var(--accent);border-radius:999px;padding:7px 14px;margin-right:10px;cursor:pointer}
+@media (hover:hover){.caprow .tools{opacity:0;transition:opacity .15s}.caprow:hover .tools,.caprow:focus-within .tools,.caprow.now .tools{opacity:1}}
+.next{display:flex;justify-content:flex-end;margin-top:22px}
+#notesdet{margin-top:0}
+#notesdet summary{font-weight:600}
 </style>
 
 <div class="wrap">
@@ -188,11 +208,12 @@ textarea,input[type=text],input[type=number],.ovform select,.reelpick select{bor
       <video id="v" playsinline preload="metadata"></video>
       <div class="overlay" id="ov"></div>
       <div class="clock" id="clock" hidden></div>
+      <div class="noprev" id="noprev" hidden>Чернетки ще немає.<br>Збери її кнопкою «Зібрати чернетку».</div>
     </div>
     <div class="ctl">
-      <button class="b quiet" id="back5" type="button" aria-label="Назад на 5 секунд">−5s</button>
-      <button class="b primary" id="rough" type="button">Дивитись чорновий монтаж</button>
-      <button class="b quiet" id="fwd5" type="button" aria-label="Вперед на 5 секунд">+5s</button>
+      <button class="b quiet" id="back5" type="button" aria-label="Назад на 5 секунд">−5 с</button>
+      <button class="b primary" id="rough" type="button">▶ Дивитись</button>
+      <button class="b quiet" id="fwd5" type="button" aria-label="Вперед на 5 секунд">+5 с</button>
     </div>
     <div class="scrub"><input type="range" id="scrub" min="0" max="60" step="0.1" value="0" aria-label="Позиція в чорновому монтажі"><span class="tc" id="pos">0:00.0</span></div>
     <p class="mode" id="mode">Чорновий монтаж: твої рішення одразу на відео. Склейки ще не згладжені, графіка показана рамками.</p>
@@ -216,25 +237,28 @@ textarea,input[type=text],input[type=number],.ovform select,.reelpick select{bor
 
     <section data-p="cuts">
       <p class="lede">Тапни слово, щоб вирізати або повернути. Проведи по фразі, щоб змінити всю. Тапни час, щоб послухати рядок.</p>
-      <p class="lede">Сірі «ем» і паузи ⏸ прибрано автоматично. Тапни, щоб залишити.</p>
+      <div class="legend" aria-label="Позначки"><span><span class="w cut">слово</span> вирізано</span><span><span class="w filler">ем</span> прибрано само</span><span><span class="pz">⏸ 0.6s скорочено</span> пауза</span></div>
       <div class="tally" id="ctally"></div>
       <div id="tx"><div class="empty">Текст з'явиться тут, коли рілс завантажиться.</div></div>
     </section>
 
     <section data-p="overlays" hidden>
-      <p class="lede"><b>Крок 2.</b> Розстав свої фото й відео, графіку Claude додасть навколо. Потім напиши Claude «графіка».</p>
+      <p class="lede">Розстав свої фото й відео, графіку Claude додасть навколо. Коли закінчиш, напиши Claude «графіка».</p>
       <p class="lede" id="ovnone" hidden>Завантаження недоступне: кинь файли в папку рілса й напиши секунди.</p>
       <details class="ovform" id="ovbox" open>
       <summary>+ Накладення тут <span class="tc" id="ovat">0:00.0</span></summary>
       <p class="mode">Фото, скрін або відео до 20 МБ з цієї секунди.</p>
+      <div class="step">1 · Що додаємо</div>
       <div class="row" role="radiogroup" aria-label="Що додаємо"><label><input type="radio" name="ovkind" value="file" checked> Фото / відео</label><label><input type="radio" name="ovkind" value="text"> Текст</label></div>
       <div class="row" id="ovtextrow" hidden><input type="text" id="ovtext" placeholder="Напр.: ТАРГЕТ або без / клієнтів (/ = новий рядок)" aria-label="Текст накладення"></div>
       <div class="row" id="ovfilerow"><input type="file" id="ovfile" accept="image/png,image/jpeg,image/webp,video/mp4,video/quicktime" aria-label="Файл накладення"></div>
       <div class="row" id="ovsaverow"><label><input type="checkbox" id="ovsave"> Зберегти в «Мої файли» для наступних рілсів</label></div>
-      <div class="row"><label><input type="checkbox" id="ovbehind"> <b>За мною</b>: поставити за тобою (Claude виріже тебе тільки на ці секунди й покладе поверх; рендер на ~1 хв довший)</label></div>
       <div id="libbox" hidden><p class="mode" style="margin-top:8px"><b>Або з «Моїх файлів»:</b> тапни, щоб обрати.</p><div class="lib" id="lib"></div></div>
-      <p class="mode" style="margin-top:8px"><b>Місце:</b> перетягни рамку. <b>Розмір:</b> тягни кружечок у кутку.</p>
+      <div class="step">2 · Де</div>
+      <p class="mode">Перетягни рамку на відео, а кружечком у кутку зміни розмір.</p>
       <div class="row"><label><input type="checkbox" id="ovfull"> На весь екран</label></div>
+      <div class="row"><label><input type="checkbox" id="ovbehind"> <b>За мною</b>: поставити за тобою (Claude виріже тебе тільки на ці секунди й покладе поверх; рендер на ~1 хв довший)</label></div>
+      <div class="step">3 · Як</div>
       <div class="row"><label for="oveffect">Ефект</label>
         <select id="oveffect"><option value="soft">Плавна поява</option><option value="slide">Виліт збоку</option><option value="polaroid">Полароїд (рамка з нахилом)</option><option value="glass">Скло (як твої картки)</option><option value="zoom">Повільне наближення</option></select></div>
       <div class="row"><label for="ovdur">Скільки секунд</label><input type="number" id="ovdur" value="3" min="0.5" max="30" step="0.5"></div>
@@ -300,10 +324,13 @@ textarea,input[type=text],input[type=number],.ovform select,.reelpick select{bor
       <div id="revs"></div>
     </section>
 
+    <div class="next" id="nextbox"><button class="b primary" id="nextbtn" type="button">Далі →</button></div>
+
     <div class="notes" id="notesbox">
-      <label for="notes">Ще щось щодо розділу «<span id="notetab">нарізка</span>» в цьому рілсі?</label>
-      <textarea id="notes" placeholder="Стосується тільки цього рілса."></textarea>
-      <div class="ctl"><span id="resetbox"><button class="b quiet" id="reset" type="button">Скинути цей розділ</button></span></div>
+      <details id="notesdet"><summary>Нотатка до розділу «<span id="notetab">нарізка</span>»</summary>
+        <textarea id="notes" aria-label="Нотатка до цього розділу" placeholder="Що ще змінити в цьому розділі. Стосується тільки цього рілса."></textarea>
+        <div class="ctl" style="margin-top:8px"><span id="resetbox"><button class="b quiet" id="reset" type="button">Скинути цей розділ</button></span></div>
+      </details>
       <details>
         <summary>Змінити налаштування бренду (для всіх наступних рілсів)</summary>
         <p class="lede">Тільки для постійних змін, напр. «субтитри завжди менші».</p>
@@ -357,15 +384,22 @@ function showTab(t) {
   $$(".tab").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t));
   $$("section[data-p]").forEach(s => s.hidden = s.dataset.p !== t);
   $("#notetab").textContent = { cuts: "нарізка", overlays: "накладення", effects: "ефекти", graphics: "графіка", captions: "субтитри", sound: "звук і колір", preview: "чернетка" }[t];
-  $("#notes").value = S.notes[t] || ""; $("#resetbox").hidden = t === "preview";
+  $("#notes").value = S.notes[t] || ""; $("#notesdet").open = !!(S.notes[t] || "").trim(); $("#resetbox").hidden = t === "preview";
+  { const k = ORDER.indexOf(t), nx = $$(".tab")[k + 1]; $("#nextbox").hidden = !nx;
+    if (nx) $("#nextbtn").textContent = "Далі: " + nx.textContent.replace(/^\d+/, "").trim() + " →"; }
   stopPlay();
   if (t !== "overlays" && placing && !placing.id) stopPlacing();
   if (t === "overlays" && assets && $("#ovbox").open && !placing) setTimeout(() => startPlacing(OV_PLACE[ovMode()]), 0);
+  $("#noprev").hidden = !(t === "preview" && !B?.url);
   if (t === "preview") { if (B?.url && v.getAttribute("src") !== B.url) { v.setAttribute("src", B.url); v.load(); } $("#rough").hidden = $("#back5").hidden = $("#fwd5").hidden = true; $(".scrub").hidden = true; v.controls = true; }
   else { if (v.getAttribute("src") !== R.srcUrl) { v.setAttribute("src", R.srcUrl); v.load(); } $("#rough").hidden = $("#back5").hidden = $("#fwd5").hidden = false; $(".scrub").hidden = false; v.controls = false; }
   overlay(pos);
 }
 $$(".tab").forEach(b => b.addEventListener("click", () => showTab(b.dataset.tab)));
+// the steps in order: a number on each tab and a «Далі» button under each section
+const ORDER = $$(".tab").map(b => b.dataset.tab);
+$$(".tab").forEach((b, k) => { const n = document.createElement("span"); n.className = "num"; n.textContent = k + 1; b.prepend(n); });
+$("#nextbtn").addEventListener("click", () => { const k = ORDER.indexOf(tab); if (k < ORDER.length - 1) { showTab(ORDER[k + 1]); scrollTo({ top: 0, behavior: "smooth" }); } });
 $("#notes").addEventListener("input", e => { S.notes[tab] = e.target.value; queueSave(); });
 $("#brand").addEventListener("input", e => { S.brandRequest = e.target.value; queueSave(); });
 $("#reset").addEventListener("click", () => {
@@ -388,7 +422,7 @@ const resetBtn = $("#reset");
 
 // ---------- playback: line (raw) and continuous rough cut ----------
 let pos = 0;   // where the rough cut is, in cut time: pause, scrub and ±5 s all keep it
-function stopPlay() { mode = "idle"; cancelAnimationFrame(loop); v.pause(); v.playbackRate = 1; $("#rough").textContent = "Дивитись чорновий монтаж"; }
+function stopPlay() { mode = "idle"; cancelAnimationFrame(loop); v.pause(); v.playbackRate = 1; $("#rough").textContent = "▶ Дивитись"; }
 function setPos(c) {
   pos = Math.max(0, Math.min(c, P.cutDur - 0.05));
   $("#scrub").max = P.cutDur.toFixed(1); $("#scrub").value = pos.toFixed(1);
@@ -410,8 +444,8 @@ function playLine(s, e) {
 function playRough(fromCut = pos) {
   if (fromCut >= P.cutDur - 0.1) fromCut = 0;
   stopPlay(); mode = "rough"; v.playbackRate = P.speed; setPos(fromCut); v.currentTime = P.toSrc(pos); $("#clock").hidden = false;
-  $("#rough").textContent = "Пауза";
-  v.play().catch(() => { stopPlay(); pill("Відтворення заблоковано. Натисни «Дивитись чорновий монтаж» ще раз.", true); });
+  $("#rough").textContent = "❚❚ Пауза";
+  v.play().catch(() => { stopPlay(); pill("Відтворення заблоковано. Натисни «Дивитись» ще раз.", true); });
   const tick = () => {
     if (mode !== "rough") return;
     const t = v.currentTime, sp = P.spans;
@@ -424,6 +458,7 @@ function playRough(fromCut = pos) {
   loop = requestAnimationFrame(tick);
 }
 $("#rough").addEventListener("click", () => { if (mode === "rough") { stopPlay(); mode = "roughPaused"; overlay(pos); } else playRough(pos); });
+v.addEventListener("loadedmetadata", () => { if (mode === "idle" && tab !== "preview" && v.currentTime === 0) v.currentTime = 0.05; });   // show a frame, not black
 v.addEventListener("error", () => pill("Відео не завантажилось. Онови сторінку; якщо не допоможе, попроси Claude завантажити його знову.", true));
 
 // overlay at a cut time: approximate graphic boxes + caption style preview
@@ -652,7 +687,7 @@ function placeBox() {
   });
   return el;
 }
-$("#ovbox").addEventListener("toggle", () => { if ($("#ovbox").open) startPlacing(OV_PLACE[ovMode()]); else if (placing && !placing.id) stopPlacing(); });
+$("#ovbox").addEventListener("toggle", () => { if (!R || tab !== "overlays") return; if ($("#ovbox").open) startPlacing(OV_PLACE[ovMode()]); else if (placing && !placing.id) stopPlacing(); });
 $("#ovfull").addEventListener("change", () => {   // full screen on/off; any other size is the box they drag and resize
   const np = [...OV_PLACE[ovMode()]];
   if (placing) { placing.place = np; overlay(pos); } else startPlacing(np);
@@ -801,7 +836,7 @@ function renderCaptions() {
       }));
       cw.appendChild(b);
     });
-    if (c.overlapFixed) { const f = document.createElement("span"); f.className = "flag"; f.textContent = "скорочено, щоб не накладався на наступний"; cw.appendChild(f); }
+    if (c.overlapFixed) { const f = document.createElement("span"); f.className = "flag"; f.textContent = "скорочено"; f.title = "Скорочено, щоб не накладався на наступний субтитр"; cw.appendChild(f); }
     const tools = document.createElement("div"); tools.className = "tools";
     const tool = (label, title, fn) => { const b = document.createElement("button"); b.type = "button"; b.textContent = label; b.title = title; b.addEventListener("click", fn); tools.appendChild(b); };
     tool("правити", "Виправити текст", () => {
