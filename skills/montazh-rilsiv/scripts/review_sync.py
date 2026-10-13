@@ -170,7 +170,7 @@ def do_import(reel, review):
         if g.get("gone") or g["state"] == "d": continue
         note = ((d.get("board") or {}).get(g["id"]) or {}).get("note")
         if g["state"] == "c": changes.append(f"{g['id']} @ cut {g['start']:.1f}s: {note or '(no note)'}")
-        spec = {k: v for k, v in g.items() if k not in ("id", "kind", "what", "w0", "w1", "state", "place", "moved", "gone")}
+        spec = {k: v for k, v in g.items() if k not in ("id", "kind", "what", "w0", "w1", "state", "place", "moved", "gone", "own")}
         spec.update(start=round(g["start"], 3), end=round(g["end"], 3), id=g["id"])
         if g["id"] in (d.get("sfxOff") or {}) and d["sfxOff"][g["id"]]: spec["sfx"] = False
         if g.get("type") == "overlay":   # uploaded on the page: Claude downloads the asset into <reel>/overlays/ before rendering
@@ -187,6 +187,8 @@ def do_import(reel, review):
     print(f"cut {P['cutDur']:.1f}s from {len(P['spans'])} spans; {len(caps)} captions; {len(cards)} graphics; hash {P['hash']}")
     for c in changes: print("CHANGE REQUESTED:", c)
     for o in overlays: print("OVERLAY:", o)
+    if (d.get("hook") or "").strip(): print("HOOK (their text, use as is):", d["hook"].strip())
+    if ((d.get("cta") or {}).get("text") or "").strip(): print("CTA (their text):", d["cta"]["text"].strip())
     users = [g for g in P["graphics"] if g.get("user") and not g.get("gone") and g["state"] != "d"]
     for g in P["graphics"]:
         if not g.get("user") and not g.get("gone") and g["state"] != "d":

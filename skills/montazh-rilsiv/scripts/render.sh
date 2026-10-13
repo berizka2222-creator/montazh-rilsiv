@@ -36,3 +36,5 @@ else
 fi
 mv "$REEL/final_ln.mp4" "$REEL/final.mp4"
 python3 "$S/timings.py" "$REEL"
+# a Mac notification when the render is done (the person may be away from the screen)
+command -v osascript >/dev/null && osascript -e "display notification \"$(basename "$REEL")\" with title \"Рілс відрендерено\" sound name \"Glass\"" >/dev/null 2>&1 || true

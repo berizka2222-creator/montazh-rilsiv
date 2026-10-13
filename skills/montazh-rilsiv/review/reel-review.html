@@ -130,6 +130,13 @@ summary{cursor:pointer;font-weight:700}
 .gbox.place:active{cursor:grabbing}
 .who{display:inline-block;font:700 11px var(--f-body);letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:2px 8px;margin-right:6px;background:var(--pink-soft);color:var(--pink)}
 .who.mine{background:var(--keep);color:var(--on-accent)}
+.panel{border:2px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:14px;background:var(--surface)}
+.panel label{font-weight:700;font-size:14px;display:block;margin:8px 0 4px}
+.lib{display:flex;flex-wrap:wrap;gap:8px}
+.lib button{width:64px;height:80px;border-radius:10px;border:2px solid var(--line);background:#222 center/cover;color:#fff;font:600 10px var(--f-body);padding:2px;cursor:pointer;overflow:hidden;text-shadow:0 1px 2px #000}
+.lib button[aria-pressed="true"]{border-color:var(--pink);box-shadow:0 0 0 3px var(--pink-soft)}
+.sr{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.sr input{max-width:200px}
 </style>
 
 <div class="wrap">
@@ -177,7 +184,12 @@ summary{cursor:pointer;font-weight:700}
       <details class="ovform" id="ovbox" open>
       <summary>+ Накладення тут <span class="tc" id="ovat">0:00.0</span></summary>
       <p class="mode">Фото, скрін або відео з цього моменту чорнового монтажу (від найближчого слова). До 20 МБ; більший файл кинь у папку рілса й напиши Claude.</p>
-      <div class="row"><input type="file" id="ovfile" accept="image/png,image/jpeg,image/webp,video/mp4,video/quicktime" aria-label="Файл накладення"></div>
+      <div class="row" role="radiogroup" aria-label="Що додаємо"><label><input type="radio" name="ovkind" value="file" checked> Фото / відео</label><label><input type="radio" name="ovkind" value="text"> Текст</label></div>
+      <div class="row" id="ovtextrow" hidden><input type="text" id="ovtext" placeholder="Напр.: ТАРГЕТ або без / клієнтів (/ = новий рядок)" aria-label="Текст накладення"></div>
+      <div class="row" id="ovfilerow"><input type="file" id="ovfile" accept="image/png,image/jpeg,image/webp,video/mp4,video/quicktime" aria-label="Файл накладення"></div>
+      <div class="row" id="ovsaverow"><label><input type="checkbox" id="ovsave"> Зберегти в «Мої файли» для наступних рілсів</label></div>
+      <div class="row"><label><input type="checkbox" id="ovbehind"> <b>За мною</b>: поставити за тобою (Claude виріже тебе тільки на ці секунди й покладе поверх; рендер на ~1 хв довший)</label></div>
+      <div id="libbox" hidden><p class="mode" style="margin-top:8px"><b>Або з «Моїх файлів»:</b> тапни, щоб обрати.</p><div class="lib" id="lib"></div></div>
       <p class="mode" style="margin-top:8px"><b>Місце:</b> перетягни рамку на відео вище, куди хочеш.</p>
       <div class="row"><label for="ovmode">Розмір</label>
         <select id="ovmode"><option value="small-r">Маленьке, праворуч</option><option value="small-l">Маленьке, ліворуч</option><option value="big">Велике, вгорі</option><option value="full">На весь екран</option></select></div>
@@ -192,12 +204,20 @@ summary{cursor:pointer;font-weight:700}
 
     <section data-p="graphics" hidden>
       <p class="lede">Усе, що з'явиться поверх відео, за часом: <b>твої накладення</b> і <b>графіка від Claude</b>, на таймлайні <b>монтажу</b>. Мініатюра показує приблизне розташування на кадрі з цього моменту, а не фінальну анімацію. Залиш її, попроси змінити (твоя нотатка лишиться при цій графіці) або прибери.</p>
+      <div class="panel">
+        <label for="hooktext">Хук: заголовок на початку</label>
+        <input type="text" id="hooktext" placeholder="Напр.: Чому не / виходить / заробляти? (/ = новий рядок)">
+        <label for="ctatext">CTA: заклик у кінці (необов'язково)</label>
+        <input type="text" id="ctatext" placeholder="Напр.: Пиши АНКЕТА в директ (слово КАПСОМ стане рожевим)">
+        <div class="row ctl" style="margin-top:8px"><label for="ctadur" style="margin:0">CTA на екрані, секунд</label><input type="number" id="ctadur" value="4" min="2" max="10" step="0.5" style="width:80px"></div>
+      </div>
       <div class="tally" id="gtally"></div>
       <div class="cards" id="cards"><div class="empty">Графіка з'явиться тут, коли рілс завантажиться.</div></div>
     </section>
 
     <section data-p="captions" hidden>
       <p class="lede">Субтитри йдуть за нарізкою: якщо слова вирізано, субтитр зникає, а час зсувається разом з монтажем. Тапни слово, щоб зробити його акцентом. <b>правити</b> виправляє текст, ±0,1 зсуває початок, <b>об'єднати</b> склеює з наступним. У плеєрі статичне прев'ю стилю твоїми шрифтами; у фінальному відео субтитри ще й анімовані.</p>
+      <div class="sr"><input type="text" id="srfind" placeholder="Знайти слово" aria-label="Знайти слово"><input type="text" id="srrepl" placeholder="Замінити на" aria-label="Замінити на"><button class="b" id="srgo" type="button">Замінити всюди</button><span class="mode" id="srmsg" aria-live="polite"></span></div>
       <div class="tally" id="captally"></div>
       <div class="caps" id="caps"><div class="empty">Субтитри з'являться тут, коли рілс завантажиться.</div></div>
     </section>
@@ -465,8 +485,9 @@ function placeText(g) {
 function renderGraphics() {
   const byTime = (a, b) => (a.gone - b.gone) || (a.start || 0) - (b.start || 0);
   const all = [...GFX].sort(byTime), mine = all.filter(g => g.user);
+  const own = all.filter(g => g.user || g.own).length;
   const n = cardList($("#cards"), all), m = cardList($("#ovcards"), mine);
-  $("#gtally").innerHTML = `<span>усього: <b>${all.length}</b></span><span>твоїх накладень: <b>${mine.length}</b></span><span>від Claude: <b>${all.length - mine.length}</b></span><span>змінити: <b>${n.c}</b></span><span>прибрати: <b>${n.d}</b></span>`;
+  $("#gtally").innerHTML = `<span>усього: <b>${all.length}</b></span><span>твоїх: <b>${own}</b></span><span>від Claude: <b>${all.length - own}</b></span><span>змінити: <b>${n.c}</b></span><span>прибрати: <b>${n.d}</b></span>`;
   $("#otally").innerHTML = mine.length ? `<span>твоїх накладень: <b>${mine.length}</b></span>` : "";
   if (!mine.length) $("#ovcards").innerHTML = `<div class="empty">Накладень ще немає. Додай перше формою вище або переходь до «Графіки».</div>`;
 }
@@ -481,7 +502,7 @@ function cardList(box, list) {
     th.append(tb, ap);
     const body = document.createElement("div");
     const kind = document.createElement("div"); kind.className = "kind";
-    const who = document.createElement("span"); who.className = "who" + (g.user ? " mine" : ""); who.textContent = g.user ? "твоє" : "від Claude";
+    const who = document.createElement("span"); who.className = "who" + (g.user || g.own ? " mine" : ""); who.textContent = g.user || g.own ? "твоє" : "від Claude";
     kind.append(who, document.createTextNode(g.kind));
     const what = document.createElement("div"); what.className = "what"; what.textContent = g.what;
     const meta = document.createElement("div"); meta.className = "meta";
@@ -492,7 +513,9 @@ function cardList(box, list) {
       meta.append(t);
       const d = document.createElement("span"); d.textContent = `${(g.end - g.start).toFixed(1)} с на екрані`; meta.append(d);
       const p = document.createElement("span"); p.textContent = placeText(g); meta.append(p);
-      if (g.user) { const fx = document.createElement("span"); fx.textContent = "ефект: " + ({ soft: "плавна поява", slide: "виліт збоку", polaroid: "полароїд", glass: "скло", zoom: "наближення" }[g.effect] || g.effect); meta.append(fx);
+      if (g.behind) { const bh = document.createElement("span"); bh.textContent = "за тобою"; bh.style.fontWeight = "700"; meta.append(bh); }
+      if (g.user && g.type !== "bigtext") { const fx = document.createElement("span"); fx.textContent = "ефект: " + ({ soft: "плавна поява", slide: "виліт збоку", polaroid: "полароїд", glass: "скло", zoom: "наближення" }[g.effect] || g.effect); meta.append(fx); }
+      if (g.user) {
         const mvb = document.createElement("button"); mvb.type = "button"; mvb.className = "b quiet"; const on = placing?.id === g.id;
         mvb.textContent = on ? "Готово" : "Перемістити"; mvb.title = "Перетягни рамку на відео, щоб змінити місце";
         mvb.addEventListener("click", () => { if (on) stopPlacing(); else { setPos(g.start + 0.3); startPlacing(g.place, g.id); } }); meta.append(mvb); }
@@ -519,7 +542,12 @@ const box_ = g => box(g, false);
 // ---------- overlays they upload: an image or video from the current rough-cut moment ----------
 let assets = null;
 // where an overlay goes: a box they drag on the player (1080x1920 frame units); size presets set its width and height
-const OV_PLACE = { "small-r": [600, 170, 400, 500], "small-l": [80, 170, 400, 500], big: [90, 150, 900, 640], full: [0, 0, 1080, 1920] };
+const OV_PLACE = { "small-r": [600, 170, 400, 500], "small-l": [80, 170, 400, 500], big: [90, 150, 900, 640], full: [0, 0, 1080, 1920], text: [40, 360, 1000, 280] };
+const ovKind = () => document.querySelector('input[name="ovkind"]:checked').value;
+document.querySelectorAll('input[name="ovkind"]').forEach(r => r.addEventListener("change", () => {
+  const txt = ovKind() === "text"; $("#ovtextrow").hidden = !txt; $("#ovfilerow").hidden = txt; $("#ovsaverow").hidden = txt; $("#libbox").hidden = txt || !LIB.length;
+  if (txt) { $("#ovbehind").checked = true; if (placing && !placing.id) { placing.place = [...OV_PLACE.text]; placing.img = null; overlay(pos); } }
+}));
 let placing = null;   // {place: [x, y, w, h], id?: overlay being moved, img?: preview of the chosen file}
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 function startPlacing(place, id) {
@@ -530,7 +558,8 @@ function startPlacing(place, id) {
 function stopPlacing() { placing = null; overlay(pos); renderGraphics(); }
 function placeBox() {
   const p = placing.place, full = p[2] >= 1080 && p[3] >= 1920;
-  const el = box({ place: p, imgUrl: placing.img, kind: full ? "На весь екран" : "Перетягни мене" }, true); el.classList.add("place");
+  const tx = !placing.id && ovKind() === "text" && $("#ovtext").value.trim();
+  const el = box({ place: p, imgUrl: placing.img, kind: full ? "На весь екран" : tx ? tx.replace(/\s*\/\s*/g, " ") : "Перетягни мене" }, true); el.classList.add("place");
   if (full) return el;
   el.addEventListener("pointerdown", e => {
     e.preventDefault(); el.setPointerCapture(e.pointerId);
@@ -549,6 +578,7 @@ $("#ovmode").addEventListener("change", () => {   // new size, same centre
   const np = w >= 1080 ? [0, 0, 1080, 1920] : [Math.round(clamp(cx - w / 2, 0, 1080 - w)), Math.round(clamp(cy - h / 2, 0, 1920 - h)), w, h];
   if (placing) { placing.place = np; overlay(pos); } else startPlacing(np);
 });
+$("#ovtext").addEventListener("input", () => { if (placing && !placing.id) overlay(pos); });
 $("#ovfile").addEventListener("change", () => { const f = $("#ovfile").files[0];
   if (placing) { placing.img = f && f.type.startsWith("image") ? URL.createObjectURL(f) : null; overlay(pos); } });
 function wordAtCut(c) {   // the kept word nearest this rough-cut moment: overlays hang on words so they move with the cut
@@ -557,20 +587,70 @@ function wordAtCut(c) {   // the kept word nearest this rough-cut moment: overla
   return best;
 }
 $("#ovadd").addEventListener("click", async () => {
-  const f = $("#ovfile").files[0], msg = $("#ovmsg"), btn = $("#ovadd");
-  if (!f) { msg.textContent = "Спершу вибери файл."; $("#ovfile").focus(); return; }
+  const msg = $("#ovmsg"), btn = $("#ovadd"), behindOn = $("#ovbehind").checked;
+  if (ovKind() === "text") {   // big text, usually behind them: no file, nothing to upload
+    const text = $("#ovtext").value.trim(); if (!text) { msg.textContent = "Впиши текст."; $("#ovtext").focus(); return; }
+    const w0 = wordAtCut(pos); if (w0 === null) { msg.textContent = "Тут немає жодного слова в нарізці."; return; }
+    const at = pos, dur = Math.min(30, Math.max(0.5, +$("#ovdur").value || 3));
+    mutate(() => { S.overlays = [...(S.overlays || []), { id: "ov" + Date.now().toString(36), kind: "text", text, name: text, behind: behindOn, dur, w0,
+      place: placing && !placing.id ? [...placing.place] : [...OV_PLACE.text] }]; });
+    msg.textContent = `Текст додано з ${fmt(at)}.`; $("#ovtext").value = ""; return;
+  }
+  const f = $("#ovfile").files[0], pick = !f && libPick;
+  if (!f && !pick) { msg.textContent = "Спершу вибери файл або щось із «Моїх файлів»."; $("#ovfile").focus(); return; }
   if (!assets) { msg.textContent = "Завантаження тут недоступне. Кинь файл у папку рілса й напиши Claude."; return; }
-  if (f.size > 20 * 1024 * 1024) { msg.textContent = "Файл більший за 20 МБ. Кинь його в папку рілса й напиши Claude, на якій секунді."; return; }
+  if (f && f.size > 20 * 1024 * 1024) { msg.textContent = "Файл більший за 20 МБ. Кинь його в папку рілса й напиши Claude, на якій секунді."; return; }
   const w0 = wordAtCut(pos); if (w0 === null) { msg.textContent = "Тут немає жодного слова в нарізці."; return; }
   const at = pos, mode = $("#ovmode").value, effect = $("#oveffect").value, dur = Math.min(30, Math.max(0.5, +$("#ovdur").value || 3));
   btn.disabled = true; msg.textContent = "Завантажую…";
   try {
-    const up = await assets.upload(f);
-    mutate(() => { S.overlays = [...(S.overlays || []), { id: "ov" + Date.now().toString(36), assetId: up.id, url: up.url, name: f.name,
-      kind: f.type.startsWith("video") ? "video" : "image", mode, effect, dur, w0, place: placing && !placing.id ? [...placing.place] : OV_PLACE[mode] }]; });
+    const up = pick ? { id: pick.id, url: pick.url } : await assets.upload(f);
+    const name = pick ? pick.name : f.name, kind = pick ? pick.kind : f.type.startsWith("video") ? "video" : "image";
+    if (!pick && $("#ovsave").checked && libRef) await saveToLib({ id: up.id, url: up.url, name, kind });
+    mutate(() => { S.overlays = [...(S.overlays || []), { id: "ov" + Date.now().toString(36), assetId: up.id, url: up.url, name,
+      kind, mode, effect, dur, w0, behind: behindOn, place: placing && !placing.id ? [...placing.place] : OV_PLACE[mode] }]; });
+    libPick = null; renderLib();
     msg.textContent = `Додано з ${fmt(at)}. Воно в списку нижче.`; $("#ovfile").value = "";
   } catch (e) { msg.textContent = "Не вдалося завантажити (" + (e?.code || "помилка") + "). Спробуй ще раз або кинь файл у папку рілса."; }
   finally { btn.disabled = false; }
+});
+
+// ---------- hook + CTA typed on the page ----------
+function syncHookCta() {
+  const hook = GFX.find(g => g.type === "title");
+  $("#hooktext").value = S.hook != null ? S.hook : (hook?.text || "");
+  $("#ctatext").value = (S.cta || {}).text || ""; $("#ctadur").value = (S.cta || {}).dur || 4;
+}
+$("#hooktext").addEventListener("change", e => mutate(() => { S.hook = e.target.value.trim(); }));
+const setCta = () => mutate(() => { const tx = $("#ctatext").value.trim(); S.cta = tx ? { text: tx, dur: Math.min(10, Math.max(2, +$("#ctadur").value || 4)) } : null; });
+$("#ctatext").addEventListener("change", setCta); $("#ctadur").addEventListener("change", setCta);
+
+// ---------- «Мої файли»: photos/videos kept on the page for every reel (db library/files) ----------
+let libRef = null, LIB = [], libPick = null;
+function renderLib() {
+  const box = $("#lib"); box.textContent = ""; $("#libbox").hidden = !LIB.length;
+  for (const it of LIB) {
+    const b = document.createElement("button"); b.type = "button"; b.title = it.name; b.setAttribute("aria-pressed", libPick?.id === it.id);
+    if (it.kind === "image") b.style.backgroundImage = `url(${JSON.stringify(it.url)})`; else b.textContent = "▶ " + it.name;
+    b.addEventListener("click", () => { libPick = libPick?.id === it.id ? null : it; $("#ovfile").value = "";
+      if (placing) { placing.img = libPick && libPick.kind === "image" ? libPick.url : null; overlay(pos); } renderLib(); });
+    box.appendChild(b);
+  }
+}
+async function saveToLib(item) { LIB = [...LIB, item]; renderLib(); try { await libRef.set({ items: LIB, updatedAt: new Date().toISOString() }); } catch (e) { pill("Не вдалося зберегти в «Мої файли»", true); } }
+
+// ---------- search & replace across captions ----------
+$("#srgo").addEventListener("click", () => {
+  const f = $("#srfind").value.trim(), r = $("#srrepl").value.trim(), msg = $("#srmsg");
+  if (!f) { msg.textContent = "Впиши слово, яке шукаємо."; $("#srfind").focus(); return; }
+  const esc = f.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), re = new RegExp(`(^|\\s)${esc}(?=$|\\s|[.,!?;:])`, "giu");
+  let n = 0;
+  mutate(() => { const arr = capsEditable();
+    for (const c of CAPS) { if (c.gone) continue;
+      const before = c.words.map(w => w.text).join(" "), after = before.replace(re, (m, sp) => { n++; return sp + r; });
+      if (after !== before) { const cc = arr[c.ci], keep = after.split(/\s+/).length === c.words.length;
+        cc.text = after; cc.accText = keep ? c.words.map((w, k) => w.accent ? k : -1).filter(k => k >= 0) : []; } } });
+  msg.textContent = n ? `Замінено: ${n}` : "Такого слова в субтитрах немає.";
 });
 
 // ---------- 3. captions ----------
@@ -686,8 +766,8 @@ $("#revadd").addEventListener("click", () => {
 });
 
 function renderAll() {
-  renderCuts(); renderGraphics(); renderCaptions(); renderSound(); renderPreview();
-  const sent = { cuts: S.cut != null, overlays: (S.overlays || []).length, graphics: Object.keys(S.board).length, captions: S.captions != null, sound: Object.keys(S.sfxOff).length || S.voiceClean === false };
+  renderCuts(); renderGraphics(); renderCaptions(); renderSound(); renderPreview(); syncHookCta();
+  const sent = { cuts: S.cut != null, overlays: (S.overlays || []).length, graphics: Object.keys(S.board).length || (S.hook != null) || !!S.cta, captions: S.captions != null, sound: Object.keys(S.sfxOff).length || S.voiceClean === false };
   $$(".tab").forEach(b => { const d = b.querySelector(".dot"); if (d) d.hidden = !sent[b.dataset.tab]; });
 }
 
@@ -713,6 +793,9 @@ function renderAll() {
     }
     assets = await window.claude?.use?.("assets");   // only editors get it; others don't see the overlay button
     $("#ovbox").hidden = !assets; $("#ovnone").hidden = !!assets;
+    libRef = db.doc("library/files");   // «Мої файли» live across reels
+    try { const l = await libRef.get(); LIB = l.exists ? (l.data().items || []) : []; } catch (e) { LIB = []; }
+    renderLib();
     ref = db.doc("review/current");
     const rv = await ref.get(); if (rv.exists) S = { ...blank(), ...JSON.parse(JSON.stringify(rv.data())) };
     // someone else (Claude, another tab) changed the decisions: take theirs instead of saving a stale copy over it

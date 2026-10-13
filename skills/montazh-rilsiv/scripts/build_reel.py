@@ -29,6 +29,8 @@ edit.json (written by auto_edit.py, then Claude marks accents and adds cards):
      overlay {src: "overlays/<file or asset id>", mode: "small-r"|"small-l"|"big"|"full", effect: "soft"|"slide"|"polaroid"|"glass"|"zoom", box?: [x,y,w,h]}
                                                      an image or video they uploaded on the review page (or dropped in the folder):
                                                      a small card top right/left, a wide panel above the head, or full screen; video muted
+     bigtext {text: "big / words", y?: 330, size?, color?}   huge words in the head font; with "behind": true they sit behind the person
+     (any card) "behind": true   between the background and the person: the person is cut out for that window (local AI, ~13 s per second of video, cached)
      follow {words: [{text, accent}], framing: "wide"}   caption-camera-follow in brand colours/font: one sentence
                                                      written word by word across a camera that pulls back (hook moments)
   Any card: "glass": true gives the frosted liquid-glass look (card, tag).
@@ -165,12 +167,28 @@ def phrase_end(t):
     return next((e + 0.15 for e in PHRASE_ENDS if e > t + 1.0), min(t + 2.5, DUR))
 
 quiet = []                                      # spans where a card carries its own words, so captions step aside
+# "behind": true on a card puts it between the background and the person: the person is cut out (AI matting, local)
+# for that window and laid back on top, so text, photos or motion sit behind them.
+behind, BEHIND_WIN = [], []
+_BACK, _MID, _FRONT = back, mid, front
 for i, c in enumerate(edit.get("cards", [])):
     CARD_MUTE = c.get("sfx") is False
     CARD_SFX = c.get("sfx") if isinstance(c.get("sfx"), dict) else None
     a, b, cid = c["start"], c.get("end") or phrase_end(c["start"]), f"k{i}"
     b = min(b, DUR)
     kind = c["type"]
+    back, mid, front = (behind, behind, behind) if c.get("behind") else (_BACK, _MID, _FRONT)
+    if c.get("behind"): BEHIND_WIN.append((a, b))
+    if kind == "bigtext":
+        # big words in the brand's head font, usually behind the head ("behind": true); "/" breaks lines
+        lines = [case(x.strip()) for x in c.get("text", "").split("/") if x.strip()]
+        px = c.get("size") or min(fit(max(lines, key=len), 320), 320)
+        front.append(f'<div id="{cid}" class="bigtext" style="top:{c.get("y", 430)}px;{font("head", px)};color:{c.get("color", LIGHT)}">'
+                     + "".join(f'<div class="btl">{esc(x)}</div>' for x in lines) + "</div>")
+        show(f"#{cid}", a, b, 0.2)
+        js.append(f'tl.fromTo("#{cid} .btl",{{y:140,opacity:0}},{{y:0,opacity:1,duration:0.6,ease:"power3.out",stagger:0.12}},{q(a)});')
+        sfx("whoosh", a - 0.05, -13)
+        continue
     if kind == "title":
         lines = [case(x.strip()) for x in c["text"].split("/")]
         if c.get("quiet", True): quiet.append((a, b))                    # the hook says it: captions step aside ("quiet": false keeps them)
@@ -218,6 +236,13 @@ for i, c in enumerate(edit.get("cards", [])):
                  "" if full else "border-radius:28px;border:3px solid rgba(255,255,255,.55);box-shadow:0 24px 60px rgba(0,0,0,.3)")
         inner_r = "0" if full else ("2px" if fx == "polaroid" else "20px" if fx == "glass" else "25px")
         cover = "width:100%;height:100%;object-fit:cover;display:block"
+        if src.suffix.lower() in (".png", ".webp") and fx not in ("polaroid", "glass"):
+            try:   # a cut-out element (transparent PNG, e.g. their chrome stickers): no frame, shown whole
+                from PIL import Image as _I
+                _im = _I.open(src)
+                if _im.mode in ("RGBA", "LA", "P") and _im.convert("RGBA").getchannel("A").getextrema()[0] < 250:
+                    frame, inner_r, cover = "", "0", "width:100%;height:100%;object-fit:contain;display:block"
+            except Exception: pass
         if src.suffix.lower() in (".mp4", ".mov", ".m4v", ".webm"):
             b = min(b, a + dur_of(src))                                      # never outlast the clip
             dst = proj / "img" / f"ov{i}.mp4"                                # one clean H.264 copy at its display size, no audio
@@ -375,6 +400,30 @@ if brand.get("require_carousel") and not edit.get("no_carousel_ok") and not any(
         k["type"] == "motion" and "carousel" in k.get("name", "") for k in edit.get("cards", [])):
     sys.exit("brand rule: add a carousel motion card (or ask them; if they say no, set \"no_carousel_ok\": true in edit.json)")
 
+back, mid, front = _BACK, _MID, _FRONT
+subj = []   # the person, cut out for every "behind" window (cached in <reel>/cutouts, so re-renders don't redo it)
+if BEHIND_WIN:
+    wins = []
+    for a, b in sorted(BEHIND_WIN):
+        a, b = max(0, a - 0.3), min(DUR, b + 0.3)
+        if wins and a <= wins[-1][1]: wins[-1] = (wins[-1][0], max(wins[-1][1], b))
+        else: wins.append((a, b))
+    cache = reel / "cutouts"; cache.mkdir(exist_ok=True)
+    for k, (s0, s1) in enumerate(wins):
+        s0, s1 = q(s0), q(s1)
+        out = cache / f"cut_{s0:.2f}_{s1:.2f}.webm"
+        if not out.exists():
+            seg = cache / f"seg_{k}.mp4"
+            subprocess.run(["ffmpeg", "-nostdin", "-v", "error", "-y", "-ss", f"{s0:.4f}", "-t", f"{s1 - s0:.4f}", "-i", str(reel / "master.mp4"),
+                            "-an", "-c:v", "libx264", "-crf", "12", "-pix_fmt", "yuv420p", str(seg)], check=True)
+            print(f"cutting the person out for {s0:.1f}-{s1:.1f}s (about {int((s1 - s0) * 13) + 15} s)...")
+            subprocess.run(["npx", "-y", "hyperframes@0.8.145", "remove-background", str(seg), "-o", str(out), "--quality", "best"],
+                           check=True, capture_output=True)
+            seg.unlink(missing_ok=True)
+        shutil.copy(out, proj / "img" / out.name)
+        subj.append(f'<video id="sj{k}" class="clip" src="img/{out.name}" muted playsinline data-start="{s0}" data-duration="{q(s1 - s0)}" '
+                    f'data-media-start="0" data-track-index="{70 + k}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></video>')
+
 # ---- captions -----------------------------------------------------------------------------------------------------
 cap_json = []
 for i, c in enumerate(edit.get("captions", [])):
@@ -412,6 +461,9 @@ html, body {{ margin: 0; background: #000; overflow: hidden; }}
 .title {{ position: absolute; left: 0; top: 170px; width: {W}px; padding: 0 90px; box-sizing: border-box; line-height: .88; letter-spacing: -.045em; text-shadow: 0 0 3px rgba(0,0,0,.18), 0 6px 34px rgba(0,0,0,.4); }}
 .tl {{ white-space: nowrap; }}
 .block {{ position: absolute; inset: 0; }}
+#behind, #subj {{ position: absolute; inset: 0; }}
+.bigtext {{ position: absolute; left: 0; width: {W}px; text-align: center; line-height: .86; letter-spacing: -.045em; opacity: 0; visibility: hidden; }}
+.btl {{ white-space: nowrap; }}
 .frame {{ position: absolute; left: 250px; top: 440px; width: 580px; height: 1000px; overflow: hidden; border: 10px solid #fff; border-radius: 8px; box-shadow: 0 24px 60px rgba(0,0,0,.22); }}
 .frame video {{ width: 100%; height: 100%; object-fit: cover; display: block; }}
 .bl {{ position: absolute; left: 0; width: {W}px; padding: 0 90px; box-sizing: border-box; line-height: .82; letter-spacing: -.05em; white-space: nowrap; }}
@@ -450,6 +502,7 @@ html, body {{ margin: 0; background: #000; overflow: hidden; }}
 <body>
 <div id="stage" data-composition-id="main" data-start="0" data-duration="{DUR}" data-fps="{FPS}" data-width="{W}" data-height="{H}">
   <div id="cam"><video id="bg" class="clip" src="master.mp4" playsinline data-has-audio="true" data-start="0" data-duration="{DUR}" data-track-index="1"></video>
+    <div id="behind">{"".join(behind)}</div><div id="subj">{"".join(subj)}</div>
     <div id="back">{"".join(back)}</div></div>
   <div id="mid">{"".join(mid)}</div>
   <div id="front">{"".join(front)}</div>
