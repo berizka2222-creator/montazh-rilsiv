@@ -48,7 +48,7 @@ button.b.primary{background:var(--pink);color:var(--on-accent)}
 button.b.quiet{border-color:var(--line);font-weight:600}
 button.b:disabled{opacity:.45;cursor:default}
 button:focus-visible,.w:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
-textarea,input[type=text]{font:inherit;font-size:16px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 10px;width:100%;box-sizing:border-box}
+textarea,input[type=text],input[type=number]{font:inherit;font-size:16px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 10px;width:100%;box-sizing:border-box}
 textarea{min-height:80px;resize:vertical}
 .ts{font:500 11px var(--f-mono);color:var(--muted);background:none;border:0;cursor:pointer;padding:2px 0 0;text-align:left;font-variant-numeric:tabular-nums;white-space:nowrap}
 .ts:hover{color:var(--pink)}
@@ -120,6 +120,12 @@ details{margin-top:14px;border:2px solid var(--line);border-radius:12px;padding:
 summary{cursor:pointer;font-weight:700}
 .empty{padding:20px;border:2px dashed var(--line);border-radius:16px;color:var(--muted)}
 .confirm{display:inline-flex;gap:6px;align-items:center;font-size:14px}
+/* overlay upload (under the player) */
+.ovform{margin-top:0}
+.ovform .row{display:flex;gap:6px 14px;flex-wrap:wrap;align-items:center;margin-top:8px;font-size:14px}
+.ovform input[type=number]{width:80px}
+.ovform select{font:inherit;font-size:14px;border-radius:10px;border:2px solid var(--line);background:var(--surface);color:var(--ink);padding:5px 8px;max-width:100%}
+.ovform input[type=file]{font:inherit;font-size:13px;max-width:100%}
 </style>
 
 <div class="wrap">
@@ -138,6 +144,17 @@ summary{cursor:pointer;font-weight:700}
     </div>
     <div class="scrub"><input type="range" id="scrub" min="0" max="60" step="0.1" value="0" aria-label="Позиція в чорновому монтажі"><span class="tc" id="pos">0:00.0</span></div>
     <p class="mode" id="mode">Чорновий монтаж грає оригінальне відео одразу з твоїми рішеннями, на таймлайні <b>монтажу</b>. Склейки тут не згладжені, а графіка показана приблизними рамками.</p>
+    <details class="ovform" id="ovbox" hidden>
+      <summary>+ Накладення тут <span class="tc" id="ovat">0:00.0</span></summary>
+      <p class="mode">Фото, скрін або відео з цього моменту чорнового монтажу (від найближчого слова). До 20 МБ; більший файл кинь у папку рілса й напиши Claude.</p>
+      <div class="row"><input type="file" id="ovfile" accept="image/png,image/jpeg,image/webp,video/mp4,video/quicktime" aria-label="Файл накладення"></div>
+      <div class="row"><label for="ovmode">Розмір</label>
+        <select id="ovmode"><option value="small-r">Маленьке, праворуч</option><option value="small-l">Маленьке, ліворуч</option><option value="big">Велике, вгорі</option><option value="full">На весь екран</option></select></div>
+      <div class="row"><label for="oveffect">Ефект</label>
+        <select id="oveffect"><option value="soft">Плавна поява</option><option value="slide">Виліт збоку</option><option value="polaroid">Полароїд (рамка з нахилом)</option><option value="glass">Скло (як твої картки)</option><option value="zoom">Повільне наближення</option></select></div>
+      <div class="row"><label for="ovdur">Скільки секунд</label><input type="number" id="ovdur" value="3" min="0.5" max="30" step="0.5"></div>
+      <div class="row"><button class="b primary" id="ovadd" type="button">Додати накладення</button><span class="mode" id="ovmsg" aria-live="polite"></span></div>
+    </details>
     <div class="savebar">
       <span class="pill" id="save" aria-live="polite">Не завантажено</span>
       <button class="b quiet" id="retry" type="button" hidden>Зберегти ще раз</button>
@@ -214,7 +231,7 @@ const v = $("#v"), ov = $("#ov");
 const fmt = t => `${Math.floor(t / 60)}:${(Math.max(0, t) % 60).toFixed(1).padStart(4, "0")}`;
 let R = null, B = null, S = blank(), P = null, CAPS = [], GFX = [];
 let tab = "cuts", ref = null, saving = Promise.resolve(), timer = null, undo = [], mode = "idle", loop = null;
-function blank() { return { cut: null, restoredFillers: [], restoredPauses: [], trimmedPauses: [], captions: null, board: {}, sfxOff: {}, notes: {}, brandRequest: "", revisions: [], buildRequest: null }; }
+function blank() { return { cut: null, restoredFillers: [], restoredPauses: [], trimmedPauses: [], captions: null, board: {}, sfxOff: {}, overlays: [], notes: {}, brandRequest: "", revisions: [], buildRequest: null }; }
 
 // ---------- saving, undo ----------
 const pill = (t, err) => { $("#save").textContent = t; $("#save").classList.toggle("err", !!err); $("#retry").hidden = !err; };
@@ -283,6 +300,7 @@ function setPos(c) {
   pos = Math.max(0, Math.min(c, P.cutDur - 0.05));
   $("#scrub").max = P.cutDur.toFixed(1); $("#scrub").value = pos.toFixed(1);
   $("#pos").textContent = `${fmt(pos)} / ${fmt(P.cutDur)}`; $("#clock").textContent = `монтаж ${fmt(pos)} / ${fmt(P.cutDur)}`;
+  $("#ovat").textContent = fmt(pos);
 }
 function seekCut(c) {   // jump within the rough cut; keeps playing if it was playing, else shows that frame
   setPos(c); v.currentTime = P.toSrc(pos); $("#clock").hidden = false;
@@ -445,6 +463,7 @@ function renderGraphics() {
       meta.append(t);
       const d = document.createElement("span"); d.textContent = `${(g.end - g.start).toFixed(1)} с на екрані`; meta.append(d);
       const p = document.createElement("span"); p.textContent = placeText(g); meta.append(p);
+      if (g.user) { const fx = document.createElement("span"); fx.textContent = "ефект: " + ({ soft: "плавна поява", slide: "виліт збоку", polaroid: "полароїд", glass: "скло", zoom: "наближення" }[g.effect] || g.effect); meta.append(fx); }
       if (g.moved) { const m = document.createElement("span"); m.className = "warnline"; m.textContent = "Її перше слово вирізано, тому вона зсунулась на наступне слово."; meta.append(m); }
     }
     const seg = document.createElement("div"); seg.className = "seg"; seg.setAttribute("role", "group"); seg.setAttribute("aria-label", "Рішення для " + g.kind);
@@ -464,6 +483,30 @@ function renderGraphics() {
   $("#gtally").innerHTML = `<span>графіки: <b>${GFX.length}</b></span><span>залишити: <b>${n.k}</b></span><span>змінити: <b>${n.c}</b></span><span>прибрати: <b>${n.d}</b></span>`;
 }
 const box_ = g => box(g, false);
+
+// ---------- overlays they upload: an image or video from the current rough-cut moment ----------
+let assets = null;
+function wordAtCut(c) {   // the kept word nearest this rough-cut moment: overlays hang on words so they move with the cut
+  const src = P.toSrc(c); let best = null;
+  for (const i of P.kept) if (!R.words[i].filler && (best === null || Math.abs(R.words[i].s - src) < Math.abs(R.words[best].s - src))) best = i;
+  return best;
+}
+$("#ovadd").addEventListener("click", async () => {
+  const f = $("#ovfile").files[0], msg = $("#ovmsg"), btn = $("#ovadd");
+  if (!f) { msg.textContent = "Спершу вибери файл."; $("#ovfile").focus(); return; }
+  if (!assets) { msg.textContent = "Завантаження тут недоступне. Кинь файл у папку рілса й напиши Claude."; return; }
+  if (f.size > 20 * 1024 * 1024) { msg.textContent = "Файл більший за 20 МБ. Кинь його в папку рілса й напиши Claude, на якій секунді."; return; }
+  const w0 = wordAtCut(pos); if (w0 === null) { msg.textContent = "Тут немає жодного слова в нарізці."; return; }
+  const at = pos, mode = $("#ovmode").value, effect = $("#oveffect").value, dur = Math.min(30, Math.max(0.5, +$("#ovdur").value || 3));
+  btn.disabled = true; msg.textContent = "Завантажую…";
+  try {
+    const up = await assets.upload(f);
+    mutate(() => { S.overlays = [...(S.overlays || []), { id: "ov" + Date.now().toString(36), assetId: up.id, url: up.url, name: f.name,
+      kind: f.type.startsWith("video") ? "video" : "image", mode, effect, dur, w0 }]; });
+    msg.textContent = `Додано з ${fmt(at)}. Воно у вкладці «Графіка».`; $("#ovfile").value = "";
+  } catch (e) { msg.textContent = "Не вдалося завантажити (" + (e?.code || "помилка") + "). Спробуй ще раз або кинь файл у папку рілса."; }
+  finally { btn.disabled = false; }
+});
 
 // ---------- 3. captions ----------
 function capsEditable() { if (!S.captions) S.captions = JSON.parse(JSON.stringify(R.captions)); return S.captions; }
@@ -579,7 +622,7 @@ $("#revadd").addEventListener("click", () => {
 
 function renderAll() {
   renderCuts(); renderGraphics(); renderCaptions(); renderSound(); renderPreview();
-  const sent = { cuts: S.cut != null, graphics: Object.keys(S.board).length, captions: S.captions != null, sound: Object.keys(S.sfxOff).length || S.voiceClean === false };
+  const sent = { cuts: S.cut != null, graphics: Object.keys(S.board).length || (S.overlays || []).length, captions: S.captions != null, sound: Object.keys(S.sfxOff).length || S.voiceClean === false };
   $$(".tab").forEach(b => { const d = b.querySelector(".dot"); if (d) d.hidden = !sent[b.dataset.tab]; });
 }
 
@@ -603,6 +646,8 @@ function renderAll() {
       if (R.fonts.accent) rt.style.setProperty("--f-display", '"ra", Georgia, serif');
       if (R.fonts.body) rt.style.setProperty("--f-body", '"rb", system-ui, sans-serif');
     }
+    assets = await window.claude?.use?.("assets");   // only editors get it; others don't see the overlay button
+    $("#ovbox").hidden = !assets;
     ref = db.doc("review/current");
     const rv = await ref.get(); if (rv.exists) S = { ...blank(), ...JSON.parse(JSON.stringify(rv.data())) };
     // someone else (Claude, another tab) changed the decisions: take theirs instead of saving a stale copy over it

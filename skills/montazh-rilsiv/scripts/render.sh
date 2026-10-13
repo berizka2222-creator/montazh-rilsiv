@@ -22,7 +22,7 @@ fi
 [ -s "$S/../engine/gsap.min.js" ] || bash "$S/setup_engine.sh"
 stamp "build:start"; python3 "$S/build_reel.py" "$REEL" ${ARGS[@]+"${ARGS[@]}"}; stamp "build:end"
 stamp "render:start"
-nice -n 15 npx -y hyperframes@0.8.145 render "$REEL/proj" --workers "$WORKERS" -o "$REEL/final.mp4" --resolution "$RES" --quality delivery --quiet
+nice -n 15 npx -y hyperframes@0.8.145 render "$REEL/proj" --workers "$WORKERS" -o "$REEL/final.mp4" --resolution "$RES" --quality delivery --crf "${REEL_CRF:-14}" --quiet   # CRF 14: graphics and skin stay clean through Instagram's own re-encode
 stamp "render:end"
 # Final mix. Optional music bed (brand.json "music": path) sits ~18 dB under the voice and ducks further while she talks.
 # Then bring the whole mix to -14 LUFS (video copied, not re-encoded).

@@ -127,7 +127,7 @@ def do_import(reel, review):
     reel_json = json.load(open(reel / "review_reel.json"))
     d = json.load(open(review)) if Path(review).exists() else {}
     # same defaults as the page's blank() + decisions(), so the build's fingerprint matches what the page computes
-    d = {"restoredFillers": [], "restoredPauses": [], "trimmedPauses": [], "board": {}, "sfxOff": {}, **d}
+    d = {"restoredFillers": [], "restoredPauses": [], "trimmedPauses": [], "board": {}, "sfxOff": {}, "overlays": [], **d}
     if d.get("cut") is None: d["cut"] = reel_json["proposedCut"]          # [] is a real decision ("cut nothing"), not "unset"
     if d.get("captions") is None: d["captions"] = reel_json["captions"]
     P = node(reel_json, d)
@@ -138,7 +138,7 @@ def do_import(reel, review):
     caps = [{"start": round(c["start"], 3), "end": round(c["end"], 3),
              "words": [{"text": re.sub(r"[.,!?;:]+$", "", w["text"]), "t": round(w["t"], 3), "accent": w["accent"]} for w in c["words"]]}
             for c in P["captions"] if not c.get("gone")]
-    cards, changes = [], []
+    cards, changes, overlays = [], [], []
     for g in P["graphics"]:
         if g.get("gone") or g["state"] == "d": continue
         note = ((d.get("board") or {}).get(g["id"]) or {}).get("note")
@@ -146,6 +146,12 @@ def do_import(reel, review):
         spec = {k: v for k, v in g.items() if k not in ("id", "kind", "what", "w0", "w1", "state", "place", "moved", "gone")}
         spec.update(start=round(g["start"], 3), end=round(g["end"], 3), id=g["id"])
         if g["id"] in (d.get("sfxOff") or {}) and d["sfxOff"][g["id"]]: spec["sfx"] = False
+        if g.get("type") == "overlay":   # uploaded on the page: Claude downloads the asset into <reel>/overlays/ before rendering
+            spec = {k: v for k, v in spec.items() if k not in ("imgUrl", "user", "media")}
+            spec["src"] = f"overlays/{g['assetId']}"
+            have = list((reel / "overlays").glob(g["assetId"] + ".*")) if (reel / "overlays").exists() else []
+            overlays.append(f"{g['id']} @ cut {g['start']:.1f}-{g['end']:.1f}s, {g['mode']}, {g.get('what', '')}: "
+                            + ("file ready" if have else f"DOWNLOAD asset {g['assetId']} into {reel / 'overlays'}"))
         cards.append(spec)
     punch, last = [], -9.0   # punch-ins on sentence starts in the cut, at most every ~6 s (emphasis, not every line)
     for c in caps:
@@ -153,6 +159,7 @@ def do_import(reel, review):
     json.dump({"captions": caps, "punch": punch, "cards": cards, "hash": P["hash"]}, open(reel / "edit.json", "w"), indent=1)
     print(f"cut {P['cutDur']:.1f}s from {len(P['spans'])} spans; {len(caps)} captions; {len(cards)} graphics; hash {P['hash']}")
     for c in changes: print("CHANGE REQUESTED:", c)
+    for o in overlays: print("OVERLAY:", o)
     for k, n in (d.get("notes") or {}).items():
         if n.strip(): print(f"NOTE ({k}):", n.strip())
     if (d.get("brandRequest") or "").strip(): print("BRAND CHANGE REQUESTED (only apply if confirmed):", d["brandRequest"].strip())

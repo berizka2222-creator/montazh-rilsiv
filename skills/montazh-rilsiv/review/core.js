@@ -74,6 +74,10 @@
     return out;
   }
 
+  // where an uploaded overlay sits on the 1080x1920 frame, per size choice (build_reel.py uses the same boxes)
+  const OVERLAY_PLACE = { full: [0, 0, 1080, 1920], big: [90, 150, 900, 640], box: [90, 150, 900, 640],
+                          "small-r": [600, 170, 400, 500], "small-l": [80, 170, 400, 500] };
+
   // graphics anchored to source words -> cut-time windows; a card ends with its phrase unless endWord is set
   function graphics(reel, d, P) {
     const W = reel.words, firstKeptFrom = i => { for (let k = i; k < W.length; k++) if (!P.removed(k)) return k; return null; };
@@ -86,12 +90,20 @@
       else { let k = a; while (k < W.length - 1 && !/[.,!?;:]$/.test(W[k].text) && W[k + 1].s - W[k].e < 0.35 && P.toCut(W[k].e) - P.toCut(W[a].s) < 4) k++; endSrc = W[k].e; }
       const start = P.toCut(W[a].s), end = Math.max(start + 1, P.toCut(endSrc) + 0.15);
       return { ...g, state, start, end: Math.min(end, P.cutDur), moved: a !== g.w0 };
-    });
+    }).concat((d.overlays || []).map(o => {   // overlays they added on the page: an uploaded image/video from a word, for o.dur seconds
+      const state = ((d.board || {})[o.id] || {}).state || "k", a = firstKeptFrom(o.w0);
+      const g = { id: o.id, type: "overlay", kind: "Накладення", what: o.name, mode: o.mode, effect: o.effect || "soft", media: o.kind, assetId: o.assetId,
+                  place: OVERLAY_PLACE[o.mode] || OVERLAY_PLACE.big, imgUrl: o.kind === "image" ? o.url : null, w0: o.w0, user: true };
+      if (a === null) return { ...g, state, gone: true };
+      const start = P.toCut(W[a].s);
+      return { ...g, state, start, end: Math.min(start + (o.dur || 3), P.cutDur), moved: a !== o.w0 };
+    }));
   }
 
   // a fingerprint of everything that changes the render, to tell whether a built preview is outdated
   function hash(d) {
-    const s = JSON.stringify([d.cut, d.restoredFillers, d.restoredPauses, d.trimmedPauses, d.captions, d.board, d.sfxOff, d.voiceClean === false]);
+    const s = JSON.stringify([d.cut, d.restoredFillers, d.restoredPauses, d.trimmedPauses, d.captions, d.board, d.sfxOff, d.voiceClean === false]
+      .concat((d.overlays || []).length ? [d.overlays] : []));   // overlays only when there are some, so older builds keep their hash
     let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0;
     return (h >>> 0).toString(36);
   }

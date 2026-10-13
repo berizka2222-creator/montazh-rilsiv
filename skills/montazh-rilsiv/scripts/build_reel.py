@@ -26,6 +26,9 @@ edit.json (written by auto_edit.py, then Claude marks accents and adds cards):
                                                      a HyperFrames sub-composition written for this reel (own motion design
                                                      on a phrase or sentence, or a full-screen takeover). Everything in the
                                                      src file's folder is copied along (fonts, js). Default box = full frame.
+     overlay {src: "overlays/<file or asset id>", mode: "small-r"|"small-l"|"big"|"full", effect: "soft"|"slide"|"polaroid"|"glass"|"zoom"}
+                                                     an image or video they uploaded on the review page (or dropped in the folder):
+                                                     a small card top right/left, a wide panel above the head, or full screen; video muted
      follow {words: [{text, accent}], framing: "wide"}   caption-camera-follow in brand colours/font: one sentence
                                                      written word by word across a camera that pulls back (hook moments)
   Any card: "glass": true gives the frosted liquid-glass look (card, tag).
@@ -44,6 +47,10 @@ edit = json.load(open(reel / "edit.json"))
 C = brand["colors"]
 MAIN, POP, LIGHT = C["main"], C["pop"], C.get("light", "#FFFFFF")
 CAP, CAP_ACC = C.get("caption", "#FFFFFF"), C.get("caption_accent", POP)
+ACC_COLS = [CAP_ACC] + ([C["caption_accent_2"]] if C.get("caption_accent_2") else [])   # 2 accent colours: accent words alternate
+_acc_n = [0]
+def next_acc():
+    _acc_n[0] += 1; return ACC_COLS[(_acc_n[0] - 1) % len(ACC_COLS)]
 CAPS = brand.get("captions", {})
 GLASS_ALL = bool(brand.get("glass"))
 def _rgba(hexc, a):
@@ -184,12 +191,55 @@ for i, c in enumerate(edit.get("cards", [])):
         mid.append(f'<div id="{cid}" class="block" style="opacity:0;visibility:hidden;background:{c.get("color", MAIN)}">'
                    f'<div class="frame"><video id="{cid}v" src="master.mp4" muted playsinline data-start="{q(a)}" data-duration="{q(b - a)}" data-media-start="{q(a)}" data-track-index="{9 + i}"></video></div>'
                    f'<div class="bl" style="{font("head", fit(c.get("top", ""), 210))};top:230px;text-align:left;color:{LIGHT}">{esc(case(c.get("top", "")))}</div>'
-                   f'<div class="bl" style="{font("head", fit(c.get("bottom", ""), 210))};top:1500px;text-align:right;color:#fff">{esc(case(c.get("bottom", "")))}</div></div>')
+                   f'<div class="bl" style="{font("head", fit(c.get("bottom", ""), 210))};top:1490px;text-align:right;color:#fff">{esc(case(c.get("bottom", "")))}</div></div>')
         js.append(f'tl.set("#{cid}",{{autoAlpha:1}},{q(a)});tl.fromTo("#{cid}",{{clipPath:"inset(0% 0% 0% 100%)"}},{{clipPath:"inset(0% 0% 0% 0%)",duration:0.22,ease:"power3.out"}},{q(a)});'
                   f'tl.fromTo("#{cid} .frame",{{scale:0.82}},{{scale:1,duration:0.5,ease:"back.out(1.6)"}},{q(a + 0.05)});'
                   f'tl.fromTo("#{cid} .bl",{{clipPath:"inset(0% 100% 0% 0%)"}},{{clipPath:"inset(0% 0% 0% 0%)",duration:0.34,ease:"power3.out",stagger:0.3}},{q(a + 0.12)});'
                   f'tl.to("#{cid}",{{clipPath:"inset(0% 100% 0% 0%)",duration:0.2,ease:"power3.in"}},{q(b - 0.2)});tl.set("#{cid}",{{autoAlpha:0}},{q(b)});')
         sfx("swish", a - 0.08, -12)
+    elif kind == "overlay":
+        # an image or video they uploaded at a moment on the review page (or dropped in the reel folder).
+        # mode (size): "full" covers the frame, "big" a wide panel above the head, "small-r"/"small-l" a small card top right/left.
+        # effect: soft (fade + settle), slide (flies in from the side), polaroid (white frame, tilted), glass (brand frosted
+        # frame), zoom (slow push-in). Video plays muted: her voice carries on.
+        src = next((p for p in (reel / c["src"], HOME / "assets" / c["src"], Path(c["src"]).expanduser()) if p.is_file()), None) \
+            or next(iter(sorted((reel / Path(c["src"]).parent).glob(Path(c["src"]).name + ".*"))), None)
+        if not src: print(f"warning: overlay not found: {c['src']} (download it first)"); continue
+        mode = {"box": "big"}.get(c.get("mode", "big"), c.get("mode", "big"))
+        x, y, ow, oh = {"full": (0, 0, 1080, 1920), "big": (90, 150, 900, 640), "small-r": (600, 170, 400, 500),
+                        "small-l": (80, 170, 400, 500)}.get(mode, (90, 150, 900, 640))
+        full = mode == "full"
+        fx = c.get("effect", "soft")
+        if full and fx in ("polaroid", "glass"): fx = "soft"                 # a frame needs a border around it: not on a full screen
+        frame = {"polaroid": "padding:14px 14px 48px;background:#fff;border-radius:6px;box-shadow:0 30px 70px rgba(0,0,0,.35)",
+                 "glass": f"padding:12px;background:{GLASS_TINT};border:1.5px solid rgba(255,255,255,.45);border-radius:30px;"
+                          "backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 24px 60px rgba(0,0,0,.28)"}.get(fx,
+                 "" if full else "border-radius:28px;border:3px solid rgba(255,255,255,.55);box-shadow:0 24px 60px rgba(0,0,0,.3)")
+        inner_r = "0" if full else ("2px" if fx == "polaroid" else "20px" if fx == "glass" else "25px")
+        cover = "width:100%;height:100%;object-fit:cover;display:block"
+        if src.suffix.lower() in (".mp4", ".mov", ".m4v", ".webm"):
+            b = min(b, a + dur_of(src))                                      # never outlast the clip
+            dst = proj / "img" / f"ov{i}.mp4"                                # one clean H.264 copy at its display size, no audio
+            vf = "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920" if full else "scale=1280:-2"
+            subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(src), "-an", "-vf", vf + ",fps=30", "-c:v", "libx264", "-preset", "medium",
+                            "-crf", "14", "-g", "30", "-keyint_min", "30", "-pix_fmt", "yuv420p", str(dst)], check=True)
+            media = (f'<video id="{cid}v" src="img/{dst.name}" muted playsinline data-start="{q(a)}" data-duration="{q(b - a)}" '
+                     f'data-media-start="0" data-track-index="{9 + i}" style="{cover}"></video>')
+        else:
+            media = f'<img src="{img(str(src))}" style="{cover}" />'
+        (mid if full else front).append(
+            f'<div id="{cid}" style="position:absolute;left:{x}px;top:{y}px;width:{ow}px;height:{oh}px;box-sizing:border-box;{frame};opacity:0;visibility:hidden">'
+            f'<div class="m" style="width:100%;height:100%;overflow:hidden;border-radius:{inner_r}">{media}</div></div>')
+        show(f"#{cid}", a, b, 0.15)
+        side = -1 if mode == "small-l" else 1
+        js.append({
+            "slide": f'tl.fromTo("#{cid}",{{x:{side * 760},rotation:{side * 6}}},{{x:0,rotation:0,duration:0.55,ease:"back.out(1.3)"}},{q(a)});',
+            "polaroid": f'tl.fromTo("#{cid}",{{y:-260,rotation:{-side * 16},scale:0.9}},{{y:0,rotation:{-side * 4},scale:1,duration:0.6,ease:"back.out(1.5)"}},{q(a)});',
+            "glass": f'tl.fromTo("#{cid}",{{scale:0.8,filter:"blur(10px)"}},{{scale:1,filter:"blur(0px)",duration:0.45,ease:"back.out(1.6)"}},{q(a)});',
+        }.get(fx, f'tl.fromTo("#{cid}",{{scale:{1.04 if full else 0.85}}},{{scale:1,duration:0.4,ease:"power3.out"}},{q(a)});'))
+        if fx == "zoom":   # slow push-in on the picture itself for the whole time it is on screen
+            js.append(f'tl.fromTo("#{cid} .m > *",{{scale:1}},{{scale:1.14,duration:{max(b - a, 0.5):.2f},ease:"none"}},{q(a)});')
+        sfx("whoosh" if fx == "slide" else "pop" if fx == "polaroid" else "swish", a - 0.05, -13)
     elif kind == "card":
         rows = c.get("rows", [])
         rt = c.get("row_times") or [a + 0.45 + 0.35 * j for j in range(len(rows))]
@@ -300,7 +350,7 @@ for i, c in enumerate(edit.get("cards", [])):
         t = src.read_text()
         words = [{"text": case(w["text"]), **({"accent": True} if w.get("accent") else {})} for w in c["words"]]
         n = max(len(words), 1); dur = b - a
-        t = re.sub(r"var WORDS = \[.*?\];", "var WORDS = " + json.dumps(words) + ";", t, flags=re.S)
+        t = re.sub(r"var WORDS = \[.*?\];", lambda _: "var WORDS = " + json.dumps(words) + ";", t, flags=re.S)   # lambda: \u escapes from non-Latin words are not regex escapes
         t = t.replace("var DUR = 9;", f"var DUR = {dur:.2f};").replace("var STEP = 0.52;", f"var STEP = {max(0.22, (dur - 1.2) / n):.3f};")
         t = t.replace('var ACCENT = ACCENTS[pick(ACCENTS, vars.accent, "gold")];', f'var ACCENT = "{CAP_ACC}";')
         t = t.replace('data-duration="9"', f'data-duration="{dur:.2f}"')
@@ -341,7 +391,7 @@ for i, c in enumerate(edit.get("captions", [])):
     big = 1.7 if CAPS.get("style") == "editorial" else 1.12          # editorial = dramatic size contrast on the emphasis word
     big = min(big, min((fit(w["text"], px * big) / px) for w in ws if w.get("accent")) if any(w.get("accent") for w in ws) else big)
     blk = "display:block;line-height:.95;" if CAPS.get("style") == "editorial" and len(ws) > 1 else ""
-    spans = "".join(f'<span class="acc" style="{blk}{font("accent", int(px * big))};color:{CAP_ACC}">{esc(case(w["text"]))}</span> ' if w.get("accent")
+    spans = "".join(f'<span class="acc" style="{blk}{font("accent", int(px * big))};color:{next_acc()}">{esc(case(w["text"]))}</span> ' if w.get("accent")
                     else f'<span>{esc(case(w["text"]))}</span> ' for w in ws)
     front.append(f'<div id="c{i}" class="cap" style="top:{CAP_Y}px;{font("body", int(px))};color:{CAP};letter-spacing:{CAPS.get("tracking", -0.02)}em">{spans.strip()}</div>')
     show(f"#c{i}", c["start"], c["end"], 0.06)
@@ -361,7 +411,7 @@ html, body {{ margin: 0; background: #000; overflow: hidden; }}
 .title {{ position: absolute; left: 0; top: 170px; width: {W}px; padding: 0 90px; box-sizing: border-box; line-height: .88; letter-spacing: -.045em; text-shadow: 0 0 3px rgba(0,0,0,.18), 0 6px 34px rgba(0,0,0,.4); }}
 .tl {{ white-space: nowrap; }}
 .block {{ position: absolute; inset: 0; }}
-.frame {{ position: absolute; left: 250px; top: 470px; width: 580px; height: 1030px; overflow: hidden; border: 10px solid #fff; border-radius: 8px; box-shadow: 0 24px 60px rgba(0,0,0,.22); }}
+.frame {{ position: absolute; left: 250px; top: 440px; width: 580px; height: 1000px; overflow: hidden; border: 10px solid #fff; border-radius: 8px; box-shadow: 0 24px 60px rgba(0,0,0,.22); }}
 .frame video {{ width: 100%; height: 100%; object-fit: cover; display: block; }}
 .bl {{ position: absolute; left: 0; width: {W}px; padding: 0 90px; box-sizing: border-box; line-height: .82; letter-spacing: -.05em; white-space: nowrap; }}
 .card {{ position: absolute; left: 90px; top: 150px; width: 900px; background: #fff; border-radius: 40px; overflow: hidden; padding-bottom: 22px; box-shadow: 0 30px 70px rgba(0,0,0,.25); }}

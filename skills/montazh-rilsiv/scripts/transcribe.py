@@ -42,16 +42,39 @@ def scribe(k):
         except urllib.error.HTTPError as e:
             msg = e.read().decode(errors="replace")[:200]
             if e.code in (400, 422) and "model" in msg.lower(): continue      # model id not offered: try the older one
-            sys.exit(f"ElevenLabs error {e.code}: {msg}")
-    sys.exit("ElevenLabs: no usable Scribe model")
+            print(f"ElevenLabs error {e.code}: {msg}", file=sys.stderr); return None, None
+        except (urllib.error.URLError, TimeoutError) as e:
+            print(f"ElevenLabs unreachable: {e}", file=sys.stderr); return None, None
+    print("ElevenLabs: no usable Scribe model", file=sys.stderr); return None, None
 
 k = key()
-if k:
-    model, words = scribe(k)
+model, words = scribe(k) if k else (None, None)
+if words is not None:
     print(f"transcribed with ElevenLabs {model}: {len(words)} words")
-else:
-    d = out.parent / (out.stem + "_whisper")
-    subprocess.run(["npx", "-y", "hyperframes", "transcribe", str(src), "-d", str(d), "--json", *asr_args(BRAND)], capture_output=True, check=True)
-    words = json.load(open(d / "transcript.json"))
-    print(f"transcribed with local Whisper (no ElevenLabs key): {len(words)} words - timing can drift ~0.3 s")
+else:   # no key, or the key/network failed: the free local route, so an edit never stops on a bad key
+    if k: print("falling back to local Whisper - fix ELEVENLABS_API_KEY in ~/.config/reels/.env (it starts with sk_)", file=sys.stderr)
+    # Whisper's word times drift on long audio (up to ~1 s by a minute in). So it hears the clip in ~6 s pieces,
+    # each split at the quietest moment nearby, and the times are offset back: word timing stays within ~0.2 s.
+    import array, math, wave
+    d = out.parent / (out.stem + "_whisper"); d.mkdir(exist_ok=True)
+    wav = d / "a.wav"
+    subprocess.run(["ffmpeg", "-nostdin", "-v", "error", "-y", "-i", str(src), "-vn", "-ac", "1", "-ar", "16000", str(wav)], check=True)
+    w = wave.open(str(wav)); sr = w.getframerate(); pcm = array.array("h"); pcm.frombytes(w.readframes(w.getnframes())); dur = len(pcm) / sr
+    def lev(t):
+        s = pcm[int(t * sr):int(t * sr) + int(sr * 0.01)] or [0]
+        return math.sqrt(sum(x * x for x in s) / len(s))
+    STEP = float(os.environ.get("REEL_ASR_CHUNK", 6))
+    cuts, t = [0.0], STEP - 1
+    while t < dur - STEP / 2:
+        q = min((lev(t + k * 0.01), t + k * 0.01) for k in range(300))[1]   # quietest 10 ms in the next 3 s
+        cuts.append(round(q, 2)); t = q + STEP - 1
+    cuts.append(dur)
+    words = []
+    for i, (a, b) in enumerate(zip(cuts, cuts[1:])):
+        cw, cd = d / f"c{i}.wav", d / f"c{i}"
+        subprocess.run(["ffmpeg", "-nostdin", "-v", "error", "-y", "-ss", str(a), "-t", str(b - a), "-i", str(wav), str(cw)], check=True)
+        subprocess.run(["npx", "-y", "hyperframes", "transcribe", str(cw), "-d", str(cd), "--json", *asr_args(BRAND)], capture_output=True, check=True)
+        for x in json.load(open(cd / "transcript.json")):
+            words.append({"text": x["text"], "start": round(a + x["start"], 3), "end": round(a + min(x["end"], b - a), 3)})
+    print(f"transcribed with local Whisper (no ElevenLabs key) in {len(cuts) - 1} pieces: {len(words)} words")
 json.dump(words, open(out, "w"))

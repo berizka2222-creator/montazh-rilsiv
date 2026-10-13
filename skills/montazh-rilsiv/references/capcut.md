@@ -21,7 +21,7 @@ Never promise it works. If the connector fails, deliver the MP4 and say why.
    ```
    Then in Claude Code run `/mcp`, pick `capcut_creation`, and log in to CapCut in the browser.
 3. Get CapCut's helper scripts: download the official CapCut plugin from https://www.capcut.com/tools/capcut-x-codex, unzip it, and set `CAPCUT_SKILLS_DIR` to its `skills` folder (the one containing `capcut-stdraft-builder` and `capcut-upload`). Don't run its installer - it targets a different app.
-4. Fonts: CapCut's connector only offers a small font list. To use the person's brand font, they add it to their CapCut brand kit, apply it to one caption in the editor, then you read its `vimo://` URI back with `get_stdraft_snapshot` and save it as `capcut_font` in brand.json.
+4. Fonts (required for any non-English reel): CapCut's library fonts, the default Work Sans included, have no Cyrillic, so Ukrainian captions come out spaced-out and wrap mid-word. `capcut_draft.py` refuses to build without `capcut_font` for a non-English brand. CapCut's connector only offers a small font list. To use the person's brand font, they add it to their CapCut brand kit, apply it to one caption in the editor, then you read its `vimo://` URI back with `get_stdraft_snapshot` and save it as `capcut_font` in brand.json.
 
 ## What step 5 must produce on this route
 

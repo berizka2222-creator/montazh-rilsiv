@@ -22,6 +22,16 @@ W, H = brand.get("resolution", [1080, 1920])
 DUR = int(up["result"]["VideoMeta"]["Duration"] * 1000)
 col = brand["colors"]
 BASE, ACCENT, ON_LIGHT = col.get("caption", "#FFFFFF"), col.get("caption_accent", col["pop"]), col["pop"]
+ACC_COLS = [ACCENT] + ([col["caption_accent_2"]] if col.get("caption_accent_2") else [])   # accent words alternate colours
+_acc_n = [0]
+def next_acc():
+    _acc_n[0] += 1; return ACC_COLS[(_acc_n[0] - 1) % len(ACC_COLS)]
+if not brand.get("capcut_font") and (brand.get("language") or "en") != "en":
+    # CapCut's library fonts (Work Sans included) are Latin-only: Cyrillic captions fall back to a broken face
+    # (spaced-out letters, words wrapping mid-word). The brand font from their CapCut brand kit is the only safe choice.
+    sys.exit("No capcut_font in brand.json, and the library default has no Cyrillic. Ask them to add their caption font "
+             "to their CapCut brand kit and apply it to one caption; read its vimo:// URI with get_stdraft_snapshot and "
+             "save it as capcut_font (accent face: capcut_font_accent). See references/capcut.md, step 4.")
 FONT = brand.get("capcut_font") or "vimo://7200959526265164290"   # Work Sans Medium, a clean default from CapCut's library
 ACC_FONT = brand.get("capcut_font_accent") or FONT                # accent words (e.g. a serif italic from the brand kit)
 TRACK = brand.get("captions", {}).get("tracking", 0.0)
@@ -30,7 +40,10 @@ ITALIC = 10.0 if brand.get("fonts", {}).get("accent", {}).get("style") == "itali
 # Layout is worked out on a 1080x1920 grid; CapCut positions are -1..1 so it scales to any canvas.
 PX = 4.8                                  # CapCut font_size 1 ~= 4.8 px on a 1080-wide frame
 CHAR_W = 0.62                             # average character width in em (Work Sans measured wider than 0.56 in CapCut)
-SIZE = {"sm": 58, "big": 104, "acc": 140}
+_cc = brand.get("captions", {})
+# captions.capcut_size = the size they pick in CapCut's own font-size box (wins); else the brand caption px size scales all three
+_cap = _cc["capcut_size"] * PX / 104 if _cc.get("capcut_size") else _cc.get("size", 104) / 104
+SIZE = {"sm": round(58 * _cap), "big": round(104 * _cap), "acc": round(140 * _cap)}
 
 # CapCut library sounds (sid, length ms). Add more by searching the library with search_capcut_material.
 SFX = {"whoosh": ("sid://6993230936988977154", 566), "whoosh-short": ("sid://6993230936993204226", 566),
@@ -62,11 +75,12 @@ def patch(sid, k, a, b, px, color, acc):   # restyles letters a..b inside one ca
 
 def grouped(caps, n=3):
     """One-word captions become 2-3 word layers in CapCut: half the layers to tweak, and pushes stay under the size limit."""
-    if not caps or max(len(c["lines"][0]) for c in caps) > 1: return caps
+    if not caps or any(len(c["lines"]) > 1 for c in caps): return caps   # multi-line captions keep their own layout
+    words = lambda x: x["lines"][0]
     out, cur = [], []
-    for c in caps:
-        chars = sum(len(x["lines"][0][0]["text"]) + 1 for x in cur) + len(c["lines"][0][0]["text"])
-        if cur and (len(cur) == n or chars > 16 or c["start"] - cur[-1]["end"] > 0.25 or c.get("over_light") != cur[0].get("over_light")):
+    for c in caps:   # a caption the person merged (2-3 words) counts as its words, so one merge doesn't switch grouping off
+        chars = sum(len(w["text"]) + 1 for x in cur for w in words(x)) + sum(len(w["text"]) + 1 for w in words(c)) - 1
+        if cur and (sum(len(words(x)) for x in cur) + len(words(c)) > n or chars > 16 or c["start"] - cur[-1]["end"] > 0.25 or c.get("over_light") != cur[0].get("over_light")):
             out.append({"start": cur[0]["start"], "end": cur[-1]["end"], "over_light": cur[0].get("over_light", False),
                         "lines": [[w for x in cur for w in x["lines"][0]]]}); cur = []
         cur.append(c)
@@ -76,7 +90,10 @@ def grouped(caps, n=3):
 
 def captions(layers=(4, 5, 6, 7)):
     out = []
-    for g, c in enumerate(grouped(json.load(open(reel / "captions.json")))):
+    caps = grouped(json.load(open(reel / "captions.json")))
+    for a, b in zip(caps, caps[1:]):   # CapCut rejects overlapping text on one layer: end each caption where the next starts
+        b["start"] = max(b["start"], a["start"] + 0.05); a["end"] = min(a["end"], b["start"])
+    for g, c in enumerate(caps):
         light = c.get("over_light", False)
         scale = 0.88 if light else 1.0
         base, acc = (ON_LIGHT, ON_LIGHT) if light else (BASE, ACCENT)
@@ -86,11 +103,13 @@ def captions(layers=(4, 5, 6, 7)):
             kinds = {w["kind"] for w in line}
             main = kinds.pop() if len(kinds) == 1 else "big"
             text, pos, pats = "", 0, []
+            for w in line:
+                if w["kind"] == "acc": w["col"] = ON_LIGHT if light else next_acc()
             for wi, w in enumerate(line):
                 s = ("" if wi == 0 else " ") + w["text"]
                 a, b = pos + (0 if wi == 0 else 1), pos + len(s)
                 if w["kind"] != main:
-                    pats.append((a, b, SIZE[w["kind"]] * scale, acc if w["kind"] == "acc" else base, w["kind"] == "acc"))
+                    pats.append((a, b, SIZE[w["kind"]] * scale, w["col"] if w["kind"] == "acc" else base, w["kind"] == "acc"))
                 text += s; pos += len(s)
             tallest = max(SIZE[w["kind"]] for w in line) * scale
             width = sum((len(w["text"]) + 1) * CHAR_W * SIZE[w["kind"]] * scale for w in line)   # +1 = the space
@@ -98,7 +117,7 @@ def captions(layers=(4, 5, 6, 7)):
                 k = 900 / width; scale *= k; width = 900; tallest *= k
                 pats = [(a, b, px * k, col, ac) for a, b, px, col, ac in pats]
             cx = 540                                           # always centred: offsets pushed long lines off-frame
-            out.append(text_seg(sid, text, cx, y + tallest * 0.5, SIZE[main] * scale, acc if main == "acc" else base,
+            out.append(text_seg(sid, text, cx, y + tallest * 0.5, SIZE[main] * scale, line[0]["col"] if main == "acc" else base,
                                 max(line[0]["t"] - 0.04, c["start"]), c["end"], layers[li % len(layers)], main == "acc"))
             out += [patch(sid, k, a, b, px, colr, ac) for k, (a, b, px, colr, ac) in enumerate(pats)]
             y += tallest * 0.95

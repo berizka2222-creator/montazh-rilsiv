@@ -8,6 +8,18 @@ TMP="$(mktemp -d)"; trap 'rm -rf "$TMP"' EXIT
 ffmpeg -v error -y -i "$IN" -vn -ac 1 -ar 48000 "$TMP/raw.wav"
 SRC="$TMP/raw.wav"
 
+# brand.json "clean_voice": false = leave the voice as recorded: volume only (no denoise, EQ, de-ess or compression),
+# raised toward -14 LUFS but never past -1.5 dB peak
+BRAND="${REELS_HOME:-$HOME/reels}/brand.json"
+if [ -f "$BRAND" ] && [ "$(python3 -c "import json;print(json.load(open('$BRAND')).get('clean_voice', True))")" = "False" ]; then
+  E="$(ffmpeg -hide_banner -i "$SRC" -af ebur128=peak=true -f null - 2>&1)"
+  I="$(printf '%s' "$E" | grep -E '^\s+I:' | tail -1 | awk '{print $2}')"; P="$(printf '%s' "$E" | grep -E '^\s+Peak:' | tail -1 | awk '{print $2}')"
+  G="$(python3 -c "print(round(min(-14-($I), -1.5-($P)), 2))")"
+  ffmpeg -v error -y -i "$SRC" -af "volume=${G}dB" -ar 48000 "$OUT"
+  echo "clean_voice off: voice untouched, volume ${G} dB only" >&2
+  echo "$OUT"; exit 0
+fi
+
 if [[ "$DENOISE" == "--denoise" ]]; then
   if command -v deepFilter >/dev/null 2>&1; then
     deepFilter -a "${DENOISE_DB:-30}" "$SRC" -o "$TMP/dfn" >/dev/null 2>&1   # capped at 30 dB: light, natural, no underwater artefacts

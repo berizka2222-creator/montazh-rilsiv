@@ -34,13 +34,13 @@ Explain each step in one short Ukrainian sentence: the person is a beginner.
 
 Each reel gets its own folder: `~/reels/<yyyy-mm-dd>-<short-name>/`. Copy the raw clip in (never edit the original).
 
-1. **Transcribe** - `python3 scripts/transcribe.py <clip> transcript.json`. Uses ElevenLabs Scribe when `ELEVENLABS_API_KEY` is in `~/.config/reels/.env` (tight word timing; captions land on the word), else local Whisper (free, timing can drift ~0.3 s).
+1. **Transcribe** - `python3 scripts/transcribe.py <clip> transcript.json`. Uses ElevenLabs Scribe when `ELEVENLABS_API_KEY` is in `~/.config/reels/.env` (tight word timing; captions land on the word), else local Whisper heard in ~6 s pieces (free; one long pass drifts up to ~1 s by a minute in, pieces stay within ~0.2 s; ~3 min for a 2 min clip).
 2. **Clean the voice** - `bash scripts/clean_audio.sh <clip> voice.wav` (add `--denoise` if there is background noise). Targets -14 LUFS, the level Instagram and TikTok expect.
 3. **Review (their call)** - propose: lines to cut (repeats, false starts, rambles), fillers to drop, CTA moved to the end, target under 60 s, and the graphics plan. **Wait for their yes before cutting.** This is the step people care most about.
    **Look at the start and end before proposing cuts:** grab a frame every 0.5 s for the first and last 4 s. Cut any camera setup (pointing at the floor/garden, flipping the camera, reaching for the phone) even if words are spoken over it. Start on the first frame where they're settled in shot, and on a word that works as an opener.
    - **Main path: the Reel Review page.** ALWAYS run a tool search for `Artifact` and `ArtifactData` first (they are usually deferred and only appear after the search). Never decide they are missing without searching. If they do, follow `references/review.md`: they tap words to cut, watch the live rough cut, check graphics, captions, sound and colour, then say "build preview". Its import step writes `edl.json` + `edit.json`, so skip to step 4's cut and step 5.4's render.
    - **Fallback: review in chat** only when the search found no such tools. Say so in one line first: «Сторінку перевірки відкрити не можу: в цій сесії немає інструментів Artifact/ArtifactData, тому перевіряємо в чаті». Show the transcript as numbered lines (format in `references/rough-cut.md`), then the card list in step 5.
-4. **Tighten, then cut + speed** - write `edl.json` from the approved lines, then `python3 scripts/tighten.py <folder>`: it removes fillers and shortens pauses inside the kept lines, as hard as the brand's `"pacing"` says (`natural` default, `tight`, `fast`; presets in `scripts/pacing.py`). They never approve these one by one. Then `python3 scripts/cut.py <folder>`. Speed comes from the same preset unless `brand.json` sets `"speed"`. Listen-check: re-transcribe `master.mp4` and confirm no clipped words at the joins.
+4. **Tighten, then cut + speed** - write `edl.json` from the approved lines, then `python3 scripts/tighten.py <folder>`: it removes fillers and shortens pauses inside the kept lines, as hard as the brand's `"pacing"` says (`natural` default, `tight`, `fast`; presets in `scripts/pacing.py`). They never approve these one by one. Then `python3 scripts/snap_joins.py <folder>` (moves every join into the nearest quiet gap: transcript times are never exact, and a cut on them clips words), then `python3 scripts/cut.py <folder>`. Speed comes from the same preset unless `brand.json` sets `"speed"`.
 5. **Graphics + captions: fill the template, don't design.** You are the editor here, not the designer - the look is already built from the brand file.
    1. `python3 scripts/transcribe.py master.mp4 master_transcript.json`
    2. `python3 scripts/auto_edit.py <folder>` → drafts `edit.json` (captions in their caption mode, punch-ins)
@@ -48,12 +48,14 @@ Each reel gets its own folder: `~/reels/<yyyy-mm-dd>-<short-name>/`. Copy the ra
       - **Hook title: always ASK the person for the exact hook text before adding the title card. Never write or pick it yourself, not even from the transcript.** You may offer 2-3 options in their words if they ask for ideas, but the card goes in only with the text they approved. Layout: max ~10 characters per line, 2-3 lines (`"still / uploading / screenshots?"`), so it renders big. It's the only text with an outline.
       - **Carousel:** if `brand.json` has `"require_carousel": true`, every reel gets one (`motion` card, a `carousel-*` name, `images` from screenshots/their assets). If no line suits one, ask them; if they say no, set `"no_carousel_ok": true`.
       - **Screenshots:** for a tool or site they name that the line is about, run `bash scripts/screenshot.sh <url> shots/<name>.png`. Exit code 2 means the site blocked it: try the tool's marketing page, or ask them for a screenshot. Never use a blank one.
+      - Their own photos/videos at a moment: they upload them on the review page («+ Накладення тут»), or drop files in the reel folder and say where; either becomes an `overlay` card (sizes small-r/small-l/big/full, effects soft/slide/polaroid/glass/zoom; see the header of `scripts/build_reel.py`).
       - Mix the kinds: website shots, a colour block, a list card (`"glass": true` for liquid glass), a sticker from their assets, a `follow` card for the big moment, a counter or chart when they say a number.
-   4. `REEL_PREVIEW=1 bash scripts/render.sh <folder>` for the draft (1080p, low priority), then `bash scripts/render.sh <folder> --final` once they approve it (the resolution in `brand.json`; add `--capcut` on the CapCut route) → `final.mp4` + stage timings.
+   4. **Before the first render, always:** `python3 scripts/precheck.py <folder>`. It hears `master.mp4` again, re-times captions/cards/punch-ins to it, and lists every JOIN (read each: no clipped, doubled or stray word), MISSING speech with no caption, and CHECK words the caption has wrong (misheard words: fix the spelling to what they said). Fix all of it in `edit.json` (a bad join: edl + snap_joins + cut, then precheck again) so the draft they see is already right. A render takes ~6 min: never render to find these.
+   5. `REEL_PREVIEW=1 bash scripts/render.sh <folder>` for the draft (1080p, low priority) → `final.mp4` + stage timings. **When `brand.json` "resolution" is 1080x1920, this draft IS the final**: once they approve it, QA and deliver it as is, never render it again. Only a 4K brand needs `bash scripts/render.sh <folder> --final` after approval. Target: one render per reel (plus one per round of graphic changes).
    Do **not** hand-write composition HTML or use other HyperFrames workflows here: they are slower and ignore the brand template. Exception: own motion design on a phrase or sentence (see "Own motion design on phrases" below) goes in as a `custom` card.
 6. **QA** - `python3 scripts/qa.py <folder>` (loudness, size, length, missing words). Then grab a frame at every card and look: text inside the frame, readable over the background, on brand. Fix `edit.json` and re-run render.sh until it passes.
 7. **Deliver** - `bash scripts/deliver.sh <final.mp4> "<clear name>"` → upload-ready MP4 in their delivery folder.
-8. **CapCut (only if `brand.json` has `"capcut": true`)** - build the editable CapCut draft and give them the link. `references/capcut.md`.
+8. **CapCut** - `brand.json` `"capcut"`: `true` = always build the CapCut draft; `"ask"` = after delivering the MP4, ask once «Відправити ще в CapCut?» and build it only on a yes; `false` = never. Building it means one extra render with `--capcut` (no captions/sfx baked in), then `references/capcut.md`.
 
 Tell them what changed, and what to check by ear (cuts, names, brand words spelled right).
 
@@ -64,6 +66,13 @@ Besides the template cards, the person can ask for their own motion on a phrase 
 - Time it on `master_transcript.json` (the cut reel), then add to `edit.json`: `{"type": "custom", "src": "motion/<name>.html", "start": .., "end": .., "layer": "front", "full": true|false, "sfx": "whoosh"}`. Full-screen takeovers set `"full": true` (captions step aside).
 - Text behind the head / card behind the person needs a cutout (`npx hyperframes remove-background`): say it is slower before doing it.
 - Before the draft, grab a frame at the peak of every custom motion and check it.
+
+## Connecting ElevenLabs Scribe (optional, when they ask)
+Scribe gives exact word timing and hears "е/ем"; under 2 cents a reel ($0.22 per hour of audio, ElevenAPI tab → Add credits; keep Auto Top Up off).
+1. They create a key at elevenlabs.io → Developers → API Keys → Create: Restrict Key on, only **Speech to Text = Access**, everything else No Access. The real key starts with `sk_` and is shown once (the key ID is not the key).
+2. Never ask them to paste it in chat. Open a hidden-input dialog on their Mac and write it straight to the env file, printing only its length:
+   `K="$(osascript -e 'text returned of (display dialog "Встав API-ключ ElevenLabs (починається з sk_)" default answer "" with hidden answer buttons {"Скасувати","OK"} default button "OK" giving up after 600)')"`, then check it starts with `sk_`, replace the `ELEVENLABS_API_KEY=` line in `~/.config/reels/.env`, `chmod 600`.
+3. Test it on 20 s of audio with `scripts/transcribe.py` (it should say "transcribed with ElevenLabs"). A bad key falls back to Whisper with a warning, so an edit never stops on it.
 
 ## Language
 `brand.json` "language" (e.g. `"uk"`) drives transcription, filler words and QA. Talk to the person in their language. The Reel Review page UI is in Ukrainian: write every `kind` and `what` in proposal.json in Ukrainian too, and treat «збери чернетку» as "build preview" and «фінал» as "final".
@@ -78,7 +87,8 @@ If the brand file and your taste disagree, the brand file wins. If they correct 
 | Mistake | Instead |
 |---|---|
 | Editing before a brand file exists | Run the setup interview |
-| Cutting on Whisper word times blindly | Check the joins; nudge cuts into the quiet gap between words |
+| Cutting on Whisper word times blindly | `snap_joins.py` before `cut.py`, then read the JOIN lines from `precheck.py` |
+| Finding wrong words or late captions on the draft or final | `precheck.py` before the first render; one draft + one final is the target |
 | Graphics that decorate instead of illustrate | Each card shows what this exact line says |
 | Captions in a font the brand file bans | Re-read brand.md "Rules" before step 5 |
 | Saying CapCut works everywhere | It doesn't (see capcut.md). The MP4 route always works |

@@ -44,6 +44,10 @@ if kept / speed > brand.get("max_seconds", 60):
 
 subprocess.run(["nice", "-n", "15", "ffmpeg", "-y", "-v", "error", "-stats", "-i", str(src), "-i", str(audio),
                 "-filter_complex_script", str(script), "-map", "[vout]", "-map", "[aout]",
-                *((["-c:v", "h264_videotoolbox", "-b:v", "12M"] if sys.platform == "darwin" else ["-c:v", "libx264", "-preset", "veryfast", "-crf", "20"]) if os.environ.get("REEL_PREVIEW") else ["-c:v", "libx264", "-preset", "medium", "-crf", "16"]), "-pix_fmt", "yuv420p",
+                # A fast, lossy master only when the preview is a throwaway (a 4K brand re-cuts for its final). For a
+                # 1080p brand the preview IS the final, so it always gets the near-transparent encode.
+                *((["-c:v", "h264_videotoolbox", "-b:v", "12M"] if sys.platform == "darwin" else ["-c:v", "libx264", "-preset", "veryfast", "-crf", "20"])
+                  if os.environ.get("REEL_PREVIEW") and brand.get("resolution", [1080, 1920])[0] > 1080
+                  else ["-c:v", "libx264", "-preset", "medium", "-crf", "14"]), "-g", "30", "-keyint_min", "30", "-pix_fmt", "yuv420p",   # a keyframe every second: the renderer seeks frame by frame and freezes on sparse keyframes
                 "-c:a", "aac", "-b:a", "256k", "-movflags", "+faststart", str(reel / "master.mp4")], check=True)
 print(reel / "master.mp4")
