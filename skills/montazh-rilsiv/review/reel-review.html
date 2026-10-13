@@ -175,6 +175,7 @@ summary{cursor:pointer;font-weight:700}
     <section data-p="sound" hidden>
       <h2>Чистка голосу</h2>
       <p class="lede">Ті самі 10 секунд до і після: легке прибирання шуму, де-есер, еквалайзер і компресія, гучність під стандарт Instagram.</p>
+      <div class="ctl" id="voiceclean" style="margin-bottom:12px"></div>
       <div class="pair" id="audio"></div>
       <h2>Колір</h2>
       <p class="lede">Один кадр до і після кольорокорекції.</p>
@@ -520,6 +521,15 @@ function renderCaptions() {
 // ---------- 4. sound & colour ----------
 function renderSound() {
   const A = R.assets || {};
+  { // one button: clean the voice or keep the original sound
+    const vc = $("#voiceclean"), on = S.voiceClean !== false; vc.textContent = "";
+    const seg = document.createElement("div"); seg.className = "seg"; seg.setAttribute("role", "group"); seg.setAttribute("aria-label", "Чистка голосу");
+    for (const [cls, val, label] of [["k", true, "Чистити голос"], ["d", false, "Залишити звук як є"]]) {
+      const b = document.createElement("button"); b.type = "button"; b.className = cls; b.textContent = label; b.setAttribute("aria-pressed", on === val);
+      b.addEventListener("click", () => mutate(() => { S.voiceClean = val; })); seg.appendChild(b);
+    }
+    vc.appendChild(seg);
+  }
   const fig = (label, el) => { const f = document.createElement("figure"); const c = document.createElement("figcaption"); c.textContent = label; f.append(c, el); return f; };
   const au = u => { const a = document.createElement("audio"); a.controls = true; a.preload = "none"; a.src = u; return a; };
   const im = (u, alt) => { const i = document.createElement("img"); i.src = u; i.alt = alt; return i; };
@@ -569,7 +579,7 @@ $("#revadd").addEventListener("click", () => {
 
 function renderAll() {
   renderCuts(); renderGraphics(); renderCaptions(); renderSound(); renderPreview();
-  const sent = { cuts: S.cut != null, graphics: Object.keys(S.board).length, captions: S.captions != null, sound: Object.keys(S.sfxOff).length };
+  const sent = { cuts: S.cut != null, graphics: Object.keys(S.board).length, captions: S.captions != null, sound: Object.keys(S.sfxOff).length || S.voiceClean === false };
   $$(".tab").forEach(b => { const d = b.querySelector(".dot"); if (d) d.hidden = !sent[b.dataset.tab]; });
 }
 

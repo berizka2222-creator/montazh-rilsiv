@@ -131,7 +131,9 @@ def do_import(reel, review):
     if d.get("cut") is None: d["cut"] = reel_json["proposedCut"]          # [] is a real decision ("cut nothing"), not "unset"
     if d.get("captions") is None: d["captions"] = reel_json["captions"]
     P = node(reel_json, d)
-    json.dump({"source": raw_clip(reel).name, "audio": "voice.wav", "keep": [[round(a, 3), round(b, 3)] for a, b in P["spans"]]},
+    clean = d.get("voiceClean") is not False
+    if not clean: print("VOICE: keep the original sound, no clean-up (the final loudness is still levelled)")
+    json.dump({"source": raw_clip(reel).name, "audio": "voice.wav" if clean else raw_clip(reel).name, "keep": [[round(a, 3), round(b, 3)] for a, b in P["spans"]]},
               open(reel / "edl.json", "w"))
     caps = [{"start": round(c["start"], 3), "end": round(c["end"], 3),
              "words": [{"text": re.sub(r"[.,!?;:]+$", "", w["text"]), "t": round(w["t"], 3), "accent": w["accent"]} for w in c["words"]]}
