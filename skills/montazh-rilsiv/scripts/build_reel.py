@@ -9,7 +9,7 @@ edit.json (written by auto_edit.py, then Claude marks accents and adds cards):
   cards:    [{type, start, end, ...}]       types:
      title  {text: "line one / line two"}            big headline in the space above the head (hook)
      block  {top: "don't", bottom: "worry"}          full brand-colour screen with the clip framed in it (reveal)
-     card   {title: "my stack", rows: ["a","b"]}     white UI card, rows appear one by one (lists, steps, tools)
+     card   {title: "my stack", rows: ["a","b"], y?: 150}   white UI card, rows appear one by one (lists, steps, tools)
      tag    {text: "open source", y: 300}            small pill label that pops on (name drops)
      (every card: leave out "end" and it clears when the phrase it starts in finishes)
      cta    {text: "comment EDIT", y?: 1360}         call-to-action pill (kept above the bottom ~420 px IG covers); CAPS word = pop colour
@@ -60,7 +60,7 @@ def _rgba(hexc, a):
 GLASS_TINT = brand.get("glass_tint") or _rgba(C["main"], 0.38)
 TITLE_COLOR = brand.get("title_color", C["main"])
 CASE = CAPS.get("case", "lower")
-CAP_PX, CAP_Y = CAPS.get("size", 96), CAPS.get("y", 1250)
+CAP_PX, CAP_Y = edit.get("caption_size", CAPS.get("size", 96)), edit.get("caption_y", CAPS.get("y", 1250))   # a reel can move its captions (e.g. above the head)
 W, H, FPS = 1080, 1920, 30                     # authored at 1080x1920; 4K brands render with --resolution portrait-4k
 SAFE = 900                                     # guardrail: no text line may be wider than this (90 px margin each side)
 EM = 0.66                                      # conservative average glyph width (bold display fonts run ~0.6-0.66 em)
@@ -81,8 +81,19 @@ proj = reel / "proj"
 if proj.exists(): shutil.rmtree(proj)
 (proj / "fonts").mkdir(parents=True); (proj / "sfx").mkdir(); (proj / "vendor").mkdir()
 shutil.copy(ENGINE / "gsap.min.js", proj / "vendor/gsap.min.js")
-try: os.link(reel / "master.mp4", proj / "master.mp4")
-except OSError: shutil.copy(reel / "master.mp4", proj / "master.mp4")
+DRAFT = bool(os.environ.get("REEL_DRAFT"))   # fast review draft: rendered at 540x960 from a 540p copy of the master (a quarter of the pixels)
+_mh = int(subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=height", "-of", "csv=p=0", str(reel / "master.mp4")], capture_output=True, text=True).stdout or 1920)
+if DRAFT and _mh <= 960:   # cut.py already made a 540p draft master
+    shutil.copy(reel / "master.mp4", proj / "master.mp4")
+elif DRAFT:
+    m540 = reel / "master_540.mp4"
+    if not m540.exists() or m540.stat().st_mtime < (reel / "master.mp4").stat().st_mtime:
+        subprocess.run(["nice", "-n", "10", "ffmpeg", "-nostdin", "-v", "error", "-y", "-i", str(reel / "master.mp4"), "-vf", "scale=540:960",
+                        "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-g", "30", "-c:a", "copy", str(m540)], check=True)
+    shutil.copy(m540, proj / "master.mp4")
+else:
+    try: os.link(reel / "master.mp4", proj / "master.mp4")
+    except OSError: shutil.copy(reel / "master.mp4", proj / "master.mp4")
 for f in (ENGINE / "sfx").glob("*.wav"): shutil.copy(f, proj / "sfx" / f.name)
 for f in (Path(__file__).resolve().parent.parent / "sfx").glob("*.wav"): shutil.copy(f, proj / "sfx" / f.name)   # the skill's CC0 library
 for f in (HOME / "assets" / "sfx").glob("*.wav"): shutil.copy(f, proj / "sfx" / f.name)   # their own sound library wins on a shared name
@@ -120,6 +131,15 @@ for role, default in (("head", {"family": "Helvetica Neue", "weight": 700}), ("b
         else:
             print(f"warning: font file not found, using fallback: {src}")
     FAM[role] = (f"'{f['family']}', {FALLBACK}", f.get("weight", 400), f.get("style", "normal"))
+# caption fonts picked on the review page (edit.json "caption_fonts": {"body"|"accent": {family, file, weight, style}}); default: brand body/accent
+FAM["cap"], FAM["capacc"] = FAM["body"], FAM["accent"]
+for role, key in (("body", "cap"), ("accent", "capacc")):
+    f = (edit.get("caption_fonts") or {}).get(role)
+    if f and Path(f["file"]).expanduser().exists():
+        src = Path(f["file"]).expanduser(); shutil.copy(src, proj / "fonts" / src.name)
+        fmt = {"otf": "opentype", "ttf": "truetype", "woff2": "woff2", "woff": "woff"}.get(src.suffix[1:].lower(), "truetype")
+        font_css.append(f'@font-face {{ font-family: "{f["family"]}-{key}"; src: url("fonts/{src.name}") format("{fmt}"); font-display: block; }}')
+        FAM[key] = (f"'{f['family']}-{key}', {FALLBACK}", f.get("weight", 400), f.get("style", "normal"))
 def font(role, px):
     fam, wt, st = FAM[role]
     return f"font-family:{fam};font-weight:{wt};font-style:{st};font-size:{px}px"
@@ -180,6 +200,7 @@ for i, c in enumerate(edit.get("cards", [])):
     b = min(b, DUR)
     kind = c["type"]
     back, mid, front = (behind, behind, behind) if c.get("behind") else (_BACK, _MID, _FRONT)
+    if c.get("quiet"): quiet.append((a, b))      # review_sync: no room for this card and the captions at once
     if c.get("behind"): BEHIND_WIN.append((a, b))
     if kind == "bigtext":
         # big words in the brand's head font, usually behind the head ("behind": true); "/" breaks lines
@@ -271,7 +292,7 @@ for i, c in enumerate(edit.get("cards", [])):
     elif kind == "card":
         rows = c.get("rows", [])
         rt = c.get("row_times") or [a + 0.45 + 0.35 * j for j in range(len(rows))]
-        front.append(f'<div id="{cid}" class="card{" glass" if c.get("glass", GLASS_ALL) else ""}"><div class="ch" style="background:{MAIN};{font("head", 40)}"><i></i>{esc(case(c.get("title", "")))}</div>'
+        front.append(f'<div id="{cid}" class="card{" glass" if c.get("glass", GLASS_ALL) else ""}"' + (f' style="top:{c["y"] / c.get("zoom", 1):.0f}px;left:{c.get("x", 90) / c.get("zoom", 1):.0f}px;zoom:{c.get("zoom", 1)}"' if "y" in c else "") + f'><div class="ch" style="background:{MAIN};{font("head", 40)}"><i></i>{esc(case(c.get("title", "")))}</div>'
                      + "".join(f'<div class="cr" id="{cid}r{j}" style="{font("body", 50)};color:{MAIN}"><b style="background:{POP}"></b>{esc(case(r))}</div>' for j, r in enumerate(rows)) + "</div>")
         show(f"#{cid}", a, b)
         js.append(f'tl.fromTo("#{cid}",{{y:-160,scale:0.85,rotation:-3}},{{y:0,scale:1,rotation:-1.5,duration:0.5,ease:"back.out(1.6)"}},{q(a)});')
@@ -436,16 +457,16 @@ for i, c in enumerate(edit.get("captions", [])):
                      "lines": [[{"text": w["text"] if plain else case(w["text"]), "kind": "sm" if plain else "acc" if w.get("accent") else "big", "t": w["t"]} for w in ws]]})
     if CAPCUT: continue
     if plain:
-        front.append(f'<div id="c{i}" class="cap" style="top:{CAP_Y}px;font-family:-apple-system,Helvetica,Arial,sans-serif;font-weight:500;font-size:46px;letter-spacing:0;color:#fff">{esc(" ".join(w["text"] for w in ws))}</div>')
+        front.append(f'<div id="c{i}" class="cap" style="top:{c.get("y", CAP_Y)}px;font-family:-apple-system,Helvetica,Arial,sans-serif;font-weight:500;font-size:46px;letter-spacing:0;color:#fff">{esc(" ".join(w["text"] for w in ws))}</div>')
         show(f"#c{i}", c["start"], c["end"], 0.04); continue
     chars = sum(len(w["text"]) + 1 for w in ws)
     px = fit(" ".join(w["text"] for w in ws), CAP_PX * (1.35 if len(ws) == 1 else 1))
     big = 1.7 if CAPS.get("style") == "editorial" else 1.12          # editorial = dramatic size contrast on the emphasis word
     big = min(big, min((fit(w["text"], px * big) / px) for w in ws if w.get("accent")) if any(w.get("accent") for w in ws) else big)
     blk = "display:block;line-height:.95;" if CAPS.get("style") == "editorial" and len(ws) > 1 else ""
-    spans = "".join(f'<span class="acc" style="{blk}{font("accent", int(px * big))};color:{next_acc()}">{esc(case(w["text"]))}</span> ' if w.get("accent")
+    spans = "".join(f'<span class="acc" style="{blk}{font("capacc", int(px * big))};color:{next_acc()}">{esc(case(w["text"]))}</span> ' if w.get("accent")
                     else f'<span>{esc(case(w["text"]))}</span> ' for w in ws)
-    front.append(f'<div id="c{i}" class="cap" style="top:{CAP_Y}px;{font("body", int(px))};color:{CAP};letter-spacing:{CAPS.get("tracking", -0.02)}em">{spans.strip()}</div>')
+    front.append(f'<div id="c{i}" class="cap" style="top:{c.get("y", CAP_Y)}px;{font("cap", int(px))};color:{CAP};letter-spacing:{CAPS.get("tracking", -0.02)}em">{spans.strip()}</div>')
     show(f"#c{i}", c["start"], c["end"], 0.06)
     js.append(f'tl.fromTo("#c{i}",{{scale:0.86,y:14}},{{scale:1,y:0,duration:0.16,ease:"back.out(2)"}},{q(c["start"])});')
 
@@ -455,11 +476,11 @@ doc = f"""<!doctype html>
 <style>
 {chr(10).join(font_css)}
 html, body {{ margin: 0; background: #000; overflow: hidden; }}
-#stage {{ position: relative; width: {W}px; height: {H}px; overflow: hidden; }}
+#stage {{ position: relative; width: {W // 2 if DRAFT else W}px; height: {H // 2 if DRAFT else H}px; overflow: hidden; }}
 #cam {{ position: absolute; inset: 0; transform-origin: 50% 38%; }}
 #cam > video {{ position: absolute; left: 0; top: 0; width: {W}px; height: {H}px; object-fit: cover; }}
 #back, #mid, #front {{ position: absolute; inset: 0; }}
-#back > :not(.clip), #mid > :not(.clip), #front > :not(.clip) {{ visibility: hidden; opacity: 0; }}   /* .clip = HyperFrames motions, timed by the runtime */
+#back > :not(.clip), #mid > :not(.clip), #front > :not(.clip), #behind > :not(.clip) {{ visibility: hidden; opacity: 0; }}   /* .clip = HyperFrames motions, timed by the runtime */
 .title {{ position: absolute; left: 0; top: 170px; width: {W}px; padding: 0 90px; box-sizing: border-box; line-height: .88; letter-spacing: -.045em; text-shadow: 0 0 3px rgba(0,0,0,.18), 0 6px 34px rgba(0,0,0,.4); }}
 .tl {{ white-space: nowrap; }}
 .block {{ position: absolute; inset: 0; }}
@@ -502,12 +523,14 @@ html, body {{ margin: 0; background: #000; overflow: hidden; }}
 .cap .acc {{ text-shadow: 0 0 2px rgba(0,0,0,.25), 0 3px 22px rgba(0,0,0,.5); }}   /* accent colour stays readable over white screens, no outline */
 </style></head>
 <body>
-<div id="stage" data-composition-id="main" data-start="0" data-duration="{DUR}" data-fps="{FPS}" data-width="{W}" data-height="{H}">
+<div id="stage" data-composition-id="main" data-start="0" data-duration="{DUR}" data-fps="{FPS}" data-width="{W // 2 if DRAFT else W}" data-height="{H // 2 if DRAFT else H}">
+  <div id="scaler" style="position:absolute;left:0;top:0;width:{W}px;height:{H}px;{'zoom:.5;' if DRAFT else ''}">
   <div id="cam"><video id="bg" class="clip" src="master.mp4" playsinline data-has-audio="true" data-start="0" data-duration="{DUR}" data-track-index="1"></video>
     <div id="behind">{"".join(behind)}</div><div id="subj">{"".join(subj)}</div>
     <div id="back">{"".join(back)}</div></div>
   <div id="mid">{"".join(mid)}</div>
   <div id="front">{"".join(front)}</div>
+  </div>
   {"".join(audio)}
   <script src="vendor/gsap.min.js"></script>
   <script>(function () {{ window.__timelines = window.__timelines || {{}};

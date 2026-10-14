@@ -23,9 +23,16 @@ A private page on the person's claude.ai account where they approve the edit bef
 The page shows steps (1 her edit → 2 Claude's proposals → 3 draft → 4 final) and one big button at the bottom. Each press saves a request in her review doc and sends Claude a «Send to Claude» comment on the artifact, which wakes this session while the artifact's watch says "auto-replies armed" (`ArtifactComments action: "watch"` lists it). The comment text starts with ▶ and names the step; treat it exactly like the chat word:
 - `graphicsRequest` / «графіка» → round 2 below. When the proposals are on the board, write `reel/current` with `claudeRound` = previous + 1: the page reloads it in place, jumps to «Графіка» and shows a banner (no refresh needed).
 - `buildRequest` / «збери чернетку» → "When they say build preview".
-- `fixRequest` (revisions marked `sent`) / «виправ нотатки» → act on those revisions, re-render, new `builds/latest`.
-- `finalRequest` / «фінал» → QA, deliver, covers; then `builds/latest` gets `final: true` (step 4).
+- `fixRequest` (revisions marked `sent`) / «виправ нотатки» → act on those revisions, re-render, new `builds/latest` with `fixedFor` = `fixRequest.at` (the decisions hash may not change, so this is how the page knows the notes were answered).
+- `finalRequest` / «фінал» → QA, deliver, covers only if brand.json `covers` isn't false; then `builds/latest` gets `final: true` (step 4).
 Reply in the comment thread in one line («Взяв, роблю пропозиції, ~10 хв») and resolve it when done. If no session is listening the page tells her to type the word in chat instead.
+
+## Face, captions and «За мною»
+
+- Before `export`, run `python3 scripts/face_box.py <reel>`: macOS Vision finds the face on 12 frames and writes `<reel>/face.json`; `export` puts it into reel.json as `face`. Without it nothing is moved.
+- `core.js` `layout()` moves every graphic that would cover the face or the captions: below the chin, or above the head, inside the frame Instagram leaves clear; when nothing fits, the captions step aside while that card shows (`quiet` in edit.json). The page marks these «відсунуто від обличчя»; `review_sync import` writes the new `y` / `box`.
+- Captions: on «Субтитри» she picks «Над головою / Під підборіддям / Внизу» or drags a caption on the player; it is saved as `capY` in her review doc and goes into edit.json as `caption_y`.
+- «За мною» on any graphic on «Графіка» sets `board.<id>.behind`; the card renders behind the person (cut-out on those seconds only). Behind the body it would not show, so `layout()` lifts it into the background above the head (big words/hook tuck ~35% behind the hair, lists and cards ~8%; too tall → shrunk with `zoom`), and `capsAround()` drops the captions that would overlap it under the chin for those seconds (per-caption `y` in edit.json).
 
 ## Colour and sounds on «Звук і колір»
 
@@ -61,9 +68,9 @@ The same page holds a batch: a «Рілс» picker appears at the top when `reel
 
 1. `ArtifactData get review/current` (save to a file). Missing is fine: it means "use the proposal".
 2. `python3 scripts/review_sync.py import <reel> <review.json>` → `edl.json` + `edit.json`. Act on every `CHANGE REQUESTED`, `NOTE` and `REVISION` line it prints before rendering; `HOOK` / `CTA` lines are their approved text: use it word for word (it already went into the title / CTA card), don't ask again; for every `OVERLAY ... DOWNLOAD asset <id>` line, fetch their upload with `Artifact` `action: "read"`, `url` = the page, `path` = that asset id, `out_dir` = `<reel>/overlays` (it lands as `<id>.<ext>`; the card already points there); `BRAND CHANGE REQUESTED` only touches brand.json after they confirm.
-3. `python3 scripts/snap_joins.py <reel>`, `REEL_PREVIEW=1 python3 scripts/cut.py <reel>`, then `python3 scripts/precheck.py <reel>` and fix everything it lists (JOIN, MISSING, CHECK) before `REEL_PREVIEW=1 bash scripts/render.sh <reel>` (1080p, 2 workers, low priority). Every extra render is ~6 min of their wait.
+3. `python3 scripts/snap_joins.py <reel>`, `REEL_PREVIEW=1 python3 scripts/cut.py <reel>`, then `python3 scripts/precheck.py <reel>` and fix everything it lists (JOIN, MISSING, CHECK) before the draft: `REEL_DRAFT=1 REEL_PREVIEW=1 bash scripts/render.sh <reel>` → `draft.mp4` (540p, fast). The full-quality final renders only after «Це фінал».
 4. Grab frames at every graphic and the longest caption words; fix anything out of frame before sending.
-5. 540p proxy of `final.mp4` → upload → `ArtifactData set builds/latest` {url, hash (from edit.json), at, cutDur}. The page compares that hash with the live decisions and marks the preview outdated when they change. Then `PushNotification` (tool search first) with the reel name: the preview is ready to watch.
+5. `draft.mp4` (already 540p) → upload → `ArtifactData set builds/latest` {url, hash (from edit.json), at, cutDur}. The page compares that hash with the live decisions and marks the preview outdated when they change. Then `PushNotification` (tool search first) with the reel name: the preview is ready to watch.
 
 ## Final
 

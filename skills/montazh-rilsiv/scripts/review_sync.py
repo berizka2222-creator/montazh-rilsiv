@@ -48,7 +48,7 @@ def node(reel_json, decisions):
     # data goes in on stdin: long clips would overflow the command-line length limit
     js = f"""const C=require({json.dumps(str(CORE))});const I=JSON.parse(require("fs").readFileSync(0,"utf8"));const R=I.r,D=I.d;
 const P=C.plan(R,D);process.stdout.write(JSON.stringify({{spans:P.spans,cutDur:P.cutDur,pauses:P.pauses,
-captions:C.captions(R,D,P),graphics:C.graphics(R,D,P),hash:C.hash(D),grade:C.gradeFilter(D.grade,"__CUBE__"),cube:C.isNeutral(D.grade)?"":C.gradeCube(D.grade)}}));"""
+captions:C.capsAround(R,D,C.captions(R,D,P),C.graphics(R,D,P)),graphics:C.graphics(R,D,P),hash:C.hash(D),grade:C.gradeFilter(D.grade,"__CUBE__"),cube:C.isNeutral(D.grade)?"":C.gradeCube(D.grade)}}));"""
     return json.loads(subprocess.run(["node", "-e", js], input=json.dumps({"r": reel_json, "d": decisions}),
                                      capture_output=True, text=True, check=True).stdout)
 
@@ -125,9 +125,11 @@ def export(reel, proposal, out):
                  "captions": caps, "board": board,
                  "style": {"capSize": brand["captions"].get("size", 104), "capY": brand["captions"].get("y", 1250),
                            "mode": mode, "editorial": brand["captions"].get("style") == "editorial",
-                           "cap": brand["colors"].get("caption", "#FFFFFF"), "acc": brand["colors"].get("caption_accent", "#FF7DB8"),
+                           "cap": brand["colors"].get("caption", "#FFFFFF"), "acc": brand["colors"].get("caption_accent", "#FF7DB8"), "acc2": brand["colors"].get("caption_accent_2"),
                            "main": brand["colors"]["main"], "case": brand["captions"].get("case", "lower")},
-                 "grade": brand.get("grade")}
+                 "grade": brand.get("grade"),
+                 **({"face": json.load(open(reel / "face.json"))["box"]} if (reel / "face.json").exists() else {}),
+                 "fontChoices": {**(brand.get("caption_fonts") or {}), "names": {r: (brand.get("fonts", {}).get(r) or {}).get("family", "") for r in ("body", "accent")}}}   # face: scripts/face_box.py; fontChoices: the design system's other caption fonts
     P = node(reel_json, {"cut": proposed_cut})
     print(f"{len(words)} words ({sum(1 for w in words if w.get('filler'))} fillers), {len(caps)} captions, {len(board)} graphics, "
           f"proposed cut {P['cutDur']:.1f}s, {len(P['pauses'])} pauses ({len(keep_pauses)} kept on purpose)")
@@ -176,7 +178,7 @@ def do_import(reel, review):
     json.dump({"source": raw_clip(reel).name, "audio": "voice.wav" if clean else raw_clip(reel).name, "keep": [[round(a, 3), round(b, 3)] for a, b in P["spans"]],
                **({"grade": P["grade"]} if P.get("grade") else {})},
               open(reel / "edl.json", "w"))
-    caps = [{"start": round(c["start"], 3), "end": round(c["end"], 3),
+    caps = [{"start": round(c["start"], 3), "end": round(c["end"], 3), **({"y": c["y"]} if c.get("y") is not None else {}),
              "words": [{"text": re.sub(r"[.,!?;:]+$", "", w["text"]), "t": round(w["t"], 3), "accent": w["accent"]} for w in c["words"]]}
             for c in P["captions"] if not c.get("gone")]
     cards, changes, overlays = [], [], []
@@ -184,7 +186,13 @@ def do_import(reel, review):
         if g.get("gone") or g["state"] == "d": continue
         note = ((d.get("board") or {}).get(g["id"]) or {}).get("note")
         if g["state"] == "c": changes.append(f"{g['id']} @ cut {g['start']:.1f}s: {note or '(no note)'}")
-        spec = {k: v for k, v in g.items() if k not in ("id", "kind", "what", "w0", "w1", "state", "place", "moved", "gone", "own")}
+        spec = {k: v for k, v in g.items() if k not in ("id", "kind", "what", "w0", "w1", "state", "place", "moved", "gone", "own", "shifted", "capsAside")}
+        if g.get("capsAside"): spec["quiet"] = True   # captions step aside while this card shows (no room for both)
+        if g.get("shifted"):   # core.js moved it off the face / captions: the render uses the new spot
+            if g.get("type") in ("card", "tag", "title", "bigtext", "cta"):
+                spec["y"] = g["place"][1]
+                if g.get("zoom"): spec["x"] = g["place"][0]   # shrunk to fit above the head (behind the person)
+            elif g.get("type") in ("motion", "custom", "shot", "image"): spec["box" if g["type"] in ("motion", "custom") else "y"] = g["place"] if g["type"] in ("motion", "custom") else g["place"][1]
         spec.update(start=round(g["start"], 3), end=round(g["end"], 3), id=g["id"])
         if (d.get("sfxSwap") or {}).get(g["id"]) and isinstance(spec.get("sfx"), dict): spec["sfx"] = {**spec["sfx"], "name": d["sfxSwap"][g["id"]]}
         if g["id"] in (d.get("sfxOff") or {}) and d["sfxOff"][g["id"]]: spec["sfx"] = False
@@ -198,7 +206,24 @@ def do_import(reel, review):
     punch, last = [], -9.0   # punch-ins on sentence starts in the cut, at most every ~6 s (emphasis, not every line)
     for c in caps:
         if c["start"] - last > 6: punch.append(c["start"]); last = c["start"]
-    json.dump({"captions": caps, "punch": punch, "cards": cards, "hash": P["hash"]}, open(reel / "edit.json", "w"), indent=1)
+    extra = {}
+    cy = d.get("capY") if d.get("capY") is not None else (reel_json.get("style") or {}).get("capY")
+    if cy is not None and cy != json.load(open(HOME / "brand.json")).get("captions", {}).get("y", 1250): extra["caption_y"] = cy   # this reel's own caption height
+    if d.get("capSize") is not None: extra["caption_size"] = d["capSize"]   # the caption size she picked for this reel
+    if d.get("capFont"):   # caption fonts she picked (Google Fonts with Ukrainian letters): downloaded once into ~/reels/fonts/google
+        import urllib.request
+        out = {}
+        for role, f in d["capFont"].items():
+            if not f or not (f.get("gf") or f.get("brandFile")): continue
+            dst = HOME / "fonts" / f["brandFile"] if f.get("brandFile") else HOME / "fonts" / "google" / (re.sub(r"\W+", "-", f["gf"]).strip("-") + ".ttf")
+            if not dst.exists() and f.get("gf"):
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                css = urllib.request.urlopen(f"https://fonts.googleapis.com/css2?family={f['gf']}&display=swap").read().decode()
+                urllib.request.urlretrieve(re.search(r"url\((https://[^)]+\.ttf)\)", css).group(1), dst)
+            out[role] = {"family": f["family"], "file": str(dst), "weight": f.get("weight", 400), "style": f.get("style", "normal")}
+            print(f"CAPTION FONT ({role}): {f['family']} -> {dst.name}")
+        if out: extra["caption_fonts"] = out
+    json.dump({"captions": caps, "punch": punch, "cards": cards, "hash": P["hash"], **extra}, open(reel / "edit.json", "w"), indent=1)
     print(f"cut {P['cutDur']:.1f}s from {len(P['spans'])} spans; {len(caps)} captions; {len(cards)} graphics; hash {P['hash']}")
     for c in changes: print("CHANGE REQUESTED:", c)
     for o in overlays: print("OVERLAY:", o)
@@ -217,6 +242,10 @@ def do_import(reel, review):
               + (f" | files: {files}" if files else ""))
     for k, n in (d.get("notes") or {}).items():
         if n.strip(): print(f"NOTE ({k}):", n.strip())
+    for k, files in (d.get("refs") or {}).items():   # reference pictures/videos she attached to a section's note
+        for f in files or []:
+            have = list((reel / "refs").glob(f["id"] + ".*")) if (reel / "refs").exists() else []
+            print(f"REFERENCE ({k}): {f.get('name')} -> " + ("file ready" if have else f"DOWNLOAD asset {f['id']} into {reel / 'refs'}"))
     if (d.get("brandRequest") or "").strip(): print("BRAND CHANGE REQUESTED (only apply if confirmed):", d["brandRequest"].strip())
     for r in d.get("revisions") or []: print(f"REVISION @ cut {r['t']:.1f}s:", r["text"])
 

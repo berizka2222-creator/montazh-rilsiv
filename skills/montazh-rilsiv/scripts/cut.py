@@ -17,7 +17,10 @@ from pacing import pacing
 speed = pacing(brand)["speed"]
 w, h = brand.get("resolution", [1080, 1920])
 if os.environ.get("REEL_PREVIEW"): w, h = 1080, 1920          # previews cut at 1080p: a quarter of the work
+DRAFT = bool(os.environ.get("REEL_DRAFT"))                      # fast review draft: 540x960, colour without the slow clarity/sharpen
+if DRAFT: w, h = 540, 960
 grade = edl.get("grade") or brand.get("grade")   # the page's colour grade (review_sync import writes it into edl.json) wins
+if DRAFT and grade: grade = ",".join(f for f in grade.split(",") if not f.startswith("unsharp"))   # the final adds them back
 FADE = 0.012  # tiny audio fades at every join so cuts never click
 
 vp, ap = [], []

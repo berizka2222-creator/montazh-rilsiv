@@ -88,7 +88,8 @@
       let endSrc;
       if (g.w1 != null && !P.removed(g.w1)) endSrc = W[g.w1].e;
       else { let k = a; while (k < W.length - 1 && !/[.,!?;:]$/.test(W[k].text) && W[k + 1].s - W[k].e < 0.35 && P.toCut(W[k].e) - P.toCut(W[a].s) < 4) k++; endSrc = W[k].e; }
-      const start = P.toCut(W[a].s), end = Math.max(start + 1, P.toCut(endSrc) + 0.15);
+      const minDur = g.type === "block" ? 2.2 : g.type === "card" ? 2.5 : g.type === "follow" ? 2.5 : 1;   // long enough to read past the entrance animation
+      const start = P.toCut(W[a].s), end = Math.max(start + minDur, P.toCut(endSrc) + 0.15);
       return { ...g, state, start, end: Math.min(end, P.cutDur), moved: a !== g.w0 };
     }).concat((d.overlays || []).map(o => {   // overlays they added on the page: an uploaded image/video (or big text) from a word, for o.dur seconds
       const state = ((d.board || {})[o.id] || {}).state || "k", a = firstKeptFrom(o.w0);
@@ -105,12 +106,57 @@
     // the hook text and the CTA they typed on the page (their words, so they count as theirs)
     if ((d.hook || "").trim()) for (const g of out) if (g.type === "title") Object.assign(g, { text: d.hook.trim(), what: d.hook.replace(/\s*\/\s*/g, " ").trim(), own: true });
     for (const g of out) if (g.type === "title" && !g.gone) g.end = Math.min(Math.max(g.end, g.start + 3.5), P.cutDur);   // a hook needs ~3.5 s to be read
+    for (const g of out) { const b = (d.board || {})[g.id]; if (b && typeof b.behind === "boolean") g.behind = b.behind; }   // «За мною» toggled on the page
+    layout(reel, d, out);
     if (((d.cta || {}).text || "").trim()) {
       const dur = Math.min(d.cta.dur || 4, P.cutDur);
       out.push({ id: "cta", type: "cta", kind: "Заклик (CTA)", what: d.cta.text.trim(), text: d.cta.text.trim(), own: true,
                  state: ((d.board || {}).cta || {}).state || "k", place: [90, 1300, 900, 170], start: P.cutDur - dur, end: P.cutDur });
     }
     return out;
+  }
+
+  // keep graphics off the face and off the captions: reel.face = [x,y,w,h] (scripts/face_box.py), captions at capY.
+  // A box that hits either moves below the face, or above it, inside the frame Instagram leaves clear (top 200, bottom ~280).
+  // Full-screen cards, graphics behind the person and their own dragged overlays stay where they are.
+  const TOP_SAFE = 200, BOTTOM_SAFE = 1640, CAP_H = 170, GAP = 30;
+  function capY(reel, d) { return d.capY != null ? d.capY : ((reel.style || {}).capY ?? 1250); }
+  function layout(reel, d, out) {
+    const F = reel.face; if (!F) return;
+    const cy = capY(reel, d), zones = [[F[1] - 20, F[1] + F[3] + 20], [cy - 10, cy + CAP_H]];
+    const hits = (y, h) => zones.some(([a, b]) => y < b && a < y + h);
+    for (const g of out) {
+      const p = g.place; if (!p || g.gone || (g.user && g.box) || (p[2] >= 1000 && p[3] >= 1800)) continue;
+      if (g.behind) {   // behind the person only shows where the background is: above the head, tucked a little behind the hair
+        const tuck = g.type === "bigtext" || g.type === "title" ? 0.35 : 0.08;   // big words may hide behind the hair; lists and cards stay readable
+        let h = p[3], w = p[2], x = p[0], y = Math.round(F[1] - h * (1 - tuck));
+        if (y < TOP_SAFE) {   // too tall for the space above the head: shrink it to fit, centred where it was
+          const z = Math.max(0.55, (F[1] - TOP_SAFE) / (h * (1 - tuck)));
+          const w2 = Math.round(w * z), h2 = Math.round(h * z); x = Math.round(x + (w - w2) / 2); w = w2; h = h2; y = TOP_SAFE; g.zoom = +z.toFixed(3);
+        }
+        if (y !== p[1] || g.zoom) { g.place = [x, y, w, h]; g.shifted = true; }
+        continue;
+      }
+      if (!hits(p[1], p[3])) continue;
+      const h = p[3], tries = [F[1] + F[3] + GAP, cy + CAP_H + GAP, F[1] - h - GAP, cy - h - GAP];
+      let y = tries.find(t => t >= TOP_SAFE && t + h <= BOTTOM_SAFE && !hits(t, h));
+      let aside = false;
+      if (y == null) { y = Math.min(Math.max(F[1] + F[3] + GAP, TOP_SAFE), BOTTOM_SAFE - h); aside = true; }   // no clean spot: under the chin, and the captions step aside while it shows
+      g.place = [p[0], Math.round(y), p[2], h]; g.shifted = true; if (aside) g.capsAside = true;
+    }
+  }
+
+  // captions make room for a graphic behind the person: while one shows above the head, captions there drop under the chin
+  function capsAround(reel, d, caps, gfx) {
+    const F = reel.face; if (!F) return caps;
+    const cy = capY(reel, d), alt = F[1] + F[3] + 20;
+    for (const c of caps) {
+      if (c.gone) continue;
+      const hit = gfx.some(g => g.behind && !g.gone && g.state !== "d" && g.place && c.start < g.end && g.start < c.end &&
+        cy < g.place[1] + g.place[3] && g.place[1] < cy + CAP_H);
+      if (hit) c.y = alt; else delete c.y;
+    }
+    return caps;
   }
 
   // a fingerprint of everything that changes the render, to tell whether a built preview is outdated
@@ -120,7 +166,10 @@
       .concat((d.hook || "").trim() ? [d.hook.trim()] : []).concat(((d.cta || {}).text || "").trim() ? [d.cta] : [])
       .concat((d.effects || []).length ? [d.effects] : [])
       .concat(d.grade && !isNeutral(d.grade) ? [d.grade] : [])
-      .concat(Object.keys(d.sfxSwap || {}).length ? [d.sfxSwap] : []));
+      .concat(Object.keys(d.sfxSwap || {}).length ? [d.sfxSwap] : [])
+      .concat(d.capY != null ? [d.capY] : [])
+      .concat(d.capSize != null ? ["sz" + d.capSize] : [])
+      .concat(d.capFont ? [d.capFont] : []));
     let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0;
     return (h >>> 0).toString(36);
   }
@@ -174,6 +223,6 @@
     return out.join(",");
   }
 
-  const api = { plan, captions, graphics, hash, gradeNorm, gradeParams, gradeLut, gradeCube, gradeFilter, isNeutral, GKEYS };
+  const api = { plan, captions, graphics, hash, capY, capsAround, gradeNorm, gradeParams, gradeLut, gradeCube, gradeFilter, isNeutral, GKEYS };
   if (typeof module !== "undefined") module.exports = api; else root.ReelCore = api;
 })(this);
