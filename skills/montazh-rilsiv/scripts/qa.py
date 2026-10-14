@@ -4,7 +4,6 @@ Usage: python3 qa.py <reel-folder> [video]     default video: final.mp4. Exit co
 import difflib, json, os, re, subprocess, sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from pacing import asr_args
 
 reel = Path(sys.argv[1]).expanduser()
 video = reel / (sys.argv[2] if len(sys.argv) > 2 else "final.mp4")
@@ -35,9 +34,8 @@ if not -15 <= lufs <= -12.5: fails.append("loudness")
 exp = reel / "expected.txt"
 if exp.exists():
     tok = lambda s: re.sub(r"[^\w' ]|_", " ", s.lower()).split()
-    subprocess.run(["npx", "-y", "hyperframes", "transcribe", str(video), "-d", str(reel / "qa_transcript"),
-                    "--json", *asr_args(brand)], capture_output=True)
-    heard = [t for wd in json.load(open(reel / "qa_transcript/transcript.json")) for t in tok(wd["text"])]
+    subprocess.run([sys.executable, str(Path(__file__).resolve().parent / "transcribe.py"), str(video), str(reel / "qa_transcript.json")], check=True)
+    heard = [t for wd in json.load(open(reel / "qa_transcript.json")) for t in tok(wd["text"])]
     expected = tok(exp.read_text())
     ratio = difflib.SequenceMatcher(None, expected, heard, autojunk=False).ratio()
     missing = [expected[i1:i2] for op, i1, i2, _, _ in

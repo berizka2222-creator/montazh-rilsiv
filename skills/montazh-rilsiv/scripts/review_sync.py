@@ -11,7 +11,7 @@ proposal.json (Claude writes this per reel):
 import json, os, re, shutil, subprocess, sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from pacing import pacing
+from pacing import pacing, is_filler, lang
 
 HERE = Path(__file__).resolve().parent
 CORE = HERE.parent / "review" / "core.js"
@@ -57,7 +57,7 @@ def export(reel, proposal, out):
     brand = json.load(open(HOME / "brand.json"))
     src = [w for w in json.load(open(reel / "transcript.json")) if w["text"].strip()]
     words = [{"text": w["text"], "s": round(w["start"], 3), "e": round(w["end"], 3)} for w in src]
-    # Whisper's word times run back to back, hiding pauses. Measure real silences in the cleaned voice (threshold just
+    # Transcript word times run back to back, hiding pauses. Measure real silences in the cleaned voice (threshold just
     # above this clip's noise floor) and pull word edges back to them, so pauses show up as gaps the review can trim.
     import array, math, wave
     wf = wave.open(str(reel / "voice.wav")); sr = wf.getframerate(); pcm = array.array("h"); pcm.frombytes(wf.readframes(wf.getnframes()))
@@ -71,16 +71,20 @@ def export(reel, proposal, out):
         for w in words:
             if w["s"] < a < w["e"] and a - w["s"] > 0.08: w["e"] = round(a, 3)
             elif a <= w["s"] < b and w["e"] - b > 0.08: w["s"] = round(b, 3)
-    # fillers ("um", "uh") found by tighten.py's Whisper pass: slot them in as removable words
+    # fillers ("um", "ем"): Scribe writes them as words, so mark those; fillers.json adds any that aren't words yet
+    fl = pacing(brand)["fillers"]
+    for w in words:
+        if is_filler(w["text"], fl, lang(brand)): w["filler"] = True
     fj = reel / "fillers.json"
     if fj.exists():
         for t in json.load(open(fj))["transcription"]:
             txt = t["text"].strip()
-            if norm(txt) in set(pacing(brand)["fillers"]):
+            if is_filler(txt, fl, lang(brand)):
                 s, e = t["offsets"]["from"] / 1000, t["offsets"]["to"] / 1000
+                if any(w.get("filler") and abs(w["s"] - s) < 0.1 for w in words): continue   # already a word in the transcript
                 if not any(w["s"] < e - 0.05 and w["e"] > s + 0.05 for w in words):
                     words.append({"text": txt.strip(",.").lower(), "s": round(s, 3), "e": round(max(e, s + 0.25), 3), "filler": True})
-                else:   # Whisper folded the um into a neighbouring word: split it off so cutting it removes its audio
+                else:   # the recogniser folded the um into a neighbouring word: split it off so cutting it removes its audio
                     e = round(max(e, s + 0.25), 3)
                     for w in words:
                         if w["s"] < e - 0.05 and w["e"] > s + 0.05 and not w.get("filler"):

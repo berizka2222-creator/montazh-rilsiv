@@ -23,7 +23,7 @@ The person works in the Claude desktop app, Code tab. Never ask them to open the
 3. `ffmpeg` missing → if Homebrew exists, `brew install ffmpeg`; otherwise download static macOS builds of `ffmpeg` and `ffprobe` into `~/.local/bin`, `chmod +x`, clear quarantine (`xattr -d com.apple.quarantine`), and add `export PATH="$HOME/.local/bin:$PATH"` to `~/.zprofile`.
 4. `npx skills add heygen-com/hyperframes -y` if the HyperFrames skills are missing.
 5. `bash scripts/setup_engine.sh` (animation library + sound effects).
-6. Ukrainian speech: `npx hyperframes models install parakeet` (~640 MB, once). If huggingface.co is blocked, say so plainly.
+6. Speech recognition: connect ElevenLabs Scribe (section «Connecting ElevenLabs Scribe» below). It is required: there is no local recogniser, so nothing large is downloaded. Walk them through creating the key in one short step at a time.
 7. `mkdir -p ~/reels/fonts ~/reels/assets` (the reels workspace).
 8. `bash scripts/doctor.sh` and tell them in one sentence that everything is ready and that next time they open the Code tab with the folder `reels` and write «змонтуй рілс».
 Explain each step in one short Ukrainian sentence: the person is a beginner.
@@ -36,7 +36,7 @@ Explain each step in one short Ukrainian sentence: the person is a beginner.
 
 Each reel gets its own folder: `~/reels/<yyyy-mm-dd>-<short-name>/`. Copy the raw clip in (never edit the original).
 
-1. **Transcribe** - `python3 scripts/transcribe.py <clip> transcript.json`. Uses ElevenLabs Scribe when `ELEVENLABS_API_KEY` is in `~/.config/reels/.env` (tight word timing; captions land on the word), else local Whisper heard in ~6 s pieces (free; one long pass drifts up to ~1 s by a minute in, pieces stay within ~0.2 s; ~3 min for a 2 min clip).
+1. **Transcribe** - `python3 scripts/transcribe.py <clip> transcript.json`. Uses ElevenLabs Scribe with `ELEVENLABS_API_KEY` from `~/.config/reels/.env` (tight word timing; it writes "ем"/"um" as words, which is how fillers are found). There is no local fallback: exit code 2 = no key (connect it), 1 = key, balance or network problem (say which, then retry).
 2. **Clean the voice** - `bash scripts/clean_audio.sh <clip> voice.wav` (add `--denoise` if there is background noise). Targets -14 LUFS, the level Instagram and TikTok expect.
 3. **Review (their call)** - propose: lines to cut (repeats, false starts, rambles), fillers to drop, CTA moved to the end, target under 60 s, and the graphics plan. **Wait for their yes before cutting.** This is the step people care most about.
    **Look at the start and end before proposing cuts:** grab a frame every 0.5 s for the first and last 4 s. Cut any camera setup (pointing at the floor/garden, flipping the camera, reaching for the phone) even if words are spoken over it. Start on the first frame where they're settled in shot, and on a word that works as an opener.
@@ -74,16 +74,16 @@ Besides the template cards, the person can ask for their own motion on a phrase 
 - Text behind the head / card behind the person: set `"behind": true` on the card (see «За мною» in step 5.3); the cutout runs only on those windows and is cached. Say it adds a few minutes before the first render with it.
 - Before the draft, grab a frame at the peak of every custom motion and check it.
 
-## Connecting ElevenLabs Scribe (optional, when they ask)
+## Connecting ElevenLabs Scribe (required, once)
 Scribe gives exact word timing and hears "е/ем"; under 2 cents a reel ($0.22 per hour of audio, ElevenAPI tab → Add credits; keep Auto Top Up off).
 1. They create a key at elevenlabs.io → Developers → API Keys → Create: Restrict Key on, only **Speech to Text = Access**, everything else No Access. The real key starts with `sk_` and is shown once (the key ID is not the key).
 2. Never ask them to paste it in chat. Open a hidden-input dialog on their Mac and write it straight to the env file, printing only its length:
    `K="$(osascript -e 'text returned of (display dialog "Встав API-ключ ElevenLabs (починається з sk_)" default answer "" with hidden answer buttons {"Скасувати","OK"} default button "OK" giving up after 600)')"`, then check it starts with `sk_`, replace the `ELEVENLABS_API_KEY=` line in `~/.config/reels/.env`, `chmod 600`.
-3. Test it on 20 s of audio with `scripts/transcribe.py` (it should say "transcribed with ElevenLabs"). A bad key falls back to Whisper with a warning, so an edit never stops on it.
+3. Test it on 20 s of audio with `scripts/transcribe.py` (it should say "transcribed with ElevenLabs"). A bad key stops transcription with a clear message: fix the key or the balance, never work around it.
 
 ## Language
 `brand.json` "language" (e.g. `"uk"`) drives transcription, filler words and QA. Talk to the person in their language. The Reel Review page UI is in Ukrainian: write every `kind` and `what` in proposal.json in Ukrainian too, and treat «збери чернетку» as "build preview" and «фінал» as "final".
-Ukrainian: transcription uses Parakeet if installed, else Whisper large-v3; fillers are hesitation sounds only (е, ем, ммм, хм; "ну" only on tight/fast pacing).
+Transcription is ElevenLabs Scribe for every language; fillers are hesitation sounds only (е, ем, ммм, хм; "ну" only on tight/fast pacing).
 
 ## Their brand rules win
 
@@ -94,7 +94,7 @@ If the brand file and your taste disagree, the brand file wins. If they correct 
 | Mistake | Instead |
 |---|---|
 | Editing before a brand file exists | Run the setup interview |
-| Cutting on Whisper word times blindly | `snap_joins.py` before `cut.py`, then read the JOIN lines from `precheck.py` |
+| Cutting on transcript word times blindly | `snap_joins.py` before `cut.py`, then read the JOIN lines from `precheck.py` |
 | Finding wrong words or late captions on the draft or final | `precheck.py` before the first render; one draft + one final is the target |
 | Graphics that decorate instead of illustrate | Each card shows what this exact line says |
 | Captions in a font the brand file bans | Re-read brand.md "Rules" before step 5 |

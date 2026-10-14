@@ -29,4 +29,4 @@ The kept spans of the source, in play order (reordering is fine, e.g. CTA last):
 { "source": "raw.mov", "audio": "voice.wav", "keep": [[0.55, 9.40], [13.0, 38.2], [9.40, 13.0]] }
 ```
 
-Snap every edge into the quiet gap between words: check the 20 ms loudness dips in `voice.wav` near each Whisper time rather than trusting the word time.
+Snap every edge into the quiet gap between words: check the 20 ms loudness dips in `voice.wav` near each transcript word time rather than trusting the word time.

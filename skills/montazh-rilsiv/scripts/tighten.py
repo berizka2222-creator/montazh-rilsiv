@@ -4,8 +4,7 @@ Run after the person approves edl.json, before cut.py. Rewrites edl.json (the or
 Usage: python3 tighten.py <reel-folder>
        python3 tighten.py <reel-folder> --detect   only find the fillers (writes fillers.json); run before the review page
 
-How: Whisper normally hides fillers inside neighbouring words, so it is re-run with a prompt full of "um, uh",
-which makes it write them down. Pauses come from silencedetect on the cleaned voice. Every cut edge keeps the preset's
+How: fillers are the hesitation words in the Scribe transcript (transcript.json). Pauses come from silencedetect on the cleaned voice. Every cut edge keeps the preset's
 air (50-150 ms) so words never clip."""
 import json, os, re, shutil, subprocess, sys
 from pathlib import Path
@@ -19,46 +18,26 @@ from pacing import pacing
 P_ = pacing(json.load(open(Path(os.environ.get("REELS_HOME", "~/reels")).expanduser() / "brand.json")))
 PAD, MIN_PAUSE = P_["air"], P_["pause_min"]
 FILLERS = set(P_["fillers"])
-from pacing import lang, asr_args, FILLER_PROMPT
+from pacing import lang, is_filler
 BRAND_ = json.load(open(Path(os.environ.get("REELS_HOME", "~/reels")).expanduser() / "brand.json"))
 LANG = lang(BRAND_)
 
-# 1. fillers, via Whisper with a filler-heavy prompt
-cuts = []
-def find_whisper():
-    cli = shutil.which("whisper-cli") or next((str(p) for p in Path("~/.cache/hyperframes/whisper").expanduser().rglob("whisper-cli")), None)
-    model = next(iter(sorted(Path("~/.cache/hyperframes/whisper/models").expanduser().glob("ggml-small.en.bin" if LANG == "en" else "ggml-small.bin"))), None)
-    return cli, model
-cli, model = find_whisper()
-if not (cli and model):   # fresh install (or the ElevenLabs route): HyperFrames' transcriber downloads whisper-cli + the model
-    print("local Whisper not installed yet: installing it (one time, a few minutes)")
-    try:
-        subprocess.run(["npx", "-y", "hyperframes", "transcribe", str(voice), "-d", str(reel / "_whisper_setup"), "--json", *(["--model", "small.en"] if LANG == "en" else ["-l", LANG, "--model", "small", "-e", "whisper"])],
-                       capture_output=True)
-    except OSError as e:
-        print("couldn't install Whisper:", e)
-    shutil.rmtree(reel / "_whisper_setup", ignore_errors=True)
-    cli, model = find_whisper()
-found = False
-if cli and model:
-    wav16 = reel / "v16.wav"
-    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(voice), "-ar", "16000", "-ac", "1", str(wav16)], check=True)
-    r = subprocess.run([cli, "-m", str(model), "-f", str(wav16), "--prompt", FILLER_PROMPT.get(LANG, FILLER_PROMPT["en"]), *(["-l", LANG] if LANG != "en" else []),
-                        "-ml", "1", "-sow", "-oj", "-of", str(reel / "fillers")], capture_output=True, text=True)
-    if r.returncode == 0 and (reel / "fillers.json").exists():
-        found = True
-        toks = [(t["text"].strip(), t["offsets"]["from"] / 1000, t["offsets"]["to"] / 1000)
-                for t in json.load(open(reel / "fillers.json"))["transcription"] if t["text"].strip()]
-        for k, (txt, a, b) in enumerate(toks):
-            if re.sub(r"[\W\d_]", "", txt.lower()) in FILLERS:
-                nxt = toks[k + 1][1] if k + 1 < len(toks) else b
-                cuts.append((a - 0.02, max(b, min(nxt, a + 0.7)) - 0.02))
-        print(f"fillers found: {len(cuts)}", [round(a, 1) for a, _ in cuts])
-    else:
-        (reel / "fillers.json").unlink(missing_ok=True)   # never leave a stale or half-written file behind
-        print("whisper-cli failed:", (r.stderr or "").strip()[-300:])
+# 1. fillers: Scribe writes hesitations as words, so they are read straight from transcript.json (same timeline as voice.wav).
+#    fillers.json keeps the shape the review page import expects.
+cuts, found, hits = [], False, []
+tj = reel / "transcript.json"
+if tj.exists():
+    found = True
+    toks = [(w["text"], w["start"], w["end"]) for w in json.load(open(tj)) if w["text"].strip()]
+    for k, (txt, a, b) in enumerate(toks):
+        if is_filler(txt, FILLERS, LANG):
+            nxt = toks[k + 1][1] if k + 1 < len(toks) else b
+            cuts.append((a - 0.02, max(b, min(nxt, a + 0.7)) - 0.02))
+            hits.append({"text": txt, "offsets": {"from": int(a * 1000), "to": int(b * 1000)}})
+    json.dump({"transcription": hits}, open(reel / "fillers.json", "w"), ensure_ascii=False)
+    print(f"fillers found: {len(cuts)}", [round(a, 1) for a, _ in cuts])
 if not found:
-    print("FILLERS NOT DETECTED: um/uh won't be cut automatically. Tell the person, and offer to cut them by hand on the review.")
+    print("FILLERS NOT DETECTED: no transcript.json yet (run transcribe.py first). um/uh won't be cut automatically.")
 if DETECT: sys.exit(0 if found else 3)
 
 # 2. pauses, via silencedetect on the cleaned voice. The threshold sits just above THIS clip's background noise

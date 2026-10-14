@@ -14,17 +14,17 @@ LANG_FILLERS = {
            "tight":   ["е", "ее", "еее", "ем", "емм", "ем-м", "м", "мм", "ммм", "хм", "гм", "ну"],
            "fast":    ["е", "ее", "еее", "ем", "емм", "ем-м", "м", "мм", "ммм", "хм", "гм", "ну"]},
 }
-FILLER_PROMPT = {"en": "Um, uh, so, like, um, I mean, uh, you know.",
-                 "uk": "Ем, е-е, ну, ммм, ем, тобто, хм, ну, е."}
+# drawn-out hesitations Scribe writes with any number of letters ("еееем", "мммм", "uhhh")
+LONG_FILLER = {"uk": r"е+м*|м{2,}|[хг]м+", "en": r"u+[hm]+|e+r+m*|h?m{2,}|a+h+"}
+
+def is_filler(text, fillers, l="en"):
+    """True when this transcript word is a hesitation sound to cut. An empty fillers list keeps every filler."""
+    import re
+    n = re.sub(r"[\W\d_]", "", text.lower())
+    return bool(fillers) and (n in fillers or bool(n and re.fullmatch(LONG_FILLER.get(l, LONG_FILLER["en"]), n)))
 
 def lang(brand):
     return (brand.get("language") or "en").lower()
-
-def asr_args(brand):
-    """hyperframes transcribe args for the brand's language. English keeps the original small.en model.
-    Other languages: Parakeet if installed (engine auto picks it), else multilingual Whisper large-v3."""
-    l = lang(brand)
-    return ["--model", "small.en"] if l == "en" else ["-l", l, "--model", "large-v3"]
 
 def pacing(brand):
     p = dict(PRESETS.get(brand.get("pacing", "natural"), PRESETS["natural"]))

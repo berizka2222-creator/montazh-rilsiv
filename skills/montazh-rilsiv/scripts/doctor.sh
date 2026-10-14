@@ -19,6 +19,10 @@ ENG="$(cd "$(dirname "$0")/.." && pwd)/engine"
 if [ -s "$ENG/gsap.min.js" ] && [ -s "$ENG/sfx/whoosh.wav" ]; then ok "reel template engine"
 else bash "$(dirname "$0")/setup_engine.sh" >/dev/null 2>&1 && ok "reel template engine (just set up)" || no "reel template engine" "bash scripts/setup_engine.sh"; fi
 
+ENVF="$HOME/.config/reels/.env"
+grep -q '^ELEVENLABS_API_KEY=sk_' "$ENVF" 2>/dev/null && ok "ElevenLabs key (speech recognition)" \
+  || no "ElevenLabs key" "speech recognition runs only on ElevenLabs Scribe: connect it (SKILL.md, «Connecting ElevenLabs Scribe»)"
+
 command -v deepFilter >/dev/null && ok "noise removal (DeepFilterNet)" \
   || warn "DeepFilterNet not installed" "background noise removal falls back to ffmpeg's weaker filter. Install: uv tool install deepfilternet"
 
