@@ -34,3 +34,15 @@ def pacing(brand):
     if brand.get("speed"): p["speed"] = float(brand["speed"])
     if brand.get("fillers") is not None: p["fillers"] = list(brand["fillers"])   # [] = keep every filler
     return p
+
+# Word-by-word captions: a short word ("не", "на", "до", "цю", "щоб") rides with the next word instead of flashing alone.
+# brand.json captions "pair_short": max letters of a word that pairs forward (default 3; 0 = never pair).
+def pairs_forward(text, next_text, gap, brand):
+    """True when this caption word should share its caption with the next word (word mode only)."""
+    import re
+    n = int(brand.get("captions", {}).get("pair_short", 3))
+    if not n or next_text is None or gap > 0.35 or re.search(r"[.,!?;:—–-]$", text): return False
+    core = lambda t: re.sub(r"[\W\d_]", "", t)
+    a, b = len(core(text)), len(core(next_text))
+    if b == 1: return False   # "де в нього": the one-letter word goes with what follows it, not with "де"
+    return 0 < a <= n and a + b <= 16

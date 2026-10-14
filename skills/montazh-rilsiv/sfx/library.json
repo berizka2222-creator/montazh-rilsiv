@@ -1,0 +1,359 @@
+[
+ {
+  "name": "typing",
+  "label": "Друк на клавіатурі",
+  "cat": "Миша і клавіатура",
+  "dur": 5.18,
+  "license": "Інна Березова: нарізано з її відео 14.10.2026"
+ },
+ {
+  "name": "whoosh_v2",
+  "label": "Свіш новий",
+  "cat": "Свіш",
+  "dur": 0.32,
+  "license": "Інна Березова: нарізано з її відео 14.10.2026"
+ },
+ {
+  "name": "whoosh_v3",
+  "label": "Свіш новий 2",
+  "cat": "Свіш",
+  "dur": 0.65,
+  "license": "Інна Березова: нарізано з її відео 14.10.2026"
+ },
+ {
+  "name": "flip_fast",
+  "label": "Прогортування",
+  "cat": "Рух",
+  "dur": 1.48,
+  "license": "Інна Березова: нарізано з її відео 14.10.2026"
+ },
+ {
+  "name": "click",
+  "label": "Клік",
+  "cat": "Миша і клавіатура",
+  "dur": 0.14,
+  "license": "Інна Березова: нарізано з її відео 14.10.2026"
+ },
+ {
+  "name": "mouse_click",
+  "label": "Клік мишкою",
+  "cat": "Миша і клавіатура",
+  "dur": 0.14,
+  "license": "Інна Березова: нарізано з її відео 14.10.2026"
+ },
+ {
+  "name": "boom",
+  "label": "Бум",
+  "cat": "Акцент",
+  "dur": 0.37,
+  "license": "Інна Березова: нарізано з її відео 14.10.2026"
+ },
+ {
+  "name": "page_turn",
+  "label": "Перегортання сторінки",
+  "cat": "Рух",
+  "dur": 0.32,
+  "license": "Інна Березова: нарізано з її відео 14.10.2026"
+ },
+ {
+  "name": "fold",
+  "label": "Згортання",
+  "cat": "Рух",
+  "dur": 0.16,
+  "license": "Інна Березова: нарізано з її відео 14.10.2026"
+ },
+ {
+  "name": "woosh",
+  "label": "Вуш",
+  "cat": "Свіш",
+  "dur": 0.38,
+  "license": "Інна Березова: нарізано з її відео 14.10.2026"
+ },
+ {
+  "name": "enter_space",
+  "label": "Enter космічний",
+  "cat": "Миша і клавіатура",
+  "dur": 0.54,
+  "license": "Інна Березова: нарізано з її відео 14.10.2026"
+ },
+ {
+  "name": "click_alt",
+  "label": "Клік інший",
+  "cat": "Миша і клавіатура",
+  "dur": 0.18,
+  "license": "Інна Березова: нарізано з її відео 14.10.2026"
+ },
+ {
+  "name": "shutter",
+  "label": "Затвор камери",
+  "cat": "Камера",
+  "dur": 0.16,
+  "license": "Інна Березова: нарізано з її відео 14.10.2026"
+ },
+ {
+  "name": "microwave",
+  "label": "Мікрохвильовка",
+  "cat": "Сповіщення",
+  "dur": 1.93,
+  "license": "Інна Березова: нарізано з її відео 14.10.2026"
+ },
+ {
+  "name": "whoosh",
+  "label": "Свіш",
+  "cat": "Свіш",
+  "dur": 0.5,
+  "license": "CC0 (made for this library)"
+ },
+ {
+  "name": "whoosh_soft",
+  "label": "Свіш м'який",
+  "cat": "Свіш",
+  "dur": 0.6,
+  "license": "CC0 (made for this library)"
+ },
+ {
+  "name": "whoosh_fast",
+  "label": "Свіш швидкий",
+  "cat": "Свіш",
+  "dur": 0.28,
+  "license": "CC0 (made for this library)"
+ },
+ {
+  "name": "whoosh_long",
+  "label": "Свіш довгий",
+  "cat": "Свіш",
+  "dur": 1.0,
+  "license": "CC0 (made for this library)"
+ },
+ {
+  "name": "whoosh_air",
+  "label": "Свіш повітряний",
+  "cat": "Свіш",
+  "dur": 0.7,
+  "license": "CC0 (made for this library)"
+ },
+ {
+  "name": "swish",
+  "label": "Шурх",
+  "cat": "Свіш",
+  "dur": 0.25,
+  "license": "CC0 (made for this library)"
+ },
+ {
+  "name": "riser",
+  "label": "Наростання",
+  "cat": "Свіш",
+  "dur": 1.3,
+  "license": "CC0 (made for this library)"
+ },
+ {
+  "name": "ding",
+  "label": "Дзинь",
+  "cat": "Сповіщення",
+  "dur": 0.9,
+  "license": "CC0 (made for this library)"
+ },
+ {
+  "name": "ding_phone",
+  "label": "Сповіщення телефону",
+  "cat": "Сповіщення",
+  "dur": 0.8,
+  "license": "CC0 (made for this library)"
+ },
+ {
+  "name": "ding_tri",
+  "label": "Сповіщення 3 ноти",
+  "cat": "Сповіщення",
+  "dur": 0.9,
+  "license": "CC0 (made for this library)"
+ },
+ {
+  "name": "ding_glass",
+  "label": "Скляний дзинь",
+  "cat": "Сповіщення",
+  "dur": 0.28,
+  "license": "CC0 (Kenney.nl)"
+ },
+ {
+  "name": "notify",
+  "label": "Сповіщення м'яке",
+  "cat": "Сповіщення",
+  "dur": 0.49,
+  "license": "CC0 (Kenney.nl)"
+ },
+ {
+  "name": "success",
+  "label": "Успіх",
+  "cat": "Сповіщення",
+  "dur": 0.54,
+  "license": "CC0 (Kenney.nl)"
+ },
+ {
+  "name": "success_short",
+  "label": "Галочка",
+  "cat": "Сповіщення",
+  "dur": 0.29,
+  "license": "CC0 (Kenney.nl)"
+ },
+ {
+  "name": "error",
+  "label": "Помилка",
+  "cat": "Сповіщення",
+  "dur": 0.16,
+  "license": "CC0 (Kenney.nl)"
+ },
+ {
+  "name": "shutter_phone",
+  "label": "Камера телефону",
+  "cat": "Камера",
+  "dur": 0.15,
+  "license": "CC0 (made for this library)"
+ },
+ {
+  "name": "shutter_burst",
+  "label": "Серія кадрів",
+  "cat": "Камера",
+  "dur": 0.5,
+  "license": "CC0 (made for this library)"
+ },
+ {
+  "name": "pop",
+  "label": "Поп",
+  "cat": "Поява",
+  "dur": 0.12,
+  "license": "CC0 (made for this library)"
+ },
+ {
+  "name": "pop_drop",
+  "label": "Поп м'який",
+  "cat": "Поява",
+  "dur": 0.19,
+  "license": "CC0 (Kenney.nl)"
+ },
+ {
+  "name": "pop_pluck",
+  "label": "Плак",
+  "cat": "Поява",
+  "dur": 0.16,
+  "license": "CC0 (Kenney.nl)"
+ },
+ {
+  "name": "tap",
+  "label": "Тап",
+  "cat": "Поява",
+  "dur": 0.04,
+  "license": "CC0 (Kenney.nl)"
+ },
+ {
+  "name": "snap",
+  "label": "Клац",
+  "cat": "Поява",
+  "dur": 0.06,
+  "license": "CC0 (made for this library)"
+ },
+ {
+  "name": "toggle",
+  "label": "Перемикач",
+  "cat": "Поява",
+  "dur": 0.14,
+  "license": "CC0 (Kenney.nl)"
+ },
+ {
+  "name": "appear",
+  "label": "Поява",
+  "cat": "Поява",
+  "dur": 0.25,
+  "license": "CC0 (Kenney.nl)"
+ },
+ {
+  "name": "disappear",
+  "label": "Зникнення",
+  "cat": "Поява",
+  "dur": 0.26,
+  "license": "CC0 (Kenney.nl)"
+ },
+ {
+  "name": "slide",
+  "label": "Слайд",
+  "cat": "Рух",
+  "dur": 0.51,
+  "license": "CC0 (Kenney.nl)"
+ },
+ {
+  "name": "swipe",
+  "label": "Свайп",
+  "cat": "Рух",
+  "dur": 0.77,
+  "license": "CC0 (Kenney.nl)"
+ },
+ {
+  "name": "scroll",
+  "label": "Прокрутка",
+  "cat": "Рух",
+  "dur": 1.0,
+  "license": "CC0 (Kenney.nl)"
+ },
+ {
+  "name": "hit_soft",
+  "label": "Удар м'який",
+  "cat": "Акцент",
+  "dur": 0.53,
+  "license": "CC0 (Kenney.nl)"
+ },
+ {
+  "name": "hit_punch",
+  "label": "Удар",
+  "cat": "Акцент",
+  "dur": 0.43,
+  "license": "CC0 (Kenney.nl)"
+ },
+ {
+  "name": "bell",
+  "label": "Дзвін",
+  "cat": "Акцент",
+  "dur": 1.48,
+  "license": "CC0 (Kenney.nl)"
+ },
+ {
+  "name": "level_up",
+  "label": "Рівень вгору",
+  "cat": "Акцент",
+  "dur": 0.35,
+  "license": "CC0 (Kenney.nl)"
+ },
+ {
+  "name": "chime",
+  "label": "Дзвіночок",
+  "cat": "Акцент",
+  "dur": 0.76,
+  "license": "CC0 (made for this library)"
+ },
+ {
+  "name": "coins_pour",
+  "label": "Монети сиплються",
+  "cat": "Гроші",
+  "dur": 1.77,
+  "license": "CC0 (Kenney.nl RPG Audio; coins_pour, coins_jingle arranged)"
+ },
+ {
+  "name": "coins_jingle",
+  "label": "Дзенькіт монет",
+  "cat": "Гроші",
+  "dur": 0.79,
+  "license": "CC0 (Kenney.nl RPG Audio; coins_pour, coins_jingle arranged)"
+ },
+ {
+  "name": "coins_handful",
+  "label": "Жменя монет",
+  "cat": "Гроші",
+  "dur": 0.79,
+  "license": "CC0 (Kenney.nl RPG Audio; coins_pour, coins_jingle arranged)"
+ },
+ {
+  "name": "coins_drop",
+  "label": "Монети коротко",
+  "cat": "Гроші",
+  "dur": 0.31,
+  "license": "CC0 (Kenney.nl RPG Audio; coins_pour, coins_jingle arranged)"
+ }
+]

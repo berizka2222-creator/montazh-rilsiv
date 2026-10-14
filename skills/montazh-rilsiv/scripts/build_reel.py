@@ -84,6 +84,8 @@ shutil.copy(ENGINE / "gsap.min.js", proj / "vendor/gsap.min.js")
 try: os.link(reel / "master.mp4", proj / "master.mp4")
 except OSError: shutil.copy(reel / "master.mp4", proj / "master.mp4")
 for f in (ENGINE / "sfx").glob("*.wav"): shutil.copy(f, proj / "sfx" / f.name)
+for f in (Path(__file__).resolve().parent.parent / "sfx").glob("*.wav"): shutil.copy(f, proj / "sfx" / f.name)   # the skill's CC0 library
+for f in (HOME / "assets" / "sfx").glob("*.wav"): shutil.copy(f, proj / "sfx" / f.name)   # their own sound library wins on a shared name
 (proj / "img").mkdir()
 HF = ENGINE / "hf"
 if any(k["type"] in ("motion", "follow", "custom") for k in edit.get("cards", [])):

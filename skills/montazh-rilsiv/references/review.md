@@ -18,6 +18,21 @@ A private page on the person's claude.ai account where they approve the edit bef
 5. Upload the assets to the page (`asset: true`, up to 25 per call), then write `reel/current` = `reel.json` plus `srcUrl`, per-graphic `thumbUrl`/`imgUrl`, `assets` {audioOriginal, audioCleaned, colourBefore, colourAfter, sfx{name:url}}, `fonts` {body, accent}. Delete `review/current` and `builds/latest` from the previous reel (ask first if they hold notes).
 6. Send the link. Tell them: type the hook and CTA in the fields on «Графіка» (or approve yours), tap words to cut, use the «Накладення» tab to add their own photo/video at the current rough-cut moment and drag it into place and pull its corner to any size, sticker-small up to full screen (or tick «На весь екран»); effect: soft, slide, polaroid, glass, zoom; up to 20 MB; or pick one from «Мої файли», or add text; tick «За мною» to put it behind them), tap ⏸ / grey "um"s to keep them, Play rough cut to watch the live cut, then Build preview.
 
+## The big button and the steps (no chat words needed)
+
+The page shows steps (1 her edit → 2 Claude's proposals → 3 draft → 4 final) and one big button at the bottom. Each press saves a request in her review doc and sends Claude a «Send to Claude» comment on the artifact, which wakes this session while the artifact's watch says "auto-replies armed" (`ArtifactComments action: "watch"` lists it). The comment text starts with ▶ and names the step; treat it exactly like the chat word:
+- `graphicsRequest` / «графіка» → round 2 below. When the proposals are on the board, write `reel/current` with `claudeRound` = previous + 1: the page reloads it in place, jumps to «Графіка» and shows a banner (no refresh needed).
+- `buildRequest` / «збери чернетку» → "When they say build preview".
+- `fixRequest` (revisions marked `sent`) / «виправ нотатки» → act on those revisions, re-render, new `builds/latest`.
+- `finalRequest` / «фінал» → QA, deliver, covers; then `builds/latest` gets `final: true` (step 4).
+Reply in the comment thread in one line («Взяв, роблю пропозиції, ~10 хв») and resolve it when done. If no session is listening the page tells her to type the word in chat instead.
+
+## Colour and sounds on «Звук і колір»
+
+- **Colour**: iPhone-style sliders (exposure, highlights, shadows, contrast, brightness, saturation, vibrance, warmth, clarity, sharpness, each -100..100). The page previews them with WebGL using `core.js` `gradeParams`; `review_sync.py import` writes `<reel>/grade.cube` and the ffmpeg chain into `edl.json` `grade`, and `cut.py` applies it. Untouched = no grade.
+- **Sounds**: each sound on a graphic can be switched off or replaced from the library (`sfxSwap` in the review doc). The library lives in db `library/sfx` = `{items: [{name, label, cat, url}]}` and on disk in `sfx/` of this skill (copied into `~/reels/assets/sfx`; `build_reel.py` takes sounds from both, the person's own folder wins). First setup: upload every `sfx/*.wav` as an audio-only mp4 (`asset: true`) and write `library/sfx` with those urls, labels and categories from `sfx/library.json`.
+- Their own sounds: a recording with sound, silence, sound… → `python3 scripts/slice_sfx.py <video> [names.txt]` cuts it into separate sounds in `~/reels/assets/sfx`.
+
 ## Effects they ask for («Ефекти» tab)
 
 On «Ефекти» they pick a moment of the rough cut, describe an effect (a HyperFrames catalog name such as `count-up`, or their own words) and can attach photos/videos for it. The «Відкрити бібліотеку ефектів» button opens the catalog: the public one at hyperframes.heygen.com/catalog, or their own gallery page: set `libraryUrl` in the db doc `library/files` (works for every reel) or brand.json `"page"` `"library"`. `review_sync.py import` and `overlays` print each as `EFFECT REQUESTED @ cut …s for …s, from word "…": <text> | files: <name> -> DOWNLOAD asset <id> into <reel>/effects`.

@@ -3,16 +3,16 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@1,9..144,300;1,9..144,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 /* layout: sticky phone-shaped player on the left (stacks at phone width), the active review step on the right */
-:root{
-  --bg:#FFF8FB; --surface:#FFFFFF; --ink:#141414; --muted:#6E5A63; --line:#F3D3E1;
-  --pink:#ED84B0; --pink-soft:#FFEEF5; --now:#FCE3EE; --glow:rgba(237,132,176,.25); --on-accent:#141414;
-  --cut-bg:#141414; --cut-fg:#FFEEF5; --auto:#9A7F8B;
-  --keep:#2F7D5B; --change:#B8741A; --drop:#B4234F; --warn:#9C5B00;
+:root{   /* the brand look from the first frame (brand.json "page"); reel.json theme can still override it after load */
+  --bg:#070c07; --surface:#10180d; --ink:#F3F4EC; --muted:rgba(243,244,236,.66); --line:rgba(255,255,255,.1);
+  --pink:#FFC3CC; --pink-soft:rgba(255,255,255,.05); --now:rgba(210,219,118,.18); --glow:rgba(210,219,118,.2); --on-accent:#141a0e;
+  --cut-bg:#FFC3CC; --cut-fg:#141a0e; --auto:rgba(243,244,236,.42);
+  --keep:#D2DB76; --change:#F2B45C; --drop:#FF7A9C; --warn:#F2B45C;
   --f-display:"Fraunces",Georgia,serif; --f-body:"Manrope",system-ui,-apple-system,sans-serif; --f-mono:"IBM Plex Mono",ui-monospace,monospace;
-  --accent:var(--pink); --glow1:transparent; --glow2:transparent; --grid:transparent;
+  --accent:#D2DB76; --glow1:rgba(210,219,118,.16); --glow2:rgba(255,195,204,.14); --grid:rgba(255,255,255,.03);
+  color-scheme:dark;
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161013;--surface:#21181C;--ink:#FFEEF5;--muted:#C9A9B7;--line:#3A2A31;--pink-soft:#2C1D24;--now:#3A2430;--cut-bg:#ED84B0;--cut-fg:#141414;--auto:#A88E9A;--keep:#6FCF9F;--change:#F2B45C;--drop:#FF7A9C;--warn:#F2B45C;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#161013;--surface:#21181C;--ink:#FFEEF5;--muted:#C9A9B7;--line:#3A2A31;--pink-soft:#2C1D24;--now:#3A2430;--cut-bg:#ED84B0;--cut-fg:#141414;--auto:#A88E9A;--keep:#6FCF9F;--change:#F2B45C;--drop:#FF7A9C;--warn:#F2B45C;color-scheme:dark}
+html,body{background:#070c07}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5}
 .wrap{max-width:1200px;margin:0 auto;padding-inline:16px;padding-block:16px 120px;display:grid;grid-template-columns:330px minmax(0,1fr);gap:28px;align-items:start}
 @media (max-width:820px){.wrap{grid-template-columns:minmax(0,1fr)}}
@@ -108,7 +108,10 @@ textarea{min-height:80px;resize:vertical}
 h2{font-size:18px;margin:18px 0 8px}
 .cue{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:6px 8px;border-radius:10px}
 .cue:hover{background:var(--pink-soft)}
-.cue .what{font-size:14px}
+.cue .what{font-size:13.5px}
+.sfxlib{margin-top:14px}
+.sfxlib .gpre{gap:5px}
+.sfxsel{font:inherit;font-size:13px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:5px 10px}
 .cue.off .what{text-decoration:line-through;color:var(--muted)}
 /* preview */
 .state{font-weight:700;padding:10px 14px;border-radius:12px;border:2px solid var(--line);margin-bottom:12px}
@@ -194,18 +197,138 @@ input[type=file]{color:var(--muted);font:inherit;font-size:13px}
 input[type=file]::file-selector-button{font:600 14px var(--f-body);border:1px solid var(--accent);background:transparent;color:var(--accent);border-radius:999px;padding:7px 14px;margin-right:10px;cursor:pointer}
 @media (hover:hover){.caprow .tools{opacity:0;transition:opacity .15s}.caprow:hover .tools,.caprow:focus-within .tools,.caprow.now .tools{opacity:1}}
 .next{display:flex;justify-content:flex-end;margin-top:22px}
+.wrap{padding-bottom:150px}
 #notesdet{margin-top:0}
 #notesdet summary{font-weight:600}
+.gv::before{content:""}
+/* colour panel: compact, grouped, two columns of thin sliders */
+.gpanel{border:1px solid var(--line);border-radius:16px;padding:10px 14px 12px;margin-bottom:14px;background:linear-gradient(180deg,var(--surface),transparent)}
+.gtop{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px}
+.gpre{display:flex;gap:4px;flex-wrap:wrap}
+.gpre button{font:500 12px var(--f-body);border:1px solid var(--line);background:none;color:var(--muted);border-radius:999px;padding:3px 10px;cursor:pointer}
+.gpre button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+.gpre button:hover{color:var(--ink)}
+.ggroup{margin-top:8px}
+.gtitle{font:500 10.5px var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);opacity:.7;margin:0 0 2px}
+.ggrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 22px}
+@media (max-width:600px){.ggrid{grid-template-columns:minmax(0,1fr)}}
+.gs{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:8px;padding:3px 0}
+.gs .gl{font-size:12.5px;color:var(--ink);cursor:default;user-select:none}
+.gs .gv{font:500 11px var(--f-mono);color:var(--muted);min-width:30px;text-align:right}
+.gs.on .gv{color:var(--accent)}
+.gs input{grid-column:1/-1;width:100%;margin:2px 0 0;height:14px;background:none;-webkit-appearance:none;appearance:none}
+.gs input::-webkit-slider-runnable-track{height:2px;background:var(--line);border-radius:2px}
+.gs input::-moz-range-track{height:2px;background:var(--line);border-radius:2px}
+.gs input::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--ink);margin-top:-5px;border:0}
+.gs input::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:var(--ink);border:0}
+.gs.on input::-webkit-slider-thumb{background:var(--accent)}
+.gs.on input::-moz-range-thumb{background:var(--accent)}
+.gcv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;display:block}
+.pair canvas{border-radius:12px;width:100%;aspect-ratio:9/16;max-width:260px;display:block}
+/* steps + the big «next» button: where she is in the process and what happens next */
+.steps{list-style:none;display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px;padding:0}
+.steps li{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:5px 12px 5px 6px}
+.steps li .n{font:500 11px var(--f-mono);width:20px;height:20px;border-radius:50%;display:inline-grid;place-items:center;border:1px solid currentColor}
+.steps li.done{color:var(--ink)}
+.steps li.done .n{background:var(--keep);border-color:var(--keep);color:var(--on-accent)}
+.steps li.now{color:var(--on-accent);background:var(--accent);border-color:var(--accent)}
+.gobar{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);transform:translateX(-50%);z-index:20;display:flex;gap:14px;align-items:center;
+  width:min(760px,calc(100% - 32px));box-sizing:border-box;padding:10px 10px 10px 18px;border-radius:999px;background:var(--surface);border:1px solid var(--accent);box-shadow:0 18px 50px -12px rgba(0,0,0,.65),0 0 0 4px var(--now)}
+.gobar .gotext{flex:1;min-width:0;font-size:14px;line-height:1.35;color:var(--muted)}
+.gobar .gotext b{color:var(--ink);display:block;font-size:15px}
+.gobar button{font-size:16px;padding:12px 22px;white-space:nowrap}
+.gobar button:disabled{opacity:1;background:transparent;color:var(--accent);box-shadow:none}
+@media (max-width:560px){.gobar{border-radius:20px;flex-direction:column;align-items:stretch;text-align:center;padding:12px}.gobar button{width:100%}}
+.spin{display:inline-block;width:12px;height:12px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:sp 1s linear infinite;vertical-align:-1px;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation:none}}
+.modal{position:fixed;inset:0;z-index:30;display:grid;place-items:center;padding:16px;background:rgba(0,0,0,.6)}
+.modal .mbox{max-width:520px;width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--line);border-radius:22px;padding:22px 22px 18px;box-shadow:0 30px 80px -20px rgba(0,0,0,.8)}
+.modal h2{margin:0 0 6px;font-size:22px}
+.modal ol{margin:12px 0 16px;padding-left:20px;color:var(--muted);font-size:14.5px}
+.modal ol li{margin:4px 0}
+.modal ol li b{color:var(--ink)}
+.modal .ctl{justify-content:flex-end}
+.banner{border:1px solid var(--accent);background:var(--now);border-radius:14px;padding:10px 14px;margin:0 0 12px;font-weight:600}
+
+[hidden]{display:none!important}
+/* ===== calm pass: fewer equal-weight pills, clear levels (process > section > content), compact controls ===== */
+body{font-size:15px}
+.side{gap:12px}
+h1{font-size:30px}
+.reel-name{font-size:13px}
+/* process: a thin progress strip, not a second row of pills */
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:0 0 18px}
+.steps li{display:block;border:0;border-radius:0;padding:0 0 9px;background:none;position:relative;font:500 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);opacity:.6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.steps li .n{display:none}
+.steps li::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:3px;background:var(--line)}
+.steps li.done{opacity:.85;color:var(--ink)}
+.steps li.done::after{background:var(--keep)}
+.steps li.now{opacity:1;color:var(--accent);background:none}
+.steps li.now::after{background:var(--accent);box-shadow:0 0 12px var(--accent)}
+/* sections: quiet tabs on one line, the chosen one marked by an underline */
+.tabs{flex-wrap:nowrap;overflow-x:auto;gap:2px;margin:0 0 16px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{border:0;background:none;border-radius:0;padding:8px 10px 10px;font-size:14px;font-weight:500;color:var(--muted);white-space:nowrap;position:relative;flex:none}
+.tab:hover{color:var(--ink)}
+.tab .num{width:auto;height:auto;border:0;font-size:10.5px;opacity:.55}
+.tab[aria-selected="true"]{background:none;color:var(--ink);font-weight:600}
+.tab[aria-selected="true"]::after{content:"";position:absolute;left:8px;right:8px;bottom:-1px;height:2px;border-radius:2px;background:var(--accent)}
+.tab .dot{width:6px;height:6px}
+/* text levels */
+.lede{font-size:13.5px;line-height:1.5;margin:0 0 12px}
+.tally{font-size:12px;gap:4px 16px;margin-bottom:12px;opacity:.85}
+.legend{font-size:12.5px;margin-bottom:10px}
+.words{font-size:15.5px;line-height:1.65}
+.sent{padding:5px 8px;grid-template-columns:96px minmax(0,1fr)}
+.ts{font-size:10.5px;opacity:.75}
+.ts .src::before{content:""}
+.caprow{grid-template-columns:96px minmax(0,1fr) auto}
+h2{font-size:16px;margin:22px 0 6px}
+/* player controls: compact, the play button no longer a banner */
+.side .ctl{gap:6px}
+.side .ctl #rough{flex:1;padding:9px 14px;font-size:14px;box-shadow:none}
+.side .ctl #back5,.side .ctl #fwd5{padding:9px 12px;font-size:13px}
+.mode{font-size:12.5px;line-height:1.45}
+.savebar{gap:6px}
+.pill{font-size:11.5px;padding:2px 9px}
+.by{font-size:10px;opacity:.6;margin-top:2px}
+button.b{font-size:13.5px;padding:7px 13px}
+button.b.quiet{border-color:transparent;background:rgba(255,255,255,.05)}
+button.b.quiet:hover:not(:disabled){background:rgba(255,255,255,.09)}
+.next{margin-top:18px}
+#nextbtn{background:none;color:var(--accent);border:1px solid var(--line);box-shadow:none}
+.card{padding:10px;gap:12px;border-radius:16px}
+.panel{padding:10px 14px}
+details{padding:8px 12px}
+#notesdet summary,details summary{font-size:13.5px;font-weight:500;color:var(--muted)}
+/* the one action that moves the process: a slim floating bar */
+.gobar{width:min(620px,calc(100% - 24px));gap:12px;padding:6px 6px 6px 18px;border-color:var(--line);box-shadow:0 14px 40px -14px rgba(0,0,0,.7);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);background:color-mix(in srgb,var(--surface) 88%,transparent)}
+.gobar .gotext{font-size:12.5px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gobar .gotext b{display:inline;font-size:13.5px;margin-right:8px}
+.gobar button{font-size:14px;padding:9px 16px}
+.wrap{padding-bottom:110px}
+@media (max-width:560px){.gobar{flex-direction:row;border-radius:999px;padding:6px 6px 6px 14px;text-align:left}.gobar button{width:auto}.gobar .gotext span.sub{display:none}}
+.banner{font-size:13.5px;font-weight:500;padding:9px 13px}
+.w.cut{background:color-mix(in srgb,var(--pink) 16%,transparent);color:var(--pink);text-decoration-color:color-mix(in srgb,var(--pink) 70%,transparent);text-decoration-thickness:1.5px}
+.gobar{width:min(700px,calc(100% - 24px))}
+/* help text and the legend: reference, not content, so small and quiet until you look for them */
+.lede{font-size:12.5px;line-height:1.45;color:var(--muted);opacity:.75;max-width:60ch;margin:0 0 6px}
+.legend{font-size:11.5px;gap:4px 14px;margin:0 0 14px;opacity:.6;transition:opacity .2s}
+.legend:hover{opacity:1}
+.legend .w,.legend .pz{font-size:11px;line-height:1.4;padding:0 4px}
+.legend .pz{border-width:1px}
 </style>
 
 <div class="wrap">
   <aside class="side">
-    <div class="eyebrow" id="eyebrow">монтаж · перевірка</div>
+    <div class="eyebrow" id="eyebrow">TARGET: THE ALGORITHM · монтаж</div>
     <h1>Перегляд <em>рілса</em></h1>
     <label class="reelpick" id="reelpick" hidden>Рілс <select id="reelsel" aria-label="Який рілс перевіряєш"></select></label>
     <p class="reel-name" id="reelname">Завантажую рілс…</p>
     <div class="player" id="player">
       <video id="v" playsinline preload="metadata"></video>
+      <canvas class="gcv" id="gcv" hidden></canvas>
       <div class="overlay" id="ov"></div>
       <div class="clock" id="clock" hidden></div>
       <div class="noprev" id="noprev" hidden>Чернетки ще немає.<br>Збери її кнопкою «Зібрати чернетку».</div>
@@ -225,6 +348,8 @@ input[type=file]::file-selector-button{font:600 14px var(--f-body);border:1px so
     <p class="by">Скіл монтажу рілсів від <a href="https://instagram.com/inna_berezova" target="_blank" rel="noopener">@inna_berezova</a></p>
   </aside>
   <main>
+    <ol class="steps" id="steps" aria-label="Етапи"><li data-s="1"><span class="n">1</span>Твій монтаж</li><li data-s="2"><span class="n">2</span>Пропозиції Claude</li><li data-s="3"><span class="n">3</span>Чернетка</li><li data-s="4"><span class="n">4</span>Фінал</li></ol>
+    <div class="banner" id="banner" hidden></div>
     <div class="tabs" role="tablist">
       <button class="tab" role="tab" data-tab="cuts">Нарізка <span class="dot" hidden></span></button>
       <button class="tab" role="tab" data-tab="overlays">Накладення <span class="dot" hidden></span></button>
@@ -296,7 +421,7 @@ input[type=file]::file-selector-button{font:600 14px var(--f-body);border:1px so
     </section>
 
     <section data-p="captions" hidden>
-      <p class="lede">Тапни слово, щоб зробити його акцентом. <b>правити</b> змінює текст, ±0,1 зсуває початок, <b>об'єднати</b> склеює з наступним.</p>
+      <p class="lede">Тапни слово, щоб зробити його акцентом. <b>правити</b> змінює текст, ±0,1 зсуває початок, <b>об'єднати</b> склеює з наступним, <b>роз'єднати</b> ставить кожне слово окремо.</p>
       <div class="sr"><input type="text" id="srfind" placeholder="Знайти слово" aria-label="Знайти слово"><input type="text" id="srrepl" placeholder="Замінити на" aria-label="Замінити на"><button class="b" id="srgo" type="button">Замінити всюди</button><span class="mode" id="srmsg" aria-live="polite"></span></div>
       <div class="tally" id="captally"></div>
       <div class="caps" id="caps"><div class="empty">Субтитри з'являться тут, коли рілс завантажиться.</div></div>
@@ -308,7 +433,11 @@ input[type=file]::file-selector-button{font:600 14px var(--f-body);border:1px so
       <div class="ctl" id="voiceclean" style="margin-bottom:12px"></div>
       <div class="pair" id="audio"></div>
       <h2>Колір</h2>
-      <p class="lede">Один кадр до і після кольорокорекції.</p>
+      <p class="lede">Відео зліва одразу показує результат, у рендері буде так само. Подвійний клік по назві повертає 0.</p>
+      <div class="gpanel">
+        <div class="gtop"><div class="gpre" id="gradepre"></div></div>
+        <div id="gradebox"></div>
+      </div>
       <div class="pair" id="colour"></div>
       <h2>Звукові ефекти</h2>
       <p class="lede">Звуки на появі графіки. Вимкни зайві.</p>
@@ -326,6 +455,11 @@ input[type=file]::file-selector-button{font:600 14px var(--f-body);border:1px so
 
     <div class="next" id="nextbox"><button class="b primary" id="nextbtn" type="button">Далі →</button></div>
 
+    <div class="gobar" id="gobar" hidden><div class="gotext" id="gotext"></div><button class="b primary" id="gobtn" type="button"></button></div>
+    <div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="mtitle"><div class="mbox">
+      <h2 id="mtitle"></h2><div id="mbody"></div>
+      <div class="ctl"><button class="b quiet" id="mno" type="button">Ще ні</button><button class="b primary" id="myes" type="button"></button></div>
+    </div></div>
     <div class="notes" id="notesbox">
       <details id="notesdet"><summary>Нотатка до розділу «<span id="notetab">нарізка</span>»</summary>
         <textarea id="notes" aria-label="Нотатка до цього розділу" placeholder="Що ще змінити в цьому розділі. Стосується тільки цього рілса."></textarea>
@@ -340,6 +474,13 @@ input[type=file]::file-selector-button{font:600 14px var(--f-body);border:1px so
   </main>
 </div>
 
+<script>   // brand fonts remembered from the last visit: applied before anything renders, so the text doesn't jump
+try { const f = JSON.parse(localStorage.getItem("reelFonts") || "null");
+  if (f) { const css = [["rb", f.body], ["ra", f.accent]].filter(x => x[1]).map(([n, u]) => `@font-face{font-family:${n};src:url(${u});font-display:block}`).join("");
+    document.head.appendChild(Object.assign(document.createElement("style"), { id: "brandfonts", textContent: css }));
+    if (f.accent) document.documentElement.style.setProperty("--f-display", '"ra", Georgia, serif');
+    if (f.body) document.documentElement.style.setProperty("--f-body", '"rb", system-ui, sans-serif'); } } catch (e) {}
+</script>
 <script src="core.js"></script>
 <script>
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
@@ -393,7 +534,7 @@ function showTab(t) {
   $("#noprev").hidden = !(t === "preview" && !B?.url);
   if (t === "preview") { if (B?.url && v.getAttribute("src") !== B.url) { v.setAttribute("src", B.url); v.load(); } $("#rough").hidden = $("#back5").hidden = $("#fwd5").hidden = true; $(".scrub").hidden = true; v.controls = true; }
   else { if (v.getAttribute("src") !== R.srcUrl) { v.setAttribute("src", R.srcUrl); v.load(); } $("#rough").hidden = $("#back5").hidden = $("#fwd5").hidden = false; $(".scrub").hidden = false; v.controls = false; }
-  overlay(pos);
+  gradeView(); overlay(pos);
 }
 $$(".tab").forEach(b => b.addEventListener("click", () => showTab(b.dataset.tab)));
 // the steps in order: a number on each tab and a «Далі» button under each section
@@ -412,7 +553,7 @@ $("#reset").addEventListener("click", () => {
     if (tab === "cuts") Object.assign(S, { cut: null, restoredFillers: [], restoredPauses: [], trimmedPauses: [] });
     if (tab === "graphics") S.board = {};
     if (tab === "captions") S.captions = null;
-    if (tab === "sound") S.sfxOff = {};
+    if (tab === "sound") { S.sfxOff = {}; S.grade = null; }
     if (tab === "overlays") S.overlays = [];
     if (tab === "effects") S.effects = [];
   }); back(); });
@@ -502,7 +643,7 @@ function fitCap(el) {   // shrink until the widest word fits the frame, measured
 function highlight(c, cap) {
   $$(".card").forEach(el => { const g = GFX.find(x => x.id === el.dataset.id); el.classList.toggle("now", c != null && g && !g.gone && c >= g.start && c < g.end); });
   $$(".caprow").forEach(el => el.classList.toggle("now", !!cap && +el.dataset.ci === cap.ci));
-  if (mode === "line" || mode === "rough") { const t = v.currentTime; $$(".w").forEach(e => { const w = R.words[+e.dataset.i]; e.classList.toggle("now", t >= w.s && t < w.e); }); }
+  if (mode === "line" || mode === "rough") { const t = v.currentTime; $$(".w[data-i]").forEach(e => { const w = R.words[+e.dataset.i]; e.classList.toggle("now", t >= w.s && t < w.e); }); }
 }
 
 // ---------- 1. cuts ----------
@@ -857,6 +998,11 @@ function renderCaptions() {
       if (a.text || b.text) { a.text = [a.text || a.w.map(i => R.words[i].text).join(" "), b.text || b.w.map(i => R.words[i].text).join(" ")].join(" "); a.accText = []; }
       a.w = a.w.concat(b.w); a.acc = (a.acc || []).concat(b.acc || []); arr.splice(nextLive.ci, 1);
     }));
+    if (src.w.length > 1) tool("роз'єднати", "Кожне слово окремим субтитром", () => mutate(() => {
+      const arr = capsEditable(), a = arr[c.ci], parts = a.text ? a.text.split(/\s+/) : null, same = parts && parts.length === a.w.length;
+      arr.splice(c.ci, 1, ...a.w.map((i, k) => ({ w: [i], acc: (a.acc || []).filter(x => x === i),
+        ...(same ? { text: parts[k], accText: (a.accText || []).includes(k) ? [0] : [] } : {}), ...(k === 0 && a.nudge ? { nudge: a.nudge } : {}) })));
+    }));
     row.append(ts, cw, tools); box.appendChild(row);
   }
   const acc = live.reduce((n, c) => n + c.words.filter(w => w.accent).length, 0);
@@ -879,21 +1025,133 @@ function renderSound() {
   const au = u => { const a = document.createElement("audio"); a.controls = true; a.preload = "none"; a.src = u; return a; };
   const im = (u, alt) => { const i = document.createElement("img"); i.src = u; i.alt = alt; return i; };
   $("#audio").replaceChildren(...(A.audioOriginal ? [fig("Оригінал", au(A.audioOriginal)), fig("Після чистки", au(A.audioCleaned))] : [Object.assign(document.createElement("div"), { className: "empty", textContent: "Для цього рілса ще немає порівняння звуку." })]));
-  $("#colour").replaceChildren(...(A.colourBefore && R.grade ? [fig("Оригінал", im(A.colourBefore, "Кадр до кольорокорекції")), fig("Після корекції", im(A.colourAfter, "Той самий кадр після кольорокорекції"))] : [Object.assign(document.createElement("div"), { className: "empty", textContent: "Кольорокорекцію вимкнено, рілс лишається у твоєму кольорі." })]));
+  if (A.colourBefore) {
+    const cv = document.createElement("canvas"); cv.setAttribute("aria-label", "Той самий кадр після кольорокорекції");
+    $("#colour").replaceChildren(fig("Оригінал", im(A.colourBefore, "Кадр до кольорокорекції")), fig("Після корекції", cv));
+    gAfterGL = glFor(cv); gAfter = new Image(); gAfter.onload = () => gAfterGL && gAfterGL.draw(gAfter, ReelCore.gradeParams(curGrade())); gAfter.src = A.colourBefore;
+  } else $("#colour").textContent = "";
+  renderGrade();
   const cues = $("#cues"); cues.textContent = "";
+  const lib = sfxLib(), names = Object.keys(lib);
   for (const g of GFX.filter(g => g.sfx && !g.gone && g.state !== "d")) {
-    const off = !!S.sfxOff[g.id];
+    const off = !!S.sfxOff[g.id], cur = (S.sfxSwap || {})[g.id] || g.sfx.name;
     const row = document.createElement("div"); row.className = "cue" + (off ? " off" : "");
     const t = document.createElement("span"); t.className = "tc"; t.textContent = fmt(g.start);
-    const w = document.createElement("span"); w.className = "what"; w.textContent = `${g.sfx.name} · ${g.kind}`;
+    const w = document.createElement("span"); w.className = "what"; w.textContent = g.kind;
     const ctl = document.createElement("span"); ctl.className = "ctl";
-    const play = document.createElement("button"); play.type = "button"; play.className = "b quiet"; play.textContent = "Слухати";
-    play.addEventListener("click", () => { const u = A.sfx?.[g.sfx.name]; if (!u) return; const a = new Audio(u); a.volume = Math.min(1, Math.pow(10, (g.sfx.db + 8) / 20)); a.play().catch(() => {}); });
+    const sel = document.createElement("select"); sel.className = "sfxsel"; sel.setAttribute("aria-label", "Звук для " + g.kind);
+    const groups = {}; for (const n of new Set([cur, ...names])) (groups[(lib[n] || {}).cat || "Інше"] ||= []).push(n);
+    for (const [cat, ns] of Object.entries(groups)) { const og = document.createElement("optgroup"); og.label = cat;
+      for (const n of ns) { const o = document.createElement("option"); o.value = n; o.textContent = (lib[n] || {}).label || n; o.selected = n === cur; og.appendChild(o); } sel.appendChild(og); }
+    sel.addEventListener("change", () => { playSfx(sel.value, g.sfx.db); mutate(() => { S.sfxSwap = { ...(S.sfxSwap || {}) }; if (sel.value === g.sfx.name) delete S.sfxSwap[g.id]; else S.sfxSwap[g.id] = sel.value; }); });
+    const play = document.createElement("button"); play.type = "button"; play.className = "b quiet"; play.textContent = "▶"; play.title = "Слухати";
+    play.addEventListener("click", () => playSfx(sel.value, g.sfx.db));
     const tg = document.createElement("button"); tg.type = "button"; tg.className = "b quiet"; tg.textContent = off ? "Увімкнути" : "Вимкнути";
     tg.addEventListener("click", () => mutate(() => { if (off) delete S.sfxOff[g.id]; else S.sfxOff[g.id] = true; }));
-    ctl.append(play, tg); row.append(t, w, ctl); cues.appendChild(row);
+    ctl.append(sel, play, tg); row.append(t, w, ctl); cues.appendChild(row);
   }
+  if (!cues.children.length) cues.innerHTML = `<div class="empty">Звуків на графіці ще немає.</div>`;
+  // the whole library to listen through, by category
+  const det = document.createElement("details"); det.className = "sfxlib"; det.innerHTML = `<summary>Бібліотека звуків (${names.length})</summary>`;
+  const byCat = {}; for (const n of names) (byCat[lib[n].cat || "Інше"] ||= []).push(n);
+  for (const [cat, ns] of Object.entries(byCat)) {
+    const g = document.createElement("div"); g.className = "ggroup"; g.innerHTML = `<div class="gtitle"></div>`; g.firstChild.textContent = cat;
+    const row = document.createElement("div"); row.className = "gpre";
+    for (const n of ns) { const b = document.createElement("button"); b.type = "button"; b.textContent = "▶ " + lib[n].label; b.addEventListener("click", () => playSfx(n)); row.appendChild(b); }
+    g.appendChild(row); det.appendChild(g);
+  }
+  cues.appendChild(det);
 }
+
+// ---------- colour grade: iPhone-style sliders, previewed with WebGL using the render's exact maths (core.js gradeParams) ----------
+const GRADE_UI = [["Світло", [["ex", "Експозиція"], ["hi", "Світлі ділянки"], ["sh", "Тіні"], ["co", "Контраст"], ["br", "Яскравість"]]],
+  ["Колір", [["sa", "Насиченість"], ["vi", "Кольоровість"], ["wa", "Теплота"]]], ["Деталі", [["cl", "Чіткість"], ["sp", "Різкість"]]]];
+const GRADE_PRESETS = [["Без корекції", {}], ["Природний", { ex: 5, sh: 15, co: 8, vi: 15, wa: 10 }], ["Теплий", { ex: 3, co: 10, sa: 5, vi: 20, wa: 35 }],
+  ["Холодний", { sh: 10, co: 10, sa: -5, wa: -25 }], ["Яскравий", { ex: 8, hi: -15, sh: 20, co: 15, vi: 35, cl: 20 }]];
+const curGrade = () => ReelCore.gradeNorm(S.grade && !("c" in S.grade) ? S.grade : {});   // {b,c,s,w} = the old 4-slider format: start fresh
+function glFor(canvas) {   // one WebGL program: tone LUT -> saturation matrix -> vibrance -> clarity/sharpen (luma unsharp), like ffmpeg
+  const gl = canvas.getContext("webgl", { premultipliedAlpha: false, preserveDrawingBuffer: true }); if (!gl) return null;
+  const vs = "attribute vec2 p;varying vec2 v;void main(){v=vec2(p.x*.5+.5,.5-p.y*.5);gl_Position=vec4(p,0.,1.);}";
+  const fs = `precision highp float;uniform sampler2D I,L;uniform mat3 M;uniform float V,C,S;uniform vec2 X;varying vec2 v;
+    vec3 col(vec2 u){vec3 c=texture2D(I,u).rgb;c=vec3(texture2D(L,vec2(c.r*255./256.+.5/256.,.5)).r,texture2D(L,vec2(c.g*255./256.+.5/256.,.5)).g,texture2D(L,vec2(c.b*255./256.+.5/256.,.5)).b);
+      c=clamp(M*c,0.,1.);float mx=max(c.r,max(c.g,c.b)),mn=min(c.r,min(c.g,c.b)),l=dot(c,vec3(.2126,.7152,.0722));float k=1.+V*(1.-sign(V)*(mx-mn));return clamp(l+(c-l)*k,0.,1.);}
+    float Y(vec3 c){return dot(c,vec3(.2126,.7152,.0722));}
+    void main(){vec3 c=col(v);float y=Y(c),d=0.;
+      if(C>0.){float s=0.;for(int i=-3;i<=3;i++)for(int j=-3;j<=3;j++)s+=Y(col(v+vec2(float(i),float(j))*X*2.));d+=(y-s/49.)*C;}
+      if(S>0.){float s=0.;for(int i=-2;i<=2;i++)for(int j=-2;j<=2;j++)s+=Y(col(v+vec2(float(i),float(j))*X));d+=(y-s/25.)*S;}
+      gl_FragColor=vec4(clamp(c+d,0.,1.),1.);}`;
+  const sh = (t, src) => { const o = gl.createShader(t); gl.shaderSource(o, src); gl.compileShader(o); return o; };
+  const pr = gl.createProgram(); gl.attachShader(pr, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(pr);
+  if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) return null;
+  gl.useProgram(pr);
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer()); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+  const ap = gl.getAttribLocation(pr, "p"); gl.enableVertexAttribArray(ap); gl.vertexAttribPointer(ap, 2, gl.FLOAT, false, 0, 0);
+  const tex = u => { const t = gl.createTexture(); gl.activeTexture(gl.TEXTURE0 + u); gl.bindTexture(gl.TEXTURE_2D, t);
+    for (const [k, val] of [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D, k, val); return t; };
+  const ti = tex(0), tl = tex(1); gl.uniform1i(gl.getUniformLocation(pr, "I"), 0); gl.uniform1i(gl.getUniformLocation(pr, "L"), 1);
+  const U = n => gl.getUniformLocation(pr, n); let lastKey = "";
+  return { draw(src, P) {
+    const dpr = Math.min(2, devicePixelRatio || 1), w = Math.round(canvas.clientWidth * dpr), h = Math.round(canvas.clientHeight * dpr);
+    if (!w || !h) return; if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+    gl.viewport(0, 0, w, h);
+    const key = JSON.stringify(P.n); if (key !== lastKey) { lastKey = key;
+      const b = new Uint8Array(256 * 4); P.lut.forEach((c, i) => { b[i * 4] = Math.round(c[0] * 255); b[i * 4 + 1] = Math.round(c[1] * 255); b[i * 4 + 2] = Math.round(c[2] * 255); b[i * 4 + 3] = 255; });
+      gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, tl); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 256, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, b);
+      const m = P.sat; gl.uniformMatrix3fv(U("M"), false, [m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8]]);
+      gl.uniform1f(U("V"), P.vib); gl.uniform1f(U("C"), P.clar); gl.uniform1f(U("S"), P.sharp); gl.uniform2f(U("X"), 1 / 1080, 1 / 1920); }
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, ti);
+    try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, src); } catch (e) { return; }
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  } };
+}
+let GV = null, gLoop = null, gAfter = null, gAfterGL = null;
+function gradeView() {   // live graded video over the player while a grade is set (the built draft already has it baked in)
+  const cv = $("#gcv"), on = tab !== "preview" && !ReelCore.isNeutral(curGrade());
+  cv.hidden = !on; cancelAnimationFrame(gLoop);
+  if (!on) return;
+  if (!GV) GV = glFor(cv); if (!GV) { cv.hidden = true; return; }
+  const P = ReelCore.gradeParams(curGrade());
+  const tick = () => { if (v.readyState >= 2) GV.draw(v, P); gLoop = requestAnimationFrame(tick); }; tick();
+  if (gAfter && gAfter.complete && gAfterGL) gAfterGL.draw(gAfter, P);
+}
+function renderGrade() {
+  const g = curGrade(), box = $("#gradebox"); box.textContent = "";
+  for (const [title, rows] of GRADE_UI) {
+    const grp = document.createElement("div"); grp.className = "ggroup";
+    const t = document.createElement("div"); t.className = "gtitle"; t.textContent = title;
+    const grid = document.createElement("div"); grid.className = "ggrid";
+    for (const [k, name] of rows) {
+      const row = document.createElement("label"); row.className = "gs" + (g[k] ? " on" : "");
+      const min = k === "cl" || k === "sp" ? 0 : -100;
+      row.innerHTML = `<span class="gl"></span><span class="gv"></span><input type="range" min="${min}" max="100" step="1">`;
+      row.querySelector(".gl").textContent = name; const val = row.querySelector(".gv"), inp = row.querySelector("input");
+      const show = x => { val.textContent = x > 0 ? "+" + x : String(x); row.classList.toggle("on", !!+x); };
+      inp.value = g[k]; inp.setAttribute("aria-label", name); show(g[k]);
+      inp.addEventListener("input", () => { S.grade = { ...curGrade(), [k]: +inp.value }; show(+inp.value); gradeView(); markPresets(); });
+      inp.addEventListener("change", () => mutate(() => { if (ReelCore.isNeutral(S.grade)) S.grade = null; }));
+      row.querySelector(".gl").addEventListener("dblclick", e => { e.preventDefault(); mutate(() => { S.grade = { ...curGrade(), [k]: 0 }; if (ReelCore.isNeutral(S.grade)) S.grade = null; }); });
+      grid.appendChild(row);
+    }
+    grp.append(t, grid); box.appendChild(grp);
+  }
+  const pre = $("#gradepre"); pre.textContent = "";
+  for (const [name, p] of GRADE_PRESETS) {
+    const b = document.createElement("button"); b.type = "button"; b.textContent = name; b.dataset.p = JSON.stringify(ReelCore.gradeNorm(p));
+    b.addEventListener("click", () => mutate(() => { S.grade = ReelCore.isNeutral(p) ? null : ReelCore.gradeNorm(p); })); pre.appendChild(b);
+  }
+  markPresets(); gradeView();
+}
+function markPresets() { const now = JSON.stringify(curGrade()); $$("#gradepre button").forEach(b => b.setAttribute("aria-pressed", b.dataset.p === now)); }
+
+// ---------- sound library: the reel's own sounds plus «library/sfx» (kept on the page for every reel) ----------
+let SFXLIB = [];
+const SFX_LABEL = { whoosh: "Свіш", swish: "Шурх", pop: "Поп", snap: "Клац", chime: "Дзвіночок", typing: "Друк" };
+function sfxLib() {
+  const o = {}; if (!SFXLIB.length) for (const [n, u] of Object.entries((R && R.assets && R.assets.sfx) || {})) o[n] = { url: u, label: SFX_LABEL[n] || n };
+  for (const it of SFXLIB) o[it.name] = { url: it.url, label: it.label || SFX_LABEL[it.name] || it.name, cat: it.cat };
+  return o;
+}
+function playSfx(name, db = -12) { const u = (sfxLib()[name] || {}).url; if (!u) return; const a = new Audio(u); a.volume = Math.min(1, Math.pow(10, (db + 8) / 20)); a.play().catch(() => {}); }
 
 // ---------- 5. preview ----------
 function renderPreview() {
@@ -915,7 +1173,93 @@ function renderPreview() {
   });
   if (!S.revisions.length) revs.innerHTML = `<div class="empty">Нотаток ще немає.</div>`;
 }
-$("#build").addEventListener("click", () => mutate(() => { S.buildRequest = { hash: ReelCore.hash(decisions()), at: new Date().toISOString() }; }));
+$("#build").addEventListener("click", () => askStep("build"));
+
+// ---------- steps: 1 her edit -> 2 Claude's proposals -> 3 draft -> 4 final; one big button moves to the next ----------
+// She presses it; the page saves, marks the request in her review doc and sends Claude a «Send to Claude» comment, which
+// reaches the Claude session watching this page. Without that (no session / not an editor) it tells her the chat word.
+let comments = null;
+function stage() {
+  if (B?.final) return { n: 4, wait: false };
+  if (B?.url && S.finalRequest?.hash === B.hash) return { n: 4, wait: true };
+  if (B?.url && S.fixRequest?.hash === B.hash) return { n: 3, wait: true };   // notes sent: waiting for the next draft
+  if (B?.url) return { n: 3, wait: false };
+  if (S.buildRequest) return { n: 3, wait: true };
+  if ((R?.claudeRound || 0) > 0) return { n: 2, wait: false };
+  if (S.graphicsRequest) return { n: 2, wait: true };
+  return { n: 1, wait: false };
+}
+const STEP = {
+  graphics: { title: "Віддати Claude на пропозиції?", yes: "Так, готово → Claude",
+    body: `<p class="lede">Усе твоє збережено: нарізка, накладення, ефекти, хук, субтитри, колір.</p><ol>
+      <li><b>Claude прочитає твої рішення</b> і подивиться, де стоять твої накладення й ефекти.</li>
+      <li><b>Додасть свої пропозиції</b> на «Графіку»: картки, motion на ключові фрази, слова за тобою, лічильники. Твоє не чіпає й не перекриває.</li>
+      <li><b>Сторінка оновиться сама</b> (~5–10 хв), ти побачиш крок «Пропозиції Claude».</li>
+      <li>Ти лишаєш, змінюєш або прибираєш кожну, потім одна кнопка: <b>Зібрати чернетку</b>.</li></ol>`,
+    say: "графіка", text: "▶ Кнопка «Готово → Claude»: мій монтаж готовий, зроби пропозиції графіки (раунд 2)." },
+  build: { title: "Зібрати чернетку?", yes: "Так, збирай",
+    body: `<p class="lede">Claude збере відео з усіма рішеннями: твоїми і погодженими пропозиціями.</p><ol>
+      <li><b>Перевірить склейки й субтитри</b> до рендеру, щоб чернетка вже була чистою.</li>
+      <li><b>Рендер ~6 хв.</b> Коли готово, прийде сповіщення, а тут відкриється «Чернетка».</li>
+      <li>Ти дивишся й лишаєш нотатки на потрібних секундах. Погоджена чернетка = фінал.</li></ol>`,
+    say: "збери чернетку", text: "▶ Кнопка «Зібрати чернетку»: збери чернетку." },
+  fixes: { title: "Віддати нотатки Claude?", yes: "Так, виправляй",
+    body: `<p class="lede">Claude виправить усе з твоїх нотаток і збере нову чернетку.</p>`,
+    say: "виправ нотатки", text: "▶ Кнопка «Виправити за нотатками»: виправ нотатки до чернетки і збери нову." },
+  final: { title: "Це фінал?", yes: "Так, це фінал",
+    body: `<p class="lede">Claude перевірить звук і довжину, покладе MP4 у папку Reels і зробить 3 обкладинки з твоїм хуком.</p>`,
+    say: "фінал", text: "▶ Кнопка «Це фінал»: чернетка погоджена, видай фінал і обкладинки." },
+};
+function renderStage() {
+  if (!R) return;
+  const st = stage();
+  $$("#steps li").forEach(li => { const n = +li.dataset.s; li.className = n < st.n ? "done" : n === st.n ? "now" : ""; });
+  const bar = $("#gobar"), txt = $("#gotext"), btn = $("#gobtn"); bar.hidden = false; btn.disabled = false;
+  const set = (t, sub, label, kind) => { txt.innerHTML = `<b>${t}</b><span class="sub">${sub}</span>`; btn.innerHTML = label; btn.dataset.kind = kind || ""; btn.disabled = !kind; };
+  const newRevs = S.revisions.filter(r => B && r.hash === B.hash && !r.sent).length;
+  if (st.n === 1) set("Крок 1 · твій монтаж", "Коли все своє зроблено, передай Claude.", "Готово → пропозиції Claude", "graphics");
+  else if (st.n === 2 && st.wait) set("Claude готує пропозиції", "Сторінка оновиться сама. Можеш далі правити своє.", `<span class="spin"></span>Claude працює`);
+  else if (st.n === 2) set("Крок 2 · пропозиції Claude", "На «Графіці» все з позначкою «від Claude»: залиш, зміни або прибери.", "Зібрати чернетку", "build");
+  else if (st.n === 3 && st.wait) set("Claude збирає чернетку", "~6 хв. Прийде сповіщення, а тут відкриється «Чернетка».", `<span class="spin"></span>Рендериться`);
+  else if (st.n === 3 && newRevs) set("Крок 3 · чернетка", `Нотаток: ${newRevs}. Віддай їх Claude одним натиском.`, "Виправити за нотатками", "fixes");
+  else if (st.n === 3) set("Крок 3 · чернетка", "Подивись чернетку. Є що змінити? Лиши нотатку на секунді.", "Це фінал", "final");
+  else if (st.wait) set("Claude видає фінал", "Перевірка звуку, MP4 у папку Reels, 3 обкладинки.", `<span class="spin"></span>Готується`);
+  else set("Крок 4 · фінал", "Рілс готовий: MP4 у папці Reels, обкладинки в чаті.", "Готово ✓");
+}
+$("#gobtn").addEventListener("click", () => { const k = $("#gobtn").dataset.kind; if (k) askStep(k); });
+function askStep(kind) {
+  const c = STEP[kind]; $("#mtitle").textContent = c.title; $("#mbody").innerHTML = c.body; $("#myes").textContent = c.yes; $("#mno").textContent = "Ще ні";
+  $("#myes").hidden = false; $("#modal").hidden = false; $("#myes").focus();
+  $("#myes").onclick = () => sendStep(kind);
+}
+$("#mno").addEventListener("click", () => { $("#modal").hidden = true; });
+$("#modal").addEventListener("click", e => { if (e.target.id === "modal") $("#modal").hidden = true; });
+document.addEventListener("keydown", e => { if (e.key === "Escape") $("#modal").hidden = true; });
+async function sendStep(kind) {
+  const c = STEP[kind], at = new Date().toISOString();
+  $("#myes").disabled = true;
+  // the send must come from her click, so it goes first; the decision is saved either way
+  let sent = false, why = "";
+  try {
+    const can = comments ? await comments.canSendToClaude() : "off";
+    if (can === "available") { await comments.sendToClaude({ anchor: await comments.anchorFor($("#gobtn")), text: c.text }); sent = true; }
+    else why = can;
+  } catch (e) { why = e?.code || "error"; }
+  mutate(() => {
+    if (kind === "graphics") S.graphicsRequest = { at, sent };
+    if (kind === "build") S.buildRequest = { hash: ReelCore.hash(decisions()), at, sent };
+    if (kind === "fixes") { S.revisions.forEach(r => { if (B && r.hash === B.hash) r.sent = true; }); S.fixRequest = { at, hash: B?.hash, sent }; S.buildRequest = null; }
+    if (kind === "final") S.finalRequest = { at, hash: B?.hash, sent };
+  });
+  $("#myes").disabled = false;
+  if (sent) { $("#modal").hidden = true; pill("Передано Claude"); }
+  else {   // no Claude session listening right now: the request is saved, one chat word wakes Claude up
+    $("#mtitle").textContent = "Збережено. Ще один крок";
+    $("#mbody").innerHTML = `<p class="lede">Claude зараз не на зв'язку зі сторінкою${why === "writers_only" ? " (кнопка працює тільки для власниці сторінки)" : ""}. Напиши йому в чаті одне слово:</p><p style="font-size:22px;font-weight:700;margin:6px 0 14px">«${c.say}»</p>`;
+    $("#myes").hidden = true; $("#mno").textContent = "Зрозуміло";
+  }
+  renderStage();
+}
 $("#revadd").addEventListener("click", () => {
   const text = $("#revtext").value.trim(); if (!text) { $("#revtext").focus(); return; }
   if (!B?.url) { pill("Спочатку збери чернетку, потім додавай нотатки до моментів у ній.", true); return; }
@@ -923,8 +1267,8 @@ $("#revadd").addEventListener("click", () => {
 });
 
 function renderAll() {
-  renderCuts(); renderGraphics(); renderEffects(); renderCaptions(); renderSound(); renderPreview(); syncHookCta();
-  const sent = { cuts: S.cut != null, overlays: (S.overlays || []).length, effects: (S.effects || []).length, graphics: Object.keys(S.board).length || (S.hook != null) || !!S.cta, captions: S.captions != null, sound: Object.keys(S.sfxOff).length || S.voiceClean === false };
+  renderCuts(); renderGraphics(); renderEffects(); renderCaptions(); renderSound(); renderPreview(); syncHookCta(); renderStage();
+  const sent = { cuts: S.cut != null, overlays: (S.overlays || []).length, effects: (S.effects || []).length, graphics: Object.keys(S.board).length || (S.hook != null) || !!S.cta, captions: S.captions != null, sound: Object.keys(S.sfxOff).length || S.voiceClean === false || !ReelCore.isNeutral(S.grade) };
   $$(".tab").forEach(b => { const d = b.querySelector(".dot"); if (d) d.hidden = !sent[b.dataset.tab]; });
 }
 
@@ -959,6 +1303,7 @@ async function load(id) {
       if (R.theme.library) $("#eflib").href = R.theme.library;
       rt.setAttribute("data-theme", R.theme.scheme || "light"); rt.style.colorScheme = R.theme.scheme || "light";
     }
+    try { if (R.fonts) localStorage.setItem("reelFonts", JSON.stringify(R.fonts)); } catch (e) {}
     if (R.fonts && !document.getElementById("brandfonts")) {   // brand fonts, so the caption preview uses the real faces
       const css = [["rb", R.fonts.body], ["ra", R.fonts.accent]].filter(f => f[1]).map(([n, u]) => `@font-face{font-family:${n};src:url(${u});font-display:swap}`).join("");
       document.head.appendChild(Object.assign(document.createElement("style"), { id: "brandfonts", textContent: css }));
@@ -977,8 +1322,18 @@ async function load(id) {
       recompute(); renderAll(); setPos(pos); pill("Оновлено Claude");
     }, () => {}));
     let firstReel = true;
-    subs.push(DB.doc(d.reel).onSnapshot(() => { if (!live()) return; if (firstReel) { firstReel = false; return; } pill("Claude оновив цей рілс: онови сторінку", true); }, () => {}));
-    subs.push(DB.doc(d.build).onSnapshot(s => { if (!live()) return; B = s.exists ? s.data() : null; if (R) renderPreview(); if (tab === "preview") showTab("preview"); }, () => {}));
+    subs.push(DB.doc(d.reel).onSnapshot(async s => {   // Claude changed the reel (e.g. added proposals): take it in place
+      if (!live()) return; if (firstReel) { firstReel = false; return; } if (!s.exists) return;
+      if (dirty) { clearTimeout(timer); saveNow(); } await saving.catch(() => {});
+      const before = R.claudeRound || 0; R = s.data(); recompute(); renderAll(); setPos(pos); overlay(pos);
+      if ((R.claudeRound || 0) > before) { showTab("graphics"); const n = GFX.filter(g => !g.user && !g.own && !g.gone).length;
+        $("#banner").textContent = `Claude додав пропозиції (${n}). Переглянь кожну: залиш, зміни або прибери. Потім «Зібрати чернетку» внизу.`; $("#banner").hidden = false; pill("Пропозиції Claude готові"); }
+      else pill("Claude оновив рілс");
+    }, () => {}));
+    let firstBuild = true;
+    subs.push(DB.doc(d.build).onSnapshot(s => { if (!live()) return; const had = B?.url; B = s.exists ? s.data() : null; if (R) { renderPreview(); renderStage(); }
+      if (!firstBuild && B?.url && B.url !== had) { showTab("preview"); $("#banner").textContent = "Чернетка готова. Натисни play на відео, лиши нотатки на секундах або «Це фінал»."; $("#banner").hidden = false; }
+      else if (tab === "preview") showTab("preview"); firstBuild = false; }, () => {}));
     recompute();
     $("#reelname").textContent = `${R.title} · оригінал ${fmt(R.srcDur)} → рілс ${fmt(P.cutDur)}`; setPos(0);
     $("#brand").value = S.brandRequest || "";
@@ -989,13 +1344,16 @@ async function load(id) {
 (async () => {
   DB = await window.claude?.use?.("db");
   if (!DB) { pill("Тут рілс не завантажиться. Відкрий сторінку за посиланням з claude.ai.", true); $("#reelname").textContent = "Немає з'єднання."; return; }
-  assets = await window.claude?.use?.("assets");   // only editors get it; others don't see the overlay button
+  assets = await window.claude?.use?.("assets");
+  comments = await window.claude?.use?.("comments");   // «Send to Claude» from the big button   // only editors get it; others don't see the overlay button
   $("#ovbox").hidden = !assets; $("#ovnone").hidden = !!assets;
   libRef = DB.doc("library/files");   // «Мої файли» live across reels
   try { const l = await libRef.get(); LIB = l.exists ? (l.data().items || []) : [];
     if (l.exists && /^https:\/\//.test(l.data().libraryUrl || "")) $("#eflib").href = l.data().libraryUrl;   // their own effects gallery, for every reel
   } catch (e) { LIB = []; }
   renderLib();
+  try { const x = await DB.doc("library/sfx").get(); SFXLIB = x.exists ? (x.data().items || []) : []; } catch (e) { SFXLIB = []; }
+  DB.doc("library/sfx").onSnapshot(x => { SFXLIB = x.exists ? (x.data().items || []) : []; if (R) renderSound(); }, () => {});   // new sounds show up without a refresh
   const idx = DB.doc("reel/index");   // a batch of reels; without it the page shows reel/current as before
   try { const x = await idx.get(); LIST = x.exists ? (x.data().items || []) : []; } catch (e) { LIST = []; }
   if (!LIST.length) LIST = [{ id: "current" }];

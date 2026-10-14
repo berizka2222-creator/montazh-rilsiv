@@ -17,7 +17,7 @@ from pacing import pacing
 speed = pacing(brand)["speed"]
 w, h = brand.get("resolution", [1080, 1920])
 if os.environ.get("REEL_PREVIEW"): w, h = 1080, 1920          # previews cut at 1080p: a quarter of the work
-grade = brand.get("grade")
+grade = edl.get("grade") or brand.get("grade")   # the page's colour grade (review_sync import writes it into edl.json) wins
 FADE = 0.012  # tiny audio fades at every join so cuts never click
 
 vp, ap = [], []
@@ -43,7 +43,7 @@ if kept / speed > brand.get("max_seconds", 60):
     print(f"warning: longer than {brand.get('max_seconds', 60)}s - suggest more cuts")
 
 subprocess.run(["nice", "-n", "15", "ffmpeg", "-y", "-v", "error", "-stats", "-i", str(src), "-i", str(audio),
-                "-filter_complex_script", str(script), "-map", "[vout]", "-map", "[aout]",
+                "-/filter_complex", str(script), "-map", "[vout]", "-map", "[aout]",
                 # A fast, lossy master only when the preview is a throwaway (a 4K brand re-cuts for its final). For a
                 # 1080p brand the preview IS the final, so it always gets the near-transparent encode.
                 *((["-c:v", "h264_videotoolbox", "-b:v", "12M"] if sys.platform == "darwin" else ["-c:v", "libx264", "-preset", "veryfast", "-crf", "20"])

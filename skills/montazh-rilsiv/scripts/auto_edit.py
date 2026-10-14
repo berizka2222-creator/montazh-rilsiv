@@ -4,6 +4,8 @@ steady rhythm. Claude then only marks accent words and adds 3-6 cards - no desig
 Usage: python3 auto_edit.py <reel-folder>     (needs <reel-folder>/master_transcript.json; see SKILL.md step 5)"""
 import json, os, re, sys
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from pacing import pairs_forward
 
 reel = Path(sys.argv[1]).expanduser()
 home = Path(os.environ.get("REELS_HOME", "~/reels")).expanduser()
@@ -22,6 +24,7 @@ def flush():
 for i, w in enumerate(words):
     cur.append(w)
     gap = words[i + 1]["start"] - w["end"] if i + 1 < len(words) else 9
+    if mode == "word" and len(cur) == 1 and i + 1 < len(words) and pairs_forward(w["text"], words[i + 1]["text"], gap, brand): continue
     if mode == "word" or len(cur) >= 3 or re.search(r"[.,!?;:]$", w["text"]) or gap > 0.35:
         flush()
 flush()

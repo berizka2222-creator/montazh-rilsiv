@@ -11,7 +11,7 @@ proposal.json (Claude writes this per reel):
 import json, os, re, shutil, subprocess, sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from pacing import pacing, is_filler, lang
+from pacing import pacing, is_filler, lang, pairs_forward
 
 HERE = Path(__file__).resolve().parent
 CORE = HERE.parent / "review" / "core.js"
@@ -48,7 +48,7 @@ def node(reel_json, decisions):
     # data goes in on stdin: long clips would overflow the command-line length limit
     js = f"""const C=require({json.dumps(str(CORE))});const I=JSON.parse(require("fs").readFileSync(0,"utf8"));const R=I.r,D=I.d;
 const P=C.plan(R,D);process.stdout.write(JSON.stringify({{spans:P.spans,cutDur:P.cutDur,pauses:P.pauses,
-captions:C.captions(R,D,P),graphics:C.graphics(R,D,P),hash:C.hash(D)}}));"""
+captions:C.captions(R,D,P),graphics:C.graphics(R,D,P),hash:C.hash(D),grade:C.gradeFilter(D.grade,"__CUBE__"),cube:C.isNeutral(D.grade)?"":C.gradeCube(D.grade)}}));"""
     return json.loads(subprocess.run(["node", "-e", js], input=json.dumps({"r": reel_json, "d": decisions}),
                                      capture_output=True, text=True, check=True).stdout)
 
@@ -105,6 +105,7 @@ def export(reel, proposal, out):
         if w.get("filler"): continue
         cur.append(i)
         nxt = next((j for j in range(i + 1, len(words)) if not words[j].get("filler")), None)
+        if mode == "word" and len(cur) == 1 and nxt and pairs_forward(w["text"], words[nxt]["text"], words[nxt]["s"] - w["e"], brand): continue
         if mode == "word" or len(cur) >= 3 or re.search(r"[.,!?;:]$", w["text"]) or (nxt and words[nxt]["s"] - w["e"] > 0.35):
             caps.append({"w": cur, "acc": [k for k in cur if norm(words[k]["text"]) in acc]}); cur = []
     if cur: caps.append({"w": cur, "acc": [k for k in cur if norm(words[k]["text"]) in acc]})
@@ -167,9 +168,13 @@ def do_import(reel, review):
     if d.get("cut") is None: d["cut"] = reel_json["proposedCut"]          # [] is a real decision ("cut nothing"), not "unset"
     if d.get("captions") is None: d["captions"] = reel_json["captions"]
     P = node(reel_json, d)
+    if P.get("grade"):   # her colour grade from the page: the tone curve goes to <reel>/grade.cube, the chain into edl.json
+        (reel / "grade.cube").write_text(P["cube"]); P["grade"] = P["grade"].replace("__CUBE__", str((reel / "grade.cube").resolve()))
     clean = d.get("voiceClean") is not False
     if not clean: print("VOICE: keep the original sound, no clean-up (the final loudness is still levelled)")
-    json.dump({"source": raw_clip(reel).name, "audio": "voice.wav" if clean else raw_clip(reel).name, "keep": [[round(a, 3), round(b, 3)] for a, b in P["spans"]]},
+    if P.get("grade"): print("GRADE (set on the page, goes into edl.json, cut.py applies it):", d.get("grade"))
+    json.dump({"source": raw_clip(reel).name, "audio": "voice.wav" if clean else raw_clip(reel).name, "keep": [[round(a, 3), round(b, 3)] for a, b in P["spans"]],
+               **({"grade": P["grade"]} if P.get("grade") else {})},
               open(reel / "edl.json", "w"))
     caps = [{"start": round(c["start"], 3), "end": round(c["end"], 3),
              "words": [{"text": re.sub(r"[.,!?;:]+$", "", w["text"]), "t": round(w["t"], 3), "accent": w["accent"]} for w in c["words"]]}
@@ -181,6 +186,7 @@ def do_import(reel, review):
         if g["state"] == "c": changes.append(f"{g['id']} @ cut {g['start']:.1f}s: {note or '(no note)'}")
         spec = {k: v for k, v in g.items() if k not in ("id", "kind", "what", "w0", "w1", "state", "place", "moved", "gone", "own")}
         spec.update(start=round(g["start"], 3), end=round(g["end"], 3), id=g["id"])
+        if (d.get("sfxSwap") or {}).get(g["id"]) and isinstance(spec.get("sfx"), dict): spec["sfx"] = {**spec["sfx"], "name": d["sfxSwap"][g["id"]]}
         if g["id"] in (d.get("sfxOff") or {}) and d["sfxOff"][g["id"]]: spec["sfx"] = False
         if g.get("type") == "overlay":   # uploaded on the page: Claude downloads the asset into <reel>/overlays/ before rendering
             spec = {k: v for k, v in spec.items() if k not in ("imgUrl", "user", "media")}
