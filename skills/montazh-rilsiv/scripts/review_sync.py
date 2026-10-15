@@ -233,6 +233,8 @@ def do_import(reel, review):
     print(f"cut {P['cutDur']:.1f}s from {len(P['spans'])} spans; {len(caps)} captions; {len(cards)} graphics; hash {P['hash']}")
     for c in changes: print("CHANGE REQUESTED:", c)
     for o in overlays: print("OVERLAY:", o)
+    for n in d.get("cutNotes") or []:   # notes she left on the cut video at step 2 (cut seconds): fix the cut before the draft
+        print(f"CUT NOTE @ cut {n['t']:.1f}s: {n['text']}")
     if (d.get("hook") or "").strip(): print("HOOK (their text, use as is):", d["hook"].strip())
     if ((d.get("cta") or {}).get("text") or "").strip(): print("CTA (their text):", d["cta"]["text"].strip())
     users = [g for g in P["graphics"] if g.get("user") and not g.get("gone") and g["state"] != "d"]

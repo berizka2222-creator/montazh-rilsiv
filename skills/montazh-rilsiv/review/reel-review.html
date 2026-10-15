@@ -465,7 +465,7 @@ section[data-p="effects"].with{margin-top:34px;padding-top:24px;border-top:1px s
     <div class="topnav">
       <nav class="steps" id="steps" aria-label="Кроки">
         <button class="st" type="button" data-s="1" data-go="cuts"><i>1</i><span class="lg">Твій монтаж</span><span class="sh">Монтаж</span></button>
-        <button class="st" type="button" data-s="2" data-go="graphics"><i>2</i>Графіка</button>
+        <button class="st" type="button" data-s="2" data-go="graphics"><i>2</i><span class="lg">Нарізка і графіка</span><span class="sh">Графіка</span></button>
         <button class="st" type="button" data-s="3" data-go="preview"><i>3</i><span class="lg">Чернетка і фінал</span><span class="sh">Чернетка</span></button>
       </nav>
       <button class="stylelink" id="stylelink" type="button" data-go="style">Мої стилі <span class="dot" hidden></span></button>
@@ -533,8 +533,13 @@ section[data-p="effects"].with{margin-top:34px;padding-top:24px;border-top:1px s
     </section>
 
     <section data-p="graphics" hidden>
-      <div class="sechead"><h2>Графіка й <em>стиль</em></h2><div class="sectools"><button class="icon notebtn" type="button">+ Нотатка</button></div></div>
-      <p class="lede">Усе поверх відео за часом. Залиш, попроси змінити або прибери.</p>
+      <div class="sechead"><h2>Нарізка й <em>графіка</em></h2><div class="sectools"><button class="icon notebtn" type="button">+ Нотатка</button></div></div>
+      <p class="lede">У плеєрі справжня нарізка зі склейками: перевір її. Нижче графіка від Claude: залиш, попроси змінити або прибери.</p>
+      <div class="panel" id="cutbox">
+        <div class="gtop"><label style="margin:0">Нарізка</label><span class="mode" id="cutstate"></span></div>
+        <div class="ctl" style="margin-top:6px"><input type="text" id="cutnote" placeholder="Що не так у нарізці в цей момент (склейка, зайве слово)"><button class="b" id="cutadd" type="button">Нотатка на цю секунду</button></div>
+        <div id="cutnotes"></div>
+      </div>
       <div class="panel">
         <label id="stylepicklabel">Стиль монтажу</label>
         <div class="gpre" id="stylepick" role="group" aria-labelledby="stylepicklabel"></div>
@@ -661,7 +666,10 @@ function zonesOn(on) {
   try { localStorage.setItem("reelZones", on ? "1" : ""); } catch (e) {}
 }
 const fmt = t => `${Math.floor(t / 60)}:${(Math.max(0, t) % 60).toFixed(1).padStart(4, "0")}`;
-let R = null, B = null, S = blank(), P = null, CAPS = [], GFX = [];
+let R = null, B = null, CB = null, S = blank(), P = null, CAPS = [], GFX = [];
+// the cut on its own (db builds/cut): rendered right after step 1 so the cuts are checked before the graphics
+const cutHash = d => { const x = JSON.stringify([d.cut, d.restoredFillers, d.restoredPauses, d.trimmedPauses]); let h = 5381; for (let i = 0; i < x.length; i++) h = ((h << 5) + h + x.charCodeAt(i)) | 0; return (h >>> 0).toString(36); };
+const cutVid = () => tab === "graphics" && !!CB?.url;
 let tab = "cuts", ref = null, saving = Promise.resolve(), timer = null, undo = [], mode = "idle", loop = null;
 function blank() { return { cut: null, restoredFillers: [], restoredPauses: [], trimmedPauses: [], captions: null, board: {}, sfxOff: {}, overlays: [], effects: [], notes: {}, brandRequest: "", revisions: [], buildRequest: null }; }
 
@@ -721,9 +729,10 @@ function showTab(t) {
   if (t !== "overlays" && placing && !placing.id) stopPlacing();
   if (t === "overlays" && assets && $("#ovbox").open && !placing) setTimeout(() => startPlacing(OV_PLACE[ovMode()]), 0);
   $("#noprev").hidden = !(t === "preview" && !B?.url);
-  $("#mode").hidden = t === "preview"; $("#szbtn").hidden = t === "preview";
+  $("#mode").hidden = t === "preview" || (t === "graphics" && !!CB?.url); $("#szbtn").hidden = t === "preview";
   $("#sz").hidden = t === "preview" || $("#szbtn").getAttribute("aria-pressed") !== "true";
-  if (t === "preview") { $("#clock").hidden = true; if (B?.url && v.getAttribute("src") !== B.url) { v.setAttribute("src", B.url); v.load(); } $("#rough").hidden = $("#back5").hidden = $("#fwd5").hidden = true; $(".scrub").hidden = true; v.controls = true; }
+  if (cutVid()) { $("#clock").hidden = true; if (v.getAttribute("src") !== CB.url) { v.setAttribute("src", CB.url); v.load(); } $("#rough").hidden = $("#back5").hidden = $("#fwd5").hidden = true; $(".scrub").hidden = true; v.controls = true; mode = "cutvid"; }
+  else if (t === "preview") { $("#clock").hidden = true; if (B?.url && v.getAttribute("src") !== B.url) { v.setAttribute("src", B.url); v.load(); } $("#rough").hidden = $("#back5").hidden = $("#fwd5").hidden = true; $(".scrub").hidden = true; v.controls = true; }
   else { if (v.getAttribute("src") !== R.srcUrl) { v.setAttribute("src", R.srcUrl); v.load(); } $("#rough").hidden = $("#back5").hidden = $("#fwd5").hidden = false; $(".scrub").hidden = false; v.controls = false; }
   if (t === "captions" && R) { mode = "roughPaused"; v.currentTime = P.toSrc(pos); $("#clock").hidden = false; }
   gradeView(); overlay(pos); renderStage();
@@ -757,6 +766,29 @@ const resetBtn = $("#reset");
 
 // ---------- playback: line (raw) and continuous rough cut ----------
 let pos = 0;   // where the rough cut is, in cut time: pause, scrub and ±5 s all keep it
+v.addEventListener("timeupdate", () => { if (mode === "cutvid") { pos = v.currentTime; overlay(v.currentTime); } });
+v.addEventListener("seeked", () => { if (mode === "cutvid") { pos = v.currentTime; overlay(v.currentTime); } });
+function renderCutBox() {   // notes on the cut video (S.cutNotes, cut seconds) and whether the video still matches her cuts
+  const box = $("#cutnotes"); if (!box) return; box.textContent = "";
+  const st = $("#cutstate");
+  if (CB?.url) st.textContent = CB.cutHash && S.graphicsRequest && cutHash(decisions()) !== CB.cutHash ? "Ти змінила нарізку після цього відео: Claude врахує це в чернетці." : "Відео нарізки: склейки справжні, графіка рамками.";
+  else st.textContent = S.graphicsRequest ? "Claude збирає відео нарізки (~2–3 хв)…" : "Відео нарізки з'явиться після «Готово → Claude» на кроці 1.";
+  $("#cutadd").disabled = !CB?.url;
+  for (const [k, n] of (S.cutNotes || []).entries()) {
+    const row = document.createElement("div"); row.className = "rev";
+    const t = document.createElement("button"); t.className = "ts"; t.type = "button"; t.innerHTML = `<span class="tc">${fmt(n.t)}</span>`;
+    t.addEventListener("click", () => { if (cutVid()) { v.currentTime = n.t; v.play().catch(() => {}); } });
+    const x = document.createElement("span"); x.textContent = n.text;
+    const del = document.createElement("button"); del.type = "button"; del.className = "b quiet"; del.textContent = "Видалити";
+    del.addEventListener("click", () => mutate(() => S.cutNotes.splice(k, 1)));
+    row.append(t, x, del); box.appendChild(row);
+  }
+}
+$("#cutadd").addEventListener("click", () => {
+  const text = $("#cutnote").value.trim(); if (!text) { $("#cutnote").focus(); return; }
+  if (!cutVid()) { pill("Нотатки до нарізки ставляться на відео нарізки.", true); return; }
+  mutate(() => { S.cutNotes = [...(S.cutNotes || []), { t: +v.currentTime.toFixed(2), text }].sort((a, b) => a.t - b.t); }); $("#cutnote").value = "";
+});
 function stopPlay() { mode = "idle"; cancelAnimationFrame(loop); v.pause(); v.playbackRate = 1; $("#rough").textContent = "▶ Нарізка"; }
 function setPos(c) {
   pos = Math.max(0, Math.min(c, P.cutDur - 0.05));
@@ -799,7 +831,7 @@ v.addEventListener("error", () => pill("Відео не завантажилос
 // overlay at a cut time: approximate graphic boxes + caption style preview
 function overlay(c) {
   ov.textContent = "";
-  if (!R || tab === "preview" || c == null || (mode !== "rough" && mode !== "roughPaused" && !placing)) { highlight(null); return; }
+  if (!R || tab === "preview" || c == null || (mode !== "rough" && mode !== "roughPaused" && mode !== "cutvid" && !placing)) { highlight(null); return; }
   for (const g of GFX) if (!g.gone && g.state !== "d" && c >= g.start && c < g.end && !(placing && g.id === placing.id)) ov.appendChild(box(g, true));
   if (placing) ov.appendChild(placeBox());
   let cap = GFX.some(g => g.capsAside && !g.gone && g.state !== "d" && c >= g.start && c < g.end) ? null : CAPS.find(x => !x.gone && c >= x.start && c < x.end);
@@ -1428,7 +1460,7 @@ function glFor(canvas) {   // one WebGL program: tone LUT -> saturation matrix -
 }
 let GV = null, gLoop = null, gAfter = null, gAfterGL = null;
 function gradeView() {   // live graded video over the player while a grade is set (the built draft already has it baked in)
-  const cv = $("#gcv"), on = tab !== "preview" && !ReelCore.isNeutral(curGrade());
+  const cv = $("#gcv"), on = tab !== "preview" && !cutVid() && !ReelCore.isNeutral(curGrade());   // the built videos have the grade baked in
   cv.hidden = !on; cancelAnimationFrame(gLoop);
   if (!on) return;
   if (!GV) GV = glFor(cv); if (!GV) { cv.hidden = true; return; }
@@ -1544,10 +1576,10 @@ function stage() {
 const STEP = {
   graphics: { title: "Віддати Claude на пропозиції?", yes: "Так, готово → Claude",
     body: () => `<p class="lede">Усе твоє збережено: нарізка, накладення, ефекти, хук, субтитри, колір.</p><ol>
-      <li><b>Claude прочитає твої рішення</b> і подивиться, де стоять твої накладення й ефекти.</li>
-      <li><b>Додасть свої пропозиції</b> на «Графіку»: картки, motion на ключові фрази, слова за тобою, лічильники. Твоє не чіпає й не перекриває.</li>
-      <li><b>Сторінка оновиться сама</b> (~5–10 хв), ти побачиш крок «Пропозиції Claude».</li>
-      <li>Ти лишаєш, змінюєш або прибираєш кожну, потім одна кнопка: <b>Зібрати чернетку</b>.</li></ol>${S.style && S.style !== "brand" ? `<p class="lede">Стиль: <b>${(STYLE_LIST.find(x => x.name === S.style) || {}).title || S.style}</b>.</p>` : !S.style && STYLE_LIST.length ? `<p class="lede">Стиль не обрано: Claude спитає в чаті. Обрати можна на «Графіці».</p>` : ""}`,
+      <li><b>Збере відео нарізки</b> (~2–3 хв): справжні склейки, щоб ти перевірила їх до графіки.</li>
+      <li><b>Додасть графіку</b> у вибраному стилі: картки, motion на ключові фрази, лічильники. Твоє не чіпає й не перекриває.</li>
+      <li><b>Сторінка оновиться сама</b> (~5–10 хв) і відкриє крок 2 «Нарізка і графіка». Потім одна кнопка: <b>Зібрати чернетку</b>.</li></ol>
+      ${STYLE_LIST.length ? `<p class="lede" style="margin-top:4px"><b>Яким стилем монтуємо?</b></p><div class="gpre" id="mstylepick"></div>` : ""}`,
     say: "графіка", text: "▶ Кнопка «Готово → Claude»: мій монтаж готовий, зроби пропозиції графіки (раунд 2)." },
   build: { title: "Зібрати чернетку?", yes: "Так, збирай",
     body: `<p class="lede">Claude збере відео з усіма рішеннями: твоїми і погодженими пропозиціями.</p><ol>
@@ -1603,9 +1635,17 @@ function askStep(kind) {
   }
   askStepGo(kind);
 }
+function fillModalStyles() {   // the style is picked as she hands step 1 over (Claude makes the graphics in it)
+  const box = document.getElementById("mstylepick"); if (!box) return; box.textContent = "";
+  for (const [name, title] of [...STYLE_LIST.map(x => [x.name, x.title || x.name]), ["brand", "Тільки бренд"]]) {
+    const b = document.createElement("button"); b.type = "button"; b.textContent = title; b.setAttribute("aria-pressed", S.style === name);
+    b.addEventListener("click", () => { mutate(() => { S.style = name; }); fillModalStyles(); }); box.appendChild(b);
+  }
+}
 function askStepGo(kind) {
   const c = STEP[kind]; $("#mtitle").textContent = c.title; $("#mbody").innerHTML = typeof c.body === "function" ? c.body() : c.body; $("#myes").textContent = c.yes; $("#mno").textContent = "Ще ні";
   $("#myes").hidden = false; $("#modal").hidden = false; $("#myes").focus();
+  if (kind === "graphics") fillModalStyles();
   $("#myes").onclick = () => sendStep(kind);
 }
 $("#mno").addEventListener("click", () => { $("#modal").hidden = true; });
@@ -1622,7 +1662,7 @@ async function sendStep(kind) {
     else why = can;
   } catch (e) { why = e?.code || "error"; }
   mutate(() => {
-    if (kind === "graphics") S.graphicsRequest = { at, sent };
+    if (kind === "graphics") S.graphicsRequest = { at, sent, cutHash: cutHash(decisions()) };
     if (kind === "build") S.buildRequest = { hash: ReelCore.hash(decisions()), at, sent };
     if (kind === "fixes") { S.revisions.forEach(r => { if (B && r.hash === B.hash) r.sent = true; }); S.fixRequest = { at, hash: B?.hash, sent }; S.buildRequest = null; }
     if (kind === "final") S.finalRequest = { at, hash: B?.hash, sent };
@@ -1643,7 +1683,7 @@ $("#revadd").addEventListener("click", () => {
 });
 
 function renderAll() {
-  renderCuts(); renderGraphics(); renderEffects(); renderCaptions(); renderSound(); renderPreview(); syncHookCta(); renderStage(); renderCapPlace(); renderStylePick();
+  renderCuts(); renderGraphics(); renderEffects(); renderCaptions(); renderSound(); renderPreview(); syncHookCta(); renderStage(); renderCapPlace(); renderStylePick(); renderCutBox();
   const sent = { cuts: S.cut != null, overlays: (S.overlays || []).length, effects: (S.effects || []).length, graphics: Object.keys(S.board).length || (S.hook != null) || !!S.cta || !!S.style || !!S.speedMul, captions: S.captions != null, sound: Object.keys(S.sfxOff).length || S.voiceClean === false || !ReelCore.isNeutral(S.grade) };
   $$(".tab:not(.tabx)").forEach(b => { const d = b.querySelector(".dot"); if (d) d.hidden = !sent[b.dataset.tab]; });
   styleDot();
@@ -1888,7 +1928,7 @@ async function loadStyle() {
 // ---------- load ----------
 // One reel: docs reel/current, review/current, builds/latest. A batch: reel/index lists them, and each has reel/<id>, review/<id>, builds/<id>.
 let DB = null, subs = [], LIST = [], loadNo = 0;   // loadNo: listeners of a reel we switched away from ignore their events
-const docsFor = id => ({ reel: "reel/" + id, review: "review/" + id, build: id === "current" ? "builds/latest" : "builds/" + id });
+const docsFor = id => ({ reel: "reel/" + id, review: "review/" + id, build: id === "current" ? "builds/latest" : "builds/" + id, cut: id === "current" ? "builds/cut" : "builds/" + id + "-cut" });
 function pickReel() { let id = null; try { id = localStorage.getItem("reelPick"); } catch (e) {} return LIST.some(x => x.id === id) ? id : (LIST.find(x => !/фінал/i.test(x.status || "")) || LIST[0]).id; }
 function renderPick(cur) {
   const sel = $("#reelsel"); sel.textContent = ""; $("#reelpick").hidden = LIST.length < 2;
@@ -1902,7 +1942,7 @@ $("#reelsel").addEventListener("change", async e => {
 });
 async function load(id) {
   for (const u of subs) if (typeof u === "function") try { u(); } catch (e) {}
-  subs = []; stopPlay(); placing = null; R = null; B = null; S = blank(); undo = []; $("#undo").disabled = true; dirty = false; mine = null; pos = 0;
+  subs = []; stopPlay(); placing = null; R = null; B = null; CB = null; S = blank(); undo = []; $("#undo").disabled = true; dirty = false; mine = null; pos = 0;
   renderPick(id); $("#reelname").textContent = "Завантажую рілс…"; pill("Завантажую…");
   const d = docsFor(id), my = ++loadNo, live = () => my === loadNo;
   try {
@@ -1951,6 +1991,10 @@ async function load(id) {
       else pill("Claude оновив рілс");
     }, () => {}));
     let firstBuild = true;
+    let firstCut = true;
+    subs.push(DB.doc(d.cut).onSnapshot(s => { if (!live()) return; const had = CB?.url; CB = s.exists ? s.data() : null;
+      if (!firstCut && CB?.url && CB.url !== had && tab === "graphics") { showTab("graphics"); $("#banner").textContent = "Відео нарізки готове: перевір склейки в плеєрі."; $("#banner").hidden = false; }
+      else if (tab === "graphics") showTab("graphics"); renderCutBox(); firstCut = false; }, () => {}));
     subs.push(DB.doc(d.build).onSnapshot(s => { if (!live()) return; const had = B?.url; B = s.exists ? s.data() : null; if (R) { renderPreview(); renderStage(); }
       if (!firstBuild && B?.url && B.url !== had) { showTab("preview"); $("#banner").textContent = "Чернетка готова. Натисни play на відео, лиши нотатки на секундах або «Це фінал»."; $("#banner").hidden = false; }
       else if (tab === "preview") showTab("preview"); firstBuild = false; }, () => {}));
