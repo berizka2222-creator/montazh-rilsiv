@@ -51,6 +51,12 @@ else
 fi
 echo "  ℹ️  the review page needs Claude Code's Artifact tools; Claude checks this when you start an edit (chat review otherwise)"
 
+# text widths are measured in the real fonts (fontTools in ~/reels/.venv), so wide display fonts never spill out of the frame
+VENV="${REELS_HOME:-$HOME/reels}/.venv"
+if [ -x "$VENV/bin/python" ] && "$VENV/bin/python" -c "import fontTools, brotli" 2>/dev/null; then ok "font measuring (fontTools)"
+elif python3 -m venv "$VENV" >/dev/null 2>&1 && "$VENV/bin/pip" install -q fonttools brotli Pillow >/dev/null 2>&1; then ok "font measuring (fontTools) installed in $VENV"
+else warn "fontTools not installed" "text sizes fall back to an estimate; run: python3 -m venv ~/reels/.venv && ~/reels/.venv/bin/pip install fonttools brotli Pillow"; fi
+
 FREE_GB=$(df -Pk "$HOME" | awk 'NR==2{print int($4/1048576)}')
 [ "$FREE_GB" -ge 10 ] && ok "${FREE_GB} GB free disk" || no "only ${FREE_GB} GB free disk" "free up 10+ GB (35+ GB for 4K exports)"
 

@@ -117,8 +117,32 @@ CAP_PX, CAP_Y = edit.get("caption_size", CAPS.get("size", 96)), edit.get("captio
 W, H, FPS = 1080, 1920, 30                     # authored at 1080x1920; 4K brands render with --resolution portrait-4k
 SAFE = 900                                     # guardrail: no text line may be wider than this (90 px margin each side)
 EM = 0.66                                      # conservative average glyph width (bold display fonts run ~0.6-0.66 em)
-def fit(text, want, extra=0):
-    """Largest size <= want at which `text` stays inside the safe area (extra = outline px on each side)."""
+# real text widths from the font files (fontTools, in ~/reels/.venv): wide display faces (NAMU, serif italics) no longer
+# spill past the frame. Without fontTools the old estimate (EM per character) is used.
+try:
+    import fontTools.ttLib as _ftt
+except ImportError:
+    for _sp in sorted((HOME / ".venv" / "lib").glob("python*/site-packages")): sys.path.append(str(_sp))
+    try: import fontTools.ttLib as _ftt
+    except ImportError: _ftt = None
+FONT_FILE, _FONT_CACHE = {}, {}   # role -> font file (filled where the fonts are copied in)
+def _advance(text, role):
+    """Width of `text` at 1 px in the role's font, or None when it can't be measured."""
+    f = FONT_FILE.get(role)
+    if not (_ftt and f): return None
+    if f not in _FONT_CACHE:
+        try:
+            t = _ftt.TTFont(str(f), lazy=True); _FONT_CACHE[f] = (t.getBestCmap(), t["hmtx"].metrics, t["head"].unitsPerEm)
+        except Exception: _FONT_CACHE[f] = None
+    if not _FONT_CACHE[f]: return None
+    cmap, hm, upm = _FONT_CACHE[f]
+    space = hm.get(cmap.get(32), (upm * 0.3, 0))[0]
+    return sum(hm.get(cmap.get(ord(ch)), (upm * 0.62, 0))[0] if ord(ch) in cmap else upm * 0.62 for ch in text) / upm or None
+def fit(text, want, extra=0, role="head"):
+    """Largest size <= want at which `text` stays inside the safe area (extra = outline px on each side). Measured in the
+    role's real font (no letter-spacing credit, plus 4% spare), so every text line stays in the frame whatever the font."""
+    adv = _advance(text, role)
+    if adv: return max(24, min(int(want), int((SAFE - 2 * extra) / (adv * 1.04))))
     return max(24, min(int(want), int((SAFE - 2 * extra) / (max(len(text), 1) * EM))))
 
 def dur_of(p):
@@ -177,7 +201,7 @@ for role, default in (("head", {"family": "Helvetica Neue", "weight": 700}), ("b
     if f.get("file"):
         src = Path(f["file"]).expanduser()
         if src.exists():
-            shutil.copy(src, proj / "fonts" / src.name)
+            shutil.copy(src, proj / "fonts" / src.name); FONT_FILE[role] = src
             fmt = {"otf": "opentype", "ttf": "truetype", "woff2": "woff2", "woff": "woff"}.get(src.suffix[1:].lower(), "opentype")
             font_css.append(f'@font-face {{ font-family: "{f["family"]}-{role}"; src: url("fonts/{src.name}") format("{fmt}"); font-display: block; }}')
             f["family"] = f'{f["family"]}-{role}'
@@ -186,13 +210,14 @@ for role, default in (("head", {"family": "Helvetica Neue", "weight": 700}), ("b
     FAM[role] = (f"'{f['family']}', {FALLBACK}", f.get("weight", 400), f.get("style", "normal"))
 # caption fonts picked on the review page (edit.json "caption_fonts": {"body"|"accent": {family, file, weight, style}}); default: brand body/accent
 FAM["cap"], FAM["capacc"] = FAM["body"], FAM["accent"]
+FONT_FILE["cap"], FONT_FILE["capacc"] = FONT_FILE.get("body"), FONT_FILE.get("accent")
 for role, key in (("body", "cap"), ("accent", "capacc")):
     f = (edit.get("caption_fonts") or {}).get(role)
     if f and Path(f["file"]).expanduser().exists():
         src = Path(f["file"]).expanduser(); shutil.copy(src, proj / "fonts" / src.name)
         fmt = {"otf": "opentype", "ttf": "truetype", "woff2": "woff2", "woff": "woff"}.get(src.suffix[1:].lower(), "truetype")
         font_css.append(f'@font-face {{ font-family: "{f["family"]}-{key}"; src: url("fonts/{src.name}") format("{fmt}"); font-display: block; }}')
-        FAM[key] = (f"'{f['family']}-{key}', {FALLBACK}", f.get("weight", 400), f.get("style", "normal"))
+        FAM[key] = (f"'{f['family']}-{key}', {FALLBACK}", f.get("weight", 400), f.get("style", "normal")); FONT_FILE[key] = src
 def font(role, px):
     fam, wt, st = FAM[role]
     return f"font-family:{fam};font-weight:{wt};font-style:{st};font-size:{px}px"
@@ -346,7 +371,7 @@ for i, c in enumerate(edit.get("cards", [])):
                    f'<div class="bl" style="{font("head", fit(c.get("bottom", ""), 210))};top:{1480 - int(fit(c.get("bottom", ""), 210) * 0.82)}px;text-align:right;color:#fff">{esc(case(c.get("bottom", "")))}</div></div>')
         js.append(f'tl.set("#{cid}",{{autoAlpha:1}},{q(a)});tl.fromTo("#{cid}",{{clipPath:"inset(0% 0% 0% 100%)"}},{{clipPath:"inset(0% 0% 0% 0%)",duration:0.22,ease:"power3.out"}},{q(a)});'
                   f'tl.fromTo("#{cid} .frame",{{scale:0.82}},{{scale:1,duration:0.5,ease:"back.out(1.6)"}},{q(a + 0.05)});'
-                  f'tl.fromTo("#{cid} .bl",{{clipPath:"inset(0% 100% 0% 0%)"}},{{clipPath:"inset(0% 0% 0% 0%)",duration:0.34,ease:"power3.out",stagger:0.3}},{q(a + 0.12)});'
+                  f'tl.fromTo("#{cid} .bl",{{clipPath:"inset(-40% 100% -40% 0%)"}},{{clipPath:"inset(-40% 0% -40% 0%)",duration:0.34,ease:"power3.out",stagger:0.3}},{q(a + 0.12)});'
                   f'tl.to("#{cid}",{{clipPath:"inset(0% 100% 0% 0%)",duration:0.2,ease:"power3.in"}},{q(b - 0.2)});tl.set("#{cid}",{{autoAlpha:0}},{q(b)});')
         sfx("swish", a - 0.08, -12)
         zone(cid, "block", a, b, (0, 0, W, H), full=True)
@@ -555,7 +580,7 @@ for i, c in enumerate(edit.get("cards", [])):
                          + (f'<div class="ldt" style="{font("head", 44)};background:{POP};color:{MAIN}">{esc(ttl)}</div>' if ttl else "")
                          + "".join(f'<div class="ldr" id="{cid}r{j}" style="{font("head", px)};color:{LIGHT}"><span class="ldn" style="{font("head", px * 0.5)};background:{C.get("soft", POP)};color:{MAIN}">{j + 1}</span>{esc(r)}</div>' for j, r in enumerate(rows)) + "</div>")
             show(f"#{cid}", a, b)
-            if ttl: js.append(f'tl.fromTo("#{cid} .ldt",{{clipPath:"inset(0% 100% 0% 0%)"}},{{clipPath:"inset(0% 0% 0% 0%)",duration:0.3,ease:"power3.out"}},{q(a)});')
+            if ttl: js.append(f'tl.fromTo("#{cid} .ldt",{{clipPath:"inset(-40% 100% -40% 0%)"}},{{clipPath:"inset(-40% 0% -40% 0%)",duration:0.3,ease:"power3.out"}},{q(a)});')
             for j, t in enumerate(rt):
                 js.append(f'tl.fromTo("#{cid}r{j}",{{autoAlpha:0,y:-160,rotation:{(-5, 4)[j % 2]}}},{{autoAlpha:1,y:0,rotation:0,duration:0.5,ease:"bounce.out"}},{q(t)});')
                 sfx("hit_soft" if j % 2 else "pop", t + 0.25, -15)
@@ -570,7 +595,7 @@ for i, c in enumerate(edit.get("cards", [])):
             soft = C.get("soft", POP)
             for j, t in enumerate(rt):
                 js.append(f'tl.fromTo("#{cid}r{j}",{{autoAlpha:0}},{{autoAlpha:1,duration:0.05}},{q(t)});'
-                          f'tl.fromTo("#{cid}r{j} .lnx",{{clipPath:"inset(0% 100% 0% 0%)"}},{{clipPath:"inset(0% 0% 0% 0%)",duration:0.45,ease:"steps(12)"}},{q(t)});'
+                          f'tl.fromTo("#{cid}r{j} .lnx",{{clipPath:"inset(-40% 100% -40% 0%)"}},{{clipPath:"inset(-40% 0% -40% 0%)",duration:0.45,ease:"steps(12)"}},{q(t)});'
                           f'tl.to("#{cid}r{j} .lnc",{{backgroundColor:"{soft}",borderColor:"{soft}",duration:0.15}},{q(t + 0.5)});'
                           f'tl.fromTo("#{cid}r{j} path",{{strokeDashoffset:30}},{{strokeDashoffset:0,duration:0.25,ease:"power2.out"}},{q(t + 0.52)});')
                 sfx("typing", t, -19, dur=0.45); sfx("tap", t + 0.5, -14)
@@ -770,9 +795,9 @@ for i, c in enumerate(edit.get("captions", [])):
         front.append(f'<div id="c{i}" class="cap" style="top:{c.get("y", CAP_Y)}px;font-family:-apple-system,Helvetica,Arial,sans-serif;font-weight:500;font-size:46px;letter-spacing:0;color:#fff">{esc(" ".join(w["text"] for w in ws))}</div>')
         show(f"#c{i}", c["start"], c["end"], 0.04); continue
     chars = sum(len(w["text"]) + 1 for w in ws)
-    px = fit(" ".join(w["text"] for w in ws), CAP_PX * (1.35 if len(ws) == 1 else 1))
+    px = fit(" ".join(w["text"] for w in ws), CAP_PX * (1.35 if len(ws) == 1 else 1), role="cap")
     big = 1.7 if CAPS.get("style") == "editorial" else 1.12          # editorial = dramatic size contrast on the emphasis word
-    big = min(big, min((fit(w["text"], px * big) / px) for w in ws if w.get("accent")) if any(w.get("accent") for w in ws) else big)
+    big = min(big, min((fit(w["text"], px * big, role="capacc") / px) for w in ws if w.get("accent")) if any(w.get("accent") for w in ws) else big)
     blk = "display:block;line-height:.95;" if CAPS.get("style") == "editorial" and len(ws) > 1 else ""
     spans = "".join(f'<span class="acc" style="{blk}{font("capacc", int(px * big))};{acc_look(next_acc())}">{esc(case(w["text"]))}</span> ' if w.get("accent")
                     else f'<span>{esc(case(w["text"]))}</span> ' for w in ws)
