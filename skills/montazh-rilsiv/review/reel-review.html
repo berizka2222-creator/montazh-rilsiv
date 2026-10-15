@@ -383,6 +383,10 @@ details{padding:8px 12px}
 #mystyles{margin-bottom:26px}
 .stacts{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .stacts .b{font-size:12.5px;padding:6px 10px}
+#micbtn{position:fixed;z-index:40;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:16px;line-height:1;cursor:pointer;display:grid;place-items:center;box-shadow:0 6px 18px -6px rgba(0,0,0,.6)}
+#micbtn[aria-pressed="true"]{background:var(--pink);color:var(--on-accent);border-color:var(--pink);animation:micp 1.2s ease-in-out infinite}
+@keyframes micp{50%{box-shadow:0 0 0 7px color-mix(in srgb,var(--pink) 30%,transparent)}}
+@media (prefers-reduced-motion:reduce){#micbtn[aria-pressed="true"]{animation:none}}
 .stbadge{display:inline-block;font:600 11px var(--f-body);letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:2px 8px;background:var(--keep);color:var(--on-accent);margin-left:6px;vertical-align:2px}
 #stnotebox input[type=url]{font:inherit;font-size:16px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 10px;flex:1;min-width:0;box-sizing:border-box}
 .strefs{display:flex;flex-direction:column;gap:8px;margin-top:6px}
@@ -578,6 +582,7 @@ details{padding:8px 12px}
   </main>
 </div>
 
+<button id="micbtn" type="button" hidden aria-pressed="false" aria-label="Наговорити голосом" title="Наговорити голосом">🎤</button>
 <script>   // brand fonts remembered from the last visit: applied before anything renders, so the text doesn't jump
 try { const f = JSON.parse(localStorage.getItem("reelFonts") || "null");
   if (f) { const css = [["rb", f.body], ["ra", f.accent]].filter(x => x[1]).map(([n, u]) => `@font-face{font-family:${n};src:url(${u});font-display:block}`).join("");
@@ -1819,6 +1824,37 @@ async function loadStyle() {
     styleDot();
   }, () => {});
 }
+
+// ---------- voice: a 🎤 next to whichever text field is in use; speech goes into it (Ukrainian) ----------
+(function voice() {
+  const btn = $("#micbtn"), SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const SKIP = ["srfind", "srrepl", "fontq", "streflink"];
+  let field = null, rec = null, base = "";
+  const ok = el => el && (el.tagName === "TEXTAREA" || (el.tagName === "INPUT" && el.type === "text")) && !SKIP.includes(el.id) && !el.disabled;
+  const place = () => { if (!field || !document.body.contains(field)) { btn.hidden = !rec; return; }
+    const r = field.getBoundingClientRect(); if (!r.width) { btn.hidden = true; return; }
+    btn.style.left = Math.min(innerWidth - 42, r.right - 40) + "px"; btn.style.top = (field.tagName === "TEXTAREA" ? r.bottom - 40 : r.top + (r.height - 34) / 2) + "px"; btn.hidden = false; };
+  document.addEventListener("focusin", e => { if (ok(e.target)) { if (rec && field !== e.target) stop(); field = e.target; place(); } });
+  document.addEventListener("focusout", () => setTimeout(() => { if (!rec && !ok(document.activeElement)) btn.hidden = true; }, 150));
+  addEventListener("scroll", place, true); addEventListener("resize", place);
+  btn.addEventListener("mousedown", e => e.preventDefault());   // keep the field focused
+  const tip = () => { $("#mtitle").textContent = "Голосом через систему"; $("#mno").textContent = "Зрозуміло"; $("#myes").hidden = true;
+    $("#mbody").innerHTML = `<p class="lede">Тут браузер не дає сторінці мікрофон. Диктуй вбудованим диктуванням, воно працює в будь-якому полі:</p><ol><li><b>Mac:</b> стань у поле й двічі натисни <b>Fn</b> (або 🎤 на клавіатурі), говори, потім ще раз Fn.</li><li><b>iPhone / Android:</b> мікрофон на клавіатурі.</li></ol>`;
+    $("#modal").hidden = false; };
+  const set = text => { field.value = text; field.dispatchEvent(new Event("input", { bubbles: true })); };
+  function stop() { if (!rec) return; const f = field, r = rec; rec = null; try { r.stop(); } catch (e) {} btn.setAttribute("aria-pressed", "false"); if (f) f.dispatchEvent(new Event("change", { bubbles: true })); }
+  btn.addEventListener("click", () => {
+    if (rec) { stop(); return; }
+    if (!SR || !field) { tip(); return; }
+    const r = new SR(); r.lang = "uk-UA"; r.continuous = true; r.interimResults = true;
+    base = field.value ? field.value.replace(/\s*$/, " ") : "";
+    r.onresult = e => { heard = true; let fin = "", tmp = ""; for (const x of e.results) (x.isFinal ? (fin += x[0].transcript) : (tmp += x[0].transcript)); if (field) set(base + fin + tmp); };
+    let heard = false, t0 = Date.now();
+    r.onerror = e => { window.__micErr = e.error; const was = rec; stop(); if (was && e.error !== "aborted" && !(e.error === "no-speech" && heard)) tip(); };
+    r.onend = () => { if (rec === r) { stop(); if (!heard && Date.now() - t0 < 2500) tip(); } };   // ended at once with nothing heard: the mic isn't reachable here
+    try { r.start(); rec = r; btn.setAttribute("aria-pressed", "true"); } catch (e) { tip(); }
+  });
+})();
 
 // ---------- load ----------
 // One reel: docs reel/current, review/current, builds/latest. A batch: reel/index lists them, and each has reel/<id>, review/<id>, builds/<id>.
