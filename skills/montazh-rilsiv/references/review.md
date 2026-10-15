@@ -29,7 +29,7 @@ Reply in the comment thread in one line («Взяв, роблю пропозиц
 
 ## «Стиль» tab (their style, in rounds)
 
-The page also holds the style lab: db `style/round` (written by Claude: the round's sections and variants with their mp4/poster urls) and `style/votes` (her verdicts, notes and references: reel links and uploaded files). It works with or without a reel loaded. The «Готово → Claude» button there sends a «Send to Claude» comment naming the round. Everything else (making rounds, reading verdicts, writing styles) is in `references/style-lab.md`.
+The page also holds the style lab: db `style/round` (written by Claude: the round's sections and variants with their mp4/poster urls) and `style/votes` (her verdicts, notes and references: reel links and uploaded files). It works with or without a reel loaded. db `style/list` (from `~/reels/styles/list.json`) feeds the «Стиль монтажу» buttons on «Графіка»: her pick is `style` in the review doc (part of the decisions hash) and `review_sync.py import` turns it into `<reel>/style.txt`. The «Готово → Claude» button there sends a «Send to Claude» comment naming the round. Everything else (making rounds, reading verdicts, writing styles) is in `references/style-lab.md`.
 
 ## Face, captions and «За мною»
 

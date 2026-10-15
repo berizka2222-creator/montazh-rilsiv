@@ -481,6 +481,9 @@ details{padding:8px 12px}
     <section data-p="graphics" hidden>
       <p class="lede">Усе поверх відео за часом. Залиш, попроси змінити або прибери.</p>
       <div class="panel">
+        <label id="stylepicklabel">Стиль монтажу</label>
+        <div class="gpre" id="stylepick" role="group" aria-labelledby="stylepicklabel"></div>
+        <p class="mode" id="stylehint" style="margin-top:4px"></p>
         <label for="hooktext">Хук: заголовок на початку</label>
         <input type="text" id="hooktext" placeholder="Напр.: Чому не / виходить / заробляти? (/ = новий рядок)">
         <label for="ctatext">CTA: заклик у кінці (необов'язково)</label>
@@ -1126,6 +1129,21 @@ $("#efadd").addEventListener("click", async () => {
   finally { btn.disabled = false; }
 });
 
+// ---------- the editing style for this reel (db style/list, built on «Стиль»); saved as S.style, import writes <reel>/style.txt ----------
+let STYLE_LIST = [];
+function renderStylePick() {
+  const box = $("#stylepick"); if (!box) return; box.textContent = "";
+  const cur = S.style || null, opts = [...STYLE_LIST.map(x => [x.name, x.title || x.name, x.what || ""]), ["brand", "Тільки бренд", "Кольори й шрифти бренду, без стилю"]];
+  for (const [name, title, what] of opts) {
+    const b = document.createElement("button"); b.type = "button"; b.textContent = title; b.title = what; b.setAttribute("aria-pressed", cur === name);
+    b.addEventListener("click", () => mutate(() => { S.style = cur === name ? null : name; })); box.appendChild(b);
+  }
+  const pick = STYLE_LIST.find(x => x.name === cur);
+  const go = document.createElement("button"); go.type = "button"; go.className = "b quiet"; go.textContent = "Зібрати стилі"; go.addEventListener("click", () => showTab("style"));
+  $("#stylehint").textContent = !STYLE_LIST.length ? "Стилів ще немає. Збери їх на вкладці «Стиль» або монтуй тільки з брендом. " : cur === "brand" ? "Монтаж у кольорах і шрифтах бренду, без стилю." : pick ? pick.what : "Обери стиль до «Готово → Claude»: пропозиції графіки й звуки будуть у ньому.";
+  if (!STYLE_LIST.length) $("#stylehint").appendChild(go);
+}
+
 // ---------- hook + CTA typed on the page ----------
 function syncHookCta() {
   const hook = GFX.find(g => g.type === "title");
@@ -1433,11 +1451,11 @@ function stage() {
 }
 const STEP = {
   graphics: { title: "Віддати Claude на пропозиції?", yes: "Так, готово → Claude",
-    body: `<p class="lede">Усе твоє збережено: нарізка, накладення, ефекти, хук, субтитри, колір.</p><ol>
+    body: () => `<p class="lede">Усе твоє збережено: нарізка, накладення, ефекти, хук, субтитри, колір.</p><ol>
       <li><b>Claude прочитає твої рішення</b> і подивиться, де стоять твої накладення й ефекти.</li>
       <li><b>Додасть свої пропозиції</b> на «Графіку»: картки, motion на ключові фрази, слова за тобою, лічильники. Твоє не чіпає й не перекриває.</li>
       <li><b>Сторінка оновиться сама</b> (~5–10 хв), ти побачиш крок «Пропозиції Claude».</li>
-      <li>Ти лишаєш, змінюєш або прибираєш кожну, потім одна кнопка: <b>Зібрати чернетку</b>.</li></ol>`,
+      <li>Ти лишаєш, змінюєш або прибираєш кожну, потім одна кнопка: <b>Зібрати чернетку</b>.</li></ol>${S.style && S.style !== "brand" ? `<p class="lede">Стиль: <b>${(STYLE_LIST.find(x => x.name === S.style) || {}).title || S.style}</b>.</p>` : !S.style && STYLE_LIST.length ? `<p class="lede">Стиль не обрано: Claude спитає в чаті. Обрати можна на «Графіці».</p>` : ""}`,
     say: "графіка", text: "▶ Кнопка «Готово → Claude»: мій монтаж готовий, зроби пропозиції графіки (раунд 2)." },
   build: { title: "Зібрати чернетку?", yes: "Так, збирай",
     body: `<p class="lede">Claude збере відео з усіма рішеннями: твоїми і погодженими пропозиціями.</p><ol>
@@ -1471,7 +1489,7 @@ function renderStage() {
 }
 $("#gobtn").addEventListener("click", () => { const k = $("#gobtn").dataset.kind; if (k === "style") askStyle(); else if (k) askStep(k); });
 function askStep(kind) {
-  const c = STEP[kind]; $("#mtitle").textContent = c.title; $("#mbody").innerHTML = c.body; $("#myes").textContent = c.yes; $("#mno").textContent = "Ще ні";
+  const c = STEP[kind]; $("#mtitle").textContent = c.title; $("#mbody").innerHTML = typeof c.body === "function" ? c.body() : c.body; $("#myes").textContent = c.yes; $("#mno").textContent = "Ще ні";
   $("#myes").hidden = false; $("#modal").hidden = false; $("#myes").focus();
   $("#myes").onclick = () => sendStep(kind);
 }
@@ -1510,8 +1528,8 @@ $("#revadd").addEventListener("click", () => {
 });
 
 function renderAll() {
-  renderCuts(); renderGraphics(); renderEffects(); renderCaptions(); renderSound(); renderPreview(); syncHookCta(); renderStage(); renderCapPlace();
-  const sent = { cuts: S.cut != null, overlays: (S.overlays || []).length, effects: (S.effects || []).length, graphics: Object.keys(S.board).length || (S.hook != null) || !!S.cta, captions: S.captions != null, sound: Object.keys(S.sfxOff).length || S.voiceClean === false || !ReelCore.isNeutral(S.grade) };
+  renderCuts(); renderGraphics(); renderEffects(); renderCaptions(); renderSound(); renderPreview(); syncHookCta(); renderStage(); renderCapPlace(); renderStylePick();
+  const sent = { cuts: S.cut != null, overlays: (S.overlays || []).length, effects: (S.effects || []).length, graphics: Object.keys(S.board).length || (S.hook != null) || !!S.cta || !!S.style, captions: S.captions != null, sound: Object.keys(S.sfxOff).length || S.voiceClean === false || !ReelCore.isNeutral(S.grade) };
   $$(".tab:not(.tabx)").forEach(b => { const d = b.querySelector(".dot"); if (d) d.hidden = !sent[b.dataset.tab]; });
   styleDot();
 }
@@ -1769,6 +1787,8 @@ async function load(id) {
   comments = await window.claude?.use?.("comments");   // «Send to Claude» from the big button   // only editors get it; others don't see the overlay button
   $("#ovbox").hidden = !assets; $("#ovnone").hidden = !!assets;
   await loadStyle();
+  try { const x = await DB.doc("style/list").get(); STYLE_LIST = x.exists ? (JSON.parse(JSON.stringify(x.data())).items || []) : []; } catch (e) { STYLE_LIST = []; }
+  DB.doc("style/list").onSnapshot(x => { STYLE_LIST = x.exists ? (JSON.parse(JSON.stringify(x.data())).items || []) : []; if (R) renderStylePick(); }, () => {});
   libRef = DB.doc("library/files");   // «Мої файли» live across reels
   try { const l = await libRef.get(); LIB = l.exists ? (l.data().items || []) : [];
     if (l.exists && /^https:\/\//.test(l.data().libraryUrl || "")) $("#eflib").href = l.data().libraryUrl;   // their own effects gallery, for every reel

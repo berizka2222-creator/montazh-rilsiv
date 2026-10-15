@@ -256,7 +256,9 @@ def write_md():
     if dj.exists() and json.load(open(dj)).get("maybe"):
         L += ["## Напрями на доопрацювання", ""] + [f"- {x['what']}" + (f": {x['note']}" if x.get("note") else "") for x in json.load(open(dj))["maybe"]] + [""]
     (STYLES / "STYLE.md").write_text("\n".join(L))
-    print(f"{STYLES / 'STYLE.md'}")
+    lst = {"items": [{"name": p.stem, "title": (st := json.load(open(p))).get("title", p.stem), "what": st.get("what", "")} for p in styles]}
+    json.dump(lst, open(STYLES / "list.json", "w"), ensure_ascii=False, indent=1)   # -> ArtifactData set style/list (the picker on «Графіка»)
+    print(f"{STYLES / 'STYLE.md'}, {STYLES / 'list.json'} (ArtifactData set style/list)")
 
 
 # ---- round 1: nine direction archetypes, each recoloured and re-fonted from their own brand ----------------------------
