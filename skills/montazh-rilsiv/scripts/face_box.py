@@ -6,7 +6,7 @@ Without macOS/swift it falls back to the usual talking-head zone (25%..55% of th
 import json, subprocess, sys, tempfile
 from pathlib import Path
 reel = Path(sys.argv[1]).expanduser()
-src = next(iter(sorted(reel.glob("raw.*"))))
+src = next(iter(sorted(reel.glob("raw.*"))), reel / "master.mp4")   # a style-lab fragment has only master.mp4
 dur = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(src)], capture_output=True, text=True).stdout)
 W, H = 1080, 1920
 box = [W * 0.22, H * 0.25, W * 0.56, H * 0.30]   # fallback
