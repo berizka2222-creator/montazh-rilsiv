@@ -116,7 +116,7 @@ The brand files say what their colours and fonts are; the style says how their r
    - big bold words on screen, or small and quiet?
    - sounds: none, soft, or punchy?
 2. **A 5-second piece of their video** where they make a point: `python3 scripts/style_lab.py fragment <clip> <start> <end> --hook "…"` with their own hook text.
-3. **Round 1:** 3 directions in their colours and fonts on that piece, on the review page's «Стиль» tab. They rate each: Залишити / Можливо / Прибрати + a note, then «Готово → Claude».
+3. **Round 1:** 9 directions in their colours and fonts on that piece (`style_lab.py directions`), on the review page's «Стиль» tab. They rate each: Залишити / Можливо / Прибрати + a note, can attach a reel link or files they like, then «Готово → Claude». They are never limited to what they saw: notes and references shape the next round.
 4. **Rounds 2+** go element by element (captions, hook, lists, numbers, screen splits, transitions, CTA, sounds), one change per variant, same words. Two or three rounds are enough to start editing; the rest can come later.
 5. Each direction they keep is its own style. Before every edit you ask which one.
 Full workflow: `references/style-lab.md`.

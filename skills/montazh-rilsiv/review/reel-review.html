@@ -380,6 +380,12 @@ details{padding:8px 12px}
 .sthead{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
 .sthead .grow{flex:1}
 #stzbtn.on{background:var(--accent);color:var(--on-accent)}
+#stnotebox input[type=url]{font:inherit;font-size:16px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 10px;flex:1;min-width:0;box-sizing:border-box}
+.strefs{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.stlinks{display:flex;flex-wrap:wrap;gap:6px}
+.stlink{display:inline-flex;align-items:center;gap:6px;max-width:100%;font-size:13px;border:1px solid var(--line);border-radius:999px;padding:4px 6px 4px 12px}
+.stlink a{color:var(--accent);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px}
+.stlink button{border:0;background:none;color:var(--muted);cursor:pointer;font-size:15px;line-height:1;padding:2px 6px}
 </style>
 
 <div class="wrap">
@@ -522,7 +528,12 @@ details{padding:8px 12px}
       <div class="tally" id="sttally"></div>
       <div id="stbox"><div class="empty">Раундів стилю ще немає. Попроси Claude почати «Стиль».</div></div>
       <div class="panel" id="stnotebox" hidden><label for="stnote">Загальна нотатка до раунду (необов'язково)</label>
-        <textarea id="stnote" placeholder="Напр.: усе гарне, але хочу менше руху"></textarea></div>
+        <textarea id="stnote" placeholder="Напр.: субтитри як у «Журналі», а звуки як у «Тиші». Або: жоден не підходить, хочу як у рілсі нижче"></textarea>
+        <label for="streflink">Референси: рілс, який подобається (посилання або файл)</label>
+        <div class="ctl"><input type="url" id="streflink" inputmode="url" placeholder="https://www.instagram.com/reel/…"><button class="b" id="stlinkadd" type="button">Додати посилання</button></div>
+        <div class="strefs"><div class="stlinks" id="stlinks"></div>
+          <div class="refrow"><div class="lib" id="streflist"></div><input type="file" id="streffile" multiple accept="image/png,image/jpeg,image/webp,video/mp4,video/quicktime" aria-label="Файли-референси"><span class="mode" id="strefmsg" aria-live="polite"></span></div></div>
+        <p class="mode" style="margin-top:6px">Напиши в нотатці, що саме подобається в референсі. Claude зробить за ним напрям у наступному раунді.</p></div>
     </section>
 
     <section data-p="preview" hidden>
@@ -1511,7 +1522,7 @@ function renderAll() {
 // «Готово → Claude» sends the round with the same «Send to Claude» comment as the reel steps; scripts/style_lab.py apply reads it.
 let STR = null, STV = null, stRef = null, stTimer = null, stZones = false;
 const ST_V = { keep: "Залишити", maybe: "Можливо", drop: "Прибрати" };
-const stBlank = () => ({ round: STR?.id || null, verdicts: {}, note: "", sent: null });
+const stBlank = () => ({ round: STR?.id || null, verdicts: {}, note: "", refs: [], sent: null });
 function stVariants() { return (STR?.sections || []).flatMap(s => s.variants || []); }
 function stCount() { const c = { keep: 0, maybe: 0, drop: 0 }; for (const v of stVariants()) { const x = STV?.verdicts?.[v.id]?.v; if (x) c[x]++; } return c; }
 function stWaiting() { return !!(STR && STV?.sent && STV.round === STR.id); }
@@ -1578,10 +1589,48 @@ function stPaint() {   // verdicts, notes, zones onto the cards already built (v
     const z = c.querySelector(".sz"); z.hidden = !stZones; if (stZones && !z.innerHTML) z.innerHTML = zonesSvg(STR?.handle || (R && R.handle) || "");
   }
   if (document.activeElement !== $("#stnote")) $("#stnote").value = STV?.note || "";
+  renderStRefs();
   const n = stCount(), all = stVariants().length;
   $("#sttally").textContent = all ? `Оцінено ${n.keep + n.maybe + n.drop} з ${all} · залишити ${n.keep} · можливо ${n.maybe} · прибрати ${n.drop}` : "";
 }
 $("#stnote").addEventListener("input", e => { if (!STV) return; STV.note = e.target.value; stSave(); });
+// references for the round: links to reels they like (Instagram, TikTok, YouTube) and their own files, up to 10 in all
+function renderStRefs() {
+  const refs = STV?.refs || [], links = $("#stlinks"), files = $("#streflist"); links.textContent = ""; files.textContent = "";
+  refs.forEach((r, k) => {
+    const del = () => { STV.refs = refs.filter((_, j) => j !== k); renderStRefs(); stSave(); };
+    if (r.kind === "link") {
+      const c = document.createElement("span"); c.className = "stlink";
+      const a = document.createElement("a"); a.href = r.url; a.target = "_blank"; a.rel = "noopener"; a.textContent = "↗ " + r.url.replace(/^https?:\/\/(www\.)?/, "");
+      const x = document.createElement("button"); x.type = "button"; x.textContent = "×"; x.title = "Прибрати"; x.setAttribute("aria-label", "Прибрати посилання"); x.addEventListener("click", del);
+      c.append(a, x); links.appendChild(c);
+    } else {
+      const b = document.createElement("button"); b.type = "button"; b.title = r.name + " (тапни, щоб прибрати)";
+      if (r.kind === "image") b.style.backgroundImage = `url(${JSON.stringify(r.url)})`; else b.textContent = "▶ " + r.name;
+      b.addEventListener("click", del); files.appendChild(b);
+    }
+  });
+  $("#streffile").hidden = !assets || refs.length >= 10;
+}
+$("#stlinkadd").addEventListener("click", () => {
+  const inp = $("#streflink"), u = inp.value.trim(), msg = $("#strefmsg");
+  if (!STV) return;
+  if (!/^https:\/\/\S+\.\S+/.test(u)) { msg.textContent = "Встав посилання, що починається з https://"; inp.focus(); return; }
+  if ((STV.refs || []).length >= 10) { msg.textContent = "Можна до 10 референсів."; return; }
+  STV.refs = [...(STV.refs || []), { kind: "link", url: u }]; inp.value = ""; msg.textContent = "Посилання додано."; renderStRefs(); stSave();
+});
+$("#streflink").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); $("#stlinkadd").click(); } });
+$("#streffile").addEventListener("change", async e => {
+  const fs = [...e.target.files], msg = $("#strefmsg"); if (!fs.length || !assets || !STV) return;
+  if ((STV.refs || []).length + fs.length > 10) { msg.textContent = "Можна до 10 референсів."; e.target.value = ""; return; }
+  if (fs.some(f => f.size > 20 * 1024 * 1024)) { msg.textContent = "Файл більший за 20 МБ: кинь посилання на рілс замість файлу."; e.target.value = ""; return; }
+  msg.textContent = "Завантажую…";
+  try {
+    for (const f of fs) { const u = await assets.upload(f); STV.refs = [...(STV.refs || []), { kind: f.type.startsWith("video") ? "video" : "image", id: u.id, url: u.url, name: f.name }]; }
+    msg.textContent = "Додано."; renderStRefs(); stSave();
+  } catch (er) { msg.textContent = "Не вдалося завантажити (" + (er?.code || "помилка") + "). Спробуй ще раз."; }
+  e.target.value = "";
+});
 $("#stzbtn").addEventListener("click", () => { stZones = !stZones; $("#stzbtn").classList.toggle("on", stZones); $("#stzbtn").setAttribute("aria-pressed", String(stZones)); stPaint(); });
 function styleBar() {
   const bar = $("#gobar"), txt = $("#gotext"), btn = $("#gobtn"); bar.hidden = false;
@@ -1595,7 +1644,7 @@ function styleBar() {
 function askStyle() {
   const n = stCount();
   $("#mtitle").textContent = "Віддати раунд Claude?"; $("#myes").textContent = "Так, готово → Claude"; $("#mno").textContent = "Ще ні";
-  $("#mbody").innerHTML = `<p class="lede">Залишити: ${n.keep} · Можливо: ${n.maybe} · Прибрати: ${n.drop}</p><ol>
+  $("#mbody").innerHTML = `<p class="lede">Залишити: ${n.keep} · Можливо: ${n.maybe} · Прибрати: ${n.drop}${(STV.refs || []).length ? ` · референсів: ${STV.refs.length}` : ""}</p><ol>
     <li><b>«Залишити»</b> Claude запише у твій стиль${STR?.kind === "directions" ? " (кожен напрям окремим стилем)" : ""}.</li>
     <li><b>«Можливо»</b> виправить за нотатками й покаже ще раз.</li>
     <li><b>«Прибрати»</b> більше не з'явиться, причину запише.</li></ol>`;
@@ -1605,7 +1654,7 @@ function askStyle() {
 async function sendStyle() {
   const n = stCount(), at = new Date().toISOString(); $("#myes").disabled = true;
   let sent = false, why = "";
-  const text = `▶ Кнопка «Готово → Claude» у «Стилі»: раунд ${STR.id} оцінено (залишити ${n.keep}, можливо ${n.maybe}, прибрати ${n.drop}).`;
+  const text = `▶ Кнопка «Готово → Claude» у «Стилі»: раунд ${STR.id} оцінено (залишити ${n.keep}, можливо ${n.maybe}, прибрати ${n.drop}${(STV.refs || []).length ? `, референсів ${STV.refs.length}` : ""}).`;
   try {
     const can = comments ? await comments.canSendToClaude() : "off";
     if (can === "available") { await comments.sendToClaude({ anchor: await comments.anchorFor($("#gobtn")), text }); sent = true; }

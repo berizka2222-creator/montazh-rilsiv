@@ -19,7 +19,7 @@ The workspace is `~/reels/` unless `REELS_HOME` is set.
 ## Which style (before every edit)
 
 Their editing style lives in `~/reels/styles/<name>.json` + `STYLE.md`, built in rounds on the review page's «Стиль» tab (`references/style-lab.md`, `scripts/style_lab.py`). Several styles per account are normal.
-- **No styles yet** → offer the style lab once («Зберемо твій стиль монтажу? 3 варіанти на 5 секундах твого відео»); a no means brand.json alone, as before.
+- **No styles yet** → offer the style lab once («Зберемо твій стиль монтажу? 9 варіантів на 5 секундах твого відео»); a no means brand.json alone, as before.
 - **One style** → use it. **Several** → ask «Яким стилем монтуємо?» with the styles as buttons (or brand.json `"style"` as the default), then write the name to `<reel>/style.txt`. Read that style's `STYLE.md` section before planning graphics: its Відхилено list is a hard no.
 - Never use someone else's style for a person: a student's styles come from their own rounds.
 

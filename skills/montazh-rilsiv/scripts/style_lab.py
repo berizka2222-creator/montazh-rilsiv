@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Style lab: the person's own editing style, built in rounds of rendered variants they rate (Залишити / Можливо / Прибрати).
-Round 1 = 3 whole-look directions on one 5-second fragment of their own video; later rounds go element by element
+Round 1 = 9 whole-look directions on one 5-second fragment of their own video; later rounds go element by element
 (captions, hook, lists, numbers, split, transitions, cta, sounds, motion), one change per variant, same words.
 Output: ~/reels/styles/<name>.json (read by build_reel.py) + ~/reels/styles/STYLE.md (Затверджено / Можливо / Відхилено).
 
   fragment <reel-folder | clip> <start> <end> [--hook "line / line"]   cut the 5 s the rounds are made on (-> styles/_lab/fragment)
   round <round.json>                    render every variant at 540p (-> styles/_lab/rounds/<id>/: <sec>.<var>.mp4/.jpg, page.json)
+  directions [--id ID] [--only a,b]     write round 1 from the 9 direction archetypes, in their brand (then run `round`)
   element <style> <element> [--id ID]   write the round.json for one element of a style from the catalogue (then run `round`)
   page <round-dir> <uploads.json>       page.json + uploaded urls ({file name: url}) -> doc.json for ArtifactData set style/round
   votes <round-dir> <votes.json>        print her verdicts (the page's style/votes doc) in plain words
@@ -173,6 +174,8 @@ def show_votes(rdir, votes):
             x = V.get(v["id"], {})
             print(f"  {V_UA.get(x.get('v'), 'без оцінки'):10} {v['title']}" + (f"  · {x['note']}" if x.get("note") else ""))
     if vt.get("note"): print(f"Загальна нотатка: {vt['note']}")
+    for r in vt.get("refs", []):   # links: yt-dlp them; files: Artifact read with path = id
+        print(f"Референс ({r['kind']}): {r['url']}" + (f"  asset {r['id']} ({r.get('name', '')})" if r.get("id") else ""))
 
 
 def apply(rdir, votes):
@@ -254,6 +257,112 @@ def write_md():
         L += ["## Напрями на доопрацювання", ""] + [f"- {x['what']}" + (f": {x['note']}" if x.get("note") else "") for x in json.load(open(dj))["maybe"]] + [""]
     (STYLES / "STYLE.md").write_text("\n".join(L))
     print(f"{STYLES / 'STYLE.md'}")
+
+
+# ---- round 1: nine direction archetypes, each recoloured and re-fonted from their own brand ----------------------------
+def _fonts(brand):
+    """Their display fonts: brand head/accent plus any extra files in brand.json "caption_fonts" (their design system)."""
+    F = brand.get("fonts", {})
+    extra = [f for f in (brand.get("caption_fonts", {}).get("body", []) + brand.get("caption_fonts", {}).get("accent", [])) if f.get("file")]
+    seen, out = set(), []
+    for f in extra:
+        p = (HOME / "fonts" / f["file"])
+        if p.exists() and f["file"] not in seen and "Gilroy" not in f["file"]:
+            seen.add(f["file"]); out.append({"family": f["label"].split()[0], "file": str(p), "weight": f.get("weight", 400), "style": f.get("style", "normal")})
+    return F.get("head"), F.get("accent"), out
+
+
+def _sticker():
+    for d in ("elements_clean", "elements"):
+        pngs = sorted((HOME / "assets" / d).glob("*.png")) if (HOME / "assets" / d).exists() else []
+        pngs = [x for x in pngs if not x.stem.startswith(("logo", "_"))]
+        if pngs: return f"{d}/{pngs[min(2, len(pngs) - 1)].name}"
+    return None
+
+
+def directions(rid=None, only=None):
+    """Round 1 for anyone: 9 looks (calm, editorial, scrapbook, chrome, magazine, notes, kinetic, quiet, split) on their
+    fragment, in their colours and fonts. Edit the json after (swap a direction for one from their references) before `round`."""
+    brand = json.load(open(HOME / "brand.json")); frag = json.load(open(FRAG / "fragment.json"))
+    C = brand["colors"]; MAIN, POP, LIGHT = C["main"], C["pop"], C.get("light", "#FFFFFF"); SOFT = C.get("soft", POP)
+    if not frag.get("hook"): sys.exit("fragment.json has no hook: ask them for their hook text (never invent it)")
+    g = frag.get("graphic") or {}; rows, rt = g.get("rows", []), g.get("row_times")
+    if not rows: sys.exit("fragment.json graphic.rows is empty: put the spoken words there")
+    dur, T = frag["dur"], frag.get("transition_at") or round(frag["dur"] * 0.45, 2)
+    gs, ge, ttl = g.get("start", round(dur * 0.6, 2)), g.get("end", dur), g.get("title", "")
+    head, accent, extra = _fonts(brand)
+    disp1 = extra[0] if extra else head                    # a second display face from their system, if they have one
+    disp2 = extra[1] if len(extra) > 1 else disp1
+    serif = {**accent, "weight": accent.get("weight", 400)} if accent and accent.get("file") else head
+    stk = _sticker()
+    hook = lambda **k: {"type": "title", "text": frag["hook"], "y": 1165, "size": 72, "start": 0, "end": min(2.2, dur * 0.45), **k}
+    lst = lambda lay: {"type": "list", "layout": lay, "title": ttl, "rows": rows, "row_times": rt, "start": gs, "end": ge}
+    words = " / ".join(rows[:2])
+    A = [
+     ("calm", "Спокійний преміум", "Повільний рух, субтитри проявляються з розмиття, хук і список на матовому склі, плавний наїзд камери, м'які звуки.",
+      {"motion": {"speed": 0.8}, "captions": {"anim": "blur", "accent": "color"}, "brand": {"title_glass": True, "glass": True, "cta_glass": True},
+       "layouts": {"list": ["card", "notes"], "camera": ["in", "out"]},
+       "sounds": {"events": {"transition": "whoosh_soft", "row": "hit_soft", "title": "ding_glass", "accent": "chime", "hit": "hit_soft"}}},
+      [hook(size=70), {"type": "camera", "move": "in", "scale": 1.12, "start": T, "end": dur}, lst("card")]),
+     ("editorial", "Яскравий редакційний", "Швидко і різко: слова-акценти великі на плашці, хук кольором без панелі, різкий зум, панель наїжджає на кадр, удари.",
+      {"motion": {"speed": 1.3}, "captions": {"anim": "slam", "accent": "box"},
+       "brand": {"title_glass": False, "title_color": SOFT, "glass": False, "cta_glass": False, "cta_bg": SOFT, "captions": {"style": "editorial"}},
+       "layouts": {"list": ["drop", "stack"], "camera": ["whip", "shake"]},
+       "sounds": {"events": {"transition": "whoosh_fast", "row": "pop", "title": "snap", "hit": "hit_punch", "accent": "hit_punch"}}},
+      [hook(size=76), {"type": "camera", "move": "whip", "start": T, "end": T + 0.8}, {"type": "push", "text": words, "color": SOFT, "y": 640, "start": gs, "end": ge}]),
+     ("scrapbook", "Живий скрапбук", "Звичайний темп, субтитри виринають знизу з підкресленням акценту, кадр відʼїжджає, пункти-картки летять стосом, клацання й дзвіночки.",
+      {"motion": {"speed": 1.0}, "captions": {"anim": "rise", "accent": "underline"},
+       "brand": {"title_glass": False, "title_color": LIGHT, "glass": False, "cta_glass": False, "cta_bg": POP},
+       "layouts": {"list": ["stack", "notes"], "camera": ["out", "shake"]},
+       "sounds": {"events": {"transition": "swish", "row": "pop_pluck", "title": "page_turn", "accent": "ding", "hit": "pop_drop"}}},
+      [hook(size=74), {"type": "camera", "move": "out", "start": T, "end": T + 0.9}, lst("stack")]),
+     ("chrome", "Хромовий люкс", "Повільно й дорого: заголовки акцентним шрифтом, твій елемент, великі слова з'являються над головою.",
+      {"motion": {"speed": 0.85}, "captions": {"anim": "blur", "accent": "color"},
+       "brand": {"title_glass": False, "title_color": LIGHT, "fonts": {"head": serif}},
+       "layouts": {"list": ["card", "notes"], "camera": ["in"]},
+       "sounds": {"events": {"transition": "whoosh_air", "row": "ding_glass", "title": "chime", "accent": "chime", "hit": "hit_soft"}}},
+      [hook(size=84), {"type": "camera", "move": "in", "scale": 1.1, "start": T, "end": dur}]
+      + ([{"type": "sticker", "src": stk, "x": 820, "y": 430, "size": 190, "start": gs, "end": ge}] if stk else [])
+      + [{"type": "bigtext", "text": rows[-1], "behind": True, "y": 240, "color": POP, "start": rt[-1] if rt else gs, "end": ge}]),
+     ("magazine", "Журнальна обкладинка", "Інший шрифт з твоєї системи, субтитри фразами внизу на плашці, кадр стискається у вікно, над ним великі слова.",
+      {"motion": {"speed": 1.0}, "captions": {"anim": "rise", "accent": "box"},
+       "brand": {"title_glass": False, "title_color": SOFT, "captions": {"mode": "phrase", "size": 70, "y": 1300},
+                 "colors": {"caption_accent": SOFT, "caption_accent_2": SOFT}, "fonts": {"head": disp1}},
+       "layouts": {"list": ["drop", "stack"], "camera": ["shrink", "out"]},
+       "sounds": {"events": {"transition": "page_turn", "row": "shutter", "title": "page_turn", "hit": "shutter"}}},
+      [hook(), {"type": "camera", "move": "shrink", "text": words, "start": gs, "end": ge}]),
+     ("notes", "Нотатки з телефона", "Живо, як UGC: дрібні субтитри фразами з підкресленням, лист нотаток з галочками, поштовх кадру, клацання.",
+      {"motion": {"speed": 1.1}, "captions": {"anim": "pop", "accent": "underline"},
+       "brand": {"title_glass": False, "title_color": LIGHT, "captions": {"mode": "phrase", "size": 64}},
+       "layouts": {"list": ["notes", "stack"], "camera": ["shake", "out"]},
+       "sounds": {"events": {"transition": "swipe", "row": "tap", "title": "click", "hit": "mouse_click", "typing": "typing"}}},
+      [hook(size=64), lst("notes"), {"type": "camera", "move": "shake", "start": rt[-1] if rt else ge - 1}]),
+     ("kinetic", "Кінетична типографіка", "Дуже швидко: великі субтитри вдаряють, хук кольором акценту, різкий зум, кольорова панель з великими словами на весь екран.",
+      {"motion": {"speed": 1.5}, "captions": {"anim": "slam", "accent": "color"},
+       "brand": {"title_glass": False, "title_color": POP, "captions": {"size": 110, "style": "editorial"}, "fonts": {"head": disp2}},
+       "layouts": {"list": ["drop"], "camera": ["whip", "shake"]},
+       "sounds": {"events": {"transition": "whoosh_fast", "row": "hit_punch", "title": "boom", "hit": "hit_punch", "accent": "hit_punch"}}},
+      [hook(size=80), {"type": "camera", "move": "whip", "start": T, "end": T + 0.7}, {"type": "push", "text": words, "color": POP, "y": 640, "start": gs, "end": ge}]),
+     ("quiet", "Тиша й повітря", "Мінімум: маленькі субтитри внизу, невеликий хук без панелі, камера не рухається, одна скляна пігулка, без звуків.",
+      {"motion": {"speed": 0.9}, "captions": {"anim": "rise", "accent": "color"},
+       "brand": {"title_glass": False, "title_color": LIGHT, "title_max_px": 80, "captions": {"size": 62, "y": 1360}},
+       "layouts": {"list": ["card"], "camera": ["in"]}, "sounds": {"level": "none"}},
+      [hook(size=56), {"type": "tag", "text": rows[-1], "glass": True, "y": 300, "start": rt[-1] if rt else gs, "end": ge}]),
+     ("split", "Екран навпіл", "Екран ділиться: панель зі списком зверху, ти знизу; відʼїзд кадру, м'які звуки.",
+      {"motion": {"speed": 1.0}, "captions": {"anim": "pop", "accent": "color"}, "brand": {"title_glass": True},
+       "layouts": {"list": ["card", "drop"], "camera": ["out", "in"]},
+       "sounds": {"events": {"transition": "whoosh_soft", "row": "pop", "title": "snap"}}},
+      [hook(), {"type": "camera", "move": "out", "start": T, "end": T + 0.8}, {"type": "split", "title": ttl or rows[0], "rows": rows, "row_times": rt, "start": gs, "end": ge}]),
+    ]
+    if only: A = [a for a in A if a[0] in only]
+    rid = rid or f"{(brand.get('handle') or 'style').lstrip('@')}-r1"
+    spec = {"id": rid, "round": 1, "kind": "directions", "title": "Раунд 1 · напрями",
+            "lede": f"{len(A)} напрямів на тих самих 5 секундах твого відео, усі в твоїх кольорах і шрифтах. Можна залишити кілька: кожен стане окремим стилем.",
+            "sections": [{"id": "dir", "title": "Напрями", "what": "Субтитри, хук, одна графіка, один перехід і звуки разом.",
+                          "variants": [{"id": i, "name": i, "title": t, "what": w, "style": st, "cards": cards} for i, t, w, st, cards in A]}]}
+    LAB.mkdir(parents=True, exist_ok=True)
+    out = LAB / f"{rid}.json"; json.dump(spec, open(out, "w"), ensure_ascii=False, indent=1)
+    print(f"{out}: {len(A)} directions. Swap any for one built from their references, then: python3 {Path(__file__).name} round {out}")
 
 
 # ---- element rounds: one change per variant, same words ------------------------------------------------------------
@@ -359,6 +468,7 @@ if __name__ == "__main__":
         hook = a[a.index("--hook") + 1] if "--hook" in a else None
         fragment(a[1], float(a[2]), float(a[3]), hook)
     elif cmd == "round": run_round(Path(a[1]).expanduser())
+    elif cmd == "directions": directions(a[a.index("--id") + 1] if "--id" in a else None, a[a.index("--only") + 1].split(",") if "--only" in a else None)
     elif cmd == "element": element_round(a[1], a[2], a[a.index("--id") + 1] if "--id" in a else None)
     elif cmd == "page": page_doc(a[1], a[2])
     elif cmd == "votes": show_votes(a[1], a[2])
