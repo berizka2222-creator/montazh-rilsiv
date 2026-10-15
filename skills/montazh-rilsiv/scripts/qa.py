@@ -45,5 +45,10 @@ if exp.exists():
 else:
     print("words     skipped (write the approved script to expected.txt to check for clipped words)")
 
+sz = reel / "safezones.json"   # written by build_reel.py: graphics or captions under the Instagram UI (warning, not a fail)
+if sz.exists():
+    ws = json.load(open(sz))["warnings"]
+    print(f"safe zones {'ok' if not ws else str(len(ws)) + ' warning(s)'}")
+    for w in ws: print("   ", w["msg"])
 print("PASS" if not fails else f"FAIL: {', '.join(fails)}")
 sys.exit(1 if fails else 0)

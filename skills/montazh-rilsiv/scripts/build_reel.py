@@ -33,6 +33,18 @@ edit.json (written by auto_edit.py, then Claude marks accents and adds cards):
      (any card) "behind": true   between the background and the person: the person is cut out for that window (local AI, ~13 s per second of video, cached)
      follow {words: [{text, accent}], framing: "wide"}   caption-camera-follow in brand colours/font: one sentence
                                                      written word by word across a camera that pulls back (hook moments)
+     list   {title?, rows: [..], layout?: "drop"|"notes"|"stack"|"card", y?: 980, row_times?: [..]}
+                                                     a list in one of four looks; no layout = next look in turn, never the previous list's
+     split  {title, rows: [..], side?: "top"|"left", color?, focus?: 28}   the screen divides: brand panel with the list,
+                                                     the person slides into the other half (focus = face height in %, object-position)
+     push   {text: "big / words", rows?: [..], color?, y?: 600}   наїзд кадру: a brand panel pushes the camera out to the left,
+                                                     then carries on out while the camera comes back from the right
+     steps  {items: ["a", "b", "c"], y?, row_times?}   numbered step panels slide up one over another
+     camera {move: "in"|"out"|"whip"|"shrink"|"shake", scale?, text?: "words / here" (shrink only)}   moves the clip itself:
+                                                     in = slow push-in, out = starts close and pulls back, whip = fast zoom hit,
+                                                     shrink = frame pulls back into a rounded window on the brand colour (words above), shake = jolt
+     (list and steps never cover the face: face.json moves them below the chin or above the head, shrinking if needed)
+     (every card and caption is checked against Instagram's Reels screen: scripts/safezones.py -> <reel>/safezones.json)
   Any card: "glass": true gives the frosted liquid-glass look (card, tag).
   Image paths: relative to the reel folder, or to ~/reels/assets/, or absolute.
 """
@@ -170,13 +182,20 @@ def sfx(name, t, db=-12, level="subtle", dur=None):
 SFX_OUT = []
 CARD_MUTE = False
 CARD_SFX = None
+ZONES = []   # where each graphic and caption sits, for the Instagram safe-zone check (scripts/safezones.py)
+def zone(cid, kind, a, b, box, text=True, full=False):
+    ZONES.append({"id": cid, "kind": kind, "start": round(a, 2), "end": round(b, 2), "box": [int(v) for v in box], "text": text, "full": full})
+def tw(text, px):   # rough rendered width of one line, centred
+    w = min(W, len(text) * EM * px); return (W - w) / 2, w
 def show(sel, a, b, fade=0.18):
     b = max(b, a + 0.12); fade = min(fade, (b - a) / 2)              # very short words: keep the fade after the reveal
     js.append(f'tl.set("{sel}",{{autoAlpha:1}},{q(a)});tl.to("{sel}",{{autoAlpha:0,duration:{fade}}},{q(b - fade)});')
 
 # ---- camera punch-ins ---------------------------------------------------------------------------------------------
+CAM_WIN = [(k["start"] - 0.3, (k.get("end") or k["start"] + 1.5) + 0.3) for k in edit.get("cards", []) if k["type"] in ("camera", "push")]
 for k, t in enumerate(edit.get("punch", [])):   # [t, scale] forces a zoom level (e.g. a spoken "zoom in")
     t, z = t if isinstance(t, list) else (t, 1.0 if k % 2 else 1.07)
+    if any(a0 <= t <= b0 for a0, b0 in CAM_WIN): continue   # a camera move owns the camera there
     js.append(f'tl.to("#cam",{{scale:{z},duration:0.22,ease:"power3.out",overwrite:"auto"}},{q(t)});')
 
 # ---- cards --------------------------------------------------------------------------------------------------------
@@ -187,6 +206,48 @@ PHRASE_ENDS = [w["end"] for k, w in enumerate(_tw) if re.search(r"[.,!?;:]$", w[
                or _tw[k + 1]["start"] - w["end"] > 0.35]
 def phrase_end(t):
     return next((e + 0.15 for e in PHRASE_ENDS if e > t + 1.0), min(t + 2.5, DUR))
+
+# the face (scripts/face_box.py -> face.json {"box": [x, y, w, h]}, cut-reel pixels): lists and steps never cover it
+_fj = reel / "face.json"
+FACE = json.load(open(_fj)).get("box") if _fj.exists() else None
+def off_face(c, h, default_y):
+    """Where a block of height h goes so it misses the face: (y, scale). Below the chin if it fits above Instagram's
+    bottom bar, else above the head, else shrunk into the bigger of the two gaps. "behind": true or "keep_y": true = as given."""
+    y = c.get("y", default_y)
+    if not FACE or c.get("behind") or c.get("keep_y"): return y, 1.0
+    fx, fy, fw, fh = FACE
+    head, chin = fy - 0.12 * fh, fy + fh                       # hair above the face box counts too
+    if (230 <= y and y + h <= head - 10) or (y >= chin + 10 and y + h <= 1480): return y, 1.0   # clear of the face and of Instagram's bars
+    below, above = (chin + 30, 1480 - (chin + 30)), (230, head - 20 - 230)
+    for top, room in (below, above):
+        if h <= room: return int(top), 1.0
+    top, room = max((below, above), key=lambda r: r[1])
+    return int(top), max(0.5, room / h)
+def zwrap(layer, y, z):
+    """Shrink the block just added to a layer around its top centre (the block's own tweens stay untouched)."""
+    if z < 0.999: layer[-1] = f'<div class="zw" style="transform:scale({z:.3f});transform-origin:540px {y}px">{layer[-1]}</div>'
+
+def row_times(c, a, b, n, first=0.45):
+    """When each row/step appears: the card's own "row_times" (spoken moments), else evenly spread, at most 0.9 s apart."""
+    if c.get("row_times"): return c["row_times"][:n] + [c["row_times"][-1] + 0.4 * (k + 1) for k in range(n - len(c["row_times"]))]
+    gap = min(0.9, max(0.3, (b - a - first - 0.8) / max(n, 1)))
+    return [a + first + gap * k for k in range(n)]
+
+# variety: a "list" card with no layout (or "auto") gets the next look in turn, never the one the previous list had.
+# The previous list-like graphic counts too ("card" = the white UI card).
+LIST_LAYOUTS = ["drop", "notes", "stack", "card"]
+_prev, _turn = None, 0
+for c in edit.get("cards", []):
+    if c["type"] == "card": _prev = "card"
+    if c["type"] != "list": continue
+    if c.get("layout", "auto") == "auto":
+        pick = [l for l in LIST_LAYOUTS[_turn:] + LIST_LAYOUTS[:_turn] if l != _prev][0]
+        _turn = (LIST_LAYOUTS.index(pick) + 1) % len(LIST_LAYOUTS); c["layout"] = pick
+    elif c["layout"] == _prev: print(f"variety: two lists in a row use the '{_prev}' layout ({c['start']:.1f}s) - pick another")
+    _prev = c["layout"]
+_seq = [(k["type"] + ("/" + k["layout"] if k.get("layout") else "")) for k in sorted(edit.get("cards", []), key=lambda k: k["start"])]
+for k in range(len(_seq) - 2):
+    if _seq[k] == _seq[k + 1] == _seq[k + 2]: print(f"variety: three '{_seq[k]}' graphics in a row - swap one for a list, split, push or steps")
 
 quiet = []                                      # spans where a card carries its own words, so captions step aside
 # "behind": true on a card puts it between the background and the person: the person is cut out (AI matting, local)
@@ -211,6 +272,7 @@ for i, c in enumerate(edit.get("cards", [])):
         show(f"#{cid}", a, b, 0.2)
         js.append(f'tl.fromTo("#{cid} .btl",{{y:140,opacity:0}},{{y:0,opacity:1,duration:0.6,ease:"power3.out",stagger:0.12}},{q(a)});')
         sfx("whoosh", a - 0.05, -13)
+        zone(cid, "bigtext", a, b, (*tw(max(lines, key=len), px)[:1], c.get("y", 430), tw(max(lines, key=len), px)[1], len(lines) * px * 0.86))
         continue
     if kind == "title":
         lines = [case(x.strip()) for x in c["text"].split("/")]
@@ -227,17 +289,22 @@ for i, c in enumerate(edit.get("cards", [])):
         if brand.get("title_glass"): js.append(f'tl.fromTo("#{cid} .tg",{{scale:0.9,opacity:0,filter:"blur(10px)"}},{{scale:1,opacity:1,filter:"blur(0px)",duration:0.4,ease:"power3.out"}},{q(a - 0.05)});')
         js.append(f'tl.fromTo("#{cid} .tl",{{clipPath:"inset(-40% 100% -40% 0%)",x:-30}},{{clipPath:"inset(-40% 0% -40% 0%)",x:0,duration:0.34,ease:"power3.out",stagger:0.25}},{q(a)});')
         sfx("snap", a + 0.03, -11)
+        _x, _w = tw(max(lines, key=len), max(sizes))
+        zone(cid, "title", a, b, (_x, c.get("y", brand.get("title_y", 360)), _w, sum(sizes) * 0.88))
     elif kind == "block":
         quiet.append((a, b))
         mid.append(f'<div id="{cid}" class="block" style="opacity:0;visibility:hidden;background:{c.get("color", MAIN)}">'
                    f'<div class="frame"><video id="{cid}v" src="master.mp4" muted playsinline data-start="{q(a)}" data-duration="{q(b - a)}" data-media-start="{q(a)}" data-track-index="{9 + i}"></video></div>'
                    f'<div class="bl" style="{font("head", fit(c.get("top", ""), 210))};top:230px;text-align:left;color:{LIGHT}">{esc(case(c.get("top", "")))}</div>'
-                   f'<div class="bl" style="{font("head", fit(c.get("bottom", ""), 210))};top:1490px;text-align:right;color:#fff">{esc(case(c.get("bottom", "")))}</div></div>')
+                   f'<div class="bl" style="{font("head", fit(c.get("bottom", ""), 210))};top:{1480 - int(fit(c.get("bottom", ""), 210) * 0.82)}px;text-align:right;color:#fff">{esc(case(c.get("bottom", "")))}</div></div>')
         js.append(f'tl.set("#{cid}",{{autoAlpha:1}},{q(a)});tl.fromTo("#{cid}",{{clipPath:"inset(0% 0% 0% 100%)"}},{{clipPath:"inset(0% 0% 0% 0%)",duration:0.22,ease:"power3.out"}},{q(a)});'
                   f'tl.fromTo("#{cid} .frame",{{scale:0.82}},{{scale:1,duration:0.5,ease:"back.out(1.6)"}},{q(a + 0.05)});'
                   f'tl.fromTo("#{cid} .bl",{{clipPath:"inset(0% 100% 0% 0%)"}},{{clipPath:"inset(0% 0% 0% 0%)",duration:0.34,ease:"power3.out",stagger:0.3}},{q(a + 0.12)});'
                   f'tl.to("#{cid}",{{clipPath:"inset(0% 100% 0% 0%)",duration:0.2,ease:"power3.in"}},{q(b - 0.2)});tl.set("#{cid}",{{autoAlpha:0}},{q(b)});')
         sfx("swish", a - 0.08, -12)
+        zone(cid, "block", a, b, (0, 0, W, H), full=True)
+        for _t, _y in ((c.get("top", ""), 230), (c.get("bottom", ""), 1480 - int(fit(c.get("bottom", ""), 210) * 0.82))):
+            if _t: zone(cid, "block text", a, b, (90, _y, 900, fit(_t, 210) * 0.82))
     elif kind == "overlay":
         # an image or video they uploaded at a moment on the review page (or dropped in the reel folder).
         # mode (size): "full" covers the frame, "big" a wide panel above the head, "small-r"/"small-l" a small card top right/left.
@@ -289,6 +356,7 @@ for i, c in enumerate(edit.get("cards", [])):
         if fx == "zoom":   # slow push-in on the picture itself for the whole time it is on screen
             js.append(f'tl.fromTo("#{cid} .m > *",{{scale:1}},{{scale:1.14,duration:{max(b - a, 0.5):.2f},ease:"none"}},{q(a)});')
         sfx("whoosh" if fx == "slide" else "pop" if fx == "polaroid" else "swish", a - 0.05, -13)
+        zone(cid, "overlay", a, b, (x, y, ow, oh), text=False, full=full)
     elif kind == "card":
         rows = c.get("rows", [])
         rt = c.get("row_times") or [a + 0.45 + 0.35 * j for j in range(len(rows))]
@@ -300,11 +368,13 @@ for i, c in enumerate(edit.get("cards", [])):
             js.append(f'tl.fromTo("#{cid}r{j}",{{autoAlpha:0,x:-60}},{{autoAlpha:1,x:0,duration:0.3,ease:"back.out(2)"}},{q(t)});')
             sfx("pop", t, -16, "lots")
         sfx("swish", a - 0.05, -13)
+        zone(cid, "card", a, b, (c.get("x", 90), c.get("y", 150), 900 * c.get("zoom", 1), (100 + 110 * len(rows)) * c.get("zoom", 1)))
     elif kind == "tag":
         front.append(f'<div id="{cid}" class="tagw" style="top:{c.get("y", 300)}px"><span class="tag{" glass" if c.get("glass", GLASS_ALL) else ""}" style="background:{c.get("color", POP)};{font("head", 58)}">{esc(case(c["text"]))}</span></div>')
         show(f"#{cid}", a, b)
         js.append(f'tl.fromTo("#{cid} .tag",{{scale:0.4,y:30,opacity:0}},{{scale:1,y:0,opacity:1,duration:0.42,ease:"back.out(3)"}},{q(a)});')
         sfx("pop", a, -14)
+        zone(cid, "tag", a, b, (tw(c["text"], 58)[0] - 42, c.get("y", 300), tw(c["text"], 58)[1] + 84, 100))
     elif kind == "cta":
         quiet.append((a, b))
         words = c["text"].split()
@@ -313,6 +383,7 @@ for i, c in enumerate(edit.get("cards", [])):
         show(f"#{cid}", a, b)
         js.append(f'tl.fromTo("#{cid} .cta",{{scale:0.5,y:60,opacity:0}},{{scale:1,y:0,opacity:1,duration:0.5,ease:"back.out(2.4)"}},{q(a)});')
         sfx("coin", a + 0.1, -12)
+        _px = brand.get("cta_px", 78); zone(cid, "cta", a, b, (tw(c["text"], _px)[0] - 48, c.get("y", 1360), tw(c["text"], _px)[1] + 96, _px * 1.2 + 44))
     elif kind == "shot":
         if c.get("y", 130) + 700 > CAP_Y: quiet.append((a, b))         # screenshot covers the caption zone: captions step aside
         front.append(f'<div id="{cid}" class="shot" style="top:{c.get("y", 130)}px"><div class="bar"><i style="background:#FF5F57"></i><i style="background:#FEBC2E"></i><i style="background:#28C840"></i>'
@@ -321,6 +392,7 @@ for i, c in enumerate(edit.get("cards", [])):
         js.append(f'tl.fromTo("#{cid}",{{y:-200,scale:0.8,rotation:3}},{{y:0,scale:1,rotation:1.5,duration:0.55,ease:"back.out(1.5)"}},{q(a)});'
                   f'tl.fromTo("#{cid} img",{{y:0}},{{y:-120,duration:{max(b - a - 0.8, 0.5):.2f},ease:"sine.inOut"}},{q(a + 0.6)});')
         sfx("swish", a - 0.05, -12); sfx("typing", a + 0.5, -17, dur=0.8)
+        zone(cid, "shot", a, b, (70, c.get("y", 130), 940, 684), text=False)
     elif kind == "image":
         srcs = c["src"] if isinstance(c["src"], list) else [c["src"]]
         spots = {1: [(540, 0)], 2: [(380, -6), (700, 7)], 3: [(300, -8), (540, 3), (780, 9)]}[min(len(srcs), 3)]
@@ -329,12 +401,14 @@ for i, c in enumerate(edit.get("cards", [])):
         show(f"#{cid}", a, b)
         js.append(f'tl.fromTo("#{cid} .ph",{{y:-260,opacity:0,scale:0.7}},{{y:0,opacity:1,scale:1,duration:0.5,ease:"back.out(1.7)",stagger:0.18}},{q(a)});')
         sfx("swish", a, -13)
+        zone(cid, "image", a, b, (90, 140, 900, 560), text=False)
     elif kind == "sticker":
         sz = c.get("size", 260)
         front.append(f'<div id="{cid}" class="stk" style="left:{c.get("x", 760) - sz // 2}px;top:{c.get("y", 420) - sz // 2}px;width:{sz}px"><img src="{img(c["src"])}" /></div>')
         show(f"#{cid}", a, b, 0.15)
         js.append(f'tl.fromTo("#{cid}",{{scale:0,rotation:-25}},{{scale:1,rotation:{c.get("rotate", 6)},duration:0.5,ease:"back.out(3)"}},{q(a)});')
         sfx("pop", a, -13)
+        zone(cid, "sticker", a, b, (c.get("x", 760) - sz // 2, c.get("y", 420) - sz // 2, sz, sz), text=False)
     elif kind == "page":
         bg = c.get("bg", LIGHT)
         rgb = tuple(int(LIGHT.lstrip("#")[k:k + 2], 16) for k in (0, 2, 4))
@@ -347,6 +421,8 @@ for i, c in enumerate(edit.get("cards", [])):
                   f'tl.fromTo("#{cid} .pf",{{y:300}},{{y:0,duration:0.5,ease:"back.out(1.4)"}},{q(a + 0.08)});'
                   f'tl.to("#{cid}",{{clipPath:"inset(0% 0% 100% 0%)",duration:0.25,ease:"power3.in"}},{q(b - 0.25)});tl.set("#{cid}",{{autoAlpha:0}},{q(b)});')
         sfx("swish", a - 0.08, -12)
+        zone(cid, "page", a, b, (0, 0, W, H), full=True)
+        if c.get("title"): zone(cid, "page title", a, b, (*tw(c["title"], 92)[:1], 150, tw(c["title"], 92)[1], 92))
     elif kind == "motion":
         src = next((f for f in (HF / "compositions").rglob(f"{c['name']}.html")), None)
         if not src:
@@ -370,6 +446,7 @@ for i, c in enumerate(edit.get("cards", [])):
                    f'style="position:absolute;left:{x}px;top:{y}px;width:{nw}px;height:{nh}px;transform:scale({sc:.4f});transform-origin:0 0;'
                    f'--brand:{MAIN};--accent:{POP};--accent-2:{C.get("soft", POP)};--surface:{LIGHT};--fg:{MAIN};--muted:{C.get("soft", POP)}"></div>')
         sfx("swish", a - 0.05, -12)
+        zone(cid, "motion", a, b, (x, y, bw, bh), text=False)
     elif kind == "custom":
         src = next((cand for cand in (reel / c["src"], HOME / "motion" / c["src"], Path(c["src"]).expanduser()) if cand.exists()), None)
         if not src:
@@ -394,6 +471,7 @@ for i, c in enumerate(edit.get("cards", [])):
             f'data-start="{q(a)}" data-duration="{q(b - a)}" data-track-index="{40 + i}" data-width="{nw}" data-height="{nh}" '
             f'style="position:absolute;left:{x}px;top:{y}px;width:{nw}px;height:{nh}px;transform:scale({sc:.4f});transform-origin:0 0"></div>')
         if c.get("sfx", "whoosh"): sfx(c.get("sfx", "whoosh"), a - 0.05, -12)
+        zone(cid, "custom", a, b, (x, y, bw, bh), text=False, full=bw >= W and bh >= H)
     elif kind == "follow":
         src = HF / "compositions/components/caption-camera-follow.html"
         t = src.read_text()
@@ -414,6 +492,180 @@ for i, c in enumerate(edit.get("cards", [])):
                      f'data-variable-values="{vals}" data-start="{q(a)}" data-duration="{q(dur)}" data-track-index="{40 + i}" '
                      f'style="position:absolute;inset:0;width:{W}px;height:{H}px"></div>')
         quiet.append((a, b)); sfx("sparkle", a, -12)
+    elif kind == "list":
+        # a list in one of several looks, so a reel with many lists never repeats one ("layout" picked in the pre-pass)
+        quiet.append((a, b))
+        lay, rows = c["layout"], [case(r) for r in c.get("rows", [])]
+        rt = row_times(c, a, b, len(rows))
+        ttl = case(c.get("title", ""))
+        dpx = min(fit(max(rows, key=len, default="") + "00", 84), 84)
+        lh = {"drop": (60 if ttl else 0) + len(rows) * dpx * 1.25, "notes": (70 if ttl else 20) + len(rows) * 78 + 48,
+              "stack": (66 if ttl else 0) + len(rows) * 94 + 10}.get(lay, 100 + 110 * len(rows))
+        y0, z = off_face(c, lh, 1180)
+        if lay == "drop":      # big words drop in one by one over the video, numbered
+            px = dpx
+            front.append(f'<div id="{cid}" class="ld" style="top:{y0}px">'
+                         + (f'<div class="ldt" style="{font("head", 44)};background:{POP};color:{MAIN}">{esc(ttl)}</div>' if ttl else "")
+                         + "".join(f'<div class="ldr" id="{cid}r{j}" style="{font("head", px)};color:{LIGHT}"><span class="ldn" style="{font("head", px * 0.5)};background:{C.get("soft", POP)};color:{MAIN}">{j + 1}</span>{esc(r)}</div>' for j, r in enumerate(rows)) + "</div>")
+            show(f"#{cid}", a, b)
+            if ttl: js.append(f'tl.fromTo("#{cid} .ldt",{{clipPath:"inset(0% 100% 0% 0%)"}},{{clipPath:"inset(0% 0% 0% 0%)",duration:0.3,ease:"power3.out"}},{q(a)});')
+            for j, t in enumerate(rt):
+                js.append(f'tl.fromTo("#{cid}r{j}",{{autoAlpha:0,y:-160,rotation:{(-5, 4)[j % 2]}}},{{autoAlpha:1,y:0,rotation:0,duration:0.5,ease:"bounce.out"}},{q(t)});')
+                sfx("hit_soft" if j % 2 else "pop", t + 0.25, -15)
+            zwrap(front, y0, z)
+        elif lay == "notes":   # a phone-notes sheet: each line types on, then its circle ticks in the soft colour
+            front.append(f'<div id="{cid}" class="ln" style="top:{y0}px">'
+                         + (f'<div class="lnt" style="{font("head", 44)};color:{MAIN}">{esc(ttl)}</div>' if ttl else "")
+                         + "".join(f'<div class="lnr" id="{cid}r{j}"><span class="lnc" style="border-color:{MAIN}"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="{MAIN}"/></svg></span>'
+                                   f'<span class="lnx" style="{font("body", min(fit(r, 50, 70), 50))};color:{MAIN}">{esc(r)}</span></div>' for j, r in enumerate(rows)) + "</div>")
+            show(f"#{cid}", a, b)
+            js.append(f'tl.fromTo("#{cid}",{{y:80,opacity:0,scale:0.96}},{{y:0,opacity:1,scale:1,duration:0.4,ease:"power3.out"}},{q(a)});')
+            soft = C.get("soft", POP)
+            for j, t in enumerate(rt):
+                js.append(f'tl.fromTo("#{cid}r{j}",{{autoAlpha:0}},{{autoAlpha:1,duration:0.05}},{q(t)});'
+                          f'tl.fromTo("#{cid}r{j} .lnx",{{clipPath:"inset(0% 100% 0% 0%)"}},{{clipPath:"inset(0% 0% 0% 0%)",duration:0.45,ease:"steps(12)"}},{q(t)});'
+                          f'tl.to("#{cid}r{j} .lnc",{{backgroundColor:"{soft}",borderColor:"{soft}",duration:0.15}},{q(t + 0.5)});'
+                          f'tl.fromTo("#{cid}r{j} path",{{strokeDashoffset:30}},{{strokeDashoffset:0,duration:0.25,ease:"power2.out"}},{q(t + 0.52)});')
+                sfx("typing", t, -19, dur=0.45); sfx("tap", t + 0.5, -14)
+            zwrap(front, y0, z)
+        elif lay == "stack":   # every item its own card, flying in from the side and piling up
+            cols = [(LIGHT, MAIN), (POP, MAIN), (C.get("soft", POP), MAIN)]
+            front.append(f'<div id="{cid}" class="ls" style="top:{y0}px">'
+                         + (f'<div class="ldt" style="{font("head", 44)};background:{MAIN};color:{LIGHT}">{esc(ttl)}</div>' if ttl else "")
+                         + "".join(f'<div class="lsr" id="{cid}r{j}" style="top:{(66 if ttl else 0) + j * 94}px;{font("head", min(fit(r, 54, 40), 54))};background:{cols[j % 3][0]};color:{cols[j % 3][1]};transform:rotate({(-1.5, 1.5)[j % 2]}deg)">{esc(r)}</div>' for j, r in enumerate(rows)) + "</div>")
+            show(f"#{cid}", a, b)
+            if ttl: js.append(f'tl.fromTo("#{cid} .ldt",{{scale:0.4,opacity:0}},{{scale:1,opacity:1,duration:0.35,ease:"back.out(3)"}},{q(a)});')
+            for j, t in enumerate(rt):
+                side = (1, -1)[j % 2]
+                js.append(f'tl.fromTo("#{cid}r{j}",{{autoAlpha:0,x:{side * 900},rotation:{side * 14}}},{{autoAlpha:1,x:0,rotation:{(-1.5, 1.5)[j % 2]},duration:0.5,ease:"back.out(1.4)"}},{q(t)});')
+                sfx("swish", t - 0.04, -15)
+            zwrap(front, y0, z)
+        else:   # "card": the white UI card, same as type "card"
+            rows_c = c.get("rows", [])
+            front.append(f'<div id="{cid}" class="card{" glass" if c.get("glass", GLASS_ALL) else ""}" style="top:{y0}px"><div class="ch" style="background:{MAIN};{font("head", 40)}"><i></i>{esc(ttl)}</div>'
+                         + "".join(f'<div class="cr" id="{cid}r{j}" style="{font("body", 50)};color:{MAIN}"><b style="background:{POP}"></b>{esc(case(r))}</div>' for j, r in enumerate(rows_c)) + "</div>")
+            show(f"#{cid}", a, b)
+            js.append(f'tl.fromTo("#{cid}",{{y:-160,scale:0.85,rotation:-3}},{{y:0,scale:1,rotation:-1.5,duration:0.5,ease:"back.out(1.6)"}},{q(a)});')
+            for j, t in enumerate(rt):
+                js.append(f'tl.fromTo("#{cid}r{j}",{{autoAlpha:0,x:-60}},{{autoAlpha:1,x:0,duration:0.3,ease:"back.out(2)"}},{q(t)});')
+            sfx("swish", a - 0.05, -13)
+            zwrap(front, y0, z)
+        zone(cid, "list " + lay, a, b, (540 - 450 * z, y0, 900 * z, lh * z))
+    elif kind == "split":
+        # the screen splits: the person slides into one half, a brand panel with the list fills the other
+        quiet.append((a, b))
+        side, rows = c.get("side", "top"), [case(r) for r in c.get("rows", [])]
+        bg = c.get("color", MAIN); fg = LIGHT if bg.lower() in (MAIN.lower(), C.get("deep", "").lower()) else MAIN
+        rt = row_times(c, a, b, len(rows))
+        fx, fy, fw, fh = FACE or (300, 500, 480, 600)
+        PANEL = c.get("panel", 760)          # the brand panel's share; the person keeps the rest (more of them than half)
+        if side == "left":   # person left, panel right; the window is centred on the face
+            win0, win1, pan, tx = "left:0;top:0;width:1080px;height:1920px", {"width": W - PANEL // 2}, f"left:{W - PANEL // 2}px;top:0;width:{PANEL // 2}px;height:1920px", (W - PANEL // 2 + 40, 300, PANEL // 2 - 80)
+            clip0 = "inset(0% 0% 0% 100%)"
+            pos = f"{max(0, min(100, (fx + fw / 2 - (W - PANEL // 2) / 2) / (PANEL // 2) * 100)):.0f}% 50%"
+        else:                # "top": panel above, the person below from just over the head down (face stays clear of Instagram's bottom bar)
+            win0, win1, pan, tx = "left:0;top:0;width:1080px;height:1920px", {"top": PANEL, "height": H - PANEL}, f"left:0;top:0;width:1080px;height:{PANEL}px", (90, 250, 900)
+            clip0 = "inset(0% 0% 100% 0%)"
+            src_top = max(0, fy - 0.12 * fh - c.get("headroom", 70))   # source row that lands at the window's top edge
+            pos = f"50% {max(0, min(100, src_top / PANEL * 100)):.0f}%"   # cover at scale 1 hides PANEL px of height
+        tpx = min(fit(c.get("title", ""), 104 if side != "left" else 64), 104)
+        room = (PANEL if side != "left" else 1480) - 30 - tx[1] - tpx * 1.3     # rows must end inside the panel / above the bottom bar
+        rpx = int(min(fit(max(rows, key=len, default=""), 64 if side != "left" else 46), 64, room / max(len(rows), 1) / 1.55))
+        mid.append(f'<div id="{cid}" class="sp" style="opacity:0;visibility:hidden">'
+                   f'<div class="spw" style="{win0}"><video id="{cid}v" src="master.mp4" muted playsinline data-start="{q(a)}" data-duration="{q(b - a)}" data-media-start="{q(a)}" data-track-index="{9 + i}" style="object-position:{pos}"></video></div>'
+                   f'<div class="spp" style="{pan};background:{bg}">'
+                   f'<div class="spt" style="left:{tx[0] - (540 if side == "left" else 0)}px;top:{tx[1]}px;width:{tx[2]}px;{font("head", tpx)};color:{fg}">{esc(case(c.get("title", "")))}</div>'
+                   + "".join(f'<div class="spr" id="{cid}r{j}" style="left:{tx[0] - (540 if side == "left" else 0)}px;top:{tx[1] + tpx * 1.3 + j * rpx * 1.55:.0f}px;width:{tx[2]}px;{font("body", rpx)};color:{fg}"><b style="background:{POP}"></b>{esc(r)}</div>' for j, r in enumerate(rows))
+                   + '</div></div>')
+        prop = ",".join(f"{k}:{v}" for k, v in win1.items()); back_ = ",".join(f"{k}:{ {'width': W, 'top': 0, 'height': H}[k]}" for k in win1)
+        js.append(f'tl.set("#{cid}",{{autoAlpha:1}},{q(a)});'
+                  f'tl.to("#{cid} .spw",{{{prop},duration:0.55,ease:"power3.inOut"}},{q(a)});'
+                  f'tl.fromTo("#{cid} .spp",{{clipPath:"{clip0}"}},{{clipPath:"inset(0% 0% 0% 0%)",duration:0.55,ease:"power3.inOut"}},{q(a)});'
+                  f'tl.fromTo("#{cid} .spt",{{y:40,opacity:0}},{{y:0,opacity:1,duration:0.4,ease:"power3.out"}},{q(a + 0.35)});'
+                  + "".join(f'tl.fromTo("#{cid}r{j}",{{autoAlpha:0,x:-50}},{{autoAlpha:1,x:0,duration:0.3,ease:"back.out(2)"}},{q(t)});' for j, t in enumerate(rt))
+                  + f'tl.to("#{cid} .spw",{{{back_},duration:0.45,ease:"power3.inOut"}},{q(b - 0.45)});'
+                  f'tl.to("#{cid} .spp",{{clipPath:"{clip0}",duration:0.45,ease:"power3.inOut"}},{q(b - 0.45)});tl.set("#{cid}",{{autoAlpha:0}},{q(b)});')
+        sfx("whoosh_soft", a - 0.05, -13); sfx("whoosh_soft", b - 0.45, -16)
+        for t in rt: sfx("pop", t, -16, "lots")
+        zone(cid, "split", a, b, (0, 0, W, H), full=True)
+        zone(cid, "split text", a, b, (tx[0], tx[1], tx[2], tpx * 1.3 + len(rows) * rpx * 1.55))
+    elif kind == "push":
+        # a new frame pushes the camera out of the way (наїзд кадру): a brand panel slides in from the right,
+        # the camera moves left with it; at the end the panel carries on out and the camera comes back from the right
+        quiet.append((a, b))
+        bg = c.get("color", POP); fg = LIGHT if bg.lower() in (MAIN.lower(), C.get("deep", "").lower()) else MAIN
+        lines = [case(x.strip()) for x in c.get("text", "").split("/") if x.strip()]
+        px = c.get("size") or min(fit(max(lines, key=len, default=""), 170), 170)
+        rows = [case(r) for r in c.get("rows", [])]
+        rt = row_times(c, a + 0.3, b, len(rows))
+        top = c.get("y", 600)
+        mid.append(f'<div id="{cid}" class="pu" style="opacity:0;visibility:hidden;background:{bg}">'
+                   + "".join(f'<div class="put" style="top:{top + k * px * 0.92:.0f}px;{font("head", px)};color:{fg}">{esc(x)}</div>' for k, x in enumerate(lines))
+                   + "".join(f'<div class="pur" id="{cid}r{j}" style="top:{top + len(lines) * px * 0.92 + 70 + j * 110:.0f}px;{font("body", min(fit(r, 64), 64))};color:{fg}"><b style="background:{MAIN if bg != MAIN else POP}"></b>{esc(r)}</div>' for j, r in enumerate(rows))
+                   + "</div>")
+        js.append(f'tl.set("#{cid}",{{autoAlpha:1}},{q(a)});'
+                  f'tl.fromTo("#{cid}",{{x:1080}},{{x:0,duration:0.5,ease:"power4.inOut"}},{q(a)});'
+                  f'tl.to("#cam",{{x:-540,duration:0.5,ease:"power4.inOut"}},{q(a)});'
+                  f'tl.fromTo("#{cid} .put",{{x:200,opacity:0}},{{x:0,opacity:1,duration:0.45,ease:"power3.out",stagger:0.1}},{q(a + 0.2)});'
+                  + "".join(f'tl.fromTo("#{cid}r{j}",{{autoAlpha:0,y:30}},{{autoAlpha:1,y:0,duration:0.3,ease:"back.out(2)"}},{q(t)});' for j, t in enumerate(rt))
+                  + f'tl.set("#cam",{{x:540}},{q(b - 0.5)});'
+                  f'tl.to("#{cid}",{{x:-1080,duration:0.5,ease:"power4.inOut"}},{q(b - 0.5)});'
+                  f'tl.to("#cam",{{x:0,duration:0.5,ease:"power4.inOut"}},{q(b - 0.5)});tl.set("#{cid}",{{autoAlpha:0}},{q(b)});')
+        sfx("whoosh_fast", a - 0.08, -12); sfx("whoosh_fast", b - 0.55, -14)
+        for t in rt: sfx("pop", t, -16, "lots")
+        zone(cid, "push", a, b, (0, 0, W, H), full=True)
+        zone(cid, "push text", a, b, (90, top, 900, len(lines) * px * 0.92 + 60 + len(rows) * 100))
+    elif kind == "camera":
+        # camera moves on the clip itself: in (slow push-in), out (starts close, pulls back), whip (fast zoom hit),
+        # shrink (the frame pulls back into a rounded window on the brand colour, room for words around it), shake
+        mv = c.get("move", "out")
+        if mv == "in":
+            js.append(f'tl.fromTo("#cam",{{scale:1}},{{scale:{c.get("scale", 1.18)},duration:{max(b - a, 0.5):.2f},ease:"sine.inOut"}},{q(a)});tl.set("#cam",{{scale:1}},{q(b)});')
+        elif mv == "out":
+            js.append(f'tl.fromTo("#cam",{{scale:{c.get("scale", 1.35)}}},{{scale:1,duration:{min(0.9, max(b - a, 0.4)):.2f},ease:"power3.out"}},{q(a)});')
+            sfx("whoosh_soft", a - 0.05, -15)
+        elif mv == "whip":
+            js.append(f'tl.to("#cam",{{scale:{c.get("scale", 1.3)},filter:"blur(5px)",duration:0.12,ease:"power2.in"}},{q(a)});'
+                      f'tl.to("#cam",{{scale:1.12,filter:"blur(0px)",duration:0.25,ease:"power3.out"}},{q(a + 0.12)});'
+                      f'tl.to("#cam",{{scale:1,duration:0.3,ease:"power2.inOut"}},{q(max(b - 0.3, a + 0.4))});')
+            sfx("whoosh_fast", a - 0.06, -13)
+        elif mv == "shrink":
+            z = c.get("scale", 0.74)
+            js.append(f'tl.to("#cam",{{scale:{z},y:{c.get("shift", 120)},borderRadius:{int(44 / z)},duration:0.55,ease:"power3.inOut"}},{q(a)});'
+                      f'tl.to("#cam",{{scale:1,y:0,borderRadius:0,duration:0.5,ease:"power3.inOut"}},{q(b - 0.5)});')
+            sfx("swish", a - 0.05, -14)
+            if c.get("text"):   # words in the space the frame leaves at the top
+                lines = [case(x.strip()) for x in c["text"].split("/") if x.strip()]
+                px = min(fit(max(lines, key=len), 120), 120)
+                back_lines = "".join(f'<div class="btl">{esc(x)}</div>' for x in lines)
+                mid.append(f'<div id="{cid}" class="bigtext" style="top:{c.get("y", 250)}px;{font("head", px)};color:{c.get("color", LIGHT)}">{back_lines}</div>')
+                show(f"#{cid}", a + 0.2, b - 0.3, 0.2)
+                js.append(f'tl.fromTo("#{cid} .btl",{{y:60,opacity:0}},{{y:0,opacity:1,duration:0.45,ease:"power3.out",stagger:0.1}},{q(a + 0.25)});')
+                quiet.append((a, b))
+                zone(cid, "camera text", a, b, (*tw(max(lines, key=len), px)[:1], c.get("y", 250), tw(max(lines, key=len), px)[1], len(lines) * px * 0.86))
+        elif mv == "shake":
+            js.append(f'tl.to("#cam",{{keyframes:[{{x:-14,rotation:-0.6}},{{x:12,rotation:0.5}},{{x:-8,rotation:-0.3}},{{x:5}},{{x:0,rotation:0}}],duration:0.4,ease:"none"}},{q(a)});')
+            sfx("hit_punch", a, -13)
+    elif kind == "steps":
+        # step panels slide up one over another; the one underneath shrinks back (кадри наїжджають)
+        quiet.append((a, b))
+        items = [case(x) for x in c.get("items", [])]
+        rt = row_times(c, a, b, len(items), first=0.0)
+        hh, dy = 220, 26                     # panel height; each older panel peeks out dy px below the new one
+        y0, z = off_face(c, hh + dy * max(len(items) - 1, 0), 1180)
+        styles = [(MAIN, LIGHT, POP), (LIGHT, MAIN, MAIN), (POP, MAIN, MAIN), (C.get("soft", POP), MAIN, MAIN)]
+        front.append(f'<div id="{cid}" class="st" style="top:{y0}px">' + "".join(
+            f'<div class="stp" id="{cid}r{j}" style="background:{styles[j % 4][0]};color:{styles[j % 4][1]}">'
+            f'<span class="stn" style="{font("head", 96)};color:{styles[j % 4][2]}">{j + 1:02d}</span>'
+            f'<span class="stx" style="{font("head", min(int((900 - 100 - 34 - 130) / (max(len(w) for w in x.split()) * EM)), 66))}">{esc(x)}</span></div>' for j, x in enumerate(items)) + "</div>")
+        show(f"#{cid}", a, b)
+        for j, t in enumerate(rt):
+            js.append(f'tl.fromTo("#{cid}r{j}",{{autoAlpha:0,y:900,rotation:{(3, -3)[j % 2]}}},{{autoAlpha:1,y:0,rotation:0,duration:0.55,ease:"power4.out"}},{q(t)});')
+            for k in range(j):   # everything underneath steps back
+                js.append(f'tl.to("#{cid}r{k}",{{y:{(j - k) * dy},scale:{1 - (j - k) * 0.05:.2f},filter:"brightness({1 - (j - k) * 0.18:.2f})",duration:0.5,ease:"power3.out"}},{q(t + 0.05)});')
+            sfx("whoosh_soft" if j else "swish", t - 0.05, -14)
+        zwrap(front, y0, z)
+        zone(cid, "steps", a, b, (540 - 450 * z, y0, 900 * z, (hh + dy * max(len(items) - 1, 0)) * z))
     else:
         print(f"warning: unknown card type {kind!r} - skipped")
 
@@ -468,6 +720,8 @@ for i, c in enumerate(edit.get("captions", [])):
                     else f'<span>{esc(case(w["text"]))}</span> ' for w in ws)
     front.append(f'<div id="c{i}" class="cap" style="top:{c.get("y", CAP_Y)}px;{font("cap", int(px))};color:{CAP};letter-spacing:{CAPS.get("tracking", -0.02)}em">{spans.strip()}</div>')
     show(f"#c{i}", c["start"], c["end"], 0.06)
+    _x, _w = tw(" ".join(w["text"] for w in ws), px)
+    zone(f"c{i}", "субтитри", c["start"], c["end"], (max(60, _x), c.get("y", CAP_Y), min(960, _w), px * big * 1.05))
     js.append(f'tl.fromTo("#c{i}",{{scale:0.86,y:14}},{{scale:1,y:0,duration:0.16,ease:"back.out(2)"}},{q(c["start"])});')
 
 # ---- assemble -----------------------------------------------------------------------------------------------------
@@ -477,17 +731,20 @@ doc = f"""<!doctype html>
 {chr(10).join(font_css)}
 html, body {{ margin: 0; background: #000; overflow: hidden; }}
 #stage {{ position: relative; width: {W // 2 if DRAFT else W}px; height: {H // 2 if DRAFT else H}px; overflow: hidden; }}
-#cam {{ position: absolute; inset: 0; transform-origin: 50% 38%; }}
+#cam {{ position: absolute; inset: 0; transform-origin: 50% 38%; overflow: hidden; }}
+#camBg {{ position: absolute; inset: 0; background: {MAIN}; }}   /* shows only when a camera move shrinks the frame */
 #cam > video {{ position: absolute; left: 0; top: 0; width: {W}px; height: {H}px; object-fit: cover; }}
 #back, #mid, #front {{ position: absolute; inset: 0; }}
-#back > :not(.clip), #mid > :not(.clip), #front > :not(.clip), #behind > :not(.clip) {{ visibility: hidden; opacity: 0; }}   /* .clip = HyperFrames motions, timed by the runtime */
+#back > :not(.clip):not(.zw), #mid > :not(.clip):not(.zw), #front > :not(.clip):not(.zw), #behind > :not(.clip):not(.zw) {{ visibility: hidden; opacity: 0; }}
+.zw {{ position: absolute; inset: 0; pointer-events: none; }}
+.zw > * {{ visibility: hidden; opacity: 0; }}   /* .clip = HyperFrames motions, timed by the runtime */
 .title {{ position: absolute; left: 0; top: 170px; width: {W}px; padding: 0 90px; box-sizing: border-box; line-height: .88; letter-spacing: -.045em; text-shadow: 0 0 3px rgba(0,0,0,.18), 0 6px 34px rgba(0,0,0,.4); }}
 .tl {{ white-space: nowrap; }}
 .block {{ position: absolute; inset: 0; }}
 #behind, #subj {{ position: absolute; inset: 0; }}
 .bigtext {{ position: absolute; left: 0; width: {W}px; text-align: center; line-height: .86; letter-spacing: -.045em; opacity: 0; visibility: hidden; }}
 .btl {{ white-space: nowrap; }}
-.frame {{ position: absolute; left: 250px; top: 440px; width: 580px; height: 1000px; overflow: hidden; border: 10px solid #fff; border-radius: 8px; box-shadow: 0 24px 60px rgba(0,0,0,.22); }}
+.frame {{ position: absolute; left: 279px; top: 400px; width: 522px; height: 900px; overflow: hidden; border: 10px solid #fff; border-radius: 8px; box-shadow: 0 24px 60px rgba(0,0,0,.22); }}
 .frame video {{ width: 100%; height: 100%; object-fit: cover; display: block; }}
 .bl {{ position: absolute; left: 0; width: {W}px; padding: 0 90px; box-sizing: border-box; line-height: .82; letter-spacing: -.05em; white-space: nowrap; }}
 .card {{ position: absolute; left: 90px; top: 150px; width: 900px; background: #fff; border-radius: 40px; overflow: hidden; padding-bottom: 22px; box-shadow: 0 30px 70px rgba(0,0,0,.25); }}
@@ -519,12 +776,40 @@ html, body {{ margin: 0; background: #000; overflow: hidden; }}
 .tg {{ display: inline-block; padding: 34px 56px 42px; border-radius: 44px; }}
 .title:has(.tg) {{ text-align: center; text-shadow: none; }}
 .card.glass .cr {{ color: #fff !important; border-bottom-color: rgba(255,255,255,.25); }}
+.ld {{ position: absolute; left: 90px; width: 900px; }}
+.ldt {{ display: inline-block; padding: 12px 30px; border-radius: 60px; margin-bottom: 18px; letter-spacing: -.01em; }}
+.ldr {{ display: flex; align-items: center; gap: 26px; line-height: 1.12; letter-spacing: -.035em; white-space: nowrap; text-shadow: 0 4px 26px rgba(0,0,0,.45); margin-bottom: .13em; }}
+.ldn {{ width: 1.9em; height: 1.9em; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex: none; text-shadow: none; }}
+.ln {{ position: absolute; left: 90px; width: 900px; box-sizing: border-box; padding: 24px 36px 20px; background: #FFFDF6; border-radius: 34px; box-shadow: 0 30px 70px rgba(0,0,0,.28); }}
+.lnt {{ letter-spacing: -.02em; padding-bottom: 12px; margin-bottom: 4px; border-bottom: 3px solid rgba(0,0,0,.07); }}
+.lnr {{ display: flex; align-items: center; gap: 24px; height: 78px; }}
+.lnc {{ width: 46px; height: 46px; border-radius: 50%; border: 4px solid; flex: none; box-sizing: border-box; display: flex; align-items: center; justify-content: center; }}
+.lnc svg {{ width: 30px; height: 30px; }}
+.lnc path {{ fill: none; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 30; stroke-dashoffset: 30; }}
+.lnx {{ letter-spacing: -.015em; white-space: nowrap; }}
+.ls {{ position: absolute; left: 90px; width: 900px; }}
+.lsr {{ position: absolute; left: 0; width: 900px; box-sizing: border-box; padding: 14px 40px; border-radius: 30px; letter-spacing: -.025em; white-space: nowrap; box-shadow: 0 20px 44px rgba(0,0,0,.25); }}
+.sp {{ position: absolute; inset: 0; }}
+.spw {{ position: absolute; overflow: hidden; }}
+.spw video {{ width: 100%; height: 100%; object-fit: cover; display: block; }}
+.spp {{ position: absolute; overflow: hidden; }}
+.spt {{ position: absolute; line-height: .95; letter-spacing: -.04em; }}
+.spr {{ position: absolute; display: flex; align-items: center; gap: 22px; letter-spacing: -.02em; }}
+.spr b, .pur b {{ width: 22px; height: 22px; border-radius: 50%; flex: none; }}
+.pu {{ position: absolute; inset: 0; }}
+.put {{ position: absolute; left: 90px; right: 90px; line-height: .92; letter-spacing: -.045em; white-space: nowrap; }}
+.pur {{ position: absolute; left: 90px; right: 90px; display: flex; align-items: center; gap: 24px; letter-spacing: -.02em; }}
+.st {{ position: absolute; left: 90px; width: 900px; height: 220px; }}
+.stp {{ position: absolute; inset: 0; border-radius: 40px; display: flex; align-items: center; gap: 34px; padding: 0 50px; box-sizing: border-box; box-shadow: 0 30px 70px rgba(0,0,0,.3); transform-origin: 50% 100%; }}
+.stn {{ line-height: 1; letter-spacing: -.05em; flex: none; }}
+.stx {{ line-height: 1.02; letter-spacing: -.03em; }}
 .cap {{ position: absolute; left: 60px; right: 60px; text-align: center; line-height: 1.02; letter-spacing: -.02em; text-shadow: 0 2px 14px rgba(0,0,0,.3); }}
 .cap .acc {{ text-shadow: 0 0 2px rgba(0,0,0,.25), 0 3px 22px rgba(0,0,0,.5); }}   /* accent colour stays readable over white screens, no outline */
 </style></head>
 <body>
 <div id="stage" data-composition-id="main" data-start="0" data-duration="{DUR}" data-fps="{FPS}" data-width="{W // 2 if DRAFT else W}" data-height="{H // 2 if DRAFT else H}">
   <div id="scaler" style="position:absolute;left:0;top:0;width:{W}px;height:{H}px;{'zoom:.5;' if DRAFT else ''}">
+  <div id="camBg"></div>
   <div id="cam"><video id="bg" class="clip" src="master.mp4" playsinline data-has-audio="true" data-start="0" data-duration="{DUR}" data-track-index="1"></video>
     <div id="behind">{"".join(behind)}</div><div id="subj">{"".join(subj)}</div>
     <div id="back">{"".join(back)}</div></div>
@@ -539,6 +824,8 @@ html, body {{ margin: 0; background: #000; overflow: hidden; }}
     window.__timelines["main"] = tl; }})();</script>
 </div></body></html>"""
 (proj / "index.html").write_text(doc)
+sys.path.insert(0, str(Path(__file__).resolve().parent)); import safezones
+safezones.save(reel, ZONES)
 (proj / "package.json").write_text('{"name":"reel","private":true,"type":"module"}')
 if CAPCUT:
     json.dump(cap_json, open(reel / "captions.json", "w"), indent=1)

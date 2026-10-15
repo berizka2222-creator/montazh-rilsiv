@@ -88,7 +88,7 @@
       let endSrc;
       if (g.w1 != null && !P.removed(g.w1)) endSrc = W[g.w1].e;
       else { let k = a; while (k < W.length - 1 && !/[.,!?;:]$/.test(W[k].text) && W[k + 1].s - W[k].e < 0.35 && P.toCut(W[k].e) - P.toCut(W[a].s) < 4) k++; endSrc = W[k].e; }
-      const minDur = g.type === "block" ? 2.2 : g.type === "card" ? 2.5 : g.type === "follow" ? 2.5 : 1;   // long enough to read past the entrance animation
+      const minDur = g.type === "block" ? 2.2 : ["card", "list", "split", "steps"].includes(g.type) ? 2.5 : g.type === "push" ? 2 : g.type === "follow" ? 2.5 : 1;   // long enough to read past the entrance animation
       const start = P.toCut(W[a].s), end = Math.max(start + minDur, P.toCut(endSrc) + 0.15);
       return { ...g, state, start, end: Math.min(end, P.cutDur), moved: a !== g.w0 };
     }).concat((d.overlays || []).map(o => {   // overlays they added on the page: an uploaded image/video (or big text) from a word, for o.dur seconds
@@ -223,6 +223,16 @@
     return out.join(",");
   }
 
-  const api = { plan, captions, graphics, hash, capY, capsAround, gradeNorm, gradeParams, gradeLut, gradeCube, gradeFilter, isNeutral, GKEYS };
+  // Instagram Reels screen over a 1080x1920 frame (measured off an iPhone; keep in sync with scripts/safezones.py).
+  // covered = the app draws over it; crop = cut off at the sides on taller phones; safe = where text and graphics belong.
+  const SAFE = {
+    covered: [{ id: "top", box: [0, 0, 1080, 220], label: "Верхня панель" },
+              { id: "bottom", box: [0, 1500, 1080, 420], label: "Нік, підпис, музика" },
+              { id: "buttons", box: [950, 1000, 130, 500], label: "Кнопки" }],
+    crop: [[0, 0, 60, 1920], [1020, 0, 60, 1920]],
+    safe: [60, 220, 960, 1280],
+  };
+
+  const api = { SAFE, plan, captions, graphics, hash, capY, capsAround, gradeNorm, gradeParams, gradeLut, gradeCube, gradeFilter, isNeutral, GKEYS };
   if (typeof module !== "undefined") module.exports = api; else root.ReelCore = api;
 })(this);

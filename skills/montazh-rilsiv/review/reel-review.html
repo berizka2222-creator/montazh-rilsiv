@@ -28,6 +28,14 @@ h1{font-family:var(--f-display);font-size:44px;line-height:1;margin:0;color:var(
 .capov{position:absolute;left:5%;right:5%;overflow:visible;text-align:center;line-height:1.02;text-shadow:0 2px 10px rgba(0,0,0,.4)}
 .capov .a{display:inline}
 .capov.ed .a{display:block;line-height:.95}
+.sz{position:absolute;inset:0;pointer-events:none;z-index:3}
+.sz svg{width:100%;height:100%;display:block}
+.sz .cov{fill:rgba(0,0,0,.5)}
+.sz .crop{fill:rgba(0,0,0,.28)}
+.sz .line{fill:none;stroke:#fff;stroke-width:4;stroke-dasharray:18 14;opacity:.9}
+.sz text{font:600 30px var(--f-body);fill:#fff;opacity:.92}
+.sz .ic{fill:none;stroke:#fff;stroke-width:5;opacity:.85}
+.b.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
 .clock{position:absolute;right:8px;bottom:8px;font:500 11px var(--f-mono);background:rgba(20,20,20,.72);color:#fff;border-radius:8px;padding:2px 7px}
 .scrub{display:flex;gap:10px;align-items:center}
 .scrub input{flex:1;min-width:0;accent-color:var(--pink)}
@@ -357,6 +365,7 @@ details{padding:8px 12px}
       <video id="v" playsinline preload="metadata"></video>
       <canvas class="gcv" id="gcv" hidden></canvas>
       <div class="overlay" id="ov"></div>
+      <div class="sz" id="sz" hidden aria-hidden="true"></div>
       <div class="clock" id="clock" hidden></div>
       <div class="noprev" id="noprev" hidden>Чернетки ще немає.<br>Збери її кнопкою «Зібрати чернетку».</div>
     </div>
@@ -364,6 +373,7 @@ details{padding:8px 12px}
       <button class="b quiet" id="back5" type="button" aria-label="Назад на 5 секунд">−5 с</button>
       <button class="b primary" id="rough" type="button">▶ Дивитись</button>
       <button class="b quiet" id="fwd5" type="button" aria-label="Вперед на 5 секунд">+5 с</button>
+      <button class="b quiet" id="szbtn" type="button" aria-pressed="false" title="Показати, що закриває інтерфейс Instagram">Зони</button>
     </div>
     <div class="scrub"><input type="range" id="scrub" min="0" max="60" step="0.1" value="0" aria-label="Позиція в чорновому монтажі"><span class="tc" id="pos">0:00.0</span></div>
     <p class="mode" id="mode">Чорновий монтаж: твої рішення одразу на відео. Склейки ще не згладжені, графіка показана рамками.</p>
@@ -521,6 +531,22 @@ try { const f = JSON.parse(localStorage.getItem("reelFonts") || "null");
 <script>
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const v = $("#v"), ov = $("#ov");
+// ---------- safe zones: the Instagram Reels screen over the video (ReelCore.SAFE) ----------
+function drawZones() {
+  const Z = ReelCore.SAFE, r = (b, cls) => `<rect class="${cls}" x="${b[0]}" y="${b[1]}" width="${b[2]}" height="${b[3]}" rx="${cls === "line" ? 24 : 0}"/>`;
+  const [bx, by] = Z.covered.find(z => z.id === "buttons").box;
+  const icons = [0, 1, 2, 3].map(k => `<circle class="ic" cx="${bx + 75}" cy="${by + 70 + k * 120}" r="30"/>`).join("");
+  const handle = ((R && R.handle) || "твій_нік").replace(/^@/, "");
+  $("#sz").innerHTML = `<svg viewBox="0 0 1080 1920" preserveAspectRatio="none">${Z.crop.map(b => r(b, "crop")).join("")}${Z.covered.map(z => r(z.box, "cov")).join("")}
+    ${r(Z.safe, "line")}${icons}<text x="70" y="130">Reels</text>
+    <circle class="ic" cx="105" cy="1590" r="34"/><text x="160" y="1601">${handle.replace(/[<&]/g, "")} · Стежити</text>
+    <text x="70" y="1690" opacity=".7">Підпис до рілса…</text><text x="70" y="1790" opacity=".7">♫ Оригінальний звук</text></svg>`;
+}
+function zonesOn(on) {
+  $("#sz").hidden = !on; $("#szbtn").setAttribute("aria-pressed", on); $("#szbtn").classList.toggle("on", on);
+  if (on) drawZones();
+  try { localStorage.setItem("reelZones", on ? "1" : ""); } catch (e) {}
+}
 const fmt = t => `${Math.floor(t / 60)}:${(Math.max(0, t) % 60).toFixed(1).padStart(4, "0")}`;
 let R = null, B = null, S = blank(), P = null, CAPS = [], GFX = [];
 let tab = "cuts", ref = null, saving = Promise.resolve(), timer = null, undo = [], mode = "idle", loop = null;
@@ -549,6 +575,8 @@ function mutate(fn) {
 }
 function doUndo() { if (!undo.length) return; S = JSON.parse(undo.pop()); $("#undo").disabled = !undo.length; recompute(); renderAll(); queueSave(); }
 $("#undo").addEventListener("click", doUndo);
+$("#szbtn").addEventListener("click", () => zonesOn($("#sz").hidden));
+try { if (localStorage.getItem("reelZones")) zonesOn(true); } catch (e) {}
 document.addEventListener("keydown", e => { if ((e.metaKey || e.ctrlKey) && e.key === "z" && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) { e.preventDefault(); doUndo(); } });
 
 // ---------- derived timeline ----------
@@ -1458,6 +1486,7 @@ async function load(id) {
     const rs = await DB.doc(d.reel).get(); if (!live()) return;
     if (!rs.exists) { $("#reelname").textContent = "Рілс ще не завантажено. Попроси Claude його завантажити."; pill("Нічого переглядати", true); return; }
     R = rs.data();
+    if (!$("#sz").hidden) drawZones();   // their own handle on the Instagram screen
     if (R.theme) {   // brand colours from brand.json
       const rt = document.documentElement;
       for (const [k, val] of Object.entries(R.theme)) if (k !== "scheme" && k !== "label") rt.style.setProperty("--" + k, val);
