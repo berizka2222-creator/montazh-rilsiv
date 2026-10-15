@@ -178,6 +178,13 @@ def show_votes(rdir, votes):
         print(f"Референс ({r['kind']}): {r['url']}" + (f"  asset {r['id']} ({r.get('name', '')})" if r.get("id") else ""))
 
 
+def _sample(rdir, vid):
+    """The variant's rendered example as uploaded to the page (rdir/uploads.json), so «Мої стилі» can show each style."""
+    up = Path(rdir).expanduser() / "uploads.json"
+    if not up.exists(): return None
+    u = json.load(open(up)); return {"url": u.get(f"{vid}.mp4"), "posterUrl": u.get(f"{vid}.jpg")} if u.get(f"{vid}.mp4") else None
+
+
 def apply(rdir, votes):
     page, spec, V, var, vt = read_votes(rdir, votes)
     STYLES.mkdir(exist_ok=True)
@@ -193,7 +200,7 @@ def apply(rdir, votes):
             name = v.get("name") or v["id"]
             st = {**v.get("style", {}), "name": name, "title": v["title"], "what": v.get("what", ""),
                   "locked": [{"element": "напрям", "what": v["title"], "note": V[k].get("note", ""), "round": n}],
-                  "maybe": [], "rejected": list(rej)}
+                  "maybe": [], "rejected": list(rej), "sample": _sample(rdir, k)}
             json.dump(st, open(STYLES / f"{name}.json", "w"), ensure_ascii=False, indent=1)
             print(f"style {name}: {v['title']} -> {STYLES / (name + '.json')}")
         state = {"round": n, "maybe": maybe, "rejected": rej}
@@ -207,6 +214,7 @@ def apply(rdir, votes):
             st["maybe"] = [m for m in st.get("maybe", []) if m.get("patch") != patch]
             if x.get("v") == "keep":
                 st = merge(st, patch, union=True)
+                if _sample(rdir, k): st["sample"] = _sample(rdir, k)   # the newest kept look is the style's example
                 st.setdefault("locked", []).append({"element": el, "what": v["title"], "note": note, "round": n, "patch": patch})
             elif x.get("v") == "drop":
                 st.setdefault("rejected", []).append({"element": el, "what": v["title"], "why": note, "round": n, "patch": patch})
@@ -240,7 +248,7 @@ def describe(st):
 
 
 def write_md():
-    styles = sorted(p for p in STYLES.glob("*.json"))
+    styles = sorted(p for p in STYLES.glob("*.json") if p.stem != "list")
     brand = json.load(open(HOME / "brand.json"))
     L = ["# Стилі монтажу", "",
          f"Стиль за замовчуванням: {brand.get('style') or ('`' + styles[0].stem + '`' if len(styles) == 1 else 'питати перед кожним монтажем')}.",
@@ -256,7 +264,7 @@ def write_md():
     if dj.exists() and json.load(open(dj)).get("maybe"):
         L += ["## Напрями на доопрацювання", ""] + [f"- {x['what']}" + (f": {x['note']}" if x.get("note") else "") for x in json.load(open(dj))["maybe"]] + [""]
     (STYLES / "STYLE.md").write_text("\n".join(L))
-    lst = {"items": [{"name": p.stem, "title": (st := json.load(open(p))).get("title", p.stem), "what": st.get("what", "")} for p in styles]}
+    lst = {"items": [{"name": p.stem, "title": (st := json.load(open(p))).get("title", p.stem), "what": st.get("what", ""), **(st.get("sample") or {})} for p in styles]}
     json.dump(lst, open(STYLES / "list.json", "w"), ensure_ascii=False, indent=1)   # -> ArtifactData set style/list (the picker on «Графіка»)
     print(f"{STYLES / 'STYLE.md'}, {STYLES / 'list.json'} (ArtifactData set style/list)")
 
@@ -476,6 +484,6 @@ if __name__ == "__main__":
     elif cmd == "votes": show_votes(a[1], a[2])
     elif cmd == "apply": apply(a[1], a[2])
     elif cmd == "list":
-        for p in sorted(STYLES.glob("*.json")):
+        for p in sorted(x for x in STYLES.glob("*.json") if x.stem != "list"):
             st = json.load(open(p)); print(f"{p.stem}: {st.get('title', '')}")
     else: sys.exit(__doc__)

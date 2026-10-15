@@ -380,6 +380,8 @@ details{padding:8px 12px}
 .sthead{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
 .sthead .grow{flex:1}
 #stzbtn.on{background:var(--accent);color:var(--on-accent)}
+#mystyles{margin-bottom:26px}
+.stbadge{display:inline-block;font:600 11px var(--f-body);letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:2px 8px;background:var(--keep);color:var(--on-accent);margin-left:6px;vertical-align:2px}
 #stnotebox input[type=url]{font:inherit;font-size:16px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 10px;flex:1;min-width:0;box-sizing:border-box}
 .strefs{display:flex;flex-direction:column;gap:8px;margin-top:6px}
 .stlinks{display:flex;flex-wrap:wrap;gap:6px}
@@ -528,6 +530,7 @@ details{padding:8px 12px}
     <section data-p="style" hidden>
       <div class="sthead"><p class="lede grow" id="stlede">Твій стиль монтажу збирається раундами: дивишся варіанти, лишаєш оцінку й нотатку, Claude робить наступний раунд.</p>
         <button class="b quiet" id="stzbtn" type="button" aria-pressed="false" title="Показати, що закриває інтерфейс Instagram">Зони</button></div>
+      <div id="mystyles"></div>
       <div class="tally" id="sttally"></div>
       <div id="stbox"><div class="empty">Раундів стилю ще немає. Попроси Claude почати «Стиль».</div></div>
       <div class="panel" id="stnotebox" hidden><label for="stnote">Загальна нотатка до раунду (необов'язково)</label>
@@ -1140,8 +1143,9 @@ function renderStylePick() {
   }
   const pick = STYLE_LIST.find(x => x.name === cur);
   const go = document.createElement("button"); go.type = "button"; go.className = "b quiet"; go.textContent = "Зібрати стилі"; go.addEventListener("click", () => showTab("style"));
-  $("#stylehint").textContent = !STYLE_LIST.length ? "Стилів ще немає. Збери їх на вкладці «Стиль» або монтуй тільки з брендом. " : cur === "brand" ? "Монтаж у кольорах і шрифтах бренду, без стилю." : pick ? pick.what : "Обери стиль до «Готово → Claude»: пропозиції графіки й звуки будуть у ньому.";
-  if (!STYLE_LIST.length) $("#stylehint").appendChild(go);
+  $("#stylehint").textContent = (!STYLE_LIST.length ? "Стилів ще немає. Збери їх на вкладці «Стиль» або монтуй тільки з брендом." : cur === "brand" ? "Монтаж у кольорах і шрифтах бренду, без стилю." : pick ? pick.what : "Обери стиль до «Готово → Claude»: пропозиції графіки й звуки будуть у ньому.") + " ";
+  if (STYLE_LIST.length) go.textContent = "Подивитись приклади стилів";
+  $("#stylehint").appendChild(go);
 }
 
 // ---------- hook + CTA typed on the page ----------
@@ -1487,7 +1491,7 @@ function renderStage() {
   else if (st.wait) set("Claude видає фінал", "Перевірка звуку, MP4 у папку Reels.", `<span class="spin"></span>Готується`);
   else set("Крок 4 · фінал", "Рілс готовий: MP4 у папці Reels.", "Готово ✓");
 }
-$("#gobtn").addEventListener("click", () => { const k = $("#gobtn").dataset.kind; if (k === "style") askStyle(); else if (k) askStep(k); });
+$("#gobtn").addEventListener("click", () => { const k = $("#gobtn").dataset.kind; if (k === "style") askStyle(); else if (k === "tographics") { showTab("graphics"); scrollTo({ top: 0, behavior: "smooth" }); } else if (k) askStep(k); });
 function askStep(kind) {
   const c = STEP[kind]; $("#mtitle").textContent = c.title; $("#mbody").innerHTML = typeof c.body === "function" ? c.body() : c.body; $("#myes").textContent = c.yes; $("#mno").textContent = "Ще ні";
   $("#myes").hidden = false; $("#modal").hidden = false; $("#myes").focus();
@@ -1544,7 +1548,7 @@ const stBlank = () => ({ round: STR?.id || null, verdicts: {}, note: "", refs: [
 function stVariants() { return (STR?.sections || []).flatMap(s => s.variants || []); }
 function stCount() { const c = { keep: 0, maybe: 0, drop: 0 }; for (const v of stVariants()) { const x = STV?.verdicts?.[v.id]?.v; if (x) c[x]++; } return c; }
 function stWaiting() { return !!(STR && STV?.sent && STV.round === STR.id); }
-function styleDot() { const d = document.querySelector('.tab[data-tab="style"] .dot'); if (d) d.hidden = !(STR && !stWaiting()); }
+function styleDot() { const d = document.querySelector('.tab[data-tab="style"] .dot'); if (d) d.hidden = !(STR && !STR.closed && !stWaiting()); }
 function stSave() {
   clearTimeout(stTimer);
   stTimer = setTimeout(async () => {
@@ -1557,8 +1561,37 @@ function stVote(id, v) {
   const cur = STV.verdicts[id] || {}; STV.verdicts[id] = { ...cur, v: cur.v === v ? null : v };
   renderStyle(); styleBar(); stSave();
 }
+function stPlayer(url, poster, label) {   // a muted looping example with a «Зі звуком» button (one plays with sound at a time)
+  const w = document.createElement("div"); w.className = "stpl";
+  w.innerHTML = `<video muted loop playsinline autoplay preload="metadata"></video><div class="sz" hidden aria-hidden="true"></div><button class="stsound" type="button" aria-pressed="false">Зі звуком</button>`;
+  const vid = w.querySelector("video"), sb = w.querySelector(".stsound"); vid.src = url; if (poster) vid.poster = poster; vid.setAttribute("aria-label", label || "Приклад");
+  sb.addEventListener("click", () => {
+    const on = vid.muted;
+    $$("section[data-p=style] video").forEach(x => { x.muted = true; const b = x.parentElement.querySelector(".stsound"); if (b) { b.setAttribute("aria-pressed", "false"); b.textContent = "Зі звуком"; } });
+    if (on) { vid.muted = false; vid.currentTime = 0; vid.play().catch(() => {}); sb.setAttribute("aria-pressed", "true"); sb.textContent = "Без звуку"; }
+  });
+  return w;
+}
+function renderMyStyles() {   // the styles already saved (db style/list, each with the example it was kept from)
+  const box = $("#mystyles"); if (!box) return; box.textContent = "";
+  if (!STYLE_LIST.length) return;
+  const h = document.createElement("h2"); h.style.marginTop = "0"; h.textContent = `Мої стилі (${STYLE_LIST.length})`;
+  const p = document.createElement("p"); p.className = "lede"; p.textContent = "Затверджені стилі з прикладами. Для рілса стиль обираєш на «Графіці».";
+  const grid = document.createElement("div"); grid.className = "stgrid";
+  for (const x of STYLE_LIST) {
+    const c = document.createElement("div"); c.className = "stv"; c.dataset.style = x.name;
+    if (x.url) c.appendChild(stPlayer(x.url, x.posterUrl, x.title));
+    const t = document.createElement("div"); t.className = "stt"; t.textContent = x.title || x.name;
+    if (R && S.style === x.name) { const b = document.createElement("span"); b.className = "stbadge"; b.textContent = "цей рілс"; t.appendChild(b); }
+    const w = document.createElement("p"); w.className = "stw"; w.textContent = x.what || "";
+    c.append(t, w); grid.appendChild(c);
+  }
+  box.append(h, p, grid);
+  if (stZones) box.querySelectorAll(".sz").forEach(z => { z.hidden = false; z.innerHTML = zonesSvg(STR?.handle || (R && R.handle) || ""); });
+}
 function renderStyle() {
-  const box = $("#stbox"); styleDot();
+  const box = $("#stbox"); styleDot(); renderMyStyles();
+  if (STR?.closed) { box.innerHTML = `<div class="empty">Оцінки записані у стилі вище. Новий раунд з'явиться тут, коли попросиш Claude.</div>`; $("#stnotebox").hidden = true; $("#sttally").textContent = ""; box.dataset.round = ""; return; }
   if (!STR) { box.innerHTML = `<div class="empty">Раундів стилю ще немає. Попроси Claude почати «Стиль».</div>`; $("#stnotebox").hidden = true; $("#sttally").textContent = ""; return; }
   if (STR.lede) $("#stlede").textContent = STR.lede;
   const playing = [...box.querySelectorAll("video")].find(x => !x.muted)?.dataset.id;   // keep the one with sound playing across re-renders
@@ -1606,6 +1639,7 @@ function stPaint() {   // verdicts, notes, zones onto the cards already built (v
     const ta = c.querySelector("textarea"); if (document.activeElement !== ta) ta.value = x.note || "";
     const z = c.querySelector(".sz"); z.hidden = !stZones; if (stZones && !z.innerHTML) z.innerHTML = zonesSvg(STR?.handle || (R && R.handle) || "");
   }
+  $$("#mystyles .sz").forEach(z => { z.hidden = !stZones; if (stZones && !z.innerHTML) z.innerHTML = zonesSvg(STR?.handle || (R && R.handle) || ""); });
   if (document.activeElement !== $("#stnote")) $("#stnote").value = STV?.note || "";
   renderStRefs();
   const n = stCount(), all = stVariants().length;
@@ -1653,7 +1687,7 @@ $("#stzbtn").addEventListener("click", () => { stZones = !stZones; $("#stzbtn").
 function styleBar() {
   const bar = $("#gobar"), txt = $("#gotext"), btn = $("#gobtn"); bar.hidden = false;
   const set = (t, sub, label, kind) => { txt.innerHTML = `<b>${t}</b><span class="sub">${sub}</span>`; btn.innerHTML = label; btn.dataset.kind = kind || ""; btn.disabled = !kind; };
-  if (!STR) return set("Стиль", "Claude ще не підготував раунд.", "Готово → Claude");
+  if (!STR || STR.closed) return STYLE_LIST.length ? set("Мої стилі", "Стиль для рілса обираєш на «Графіці».", "До «Графіки»", R ? "tographics" : "") : set("Стиль", "Claude ще не підготував раунд.", "Готово → Claude");
   const n = stCount(), done = n.keep + n.maybe + n.drop, all = stVariants().length;
   if (stWaiting()) return set("Claude готує наступний раунд", "Сторінка оновиться сама. Оцінки можна ще правити.", `<span class="spin"></span>Claude працює`);
   if (!done) return set(STR.title || "Стиль", "Оціни варіанти: залишити, можливо або прибрати.", "Готово → Claude");
@@ -1697,7 +1731,7 @@ async function loadStyle() {
   STV.verdicts = STV.verdicts || {};
   if (STR?.theme && !R) { const rt = document.documentElement; for (const [k, val] of Object.entries(STR.theme)) if (k !== "scheme" && k !== "label") rt.style.setProperty("--" + k, val); rt.setAttribute("data-theme", STR.theme.scheme || "light"); }
   styleDot(); if (tab === "style") { renderStyle(); styleBar(); }
-  else if (STR && !stWaiting() && !Object.keys(STV.verdicts).length) { $("#banner").textContent = `${STR.title || "Новий раунд стилю"}: відкрий вкладку «Стиль».`; $("#banner").hidden = false; }
+  else if (STR && !STR.closed && !stWaiting() && !Object.keys(STV.verdicts).length) { $("#banner").textContent = `${STR.title || "Новий раунд стилю"}: відкрий вкладку «Стиль».`; $("#banner").hidden = false; }
   let first = true;
   rr.onSnapshot(x => {   // Claude put up the next round: show it in place
     if (first) { first = false; return; }
@@ -1792,7 +1826,8 @@ async function load(id) {
   $("#ovbox").hidden = !assets; $("#ovnone").hidden = !!assets;
   await loadStyle();
   try { const x = await DB.doc("style/list").get(); STYLE_LIST = x.exists ? (JSON.parse(JSON.stringify(x.data())).items || []) : []; } catch (e) { STYLE_LIST = []; }
-  DB.doc("style/list").onSnapshot(x => { STYLE_LIST = x.exists ? (JSON.parse(JSON.stringify(x.data())).items || []) : []; if (R) renderStylePick(); }, () => {});
+  DB.doc("style/list").onSnapshot(x => { STYLE_LIST = x.exists ? (JSON.parse(JSON.stringify(x.data())).items || []) : []; if (R) renderStylePick(); if (tab === "style") { renderMyStyles(); styleBar(); } }, () => {});
+  if (tab === "style") { renderMyStyles(); styleBar(); }
   libRef = DB.doc("library/files");   // «Мої файли» live across reels
   try { const l = await libRef.get(); LIB = l.exists ? (l.data().items || []) : [];
     if (l.exists && /^https:\/\//.test(l.data().libraryUrl || "")) $("#eflib").href = l.data().libraryUrl;   // their own effects gallery, for every reel
