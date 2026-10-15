@@ -1754,7 +1754,11 @@ async function load(id) {
     const rv = await ref.get(); if (!live()) return; if (rv.exists) S = { ...blank(), ...JSON.parse(JSON.stringify(rv.data())) };
     // someone else (Claude, another tab) changed the decisions: take theirs instead of saving a stale copy over it
     subs.push(ref.onSnapshot(s => {
-      if (!live() || !s.exists || !R) return;
+      if (!live() || !R) return;
+      if (!s.exists) {   // Claude cleared the decisions (a new reel in the same slot): drop the old ones held in this tab
+        if (!dirty && JSON.stringify(S) !== JSON.stringify(blank())) { S = blank(); undo = []; mine = null; $("#undo").disabled = true; recompute(); renderAll(); setPos(0); pill("Новий рілс: старі рішення скинуто"); }
+        return;
+      }
       const d = s.data(); if (d.updatedAt === mine || dirty) return;
       if (JSON.stringify({ ...blank(), ...JSON.parse(JSON.stringify(d)) }) === JSON.stringify({ ...S })) return;   // same decisions (fields blank() adds included): nothing changed
       S = { ...blank(), ...JSON.parse(JSON.stringify(d)) }; undo = []; $("#undo").disabled = true;
