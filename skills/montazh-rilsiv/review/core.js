@@ -170,7 +170,8 @@
       .concat(d.capY != null ? [d.capY] : [])
       .concat(d.capSize != null ? ["sz" + d.capSize] : [])
       .concat(d.capFont ? [d.capFont] : [])
-      .concat(d.style ? ["st:" + d.style] : []));
+      .concat(d.style ? ["st:" + d.style] : [])
+      .concat(d.speedMul ? ["sp" + d.speedMul] : []));
     let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0;
     return (h >>> 0).toString(36);
   }

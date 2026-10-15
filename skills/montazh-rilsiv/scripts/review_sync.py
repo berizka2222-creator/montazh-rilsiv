@@ -210,6 +210,7 @@ def do_import(reel, review):
     cy = d.get("capY") if d.get("capY") is not None else (reel_json.get("style") or {}).get("capY")
     if cy is not None and cy != json.load(open(HOME / "brand.json")).get("captions", {}).get("y", 1250): extra["caption_y"] = cy   # this reel's own caption height
     if d.get("capSize") is not None: extra["caption_size"] = d["capSize"]   # the caption size she picked for this reel
+    if d.get("speedMul"): extra["motion_mul"] = d["speedMul"]; print("MOTION SPEED for this reel: x" + str(d["speedMul"]))   # «Повільніше / Швидше» on «Графіка»
     st = d.get("style")   # the editing style she picked on «Графіка» (~/reels/styles/<name>.json); "brand" = brand.json only
     if st:
         (reel / "style.txt").write_text("" if st == "brand" else st)

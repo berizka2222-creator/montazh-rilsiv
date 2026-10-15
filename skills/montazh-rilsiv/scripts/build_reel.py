@@ -808,8 +808,8 @@ for i, c in enumerate(edit.get("captions", [])):
     js.append(CAP_ANIM.get(S_CAP.get("anim", "pop"), CAP_ANIM["pop"]).replace("#C", f"#c{i}").replace("@T", str(q(c["start"]))))
 
 # ---- assemble -----------------------------------------------------------------------------------------------------
-if S_MOT.get("speed", 1) != 1:   # the style's motion speed: every tween and stagger runs faster (>1) or calmer (<1); start times stay on the words
-    _sp = float(S_MOT["speed"])
+_sp = float(S_MOT.get("speed", 1)) * float(edit.get("motion_mul", 1))   # the style's speed x this reel's «Повільніше / Швидше»
+if _sp != 1:   # every tween and stagger runs faster (>1) or calmer (<1); start times stay on the words
     js = [re.sub(r"\b(duration|stagger):([\d.]+)", lambda m: f"{m.group(1)}:{float(m.group(2)) / _sp:.3f}", x) for x in js]
 doc = f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8" />

@@ -381,6 +381,8 @@ details{padding:8px 12px}
 .sthead .grow{flex:1}
 #stzbtn.on{background:var(--accent);color:var(--on-accent)}
 #mystyles{margin-bottom:26px}
+.stacts{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.stacts .b{font-size:12.5px;padding:6px 10px}
 .stbadge{display:inline-block;font:600 11px var(--f-body);letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:2px 8px;background:var(--keep);color:var(--on-accent);margin-left:6px;vertical-align:2px}
 #stnotebox input[type=url]{font:inherit;font-size:16px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 10px;flex:1;min-width:0;box-sizing:border-box}
 .strefs{display:flex;flex-direction:column;gap:8px;margin-top:6px}
@@ -406,12 +408,12 @@ details{padding:8px 12px}
     </div>
     <div class="ctl">
       <button class="b quiet" id="back5" type="button" aria-label="Назад на 5 секунд">−5 с</button>
-      <button class="b primary" id="rough" type="button">▶ Дивитись</button>
+      <button class="b primary" id="rough" type="button" title="Сире відео з твоїми рішеннями: графіка тут показана рамками з текстом, справжня буде в чернетці">▶ Чорновий монтаж</button>
       <button class="b quiet" id="fwd5" type="button" aria-label="Вперед на 5 секунд">+5 с</button>
       <button class="b quiet" id="szbtn" type="button" aria-pressed="false" title="Показати, що закриває інтерфейс Instagram">Зони</button>
     </div>
     <div class="scrub"><input type="range" id="scrub" min="0" max="60" step="0.1" value="0" aria-label="Позиція в чорновому монтажі"><span class="tc" id="pos">0:00.0</span></div>
-    <p class="mode" id="mode">Чорновий монтаж: твої рішення одразу на відео. Склейки ще не згладжені, графіка показана рамками.</p>
+    <p class="mode" id="mode">Чорновий монтаж: твої рішення одразу на відео. Склейки ще не згладжені, графіка показана рамками з текстом. Справжній вигляд у вкладці «Чернетка».</p>
     <div class="savebar">
       <span class="pill" id="save" aria-live="polite">Не завантажено</span>
       <button class="b quiet" id="retry" type="button" hidden>Зберегти ще раз</button>
@@ -486,6 +488,8 @@ details{padding:8px 12px}
         <label id="stylepicklabel">Стиль монтажу</label>
         <div class="gpre" id="stylepick" role="group" aria-labelledby="stylepicklabel"></div>
         <p class="mode" id="stylehint" style="margin-top:4px"></p>
+        <label id="speedlabel">Швидкість руху графіки</label>
+        <div class="gpre" id="speedpick" role="group" aria-labelledby="speedlabel"></div>
         <label for="hooktext">Хук: заголовок на початку</label>
         <input type="text" id="hooktext" placeholder="Напр.: Чому не / виходить / заробляти? (/ = новий рядок)">
         <label for="ctatext">CTA: заклик у кінці (необов'язково)</label>
@@ -687,7 +691,7 @@ const resetBtn = $("#reset");
 
 // ---------- playback: line (raw) and continuous rough cut ----------
 let pos = 0;   // where the rough cut is, in cut time: pause, scrub and ±5 s all keep it
-function stopPlay() { mode = "idle"; cancelAnimationFrame(loop); v.pause(); v.playbackRate = 1; $("#rough").textContent = "▶ Дивитись"; }
+function stopPlay() { mode = "idle"; cancelAnimationFrame(loop); v.pause(); v.playbackRate = 1; $("#rough").textContent = "▶ Чорновий монтаж"; }
 function setPos(c) {
   pos = Math.max(0, Math.min(c, P.cutDur - 0.05));
   $("#scrub").max = P.cutDur.toFixed(1); $("#scrub").value = pos.toFixed(1);
@@ -744,7 +748,11 @@ function box(g, label) {
   Object.assign(el.style, { left: x / 10.8 + "%", top: y / 19.2 + "%", width: w / 10.8 + "%", height: h / 19.2 + "%" });
   if (g.imgUrl) el.style.backgroundImage = `linear-gradient(rgba(237,132,176,.15),rgba(237,132,176,.15)),url(${JSON.stringify(g.imgUrl)})`;
   if (g.imgUrl && g.user) Object.assign(el.style, { backgroundSize: "contain", backgroundRepeat: "no-repeat", backgroundPosition: "center" });   // their own pictures: shown whole
-  if (label) el.textContent = g.kind;
+  if (label) {   // the card's own words, so the rough cut says what will be there (the real look is in the draft)
+    const words = (g.text || g.title || g.top || "").replace(/\s*\/\s*/g, " ").trim() || (g.what || "");
+    el.textContent = g.kind + (words ? ": " + (words.length > 70 ? words.slice(0, 68) + "…" : words) : "");
+    el.style.whiteSpace = "normal"; el.style.textAlign = "center"; el.style.lineHeight = "1.2";
+  }
   return el;
 }
 function capEl(cap) {
@@ -970,7 +978,7 @@ function cardList(box, list) {
     const seg = document.createElement("div"); seg.className = "seg"; seg.setAttribute("role", "group"); seg.setAttribute("aria-label", "Рішення для " + g.kind);
     for (const k of ["k", "c", "d"]) {
       const b = document.createElement("button"); b.type = "button"; b.className = k; b.textContent = LABEL[k]; b.setAttribute("aria-pressed", st === k);
-      b.addEventListener("click", () => mutate(() => { S.board[g.id] = { ...(S.board[g.id] || {}), state: k }; }));
+      b.addEventListener("click", () => { mutate(() => { S.board[g.id] = { ...(S.board[g.id] || {}), state: k }; }); if (k === "c") setTimeout(() => document.getElementById("note-" + g.id)?.focus(), 0); });
       seg.appendChild(b);
     }
     const acts = document.createElement("div"); acts.className = "acts"; acts.append(seg);
@@ -1133,8 +1141,23 @@ $("#efadd").addEventListener("click", async () => {
 });
 
 // ---------- the editing style for this reel (db style/list, built on «Стиль»); saved as S.style, import writes <reel>/style.txt ----------
-let STYLE_LIST = [];
+let STYLE_LIST = [], STYLE_DEFAULT = null;
+function useDefaultStyle() {   // a reel with no style picked yet takes the one marked «Завжди цей»
+  if (R && !S.style && STYLE_DEFAULT && STYLE_LIST.some(x => x.name === STYLE_DEFAULT) && !B?.url) { S.style = STYLE_DEFAULT; recompute(); renderAll(); queueSave(); }
+}
+function placeStyleTab() {   // no styles yet: «Стиль» goes first, it is the first thing to do
+  const t = document.querySelector('.tab[data-tab="style"]'), bar = t?.parentElement; if (!t) return;
+  if (!STYLE_LIST.length && bar.firstElementChild !== t) { bar.prepend(t); t.classList.remove("tabx"); }
+  else if (STYLE_LIST.length && bar.lastElementChild !== t) { bar.appendChild(t); t.classList.add("tabx"); }
+}
+const SPEEDS = [[0.75, "Повільніше"], [1, "Як у стилі"], [1.3, "Швидше"]];
+function renderSpeedPick() {
+  const box = $("#speedpick"); if (!box) return; box.textContent = "";
+  for (const [v, t] of SPEEDS) { const b = document.createElement("button"); b.type = "button"; b.textContent = t; b.setAttribute("aria-pressed", (S.speedMul || 1) === v);
+    b.addEventListener("click", () => mutate(() => { if (v === 1) delete S.speedMul; else S.speedMul = v; })); box.appendChild(b); }
+}
 function renderStylePick() {
+  renderSpeedPick();
   const box = $("#stylepick"); if (!box) return; box.textContent = "";
   const cur = S.style || null, opts = [...STYLE_LIST.map(x => [x.name, x.title || x.name, x.what || ""]), ["brand", "Тільки бренд", "Кольори й шрифти бренду, без стилю"]];
   for (const [name, title, what] of opts) {
@@ -1474,6 +1497,13 @@ const STEP = {
     body: `<p class="lede">Claude перевірить звук і довжину й покладе готовий MP4 у папку Reels.</p>`,
     say: "фінал", text: "▶ Кнопка «Це фінал»: чернетка погоджена, видай фінал." },
 };
+function renderEta() {   // a rough clock for the draft: import + cut + precheck ~4 min, render ~2.2 s per second of reel at 540p (1 worker)
+  const at = (S.fixRequest && S.fixRequest.hash === B?.hash && B?.fixedFor !== S.fixRequest.at) ? S.fixRequest.at : S.buildRequest?.at;
+  if (!at || !P) return null;
+  const total = Math.max(4, Math.round((240 + P.cutDur * 2.2) / 60)), done = Math.max(0, Math.round((Date.now() - Date.parse(at)) / 60000));
+  return { done: Math.min(done, total + 5), total, pct: Math.min(95, Math.round(done / total * 100)) };
+}
+setInterval(() => { if (R && tab !== "style" && stage().wait) renderStage(); }, 30000);
 function renderStage() {
   if (tab === "style") { styleBar(); return; }
   if (!R) return;
@@ -1485,14 +1515,30 @@ function renderStage() {
   if (st.n === 1) set("Крок 1 · твій монтаж", "Коли все своє зроблено, передай Claude.", "Готово → пропозиції Claude", "graphics");
   else if (st.n === 2 && st.wait) set("Claude готує пропозиції", "Сторінка оновиться сама. Можеш далі правити своє.", `<span class="spin"></span>Claude працює`);
   else if (st.n === 2) set("Крок 2 · пропозиції Claude", "На «Графіці» все з позначкою «від Claude»: залиш, зміни або прибери.", "Зібрати чернетку", "build");
-  else if (st.n === 3 && st.wait) set("Claude збирає чернетку", "~6 хв. Прийде сповіщення, а тут відкриється «Чернетка».", `<span class="spin"></span>Рендериться`);
+  else if (st.n === 3 && st.wait) { const r = renderEta(); set("Claude збирає чернетку", r ? `Минуло ${r.done} хв з ~${r.total}. Сторінка відкриє «Чернетку» сама.` : "~6–10 хв. Сторінка відкриє «Чернетку» сама.", `<span class="spin"></span>${r ? r.pct + "%" : "Рендериться"}`); }
   else if (st.n === 3 && newRevs) set("Крок 3 · чернетка", `Нотаток: ${newRevs}. Віддай їх Claude одним натиском.`, "Виправити за нотатками", "fixes");
   else if (st.n === 3) set("Крок 3 · чернетка", "Подивись чернетку. Є що змінити? Лиши нотатку на секунді.", "Це фінал", "final");
   else if (st.wait) set("Claude видає фінал", "Перевірка звуку, MP4 у папку Reels.", `<span class="spin"></span>Готується`);
   else set("Крок 4 · фінал", "Рілс готовий: MP4 у папці Reels.", "Готово ✓");
 }
 $("#gobtn").addEventListener("click", () => { const k = $("#gobtn").dataset.kind; if (k === "style") askStyle(); else if (k === "tographics") { showTab("graphics"); scrollTo({ top: 0, behavior: "smooth" }); } else if (k) askStep(k); });
+function missingNotes() {   // «Змінити» with no note: Claude would have to guess what to change
+  return Object.entries(S.board || {}).filter(([id, b]) => b.state === "c" && !(b.note || "").trim()).map(([id]) => ({ id, kind: (GFX.find(g => g.id === id) || {}).kind || id }));
+}
 function askStep(kind) {
+  const miss = (kind === "graphics" || kind === "build") ? missingNotes() : [];
+  if (miss.length) {
+    $("#mtitle").textContent = "Що саме змінити?";
+    $("#mbody").innerHTML = `<p class="lede">Ти позначила «Змінити», але не написала що: ${miss.map(m => "<b>" + m.kind.replace(/[<&]/g, "") + "</b>").join(", ")}. Допиши коротко, і Claude зробить саме це.</p>`;
+    $("#myes").textContent = "Дописати"; $("#mno").textContent = "Надіслати так";
+    $("#myes").hidden = false; $("#modal").hidden = false; $("#myes").focus();
+    $("#myes").onclick = () => { $("#modal").hidden = true; showTab("graphics"); setTimeout(() => { const i = document.getElementById("note-" + miss[0].id); if (i) { i.scrollIntoView({ block: "center" }); i.focus(); } }, 50); };
+    $("#mno").onclick = () => { $("#mno").onclick = null; askStepGo(kind); };
+    return;
+  }
+  askStepGo(kind);
+}
+function askStepGo(kind) {
   const c = STEP[kind]; $("#mtitle").textContent = c.title; $("#mbody").innerHTML = typeof c.body === "function" ? c.body() : c.body; $("#myes").textContent = c.yes; $("#mno").textContent = "Ще ні";
   $("#myes").hidden = false; $("#modal").hidden = false; $("#myes").focus();
   $("#myes").onclick = () => sendStep(kind);
@@ -1533,7 +1579,7 @@ $("#revadd").addEventListener("click", () => {
 
 function renderAll() {
   renderCuts(); renderGraphics(); renderEffects(); renderCaptions(); renderSound(); renderPreview(); syncHookCta(); renderStage(); renderCapPlace(); renderStylePick();
-  const sent = { cuts: S.cut != null, overlays: (S.overlays || []).length, effects: (S.effects || []).length, graphics: Object.keys(S.board).length || (S.hook != null) || !!S.cta || !!S.style, captions: S.captions != null, sound: Object.keys(S.sfxOff).length || S.voiceClean === false || !ReelCore.isNeutral(S.grade) };
+  const sent = { cuts: S.cut != null, overlays: (S.overlays || []).length, effects: (S.effects || []).length, graphics: Object.keys(S.board).length || (S.hook != null) || !!S.cta || !!S.style || !!S.speedMul, captions: S.captions != null, sound: Object.keys(S.sfxOff).length || S.voiceClean === false || !ReelCore.isNeutral(S.grade) };
   $$(".tab:not(.tabx)").forEach(b => { const d = b.querySelector(".dot"); if (d) d.hidden = !sent[b.dataset.tab]; });
   styleDot();
 }
@@ -1572,6 +1618,27 @@ function stPlayer(url, poster, label) {   // a muted looping example with a «З
   });
   return w;
 }
+// «Доточити»: a round for one element of a saved style (scripts/style_lab.py element <style> <element>)
+const TUNE = [["captions", "Субтитри"], ["hook", "Хук"], ["lists", "Списки"], ["numbers", "Цифри"], ["split", "Розбивки екрану"], ["transitions", "Переходи"], ["cta", "CTA"], ["sounds", "Звуки"], ["motion", "Швидкість руху"]];
+function askTune(x, el, label) {
+  $("#mtitle").textContent = `Доточити «${x.title || x.name}»?`; $("#myes").textContent = "Так, роби раунд"; $("#mno").textContent = "Ще ні";
+  $("#mbody").innerHTML = `<p class="lede">Claude зробить раунд «${label}»: 3–5 варіантів цього стилю, у кожному змінено одну річ, слова ті самі. Він з'явиться тут, на «Стилі».</p>`;
+  $("#myes").hidden = false; $("#modal").hidden = false; $("#myes").focus();
+  $("#myes").onclick = async () => {
+    $("#myes").disabled = true; let sent = false;
+    try { if (comments && await comments.canSendToClaude() === "available") { await comments.sendToClaude({ anchor: await comments.anchorFor($("#mystyles")), text: `▶ «Стиль»: доточи стиль ${x.name} (${x.title || x.name}): ${el} (${label}).` }); sent = true; } } catch (e) {}
+    try { await DB.doc("style/request").set({ style: x.name, element: el, at: new Date().toISOString(), sent }); } catch (e) {}
+    $("#myes").disabled = false;
+    if (sent) { $("#modal").hidden = true; pill("Передано Claude"); }
+    else { $("#mtitle").textContent = "Збережено. Ще один крок"; $("#mbody").innerHTML = `<p class="lede">Claude зараз не на зв'язку зі сторінкою. Напиши йому в чаті:</p><p style="font-size:20px;font-weight:700;margin:6px 0 14px">«доточи ${(x.title || x.name).replace(/[<&]/g, "")}: ${label.toLowerCase()}»</p>`; $("#myes").hidden = true; $("#mno").textContent = "Зрозуміло"; }
+  };
+}
+function startPlan() {   // a new person: where they are on the way to the first reel
+  const done = [true, STYLE_LIST.length > 0, false], now = done.indexOf(false);
+  const steps = [["Бренд", "кольори, шрифти, елементи: Claude питає в чаті"], ["Стиль", "9 варіантів на 5 секундах твого відео, обираєш свої"], ["Перший рілс", "надішли Claude відео, тут з'явиться нарізка"]];
+  $("#banner").innerHTML = "<b>Як почати</b><ol style=\"margin:6px 0 0;padding-left:20px\">" + steps.map(([t, d], k) => `<li style="${k === now ? "font-weight:700" : "opacity:.75"}">${done[k] ? "✓ " : ""}${t}: ${d}</li>`).join("") + "</ol>";
+  $("#banner").hidden = false;
+}
 function renderMyStyles() {   // the styles already saved (db style/list, each with the example it was kept from)
   const box = $("#mystyles"); if (!box) return; box.textContent = "";
   if (!STYLE_LIST.length) return;
@@ -1583,8 +1650,19 @@ function renderMyStyles() {   // the styles already saved (db style/list, each w
     if (x.url) c.appendChild(stPlayer(x.url, x.posterUrl, x.title));
     const t = document.createElement("div"); t.className = "stt"; t.textContent = x.title || x.name;
     if (R && S.style === x.name) { const b = document.createElement("span"); b.className = "stbadge"; b.textContent = "цей рілс"; t.appendChild(b); }
+    if (STYLE_DEFAULT === x.name) { const b = document.createElement("span"); b.className = "stbadge"; b.textContent = "завжди"; t.appendChild(b); }
     const w = document.createElement("p"); w.className = "stw"; w.textContent = x.what || "";
-    c.append(t, w); grid.appendChild(c);
+    const acts = document.createElement("div"); acts.className = "stacts";
+    const def = document.createElement("button"); def.type = "button"; def.className = "b quiet"; def.textContent = STYLE_DEFAULT === x.name ? "Не за замовчуванням" : "Завжди цей";
+    def.title = "Новий рілс одразу бере цей стиль (на «Графіці» можна змінити)";
+    def.addEventListener("click", async () => { const v = STYLE_DEFAULT === x.name ? null : x.name;
+      try { await DB.doc("style/list").update({ default: v }); STYLE_DEFAULT = v; renderMyStyles(); pill(v ? "Стиль за замовчуванням: " + (x.title || x.name) : "Стиль за замовчуванням прибрано"); }
+      catch (e) { pill("Не збереглось (" + (e?.code || "error") + ")", true); } });
+    const sel = document.createElement("select"); sel.className = "sfxsel"; sel.setAttribute("aria-label", "Що доточити в стилі " + (x.title || x.name));
+    sel.innerHTML = `<option value="">Доточити…</option>` + TUNE.map(([k, t]) => `<option value="${k}">${t}</option>`).join("");
+    sel.addEventListener("change", () => { if (sel.value) askTune(x, sel.value, sel.selectedOptions[0].textContent); sel.value = ""; });
+    acts.append(def, sel);
+    c.append(t, w, acts); grid.appendChild(c);
   }
   box.append(h, p, grid);
   if (stZones) box.querySelectorAll(".sz").forEach(z => { z.hidden = false; z.innerHTML = zonesSvg(STR?.handle || (R && R.handle) || ""); });
@@ -1764,7 +1842,7 @@ async function load(id) {
   const d = docsFor(id), my = ++loadNo, live = () => my === loadNo;
   try {
     const rs = await DB.doc(d.reel).get(); if (!live()) return;
-    if (!rs.exists) { $("#reelname").textContent = "Рілс ще не завантажено. Попроси Claude його завантажити."; pill("Нічого переглядати", true); if (STR) showTab("style"); return; }
+    if (!rs.exists) { $("#reelname").textContent = "Рілс ще не завантажено. Попроси Claude його завантажити."; pill("Нічого переглядати", true); startPlan(); if (STR || !STYLE_LIST.length) showTab("style"); return; }
     R = rs.data();
     if (!$("#sz").hidden) drawZones();   // their own handle on the Instagram screen
     if (R.theme) {   // brand colours from brand.json
@@ -1816,6 +1894,7 @@ async function load(id) {
     $("#brand").value = S.brandRequest || "";
     renderAll(); showTab(["cuts", "overlays", "effects", "graphics", "captions", "sound", "preview", "style"].includes(location.hash.slice(1)) ? location.hash.slice(1) : tab || "cuts");
     pill(rv.exists ? "Збережені рішення завантажено" : "Готово");
+    useDefaultStyle();
   } catch (e) { if (live()) pill("Не вдалося завантажити рілс (" + (e?.code || "error") + "). Онови сторінку.", true); }
 }
 (async () => {
@@ -1825,8 +1904,10 @@ async function load(id) {
   comments = await window.claude?.use?.("comments");   // «Send to Claude» from the big button   // only editors get it; others don't see the overlay button
   $("#ovbox").hidden = !assets; $("#ovnone").hidden = !!assets;
   await loadStyle();
-  try { const x = await DB.doc("style/list").get(); STYLE_LIST = x.exists ? (JSON.parse(JSON.stringify(x.data())).items || []) : []; } catch (e) { STYLE_LIST = []; }
-  DB.doc("style/list").onSnapshot(x => { STYLE_LIST = x.exists ? (JSON.parse(JSON.stringify(x.data())).items || []) : []; if (R) renderStylePick(); if (tab === "style") { renderMyStyles(); styleBar(); } }, () => {});
+  const takeList = x => { const d = x.exists ? JSON.parse(JSON.stringify(x.data())) : {}; STYLE_LIST = d.items || []; STYLE_DEFAULT = d.default || null; };
+  try { takeList(await DB.doc("style/list").get()); } catch (e) { STYLE_LIST = []; }
+  placeStyleTab();
+  DB.doc("style/list").onSnapshot(x => { takeList(x); useDefaultStyle(); if (R) renderStylePick(); if (tab === "style") { renderMyStyles(); styleBar(); } placeStyleTab(); }, () => {});
   if (tab === "style") { renderMyStyles(); styleBar(); }
   libRef = DB.doc("library/files");   // «Мої файли» live across reels
   try { const l = await libRef.get(); LIB = l.exists ? (l.data().items || []) : [];

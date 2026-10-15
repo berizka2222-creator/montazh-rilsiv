@@ -30,6 +30,10 @@ The button sends «▶ Кнопка «Готово → Claude» у «Стилі�
    - elements: «Залишити» is merged into the style (list looks and camera moves add up), «Прибрати» is never offered again (a dropped push/steps also goes to `layouts.deny`), «Можливо» is listed to refine.
 3. Show her `STYLE.md` in two lines, then `ArtifactData set style/list` from `~/reels/styles/list.json` (apply writes it, with each style's example video from the round's `uploads.json`): that list is the «Мої стилі» gallery on «Стиль» and the «Стиль монтажу» picker on «Графіка», where she chooses the style per reel. Put up the next round if there is one; if not, `ArtifactData update style/round` with `{"closed": true}` so the page stops saying a round is coming. «Дай ще варіанти» or no keeps at all: a new directions round (other archetypes, their references, the «Можливо» ones fixed by the notes), never a dead end.
 
+## «Доточити» and «Завжди цей» (from the page)
+- A style card in «Мої стилі» has «Доточити…»: she picks an element and it sends «▶ «Стиль»: доточи стиль <name> (…): <element> (…)» (also saved in db `style/request`). Run `python3 scripts/style_lab.py element <name> <element>`, then `round`, upload, `page`, `ArtifactData set style/round` (and delete `style/votes`).
+- «Завжди цей» writes `default` into db `style/list`; a new reel with no style picked takes it. So when you refresh the list after a round, use `ArtifactData update style/list` with `{"items": [...]}` (never `set`), or her default is lost.
+
 ## Rounds 2+: element by element
 `python3 scripts/style_lab.py element <style> <element>` writes the round json from the catalogue (one change per variant, same words, rejected ones skipped), then `round`. Order: `captions`, `hook`, `lists`, `numbers`, `split` (split / push / steps), `transitions` (camera moves), `cta`, `sounds` (each sound on its own mini animation), `motion` (speed). A round may hold several sections: merge the generated jsons' `sections` into one file if she wants fewer rounds. «Можливо» variants come back fixed by her note (edit the variant's style patch by hand).
 
