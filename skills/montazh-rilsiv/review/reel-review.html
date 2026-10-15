@@ -381,6 +381,12 @@ details{padding:8px 12px}
 .sthead .grow{flex:1}
 #stzbtn.on{background:var(--accent);color:var(--on-accent)}
 #mystyles{margin-bottom:26px}
+.b.quiet.on,#szbtn.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.steps .sh{display:none}
+@media (max-width:560px){.steps .lg{display:none}.steps .sh{display:inline}}
+@media (max-width:820px){.tabs{-webkit-mask-image:linear-gradient(90deg,#000 82%,transparent);mask-image:linear-gradient(90deg,#000 82%,transparent);padding-right:40px}}
+.wrap.stylemode{grid-template-columns:minmax(0,1fr)}
+.wrap.stylemode .side{display:none}
 .stacts{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .stacts .b{font-size:12.5px;padding:6px 10px}
 .stbadge{display:inline-block;font:600 11px var(--f-body);letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:2px 8px;background:var(--keep);color:var(--on-accent);margin-left:6px;vertical-align:2px}
@@ -408,7 +414,7 @@ details{padding:8px 12px}
     </div>
     <div class="ctl">
       <button class="b quiet" id="back5" type="button" aria-label="Назад на 5 секунд">−5 с</button>
-      <button class="b primary" id="rough" type="button" title="Сире відео з твоїми рішеннями: графіка тут показана рамками з текстом, справжня буде в чернетці">▶ Чорновий монтаж</button>
+      <button class="b primary" id="rough" type="button" title="Сире відео з твоїми рішеннями: графіка тут показана рамками з текстом, справжня буде в чернетці">▶ Нарізка</button>
       <button class="b quiet" id="fwd5" type="button" aria-label="Вперед на 5 секунд">+5 с</button>
       <button class="b quiet" id="szbtn" type="button" aria-pressed="false" title="Показати, що закриває інтерфейс Instagram">Зони</button>
     </div>
@@ -422,7 +428,7 @@ details{padding:8px 12px}
     <p class="by">Скіл монтажу рілсів від <a href="https://instagram.com/inna_berezova" target="_blank" rel="noopener">@inna_berezova</a></p>
   </aside>
   <main>
-    <ol class="steps" id="steps" aria-label="Етапи"><li data-s="1"><span class="n">1</span>Твій монтаж</li><li data-s="2"><span class="n">2</span>Пропозиції Claude</li><li data-s="3"><span class="n">3</span>Чернетка</li><li data-s="4"><span class="n">4</span>Фінал</li></ol>
+    <ol class="steps" id="steps" aria-label="Етапи"><li data-s="1"><span class="n">1</span><span class="lg">Твій монтаж</span><span class="sh">Твоє</span></li><li data-s="2"><span class="n">2</span><span class="lg">Пропозиції Claude</span><span class="sh">Claude</span></li><li data-s="3"><span class="n">3</span>Чернетка</li><li data-s="4"><span class="n">4</span>Фінал</li></ol>
     <div class="banner" id="banner" hidden></div>
     <div class="tabs" role="tablist">
       <button class="tab" role="tab" data-tab="cuts">Нарізка <span class="dot" hidden></span></button>
@@ -547,7 +553,7 @@ details{padding:8px 12px}
     </section>
 
     <section data-p="preview" hidden>
-      <p class="lede">Збирає відео з твоїми рішеннями (~3 хв). Потім залиш нотатки на потрібних секундах.</p>
+      <p class="lede">Claude збирає відео з твоїми рішеннями (<span id="preveta">~7 хв</span>). Потім залиш нотатки на потрібних секундах.</p>
       <div class="state" id="bstate">Чернетку ще не зібрано.</div>
       <div class="ctl"><button class="b primary" id="build" type="button">Зібрати чернетку</button></div>
       <h2>Нотатки до чернетки</h2>
@@ -647,7 +653,7 @@ function showTab(t) {
   tab = t;
   $$(".tab").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t));
   $$("section[data-p]").forEach(s => s.hidden = s.dataset.p !== t);
-  $("#notesbox").hidden = t === "style";
+  $("#notesbox").hidden = t === "style"; document.querySelector(".wrap").classList.toggle("stylemode", t === "style");
   if (t === "style") { $("#nextbox").hidden = true; stopPlay(); renderStyle(); renderStage(); return; }
   if (!R) return;
   $("#notetab").textContent = { cuts: "нарізка", overlays: "накладення", effects: "ефекти", graphics: "графіка", captions: "субтитри", sound: "звук і колір", preview: "чернетка" }[t];
@@ -659,7 +665,9 @@ function showTab(t) {
   if (t !== "overlays" && placing && !placing.id) stopPlacing();
   if (t === "overlays" && assets && $("#ovbox").open && !placing) setTimeout(() => startPlacing(OV_PLACE[ovMode()]), 0);
   $("#noprev").hidden = !(t === "preview" && !B?.url);
-  if (t === "preview") { if (B?.url && v.getAttribute("src") !== B.url) { v.setAttribute("src", B.url); v.load(); } $("#rough").hidden = $("#back5").hidden = $("#fwd5").hidden = true; $(".scrub").hidden = true; v.controls = true; }
+  $("#mode").hidden = t === "preview"; $("#szbtn").hidden = t === "preview";
+  $("#sz").hidden = t === "preview" || $("#szbtn").getAttribute("aria-pressed") !== "true";
+  if (t === "preview") { $("#clock").hidden = true; if (B?.url && v.getAttribute("src") !== B.url) { v.setAttribute("src", B.url); v.load(); } $("#rough").hidden = $("#back5").hidden = $("#fwd5").hidden = true; $(".scrub").hidden = true; v.controls = true; }
   else { if (v.getAttribute("src") !== R.srcUrl) { v.setAttribute("src", R.srcUrl); v.load(); } $("#rough").hidden = $("#back5").hidden = $("#fwd5").hidden = false; $(".scrub").hidden = false; v.controls = false; }
   if (t === "captions" && R) { mode = "roughPaused"; v.currentTime = P.toSrc(pos); $("#clock").hidden = false; }
   gradeView(); overlay(pos); renderStage();
@@ -691,7 +699,7 @@ const resetBtn = $("#reset");
 
 // ---------- playback: line (raw) and continuous rough cut ----------
 let pos = 0;   // where the rough cut is, in cut time: pause, scrub and ±5 s all keep it
-function stopPlay() { mode = "idle"; cancelAnimationFrame(loop); v.pause(); v.playbackRate = 1; $("#rough").textContent = "▶ Чорновий монтаж"; }
+function stopPlay() { mode = "idle"; cancelAnimationFrame(loop); v.pause(); v.playbackRate = 1; $("#rough").textContent = "▶ Нарізка"; }
 function setPos(c) {
   pos = Math.max(0, Math.min(c, P.cutDur - 0.05));
   $("#scrub").max = P.cutDur.toFixed(1); $("#scrub").value = pos.toFixed(1);
@@ -937,7 +945,7 @@ function placeText(g) {
   const mid = y + h / 2; return (mid < 700 ? "Вгорі, над головою" : mid < 1250 ? "Посередині" : "Внизу") + (w < 600 ? (x + w / 2 < 540 ? ", ліворуч" : ", праворуч") : "");
 }
 function renderGraphics() {
-  const byTime = (a, b) => (a.gone - b.gone) || (a.start || 0) - (b.start || 0);
+  const byTime = (a, b) => (!!a.gone - !!b.gone) || (a.start || 0) - (b.start || 0);   // cut-out ones last
   const all = [...GFX].sort(byTime), mine = all.filter(g => g.user);
   const own = all.filter(g => g.user || g.own).length;
   const n = cardList($("#cards"), all), m = cardList($("#ovcards"), mine);
@@ -1440,6 +1448,7 @@ $("#reffile").addEventListener("change", async e => {
 
 // ---------- 5. preview ----------
 function renderPreview() {
+  if (P) $("#preveta").textContent = "~" + Math.max(4, Math.round((240 + P.cutDur * 2.2) / 60)) + " хв";
   const h = ReelCore.hash(decisions()), st = $("#bstate");
   st.className = "state";
   if (B?.url && B.hash === h) { st.textContent = `Чернетка актуальна (зібрано ${new Date(B.at).toLocaleString("uk-UA")}). Натисни play на відео.`; st.classList.add("ok"); }
