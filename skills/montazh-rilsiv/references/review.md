@@ -27,6 +27,10 @@ The page shows steps (1 her edit → 2 Claude's proposals → 3 draft → 4 fina
 - `finalRequest` / «фінал» → QA, deliver, covers only if brand.json `covers` isn't false; then `builds/latest` gets `final: true` (step 4).
 Reply in the comment thread in one line («Взяв, роблю пропозиції, ~10 хв») and resolve it when done. If no session is listening the page tells her to type the word in chat instead.
 
+## «Стиль» tab (their style, in rounds)
+
+The page also holds the style lab: db `style/round` (written by Claude: the round's sections and variants with their mp4/poster urls) and `style/votes` (her verdicts + notes). It works with or without a reel loaded. The «Готово → Claude» button there sends a «Send to Claude» comment naming the round. Everything else (making rounds, reading verdicts, writing styles) is in `references/style-lab.md`.
+
 ## Face, captions and «За мною»
 
 - Before `export`, run `python3 scripts/face_box.py <reel>`: macOS Vision finds the face on 12 frames and writes `<reel>/face.json`; `export` puts it into reel.json as `face`. Without it nothing is moved.

@@ -16,6 +16,13 @@ The workspace is `~/reels/` unless `REELS_HOME` is set.
 - **No `~/reels/brand.md`** → run the setup interview: read `references/setup-uk.md` first (design system + reference reels are required before the first edit), then `references/setup-interview.md`. Do not edit a clip without a brand file, even if they say "just use whatever". The interview takes 5 minutes and it is the whole point of this skill.
 - **Brand file exists** → read `brand.md` and `brand.json` in full, then continue.
 
+## Which style (before every edit)
+
+Their editing style lives in `~/reels/styles/<name>.json` + `STYLE.md`, built in rounds on the review page's «Стиль» tab (`references/style-lab.md`, `scripts/style_lab.py`). Several styles per account are normal.
+- **No styles yet** → offer the style lab once («Зберемо твій стиль монтажу? 3 варіанти на 5 секундах твого відео»); a no means brand.json alone, as before.
+- **One style** → use it. **Several** → ask «Яким стилем монтуємо?» with the styles as buttons (or brand.json `"style"` as the default), then write the name to `<reel>/style.txt`. Read that style's `STYLE.md` section before planning graphics: its Відхилено list is a hard no.
+- Never use someone else's style for a person: a student's styles come from their own rounds.
+
 ## First run on a new computer (do it yourself, never send the person to a terminal)
 The person works in the Claude desktop app, Code tab. Never ask them to open the Terminal. In this order, skipping what is already there:
 1. `python3` missing → run `xcode-select --install`: macOS opens a normal install window; tell them to click «Встановити» and wait, then continue.
@@ -87,7 +94,7 @@ Scribe gives exact word timing and hears "е/ем"; under 2 cents a reel ($0.22 
 3. Test it on 20 s of audio with `scripts/transcribe.py` (it should say "transcribed with ElevenLabs"). A bad key stops transcription with a clear message: fix the key or the balance, never work around it.
 
 ## Language
-`brand.json` "language" (e.g. `"uk"`) drives transcription, filler words and QA. Talk to the person in their language. The Reel Review page UI is in Ukrainian: write every `kind` and `what` in proposal.json in Ukrainian too, and treat «збери чернетку» as "build preview" and «фінал» as "final".
+`brand.json` "language" (e.g. `"uk"`) drives transcription, filler words and QA. Talk to the person in their language. The Reel Review page UI is in Ukrainian: write every `kind` and `what` in proposal.json in Ukrainian too, and treat «збери чернетку» as "build preview", «фінал» as "final" and «стиль» as "the style round is rated" (`references/style-lab.md`).
 Transcription is ElevenLabs Scribe for every language; fillers are hesitation sounds only (е, ем, ммм, хм; "ну" only on tight/fast pacing).
 
 ## Their brand rules win

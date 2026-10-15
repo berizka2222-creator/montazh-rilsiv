@@ -46,6 +46,8 @@ edit.json (written by auto_edit.py, then Claude marks accents and adds cards):
      (list and steps never cover the face: face.json moves them below the chin or above the head, shrinking if needed)
      (every card and caption is checked against Instagram's Reels screen: scripts/safezones.py -> <reel>/safezones.json)
   Any card: "glass": true gives the frosted liquid-glass look (card, tag).
+  Style: edit.json "style" / <reel>/style.txt / REEL_STYLE / brand "style" = a ~/reels/styles/<name>.json from scripts/style_lab.py
+  (brand overrides, allowed list looks and camera moves, rejected types, motion speed, caption entrance + accent look, sounds per event).
   Image paths: relative to the reel folder, or to ~/reels/assets/, or absolute.
 """
 import html, json, os, re, shutil, subprocess, sys
@@ -57,6 +59,45 @@ HOME = Path(os.environ.get("REELS_HOME", "~/reels")).expanduser()
 ENGINE = Path(__file__).resolve().parent.parent / "engine"
 brand = json.load(open(HOME / "brand.json"))
 edit = json.load(open(reel / "edit.json"))
+
+# ---- style (scripts/style_lab.py writes ~/reels/styles/<name>.json). Which one: edit.json "style", else <reel>/style.txt
+# (the name picked before the edit; survives review_sync import), else REEL_STYLE, else brand.json "style", else none --
+# {"brand": {..brand.json keys, deep-merged}, "layouts": {"list": [..], "camera": [..], "deny": [types]},
+#  "motion": {"speed": 1.0}, "captions": {"anim": "pop"|"rise"|"blur"|"slam"|"none", "accent": "color"|"box"|"underline"},
+#  "sounds": {"level": "none"|"subtle"|"lots", "gain_db": 0, "events": {"transition"|"row"|"title"|"hit"|"accent"|"cta"|"typing": name|null}}}
+def _merge(a, b):
+    out = dict(a)
+    for k, v in b.items(): out[k] = _merge(out[k], v) if isinstance(v, dict) and isinstance(out.get(k), dict) else v
+    return out
+_st = reel / "style.txt"
+STYLE, STYLE_NAME = {}, edit.get("style") or (_st.read_text().strip() if _st.exists() else "") or os.environ.get("REEL_STYLE") or brand.get("style")
+if STYLE_NAME:
+    _sp = Path(STYLE_NAME).expanduser()
+    if not _sp.suffix: _sp = HOME / "styles" / f"{STYLE_NAME}.json"
+    if not _sp.exists(): sys.exit(f"style not found: {_sp} (ls ~/reels/styles)")
+    STYLE = json.load(open(_sp)); brand = _merge(brand, STYLE.get("brand", {}))
+    print(f"style: {STYLE.get('title') or _sp.stem}")
+S_LAY, S_MOT, S_CAP, S_SND = STYLE.get("layouts", {}), STYLE.get("motion", {}), STYLE.get("captions", {}), STYLE.get("sounds", {})
+if S_SND.get("level"): brand["sfx"] = S_SND["level"]
+if "gain_db" in S_SND: brand["sfx_gain_db"] = brand.get("sfx_gain_db", 8) + S_SND["gain_db"]
+SFX_EVENT = {"whoosh": "transition", "whoosh_soft": "transition", "whoosh_fast": "transition", "swish": "transition",
+             "pop": "row", "hit_soft": "row", "tap": "row", "snap": "title", "hit_punch": "hit", "sparkle": "accent",
+             "chime": "accent", "coin": "cta", "typing": "typing"}   # built-in sound -> the event a style can re-voice
+# types the style rejects: lists/splits/pushes/steps become a list in an allowed look, camera moves are dropped
+for c in edit.get("cards", []):
+    if c["type"] not in S_LAY.get("deny", []): continue
+    print(f"style: '{c['type']}' is rejected in this style ({c['start']:.1f}s)", end=" ")
+    if c["type"] in ("split", "push", "steps"):
+        rows = c.get("rows") or c.get("items") or []
+        c.update(type="list", rows=rows or [x.strip() for x in c.get("text", "").split("/") if x.strip()],
+                 title=c.get("title") or (c.get("text", "").replace("/", " ") if c.get("rows") else ""))
+        c.pop("layout", None); print("-> list")
+    else: c["type"] = "_skip"; print("-> left out")
+for c in edit.get("cards", []):
+    if c["type"] == "camera" and S_LAY.get("camera") and c.get("move", "out") not in S_LAY["camera"]:
+        if c.get("text"):   # a shrink carrying words (a number, a credential): the words stay, as big text
+            print(f"style: camera '{c.get('move')}' -> big text ({c['start']:.1f}s)"); c.update(type="bigtext", y=c.get("y", 300), quiet=True); continue
+        print(f"style: camera '{c.get('move', 'out')}' -> '{S_LAY['camera'][0]}' ({c['start']:.1f}s)"); c["move"] = S_LAY["camera"][0]
 
 C = brand["colors"]
 MAIN, POP, LIGHT = C["main"], C["pop"], C.get("light", "#FFFFFF")
@@ -169,6 +210,9 @@ def sfx(name, t, db=-12, level="subtle", dur=None):
     if CARD_SFX and level == "subtle":                    # the sound approved in the review replaces the entrance sound
         name, db = {"sparkle": "chime"}.get(CARD_SFX["name"], CARD_SFX["name"]) if not CAPCUT else CARD_SFX["name"], CARD_SFX.get("db", db)
         CARD_SFX = None
+    elif SFX_EVENT.get(name) in S_SND.get("events", {}):   # the style's sound for this event (null = silent)
+        name = S_SND["events"][SFX_EVENT[name]]
+        if not name: return
     if brand.get("sfx", "subtle") == "none" or (level == "lots" and brand.get("sfx") != "lots") or t >= DUR: return
     vol = round(min(1.0, 10 ** ((db + brand.get("sfx_gain_db", 8)) / 20)), 3)   # +8 dB: clearly audible under a voice with no music bed
     if CAPCUT:
@@ -235,13 +279,15 @@ def row_times(c, a, b, n, first=0.45):
 
 # variety: a "list" card with no layout (or "auto") gets the next look in turn, never the one the previous list had.
 # The previous list-like graphic counts too ("card" = the white UI card).
-LIST_LAYOUTS = ["drop", "notes", "stack", "card"]
+LIST_LAYOUTS = [l for l in ["drop", "notes", "stack", "card"] if l in S_LAY.get("list", ["drop", "notes", "stack", "card"])] or ["card"]
 _prev, _turn = None, 0
 for c in edit.get("cards", []):
     if c["type"] == "card": _prev = "card"
     if c["type"] != "list": continue
+    if c.get("layout", "auto") not in LIST_LAYOUTS + ["auto"]:   # a look this style rejected
+        print(f"style: list look '{c['layout']}' is not in this style ({c['start']:.1f}s) - using the style's looks"); c["layout"] = "auto"
     if c.get("layout", "auto") == "auto":
-        pick = [l for l in LIST_LAYOUTS[_turn:] + LIST_LAYOUTS[:_turn] if l != _prev][0]
+        pick = ([l for l in LIST_LAYOUTS[_turn:] + LIST_LAYOUTS[:_turn] if l != _prev] or LIST_LAYOUTS)[0]
         _turn = (LIST_LAYOUTS.index(pick) + 1) % len(LIST_LAYOUTS); c["layout"] = pick
     elif c["layout"] == _prev: print(f"variety: two lists in a row use the '{_prev}' layout ({c['start']:.1f}s) - pick another")
     _prev = c["layout"]
@@ -263,6 +309,7 @@ for i, c in enumerate(edit.get("cards", [])):
     back, mid, front = (behind, behind, behind) if c.get("behind") else (_BACK, _MID, _FRONT)
     if c.get("quiet"): quiet.append((a, b))      # review_sync: no room for this card and the captions at once
     if c.get("behind"): BEHIND_WIN.append((a, b))
+    if kind == "_skip": continue                 # a type the style rejects (see the style block at the top)
     if kind == "bigtext":
         # big words in the brand's head font, usually behind the head ("behind": true); "/" breaks lines
         lines = [case(x.strip()) for x in c.get("text", "").split("/") if x.strip()]
@@ -378,8 +425,8 @@ for i, c in enumerate(edit.get("cards", [])):
     elif kind == "cta":
         quiet.append((a, b))
         words = c["text"].split()
-        inner = " ".join(f'<span style="color:{POP}">{esc(w)}</span>' if w.isupper() and len(w) > 1 else esc(case(w)) for w in words)
-        front.append(f'<div id="{cid}" class="ctaw" style="top:{c.get("y", 1360)}px"><span class="cta{" glass" if c.get("glass", GLASS_ALL) else ""}" style="{font("head", brand.get("cta_px", 78))};color:{MAIN};background:{LIGHT}">{inner}</span></div>')
+        inner = " ".join(f'<span style="color:{MAIN if brand.get("cta_bg", LIGHT).lower() == POP.lower() else POP}">{esc(w)}</span>' if w.isupper() and len(w) > 1 else esc(case(w)) for w in words)
+        front.append(f'<div id="{cid}" class="ctaw" style="top:{c.get("y", 1360)}px"><span class="cta{" glass" if c.get("glass", brand.get("cta_glass", GLASS_ALL)) else ""}" style="{font("head", brand.get("cta_px", 78))};color:{MAIN};background:{brand.get("cta_bg", LIGHT)}">{inner}</span></div>')
         show(f"#{cid}", a, b)
         js.append(f'tl.fromTo("#{cid} .cta",{{scale:0.5,y:60,opacity:0}},{{scale:1,y:0,opacity:1,duration:0.5,ease:"back.out(2.4)"}},{q(a)});')
         sfx("coin", a + 0.1, -12)
@@ -620,9 +667,9 @@ for i, c in enumerate(edit.get("cards", [])):
         # shrink (the frame pulls back into a rounded window on the brand colour, room for words around it), shake
         mv = c.get("move", "out")
         if mv == "in":
-            js.append(f'tl.fromTo("#cam",{{scale:1}},{{scale:{c.get("scale", 1.18)},duration:{max(b - a, 0.5):.2f},ease:"sine.inOut"}},{q(a)});tl.set("#cam",{{scale:1}},{q(b)});')
+            js.append(f'tl.fromTo("#cam",{{scale:1}},{{scale:{c.get("scale", 1.18)},immediateRender:false,duration:{max(b - a, 0.5):.2f},ease:"sine.inOut"}},{q(a)});tl.set("#cam",{{scale:1}},{q(b)});')
         elif mv == "out":
-            js.append(f'tl.fromTo("#cam",{{scale:{c.get("scale", 1.35)}}},{{scale:1,duration:{min(0.9, max(b - a, 0.4)):.2f},ease:"power3.out"}},{q(a)});')
+            js.append(f'tl.fromTo("#cam",{{scale:{c.get("scale", 1.35)}}},{{scale:1,immediateRender:false,duration:{min(0.9, max(b - a, 0.4)):.2f},ease:"power3.out"}},{q(a)});')
             sfx("whoosh_soft", a - 0.05, -15)
         elif mv == "whip":
             js.append(f'tl.to("#cam",{{scale:{c.get("scale", 1.3)},filter:"blur(5px)",duration:0.12,ease:"power2.in"}},{q(a)});'
@@ -700,6 +747,17 @@ if BEHIND_WIN:
                     f'data-media-start="0" data-track-index="{70 + k}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></video>')
 
 # ---- captions -----------------------------------------------------------------------------------------------------
+# how a caption comes on and how its accent word looks: the style's "captions" block (default = pop + accent colour)
+CAP_ANIM = {"pop": 'tl.fromTo("#C",{scale:0.86,y:14},{scale:1,y:0,duration:0.16,ease:"back.out(2)"},@T);',
+            "rise": 'tl.fromTo("#C",{y:46},{y:0,duration:0.24,ease:"power3.out"},@T);',
+            "blur": 'tl.fromTo("#C",{filter:"blur(10px)",scale:1.05},{filter:"blur(0px)",scale:1,duration:0.28,ease:"power2.out"},@T);',
+            "slam": 'tl.fromTo("#C",{scale:1.45},{scale:1,duration:0.13,ease:"power4.out"},@T);',
+            "none": ""}
+def acc_look(col):
+    look = S_CAP.get("accent", "color")
+    if look == "box": return f"color:{MAIN};background:{col};padding:0 .16em;border-radius:.14em;text-shadow:none;box-decoration-break:clone;-webkit-box-decoration-break:clone"
+    if look == "underline": return f"color:{CAP};box-shadow:inset 0 -.2em 0 {col}"
+    return f"color:{col}"
 cap_json = []
 for i, c in enumerate(edit.get("captions", [])):
     if any(a - 0.05 <= c["start"] < b for a, b in quiet): continue
@@ -716,15 +774,18 @@ for i, c in enumerate(edit.get("captions", [])):
     big = 1.7 if CAPS.get("style") == "editorial" else 1.12          # editorial = dramatic size contrast on the emphasis word
     big = min(big, min((fit(w["text"], px * big) / px) for w in ws if w.get("accent")) if any(w.get("accent") for w in ws) else big)
     blk = "display:block;line-height:.95;" if CAPS.get("style") == "editorial" and len(ws) > 1 else ""
-    spans = "".join(f'<span class="acc" style="{blk}{font("capacc", int(px * big))};color:{next_acc()}">{esc(case(w["text"]))}</span> ' if w.get("accent")
+    spans = "".join(f'<span class="acc" style="{blk}{font("capacc", int(px * big))};{acc_look(next_acc())}">{esc(case(w["text"]))}</span> ' if w.get("accent")
                     else f'<span>{esc(case(w["text"]))}</span> ' for w in ws)
     front.append(f'<div id="c{i}" class="cap" style="top:{c.get("y", CAP_Y)}px;{font("cap", int(px))};color:{CAP};letter-spacing:{CAPS.get("tracking", -0.02)}em">{spans.strip()}</div>')
     show(f"#c{i}", c["start"], c["end"], 0.06)
     _x, _w = tw(" ".join(w["text"] for w in ws), px)
     zone(f"c{i}", "субтитри", c["start"], c["end"], (max(60, _x), c.get("y", CAP_Y), min(960, _w), px * big * 1.05))
-    js.append(f'tl.fromTo("#c{i}",{{scale:0.86,y:14}},{{scale:1,y:0,duration:0.16,ease:"back.out(2)"}},{q(c["start"])});')
+    js.append(CAP_ANIM.get(S_CAP.get("anim", "pop"), CAP_ANIM["pop"]).replace("#C", f"#c{i}").replace("@T", str(q(c["start"]))))
 
 # ---- assemble -----------------------------------------------------------------------------------------------------
+if S_MOT.get("speed", 1) != 1:   # the style's motion speed: every tween and stagger runs faster (>1) or calmer (<1); start times stay on the words
+    _sp = float(S_MOT["speed"])
+    js = [re.sub(r"\b(duration|stagger):([\d.]+)", lambda m: f"{m.group(1)}:{float(m.group(2)) / _sp:.3f}", x) for x in js]
 doc = f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8" />
 <style>
