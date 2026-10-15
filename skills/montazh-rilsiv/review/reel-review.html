@@ -1673,8 +1673,8 @@ async function sendStyle() {
 }
 async function loadStyle() {
   const rr = DB.doc("style/round"); stRef = DB.doc("style/votes");
-  try { const x = await rr.get(); STR = x.exists ? x.data() : null; } catch (e) { STR = null; }
-  try { const x = await stRef.get(); STV = x.exists ? x.data() : null; } catch (e) { STV = null; }
+  try { const x = await rr.get(); STR = x.exists ? JSON.parse(JSON.stringify(x.data())) : null; } catch (e) { STR = null; }
+  try { const x = await stRef.get(); STV = x.exists ? JSON.parse(JSON.stringify(x.data())) : null; } catch (e) { STV = null; }   // a copy: db data can be read-only
   if (!STV || STV.round !== STR?.id) STV = stBlank();
   STV.verdicts = STV.verdicts || {};
   if (STR?.theme && !R) { const rt = document.documentElement; for (const [k, val] of Object.entries(STR.theme)) if (k !== "scheme" && k !== "label") rt.style.setProperty("--" + k, val); rt.setAttribute("data-theme", STR.theme.scheme || "light"); }
@@ -1683,7 +1683,7 @@ async function loadStyle() {
   let first = true;
   rr.onSnapshot(x => {   // Claude put up the next round: show it in place
     if (first) { first = false; return; }
-    const prev = STR?.id; STR = x.exists ? x.data() : null;
+    const prev = STR?.id; STR = x.exists ? JSON.parse(JSON.stringify(x.data())) : null;
     if (STR && STR.id !== prev) { STV = stBlank(); $("#stbox").dataset.round = ""; showTab("style"); $("#banner").textContent = `${STR.title || "Новий раунд"}: оціни варіанти й натисни «Готово → Claude».`; $("#banner").hidden = false; pill("Новий раунд стилю"); }
     else if (tab === "style") { $("#stbox").dataset.round = ""; renderStyle(); styleBar(); }
     styleDot();
