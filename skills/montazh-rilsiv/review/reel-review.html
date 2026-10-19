@@ -249,6 +249,23 @@ input[type=file]::file-selector-button{font:600 14px var(--f-body);border:1px so
 @media (max-width:600px){.ggrid{grid-template-columns:minmax(0,1fr)}}
 .gs{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:8px;padding:3px 0}
 .gs .gl{font-size:12.5px;color:var(--ink);cursor:default;user-select:none}
+/* text look (captions + hook): colours, gradient, outline, shadow, box, accent */
+.lookdet{margin-top:10px}.lookdet>summary{cursor:pointer;font-weight:600;font-size:14px;padding:4px 0}
+.lookdet .ggroup{margin-top:12px}
+.lookdet .gs{grid-template-columns:minmax(0,1fr) auto}.lookdet .gs .gv{padding-left:12px;white-space:nowrap}
+.lrow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 0;flex-wrap:wrap}
+.lrow .gl{font-size:12.5px;color:var(--ink)}
+.sws{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.sws button{width:24px;height:24px;border-radius:50%;border:1px solid var(--line);cursor:pointer;padding:0}
+.sws button[aria-pressed="true"]{outline:2px solid var(--accent);outline-offset:2px}
+.sws input[type=color]{width:30px;height:26px;border:1px solid var(--line);border-radius:8px;background:none;padding:1px;cursor:pointer}
+.lchk{display:flex;align-items:center;gap:6px;font-size:12.5px;padding:4px 0;cursor:pointer}
+.lookfoot{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+.hookov{position:absolute;left:0;right:0;padding:0 8.33%;line-height:.88;letter-spacing:-.045em;pointer-events:none}
+.hookov .hl{white-space:nowrap}
+.gw{position:relative;display:inline-block}.go{position:absolute;inset:0}.gw>span:last-child{position:relative}
+.go,.go *{color:var(--oc)!important;-webkit-text-fill-color:var(--oc)!important;-webkit-text-stroke:var(--ow) var(--oc)!important;paint-order:stroke fill;background:none!important;box-shadow:none!important;text-shadow:none!important;filter:none!important}
+.go i{display:none}
 .gs .gv{font:500 11px var(--f-mono);color:var(--muted);min-width:30px;text-align:right}
 .gs.on .gv{color:var(--accent)}
 .gs input{grid-column:1/-1;width:100%;margin:2px 0 0;height:14px;background:none;-webkit-appearance:none;appearance:none}
@@ -548,6 +565,7 @@ section[data-p="effects"].with{margin-top:34px;padding-top:24px;border-top:1px s
         <div class="gpre" id="speedpick" role="group" aria-labelledby="speedlabel"></div>
         <label for="hooktext">Хук: заголовок на початку</label>
         <input type="text" id="hooktext" placeholder="Напр.: Чому не / виходить / заробляти? (/ = новий рядок)">
+        <details class="lookdet" id="hooklookdet"><summary>Вигляд хука: кольори рядків, контур, тінь, фон</summary><div id="hooklook"></div></details>
         <label for="ctatext">CTA: заклик у кінці (необов'язково)</label>
         <input type="text" id="ctatext" placeholder="Напр.: Пиши АНКЕТА в директ (слово КАПСОМ стане рожевим)">
         <div class="row ctl" style="margin-top:8px"><label for="ctadur" style="margin:0">CTA на екрані, секунд</label><input type="number" id="ctadur" value="4" min="2" max="10" step="0.5" style="width:80px"></div>
@@ -566,6 +584,7 @@ section[data-p="effects"].with{margin-top:34px;padding-top:24px;border-top:1px s
         <div class="fontpop" id="fontpop" hidden><input type="text" id="fontq" placeholder="Пошук шрифту" aria-label="Пошук шрифту"><div class="fontlist" id="fontlist"></div></div>
         <label class="gs capsize" style="margin-top:8px"><span class="gl">Розмір тексту</span><span class="gv" id="capszv"></span><input type="range" id="capsz" min="56" max="140" step="2" aria-label="Розмір субтитрів"></label>
         <p class="mode" style="margin:6px 0 0">Або перетягни субтитр на відео вгору чи вниз. Графіка сама відсунеться від обличчя й субтитрів.</p></div>
+      <details class="panel lookdet" id="caplookdet" open><summary>Вигляд субтитрів: колір, контур, тінь, фон, акцент</summary><div id="caplook"></div></details>
       <div class="sr"><input type="text" id="srfind" placeholder="Знайти слово" aria-label="Знайти слово"><input type="text" id="srrepl" placeholder="Замінити на" aria-label="Замінити на"><button class="b" id="srgo" type="button">Замінити всюди</button><span class="mode" id="srmsg" aria-live="polite"></span></div>
       <div class="tally" id="captally"></div>
       <div class="caps" id="caps"><div class="empty">Субтитри з'являться тут, коли рілс завантажиться.</div></div>
@@ -832,7 +851,8 @@ v.addEventListener("error", () => pill("Відео не завантажилос
 function overlay(c) {
   ov.textContent = "";
   if (!R || tab === "preview" || c == null || (mode !== "rough" && mode !== "roughPaused" && mode !== "cutvid" && !placing)) { highlight(null); return; }
-  for (const g of GFX) if (!g.gone && g.state !== "d" && c >= g.start && c < g.end && !(placing && g.id === placing.id)) ov.appendChild(box(g, true));
+  for (const g of GFX) if (!g.gone && g.state !== "d" && c >= g.start && c < g.end && !(placing && g.id === placing.id)) {
+    if (g.type === "title" && (g.text || "").trim()) { const h = hookEl(g); ov.appendChild(h); fitHook(h); } else ov.appendChild(box(g, true)); }
   if (placing) ov.appendChild(placeBox());
   let cap = GFX.some(g => g.capsAside && !g.gone && g.state !== "d" && c >= g.start && c < g.end) ? null : CAPS.find(x => !x.gone && c >= x.start && c < x.end);
   const place = tab === "captions" && mode !== "rough";
@@ -854,19 +874,29 @@ function box(g, label) {
   return el;
 }
 function capEl(cap) {
-  const st = R.style, W = $("#player").clientWidth, one = cap.words.length === 1;
-  const el = document.createElement("div"); el.className = "capov" + (st.editorial && !one ? " ed" : "");
+  const st = R.style, W = $("#player").clientWidth, one = cap.words.length === 1, L = lookOf("cap"), k = W / 1080, big = L.acc.look === "big";
+  const el = document.createElement("div"); el.className = "capov" + (big && !one ? " ed" : "");
   const base = (S.capSize ?? st.capSize) / 1080 * W * (one ? 1.35 : 1);
   const cf = S.capFont || {};
   Object.assign(el.style, { top: (cap.y ?? ReelCore.capY(R, decisions())) / 19.2 + "%", fontFamily: cf.body ? (cf.body.brandFile ? cf.body.base : `"${cf.body.family}", sans-serif`) : "rb, var(--f-body)",
-    fontWeight: cf.body ? cf.body.weight : "", fontSize: base + "px", color: st.cap });
-  let k = st.acc2 ? accBefore(cap) : 0;   // two accent colours alternate across the reel, as in the render
+    fontWeight: cf.body ? cf.body.weight : "", fontSize: base + "px", textShadow: "none" });
+  const run = document.createDocumentFragment();
+  const wbg = L.bg === "word" ? lookBg(L, k) : "";
+  let n = L.acc.a2 ? accBefore(cap) : 0;   // two accent colours alternate across the reel, as in the render
   for (const w of cap.words) {
-    const s = document.createElement("span");
-    if (w.accent) { s.className = "a"; Object.assign(s.style, { fontFamily: cf.accent ? (cf.accent.brandFile ? cf.accent.base : `"${cf.accent.family}", serif`) : "ra, Georgia, serif", fontStyle: cf.accent ? cf.accent.style : "italic", fontWeight: cf.accent ? cf.accent.weight : "", color: st.acc2 && k++ % 2 ? st.acc2 : st.acc, fontSize: (st.editorial ? 1.7 : 1.12) + "em" }); }
-    const t = w.text.replace(/[.,!?;:]+$/, "");   // captions carry no punctuation
-    s.textContent = (st.case === "lower" ? t.toLowerCase() : t) + " "; el.appendChild(s);
+    const s = document.createElement("span"), t = w.text.replace(/[.,!?;:]+$/, ""), tx = st.case === "lower" ? t.toLowerCase() : t;   // captions carry no punctuation
+    if (w.accent) {
+      const col = L.acc.a2 && n++ % 2 ? L.acc.a2 : L.acc.a1; s.className = "a";
+      s.style.cssText = `font-family:${cf.accent ? (cf.accent.brandFile ? cf.accent.base : `"${cf.accent.family}", serif`) : "ra, Georgia, serif"};font-style:${cf.accent ? cf.accent.style : "italic"};font-weight:${cf.accent ? cf.accent.weight : ""};font-size:${big ? 1.7 : 1.12}em;` + accCss(L, col) + (L.acc.look === "box" ? "" : wbg);   // a «Плашка» accent keeps its own box
+      if (L.acc.look === "echo") { s.style.position = "relative"; s.style.display = "inline-block"; s.style.zIndex = 0;
+        for (const e of [1, 2]) { const i = document.createElement("i"); i.textContent = tx; i.setAttribute("aria-hidden", "true");
+          i.style.cssText = `position:absolute;left:0;top:${-0.42 * e}em;z-index:-1;font-style:inherit;opacity:${0.42 / e};color:${col};-webkit-text-fill-color:${col};-webkit-text-stroke:0;text-shadow:none`; s.appendChild(i); } }
+      s.appendChild(document.createTextNode(tx));
+    } else { s.textContent = tx; if (wbg) s.style.cssText = wbg; }
+    run.appendChild(s); run.appendChild(document.createTextNode(" "));
   }
+  const look = lookRun(L, k, (() => { const w = document.createElement("span"); w.appendChild(run); return w; })());
+  if (L.bg === "line") { const bx = document.createElement("span"); bx.style.cssText = lookBg(L, k); bx.appendChild(look); el.appendChild(bx); } else el.appendChild(look);
   return el;
 }
 function dragCap(el) {   // move the captions up or down on the player; saved as this reel's caption height
@@ -950,9 +980,131 @@ function renderCapPlace() {
   $("#capyval").textContent = capWhere(y);
   fillFontSelects();
   const sz = S.capSize ?? R.style.capSize; $("#capsz").value = sz; $("#capszv").textContent = sz + " px" + (S.capSize == null ? " (бренд)" : "");
+  renderLooks();
 }
 $("#capsz").addEventListener("input", e => { S.capSize = +e.target.value; $("#capszv").textContent = S.capSize + " px"; overlay(pos); });
 $("#capsz").addEventListener("change", () => mutate(() => { if (S.capSize === R.style.capSize) delete S.capSize; }));
+
+// ---------- text look: captions + hook (colour or gradient, outline, shadow, box, accent word, 2nd hook line) ----------
+// stored partial in S.look {cap, hook, keep}: only what was changed; brand.json "text_look" (R.look) and LDEF fill the rest.
+// The render (build_reel.py look_fill / look_bg) uses the same numbers on the 1080 frame.
+const LDEF = {
+  cap: () => ({ c1: R.style.cap || "#FFFFFF", c2: null, gd: 90, sw: 0, sc: "#000000", sh: 30, ss: 28, bg: "none", bc: R.style.main, bo: 70, br: 16,
+    acc: { look: R.style.editorial ? "big" : "color", a1: R.style.acc, a2: R.style.acc2 || null } }),
+  hook: () => ({ c1: R.titleColor || "#FFFFFF", c2: null, gd: 90, sw: 0, sc: "#000000", sh: 40, ss: 68, bg: "none", bc: R.style.main, bo: 70, br: 16,
+    l2: { c1: null, c2: null }, l2acc: false }) };
+function lookOf(k) {
+  const d = LDEF[k](), b = (R.look || {})[k] || {}, s = (S.look || {})[k] || {};
+  const L = { ...d, ...b, ...s, acc: { ...d.acc, ...(b.acc || {}), ...(s.acc || {}) }, l2: { ...d.l2, ...(b.l2 || {}), ...(s.l2 || {}) } };
+  if (!L.l2.c1) L.l2.c1 = L.c1;
+  return L;
+}
+const hexA = (h, a) => { h = (h || "#000000").replace("#", ""); return `rgba(${parseInt(h.slice(0, 2), 16)},${parseInt(h.slice(2, 4), 16)},${parseInt(h.slice(4, 6), 16)},${a})`; };
+function lookShadow(L, k, filt) {
+  const a = L.sh / 100, blur = L.ss * 0.5 * k, sh = `0 ${blur * 0.18 + (a ? 2 * k : 0)}px ${blur}px rgba(0,0,0,${a})`;
+  return filt ? (a ? `filter:drop-shadow(${sh});` : "") : `text-shadow:${a ? sh : "none"};`;
+}
+const lookFill = (L, k) => `color:${L.c1};-webkit-text-fill-color:${L.c1};` + (L.sw > 0 ? `-webkit-text-stroke:${L.sw * 2 * k}px ${L.sc};paint-order:stroke fill;` : "-webkit-text-stroke:0;") + lookShadow(L, k);
+function lookRun(L, k, node, cls) {   // same layers as build_reel.py look_run: gradient clipped to the letters, its outline a copy underneath
+  const run = document.createElement("span"); run.className = cls || "cf"; run.appendChild(node);
+  if (!L.c2) { run.style.cssText = lookFill(L, k); return run; }
+  run.style.cssText = `background:linear-gradient(${L.gd}deg,${L.c1},${L.c2});-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;-webkit-text-stroke:0;text-shadow:none;`;
+  const gw = document.createElement("span"); gw.className = "gw"; gw.style.cssText = lookShadow(L, k, true);
+  if (L.sw > 0) { const go = document.createElement("span"); go.className = "go"; go.setAttribute("aria-hidden", "true"); go.style.setProperty("--oc", L.sc); go.style.setProperty("--ow", L.sw * 2 * k + "px");
+    go.appendChild(node.cloneNode(true)); gw.appendChild(go); }
+  gw.appendChild(run); return gw;
+}
+const lookBg = (L, k) => L.bg === "none" ? "" : `background:${hexA(L.bc, L.bo / 100)};padding:.06em .26em .1em;border-radius:${L.br * k}px;box-decoration-break:clone;-webkit-box-decoration-break:clone;`;
+function accCss(L, col) {
+  if (L.acc.look === "box") return `color:${R.style.main};-webkit-text-fill-color:${R.style.main};background:${col};padding:0 .16em;border-radius:.14em;text-shadow:none;filter:none;-webkit-text-stroke:0;box-decoration-break:clone;-webkit-box-decoration-break:clone;`;
+  if (L.acc.look === "underline") return `color:${L.c1};-webkit-text-fill-color:${L.c1};box-shadow:inset 0 -.2em 0 ${col};`;
+  return `color:${col};-webkit-text-fill-color:${col};`;
+}
+function hookEl(g) {   // the hook on the rough cut, in the picked look (the draft shows the real animation)
+  const L = lookOf("hook"), k = $("#player").clientWidth / 1080, el = document.createElement("div"); el.className = "hookov";
+  const lines = g.text.split("/").map(x => x.trim()).filter(Boolean).map(x => R.style.case === "lower" ? x.toLowerCase() : x);
+  const bold = Object.keys((R.fonts || {}).extra || {}).find(f => /bold/i.test(f));   // the brand's head face (Gilroy Bold) when it was uploaded
+  Object.assign(el.style, { top: ((g.place || [])[1] ?? R.titleY ?? 360) / 19.2 + "%", fontFamily: bold ? "bf_" + bold.replace(/\W/g, "_") + ", rb, var(--f-body)" : "rb, var(--f-body)", fontWeight: bold ? 400 : 700 });
+  lines.forEach((x, j) => {
+    const d = document.createElement("div"), s = document.createElement("span"), alt = j % 2 === 1;
+    d.className = "hl"; d.style.textAlign = lines.length > 1 ? (alt ? "right" : "left") : "center"; d.style.fontSize = 130 * k + "px";
+    if (alt && L.l2acc) Object.assign(d.style, { fontFamily: "ra, Georgia, serif", fontStyle: "italic", fontWeight: 400 });
+    s.style.cssText = lookBg(L, k); s.appendChild(lookRun(alt ? { ...L, c1: L.l2.c1, c2: L.l2.c2 } : L, k, document.createTextNode(x), "hk")); d.appendChild(s); el.appendChild(d);
+  });
+  return el;
+}
+function fitHook(el) { for (const d of el.children) { let fs = parseFloat(d.style.fontSize); for (let i = 0; i < 25 && d.scrollWidth > d.clientWidth + 1; i++) { fs *= 0.92; d.style.fontSize = fs + "px"; } } }
+function setLook(k, key, val, sub, live) {   // live = while dragging (no undo step, no save yet)
+  const apply = () => { S.look = { ...(S.look || {}) }; const o = { ...(S.look[k] || {}) }; if (sub) o[sub] = { ...(o[sub] || {}), [key]: val }; else o[key] = val; S.look[k] = o; };
+  if (live) { apply(); lookPreview(k); } else { mutate(apply); lookPreview(k); }
+}
+function lookPreview(k) {   // show the change on the player: the hook's seconds for the hook, captions where they are
+  if (k === "hook") { const g = GFX.find(x => x.type === "title" && !x.gone && x.state !== "d"); if (g && (pos < g.start || pos >= g.end)) seekCut(g.start + 0.5); }
+  if (!["rough", "roughPaused", "cutvid"].includes(mode)) mode = "roughPaused";
+  overlay(pos);
+}
+const LSW = () => [...new Set(["#FFFFFF", "#000000", R.style.main, R.style.acc, R.style.acc2, (R.theme || {}).soft].filter(Boolean).map(x => x.toUpperCase()))];
+function lColor(label, val, set, live) {
+  const r = document.createElement("div"); r.className = "lrow"; r.innerHTML = `<span class="gl"></span><div class="sws"></div>`; r.firstChild.textContent = label;
+  const box = r.lastChild;
+  for (const c of LSW()) { const b = document.createElement("button"); b.type = "button"; b.style.background = c; b.title = c; b.setAttribute("aria-label", label + " " + c);
+    b.setAttribute("aria-pressed", (val || "").toUpperCase() === c); b.addEventListener("click", () => set(c)); box.appendChild(b); }
+  const i = document.createElement("input"); i.type = "color"; i.value = /^#[0-9a-f]{6}$/i.test(val || "") ? val : "#ffffff"; i.setAttribute("aria-label", label + ": свій колір");
+  i.addEventListener("input", () => live(i.value)); i.addEventListener("change", () => set(i.value)); box.appendChild(i);
+  return r;
+}
+function lSlider(label, min, max, step, val, show, set, live) {
+  const r = document.createElement("label"); r.className = "gs"; r.innerHTML = `<span class="gl"></span><span class="gv"></span><input type="range" min="${min}" max="${max}" step="${step}">`;
+  r.firstChild.textContent = label; const v = r.children[1], i = r.lastChild; i.value = val; v.textContent = show(+val); i.setAttribute("aria-label", label);
+  i.addEventListener("input", () => { v.textContent = show(+i.value); live(+i.value); }); i.addEventListener("change", () => set(+i.value));
+  return r;
+}
+function lSeg(label, opts, val, set) {
+  const r = document.createElement("div"); r.className = "lrow"; r.innerHTML = `<span class="gl"></span><div class="gpre" role="group"></div>`; r.firstChild.textContent = label;
+  for (const [t, v] of opts) { const b = document.createElement("button"); b.type = "button"; b.textContent = t; b.setAttribute("aria-pressed", v === val); b.addEventListener("click", () => set(v)); r.lastChild.appendChild(b); }
+  return r;
+}
+function lChk(label, on, set) {
+  const r = document.createElement("label"); r.className = "lchk"; r.innerHTML = `<input type="checkbox"><span></span>`; r.lastChild.textContent = label;
+  r.firstChild.checked = !!on; r.firstChild.addEventListener("change", e => set(e.target.checked)); return r;
+}
+function lGroup(title, ...rows) { const g = document.createElement("div"); g.className = "ggroup"; g.innerHTML = `<div class="gtitle"></div>`; g.firstChild.textContent = title; rows.filter(Boolean).forEach(x => g.appendChild(x)); return g; }
+function renderLook(k, root) {
+  const L = lookOf(k), set = (key, sub) => v => setLook(k, key, v, sub), live = (key, sub) => v => setLook(k, key, v, sub, true);
+  root.textContent = "";
+  const grid = document.createElement("div"); grid.className = "ggrid"; root.appendChild(grid);
+  const fillRows = (c1, c2, sub, name) => [
+    lColor(name, c1, set("c1", sub), live("c1", sub)),
+    lChk("Градієнт", !!c2, on => setLook(k, "c2", on ? (k === "cap" ? R.style.acc : R.style.acc2 || R.style.acc) : null, sub)),
+    c2 ? lColor("Другий колір градієнта", c2, set("c2", sub), live("c2", sub)) : null];
+  grid.appendChild(lGroup(k === "hook" ? "Колір першого рядка" : "Колір тексту", ...fillRows(L.c1, L.c2, null, "Колір"),
+    L.c2 || (k === "hook" && L.l2.c2) ? lSeg("Напрямок градієнта", [["→", 90], ["↓", 180], ["↘", 135]], L.gd, set("gd")) : null));
+  if (k === "hook") grid.appendChild(lGroup("Другий рядок", ...fillRows(L.l2.c1, L.l2.c2, "l2", "Колір"),
+    lChk("Акцентним шрифтом (з засічками, курсив)", L.l2acc, set("l2acc"))));
+  grid.appendChild(lGroup("Контур",
+    lSlider("Товщина", 0, 16, 0.5, L.sw, v => v ? v + " px" : "без контуру", set("sw"), live("sw")),
+    L.sw > 0 ? lColor("Колір контуру", L.sc, set("sc"), live("sc")) : null));
+  grid.appendChild(lGroup("Тінь під текстом",
+    lSlider("Сила", 0, 100, 1, L.sh, v => v ? v + "%" : "без тіні", set("sh"), live("sh")),
+    L.sh > 0 ? lSlider("М'якість", 0, 100, 1, L.ss, v => v < 15 ? "чітка" : v > 70 ? "дуже м'яка" : "м'яка", set("ss"), live("ss")) : null));
+  grid.appendChild(lGroup("Фон під текстом",
+    lSeg("Фон", [["Немає", "none"], ["Під рядком", "line"], ["Під кожним словом", "word"]], L.bg, set("bg")),
+    L.bg !== "none" ? lColor("Колір фону", L.bc, set("bc"), live("bc")) : null,
+    L.bg !== "none" ? lSlider("Прозорість", 0, 95, 1, 100 - L.bo, v => v + "%", v => setLook(k, "bo", 100 - v), v => setLook(k, "bo", 100 - v, null, true)) : null,
+    L.bg !== "none" ? lSlider("Кути", 0, 60, 1, L.br, v => v ? "заокруглені, " + v + " px" : "чіткі", set("br"), live("br")) : null));
+  if (k === "cap") grid.appendChild(lGroup("Слово-акцент",
+    lSeg("Як виділяти", [["Колір", "color"], ["Плашка", "box"], ["Підкреслення", "underline"], ["Велике", "big"], ["Ехо", "echo"]], L.acc.look, set("look", "acc")),
+    lColor("Колір акценту", L.acc.a1, set("a1", "acc"), live("a1", "acc")),
+    lChk("Чергувати з другим кольором", !!L.acc.a2, on => setLook(k, "a2", on ? (R.style.acc2 || R.style.acc) : null, "acc")),
+    L.acc.a2 ? lColor("Другий колір акценту", L.acc.a2, set("a2", "acc"), live("a2", "acc")) : null));
+  const foot = document.createElement("div"); foot.className = "lookfoot";
+  const reset = document.createElement("button"); reset.type = "button"; reset.className = "b"; reset.textContent = "Повернути як у бренді"; reset.disabled = !(S.look || {})[k];
+  reset.addEventListener("click", () => { mutate(() => { const o = { ...(S.look || {}) }; delete o[k]; S.look = o; }); lookPreview(k); });
+  foot.appendChild(reset);
+  foot.appendChild(lChk("Робити так у всіх наступних рілсах", (S.look || {}).keep, on => mutate(() => { S.look = { ...(S.look || {}), keep: on }; })));
+  root.appendChild(foot);
+}
+function renderLooks() { if (!R) return; renderLook("cap", $("#caplook")); renderLook("hook", $("#hooklook")); }
 function accBefore(cap) { let n = 0; for (const c of CAPS) { if (c === cap) break; if (!c.gone) n += c.words.filter(w => w.accent).length; } return n; }
 function fitCap(el) {   // shrink until the widest word fits the frame, measured in the real fonts (the render does the same)
   let fs = parseFloat(el.style.fontSize);

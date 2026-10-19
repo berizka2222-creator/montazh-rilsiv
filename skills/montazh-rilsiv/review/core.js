@@ -171,7 +171,8 @@
       .concat(d.capSize != null ? ["sz" + d.capSize] : [])
       .concat(d.capFont ? [d.capFont] : [])
       .concat(d.style ? ["st:" + d.style] : [])
-      .concat(d.speedMul ? ["sp" + d.speedMul] : []));
+      .concat(d.speedMul ? ["sp" + d.speedMul] : [])
+      .concat(d.look && (d.look.cap || d.look.hook) ? [{ cap: d.look.cap, hook: d.look.hook }] : []));
     let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0;
     return (h >>> 0).toString(36);
   }

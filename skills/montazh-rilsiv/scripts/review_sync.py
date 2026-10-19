@@ -127,7 +127,7 @@ def export(reel, proposal, out):
                            "mode": mode, "editorial": brand["captions"].get("style") == "editorial",
                            "cap": brand["colors"].get("caption", "#FFFFFF"), "acc": brand["colors"].get("caption_accent", "#FF7DB8"), "acc2": brand["colors"].get("caption_accent_2"),
                            "main": brand["colors"]["main"], "case": brand["captions"].get("case", "lower")},
-                 "grade": brand.get("grade"),
+                 "grade": brand.get("grade"), "look": brand.get("text_look"), "titleColor": brand.get("title_color", brand["colors"]["main"]), "titleY": brand.get("title_y", 360),
                  **({"face": json.load(open(reel / "face.json"))["box"]} if (reel / "face.json").exists() else {}),
                  "fontChoices": {**(brand.get("caption_fonts") or {}), "names": {r: (brand.get("fonts", {}).get(r) or {}).get("family", "") for r in ("body", "accent")}}}   # face: scripts/face_box.py; fontChoices: the design system's other caption fonts
     P = node(reel_json, {"cut": proposed_cut})
@@ -210,6 +210,15 @@ def do_import(reel, review):
     cy = d.get("capY") if d.get("capY") is not None else (reel_json.get("style") or {}).get("capY")
     if cy is not None and cy != json.load(open(HOME / "brand.json")).get("captions", {}).get("y", 1250): extra["caption_y"] = cy   # this reel's own caption height
     if d.get("capSize") is not None: extra["caption_size"] = d["capSize"]   # the caption size she picked for this reel
+    page_look = {k: v for k, v in (d.get("look") or {}).items() if k in ("cap", "hook") and v}   # text look from «Субтитри» / the hook block (only what she changed)
+    base_look = json.load(open(HOME / "brand.json")).get("text_look") or {}                      # her saved default («Робити так у всіх наступних рілсах»)
+    look = {k: {**base_look.get(k, {}), **page_look.get(k, {}), **({"acc": {**base_look.get(k, {}).get("acc", {}), **page_look.get(k, {}).get("acc", {})}} if k == "cap" else {}),
+                **({"l2": {**base_look.get(k, {}).get("l2", {}), **page_look.get(k, {}).get("l2", {})}} if k == "hook" else {})} for k in set(base_look) | set(page_look)}
+    if look:
+        extra["text_look"] = look; print("TEXT LOOK:", json.dumps(look, ensure_ascii=False))
+        if page_look and (d.get("look") or {}).get("keep"):   # becomes the brand default (reel.json "look" on the next reels)
+            bp = HOME / "brand.json"; bj = json.load(open(bp)); bj["text_look"] = look
+            json.dump(bj, open(bp, "w"), ensure_ascii=False, indent=2); print("TEXT LOOK saved to brand.json for the next reels")
     if d.get("speedMul"): extra["motion_mul"] = d["speedMul"]; print("MOTION SPEED for this reel: x" + str(d["speedMul"]))   # «Повільніше / Швидше» on «Графіка»
     st = d.get("style")   # the editing style she picked on «Графіка» (~/reels/styles/<name>.json); "brand" = brand.json only
     if st:

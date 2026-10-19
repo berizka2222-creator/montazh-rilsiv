@@ -113,6 +113,39 @@ def _rgba(hexc, a):
 GLASS_TINT = brand.get("glass_tint") or _rgba(C["main"], 0.38)
 TITLE_COLOR = brand.get("title_color", C["main"])
 CASE = CAPS.get("case", "lower")
+# text look set on the review page (edit.json "text_look": {"cap": {...}, "hook": {...}}); a missing block = the brand look as before.
+# c1, c2 (gradient end, none = solid), gd (gradient angle), sw (outline px as seen, 1080 frame), sc (outline colour),
+# sh (shadow strength 0-100), ss (shadow softness 0-100), bg ("none"|"line"|"word"), bc, bo (box colour, opacity 0-100), br (corner px).
+# cap also: acc {look: "color"|"box"|"underline"|"big"|"echo", a1, a2}; hook also: l2 {c1, c2} second-line colours, l2acc (accent font).
+LOOK = edit.get("text_look") or {}
+def look_shadow(L, filt=False):
+    """The picked shadow: text-shadow, or a drop-shadow filter for gradient text (text-shadow would sit on top of it)."""
+    if L.get("sh") is None: return ""
+    a, blur = max(0, min(100, L["sh"])) / 100, max(0, min(100, L.get("ss", 30))) * 0.5
+    sh = f"0 {blur * 0.18 + (2 if a else 0):.0f}px {blur:.0f}px rgba(0,0,0,{a:.2f})"
+    return (f"filter:drop-shadow({sh})" if a else "") if filt else f"text-shadow:{sh if a else 'none'}"
+def look_fill(L):
+    """Solid fill + outline + shadow of one text run (gradients go through look_run)."""
+    c1, sw = L.get("c1") or "#FFFFFF", float(L.get("sw") or 0)
+    return ";".join([f"color:{c1}", f"-webkit-text-fill-color:{c1}",
+                     f"-webkit-text-stroke:{sw * 2:g}px {L.get('sc') or '#000000'};paint-order:stroke fill" if sw > 0 else "-webkit-text-stroke:0", look_shadow(L)])
+def look_run(L, inner, cls="cf"):
+    """One text run in the picked look. A gradient is clipped to the letters, so its outline is a copy underneath (.go)
+    and its shadow a filter on the wrapper; a solid colour keeps a plain stroke."""
+    if not L.get("c2"): return f'<span class="{cls}" style="{look_fill(L)}">{inner}</span>'
+    sw = float(L.get("sw") or 0)
+    grad = (f"background:linear-gradient({int(L.get('gd', 90))}deg,{L.get('c1') or '#FFFFFF'},{L['c2']});-webkit-background-clip:text;background-clip:text;"
+            "color:transparent;-webkit-text-fill-color:transparent;-webkit-text-stroke:0;text-shadow:none")
+    under = f'<span class="go" aria-hidden="true" style="--oc:{L.get("sc") or "#000000"};--ow:{sw * 2:g}px">{inner}</span>' if sw > 0 else ""
+    return f'<span class="gw" style="{look_shadow(L, True)}">{under}<span class="{cls}" style="{grad}">{inner}</span></span>'
+def look_bg(L):
+    """The box behind the text (one per line with box-decoration-break, or one per word)."""
+    if not L or L.get("bg", "none") == "none": return ""
+    return (f"background:{_rgba(L.get('bc') or MAIN, max(0, min(100, L.get('bo', 70))) / 100)};padding:.06em .26em .1em;border-radius:{int(L.get('br', 16))}px;"
+            "box-decoration-break:clone;-webkit-box-decoration-break:clone")
+_LD = {"sh": 30, "ss": 28, "bc": MAIN, "bo": 70, "br": 16}   # same defaults as the page (LDEF in reel-review.html)
+LC = {"c1": CAP, **_LD, **LOOK["cap"]} if LOOK.get("cap") else None
+LH = {"c1": TITLE_COLOR, **_LD, "sh": 40, "ss": 68, **LOOK["hook"]} if LOOK.get("hook") else None
 CAP_PX, CAP_Y = edit.get("caption_size", CAPS.get("size", 96)), edit.get("caption_y", CAPS.get("y", 1250))   # a reel can move its captions (e.g. above the head)
 W, H, FPS = 1080, 1920, 30                     # authored at 1080x1920; 4K brands render with --resolution portrait-4k
 SAFE = 900                                     # guardrail: no text line may be wider than this (90 px margin each side)
@@ -353,7 +386,14 @@ for i, c in enumerate(edit.get("cards", [])):
         ol = brand.get("title_outline", "#FFFFFF")                     # outline is for the hook title only, never captions
         olw = brand.get("title_outline_px")                            # fixed outline width (e.g. 2 for a faint hairline); default scales with size
         st = lambda px: f";-webkit-text-stroke:{olw or max(6, px // 16)}px {ol};paint-order:stroke fill" if ol else ""
-        back.append(f'<div id="{cid}" class="title" style="{font("head", sizes[0])};top:{c.get("y", brand.get("title_y", 360))}px;color:{c.get("color", TITLE_COLOR)};letter-spacing:{brand.get("title_tracking", -0.045)}em">'
+        if LH and not brand.get("title_glass"):   # the hook look picked on the page: line colours / gradient, outline, shadow, box, 2nd line font
+            roles = ["accent" if LH.get("l2acc") and j % 2 else "head" for j in range(len(lines))]
+            sizes = [c.get("size") or min(fit(x, 230, 230 // 16 + float(LH.get("sw") or 0), role=r), brand.get("title_max_px", 999)) for x, r in zip(lines, roles)]
+            lk = lambda j: {**LH, "c1": LH["l2"].get("c1") or LH.get("c1"), "c2": LH["l2"].get("c2")} if j % 2 and LH.get("l2") else LH
+            back.append(f'<div id="{cid}" class="title" style="{font("head", sizes[0])};top:{c.get("y", brand.get("title_y", 360))}px;letter-spacing:{brand.get("title_tracking", -0.045)}em;text-shadow:none">'
+                        + "".join(f'<div class="tl" style="{font(r, px) if r != "head" else f"font-size:{px}px"};text-align:{("left", "right")[j % 2] if len(lines) > 1 else "center"}">'
+                                  f'<span style="{look_bg(LH)}">{look_run(lk(j), esc(x), "hk")}</span></div>' for j, (x, px, r) in enumerate(zip(lines, sizes, roles))) + "</div>")
+        else: back.append(f'<div id="{cid}" class="title" style="{font("head", sizes[0])};top:{c.get("y", brand.get("title_y", 360))}px;color:{c.get("color", TITLE_COLOR)};letter-spacing:{brand.get("title_tracking", -0.045)}em">'
                     + ('<div class="tg glass">' if brand.get("title_glass") else "")
                     + "".join(f'<div class="tl" style="font-size:{px}px;text-align:{("left", "right")[j % 2] if len(lines) > 1 and not brand.get("title_glass") else "center"}{st(px)}">{esc(x)}</div>' for j, (x, px) in enumerate(zip(lines, sizes)))
                     + ("</div>" if brand.get("title_glass") else "") + "</div>")
@@ -778,11 +818,14 @@ CAP_ANIM = {"pop": 'tl.fromTo("#C",{scale:0.86,y:14},{scale:1,y:0,duration:0.16,
             "blur": 'tl.fromTo("#C",{filter:"blur(10px)",scale:1.05},{filter:"blur(0px)",scale:1,duration:0.28,ease:"power2.out"},@T);',
             "slam": 'tl.fromTo("#C",{scale:1.45},{scale:1,duration:0.13,ease:"power4.out"},@T);',
             "none": ""}
+LA = (LC or {}).get("acc") or {}
+if LA.get("a1"): ACC_COLS[:] = [LA["a1"]] + ([LA["a2"]] if LA.get("a2") else [])   # accent colours picked on the page
+ACC_LOOK = LA.get("look") or S_CAP.get("accent", "color")   # "big" / "echo" come from the page only
 def acc_look(col):
-    look = S_CAP.get("accent", "color")
-    if look == "box": return f"color:{MAIN};background:{col};padding:0 .16em;border-radius:.14em;text-shadow:none;box-decoration-break:clone;-webkit-box-decoration-break:clone"
-    if look == "underline": return f"color:{CAP};box-shadow:inset 0 -.2em 0 {col}"
-    return f"color:{col}"
+    look, fill = ACC_LOOK, (lambda c: f"color:{c};-webkit-text-fill-color:{c}") if LC else (lambda c: f"color:{c}")
+    if look == "box": return f"{fill(MAIN)};background:{col};padding:0 .16em;border-radius:.14em;text-shadow:none;filter:none;-webkit-text-stroke:0;box-decoration-break:clone;-webkit-box-decoration-break:clone"
+    if look == "underline": return f"{fill((LC or {}).get('c1') or CAP)};box-shadow:inset 0 -.2em 0 {col}"
+    return fill(col)
 cap_json = []
 for i, c in enumerate(edit.get("captions", [])):
     if any(a - 0.05 <= c["start"] < b for a, b in quiet): continue
@@ -795,14 +838,29 @@ for i, c in enumerate(edit.get("captions", [])):
         front.append(f'<div id="c{i}" class="cap" style="top:{c.get("y", CAP_Y)}px;font-family:-apple-system,Helvetica,Arial,sans-serif;font-weight:500;font-size:46px;letter-spacing:0;color:#fff">{esc(" ".join(w["text"] for w in ws))}</div>')
         show(f"#c{i}", c["start"], c["end"], 0.04); continue
     chars = sum(len(w["text"]) + 1 for w in ws)
-    px = fit(" ".join(w["text"] for w in ws), CAP_PX * (1.35 if len(ws) == 1 else 1), role="cap")
-    big = 1.7 if CAPS.get("style") == "editorial" else 1.12          # editorial = dramatic size contrast on the emphasis word
-    big = min(big, min((fit(w["text"], px * big, role="capacc") / px) for w in ws if w.get("accent")) if any(w.get("accent") for w in ws) else big)
-    blk = "display:block;line-height:.95;" if CAPS.get("style") == "editorial" and len(ws) > 1 else ""
-    spans = "".join(f'<span class="acc" style="{blk}{font("capacc", int(px * big))};{acc_look(next_acc())}">{esc(case(w["text"]))}</span> ' if w.get("accent")
-                    else f'<span>{esc(case(w["text"]))}</span> ' for w in ws)
-    front.append(f'<div id="c{i}" class="cap" style="top:{c.get("y", CAP_Y)}px;{font("cap", int(px))};color:{CAP};letter-spacing:{CAPS.get("tracking", -0.02)}em">{spans.strip()}</div>')
+    sw = float((LC or {}).get("sw") or 0)
+    px = fit(" ".join(w["text"] for w in ws), CAP_PX * (1.35 if len(ws) == 1 else 1), extra=sw, role="cap")
+    editorial = CAPS.get("style") == "editorial" if not LA.get("look") else ACC_LOOK == "big"
+    big = 1.7 if editorial else 1.12          # editorial / «Велике слово» = dramatic size contrast on the emphasis word
+    big = min(big, min((fit(w["text"], px * big, extra=sw, role="capacc") / px) for w in ws if w.get("accent")) if any(w.get("accent") for w in ws) else big)
+    blk = "display:block;line-height:.95;" if editorial and len(ws) > 1 else ""
+    wbg = look_bg(LC) if (LC or {}).get("bg") == "word" else ""
+    def acc_span(w, k):
+        col, t = next_acc(), esc(case(w["text"]))
+        echo = "".join(f'<i class="ec ec{n}" aria-hidden="true" style="color:{col};-webkit-text-fill-color:{col};opacity:0">{t}</i>' for n in (1, 2)) if ACC_LOOK == "echo" else ""
+        return (f'<span class="acc{" echo" if echo else ""}" style="{blk}{font("capacc", int(px * big))};{acc_look(col)};{"" if ACC_LOOK == "box" else wbg}">{echo}{t}</span> ')
+    spans = "".join(acc_span(w, k) if w.get("accent") else f'<span style="{wbg}">{esc(case(w["text"]))}</span> ' if wbg else f'<span>{esc(case(w["text"]))}</span> '
+                    for k, w in enumerate(ws)).strip()
+    if LC:   # the look picked on the page: one fill run (so a gradient spans the line), optional box per line
+        spans = look_run(LC, spans)
+        if LC.get("bg") == "line": spans = f'<span class="bx" style="{look_bg(LC)}">{spans}</span>'
+    front.append(f'<div id="c{i}" class="cap" style="top:{c.get("y", CAP_Y)}px;{font("cap", int(px))};color:{CAP};letter-spacing:{CAPS.get("tracking", -0.02)}em{";text-shadow:none" if LC else ""}">{spans}</div>')
     show(f"#c{i}", c["start"], c["end"], 0.06)
+    if ACC_LOOK == "echo" and any(w.get("accent") for w in ws):   # echo: two fading copies stack above the word, then fade out
+        off = px * big * 0.42
+        for n in (1, 2):
+            js.append(f'tl.fromTo("#c{i} .ec{n}",{{y:0,opacity:{0.5 / n:.2f}}},{{y:{-off * n:.0f},opacity:{0.42 / n:.2f},duration:0.3,ease:"power3.out"}},{q(c["start"] + 0.04 * n)});'
+                      f'tl.to("#c{i} .ec{n}",{{opacity:0,duration:0.45}},{q(min(c["end"] - 0.1, c["start"] + 0.75))});')
     _x, _w = tw(" ".join(w["text"] for w in ws), px)
     zone(f"c{i}", "субтитри", c["start"], c["end"], (max(60, _x), c.get("y", CAP_Y), min(960, _w), px * big * 1.05))
     js.append(CAP_ANIM.get(S_CAP.get("anim", "pop"), CAP_ANIM["pop"]).replace("#C", f"#c{i}").replace("@T", str(q(c["start"]))))
@@ -891,6 +949,15 @@ html, body {{ margin: 0; background: #000; overflow: hidden; }}
 .stx {{ line-height: 1.02; letter-spacing: -.03em; }}
 .cap {{ position: absolute; left: 60px; right: 60px; text-align: center; line-height: 1.02; letter-spacing: -.02em; text-shadow: 0 2px 14px rgba(0,0,0,.3); }}
 .cap .acc {{ text-shadow: 0 0 2px rgba(0,0,0,.25), 0 3px 22px rgba(0,0,0,.5); }}   /* accent colour stays readable over white screens, no outline */
+.cap .cf .acc {{ text-shadow: inherit; }}
+.gw {{ position: relative; display: inline-block; }}
+.go {{ position: absolute; inset: 0; }}
+.gw > span:last-child {{ position: relative; }}   /* the gradient run sits above its outline copy */
+.go, .go * {{ color: var(--oc) !important; -webkit-text-fill-color: var(--oc) !important; -webkit-text-stroke: var(--ow) var(--oc) !important; paint-order: stroke fill;
+             background: none !important; box-shadow: none !important; text-shadow: none !important; filter: none !important; }}
+.go .ec {{ display: none; }}   /* with a page look the accent shares the picked shadow */
+.cap .acc.echo {{ position: relative; display: inline-block; z-index: 0; }}
+.cap .ec {{ position: absolute; left: 0; top: 0; z-index: -1; font-style: inherit; -webkit-text-stroke: 0; text-shadow: none; filter: none; }}
 </style></head>
 <body>
 <div id="stage" data-composition-id="main" data-start="0" data-duration="{DUR}" data-fps="{FPS}" data-width="{W // 2 if DRAFT else W}" data-height="{H // 2 if DRAFT else H}">
