@@ -49,7 +49,7 @@ The page also holds the style lab: db `style/round` (written by Claude: the roun
 
 On «Ефекти» they pick a moment of the rough cut, describe an effect (a HyperFrames catalog name such as `count-up`, or their own words) and can attach photos/videos for it. The «Відкрити бібліотеку ефектів» button opens the catalog: the public one at hyperframes.heygen.com/catalog, or their own gallery page: set `libraryUrl` in the db doc `library/files` (works for every reel) or brand.json `"page"` `"library"`. `review_sync.py import` and `overlays` print each as `EFFECT REQUESTED @ cut …s for …s, from word "…": <text> | files: <name> -> DOWNLOAD asset <id> into <reel>/effects`.
 - Download each file with `Artifact` `action: "read"`, `path` = the asset id, `out_dir` = `<reel>/effects`.
-- A catalog name: `cd engine/hf && npx hyperframes add <name>` if it isn't installed yet, add it to `references/motions.md`, then a `motion` card at that moment with their files as `images`/vars. Their own words: build it as a `custom` motion (see SKILL.md «Own motion design on phrases»).
+- A catalog name: if it's in `references/motion_catalog.json` as ready, a `motion` card at that moment with their files as `images`/vars. Not there yet: add and test it first («Adding more» in `references/motions.md`). Their own words: build it as a `custom` motion (see SKILL.md «Own motion design on phrases»).
 - It goes on «Графіка» as their item (like an overlay), so plan your cards around it. If a description is unclear, ask one short question before building.
 
 ## Two rounds: their overlays first, then Claude's graphics

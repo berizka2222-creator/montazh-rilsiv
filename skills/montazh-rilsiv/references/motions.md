@@ -1,29 +1,62 @@
-# Motions (HyperFrames catalog, cached in engine/hf)
+# Motions (HyperFrames catalog, tested, cached in engine/hf)
 
-Use with a `motion` card in edit.json: `{"type":"motion","name":"<name>","start":..,"end":..,"vars":{..},"box":[x,y,w,h]}`.
-Carousels also take `"images": [..]` and every slot is filled for you. `box` is where it sits on the 1080x1920 frame (default: full width, top).
-Add more from the 392-item catalog: `cd engine/hf && npx hyperframes add <name>` (browse with `npx hyperframes catalog`).
+86 catalog motions are installed and tested on a real reel with Ukrainian text, in the brand's colours and fonts. The list,
+with what each one is for, its moment and its tested placement, is `references/motion_catalog.json`. Read it through
+`scripts/motions.py`, not by memory:
 
-| motion | size | use it for | settings (vars) |
-|---|---|---|---|
-| carousel-circle-1 | 1920x1080 | lists of tools/examples (the brand's required carousel) | `image1..N` (use images), `speed`, `background` |
-| carousel-orbit-1 | 1920x1080 | lists of tools/examples (the brand's required carousel) | `image1..N` (use images), `speed`, `background` |
-| carousel-path-1 | 1920x1080 | lists of tools/examples (the brand's required carousel) | `image1..N` (use images), `speed`, `background` |
-| carousel-vision-1 | 1920x1080 | lists of tools/examples (the brand's required carousel) | `image1..N` (use images), `speed`, `background` |
-| animated-bar-chart | fits box | comparing a few numbers | none (text is in the file) |
-| caption-camera-follow | fits box | use the `follow` card instead (brand font + colours) | `accent`, `framing`, `smear` |
-| caption-editorial-emphasis | 1920x1080 | don't mount: the template's editorial caption style does this in brand fonts | none (text is in the file) |
-| chart-story | fits box | a chart that builds with exact values | `type`, `data`, `labels`, `emphasize`, `unit`, `accent`, `exit` |
-| chat-message | fits box | a DM or chat bubble | `type`, `text`, `cardTitle`, `cardDomain`, `tail`, `delivered` |
-| code-terminal-run | fits box | a command being typed | `prompt_glyph`, `cadence`, `cues`, `accent`, `exit` |
-| count-up | fits box | a number that matters (stats, results) | `start`, `end`, `prefix`, `suffix`, `accent`, `glow`, `exit` |
-| hw-arrow | 1920x1080 | point at something on screen | none (text is in the file) |
-| hw-underline | 1920x1080 | circle/underline a word or UI element | none (text is in the file) |
-| native-notification-pop | fits box | one iOS/macOS notification | `title`, `body`, `app_label`, `os`, `at`, `accent`, `exit` |
-| notification-stack | fits box | results / alerts stacking up | `titles`, `bodies`, `expand`, `cues`, `accent`, `exit` |
-| oversized-cursor | fits box | a click on a button in a screenshot | `cursor_variant`, `target_x`, `target_y`, `click_label`, `exit` |
-| x-follow-card | fits box | follow CTA (X) | none (text is in the file) |
-| instagram-follow | 1080x1920 | follow CTA at the end | none (text is in the file) |
-| mk-line-graph | 1920x1080 | growth over time | none (text is in the file) |
-| nyc-paris-flight | 1920x1080 | travel / map moments (example route, hardcoded) | none (text is in the file) |
-| yt-comment-card | 1920x1080 | a comment you're replying to | none (text is in the file) |
+- `python3 scripts/motions.py menu` - every ready motion by moment («цифра», «список / кроки», «до / після», «питання / ШІ»,
+  «повідомлення / чат», «відгук / доказ», «проблема / тиск», «ім'я / хто я», «заклик (CTA)», «картинки / приклади»,
+  «успіх / готово», «перехід», «хук / ключова фраза»). Motions the last 3 reels used are marked.
+- `python3 scripts/motions.py ideas <reel>` - for each phrase of the cut reel, 1-3 motions that fit it, freshest first
+  (not in this reel yet, not in the last reels). Use it when planning the graphics, before writing proposal.json.
+- `python3 scripts/motions.py log <reel>` - after delivering, so the next reels reach for other ones.
+
+## How many and how varied (the rule)
+
+- Every reel uses catalog motions, not only the template cards: `minimal` 2+, `balanced` 4+, `busy` / `inserts` 6+.
+- Never the same motion twice in one reel. Prefer ones the last 3 reels didn't use (`menu` / `ideas` show them).
+- Mix moments: a reel with a number, a list and a CTA gets a number motion, a list motion and a CTA motion, not three text
+  effects. The template cards (list, split, push, steps, camera) still go in alongside.
+- A motion still has to show what that exact line says. «ideas» suggests, it doesn't decide.
+
+## The card
+
+```json
+{"type": "motion", "name": "conic-progress-ring", "start": 12.4, "end": 15.0, "vars": {"value": 87, "label": "окупність"}}
+```
+
+- `vars`: their words. The catalog's `text` field names the fields; the motion file's `data-composition-variables` header
+  lists every one with its default. Numbers exactly as said.
+- **Placement rule: a motion is either fully clear of the face or it replaces the frame. Never a panel
+  half over the person.** Every catalog entry has its tested `layout`, applied automatically; change it on the card if needed:
+  - `front`: transparent, light text on the video, in a band above the head (`place: "top"`) or on the chest (`"chest"`);
+  - `behind`: like front, cut out behind the person (text behind the head);
+  - `bubble`: a rounded brand window in that band, `"shape": "circle"` for a circle;
+  - `split`: the screen divides, the motion on a brand panel at the top, the person slides into the lower part (`"panel": 820` = its height);
+  - `full`: the whole frame is the motion on the brand colour for its seconds (phones, CTA end screens).
+- The tested placement comes from the catalog automatically (layout, place, tone, ink, css); set them on the card only to move it.
+  `box: [x, y, w, h]` on the 1080x1920 frame; `scale` shows a 1920-wide overlay bigger than the frame (lower thirds, light
+  leaks: x may go negative).
+- `tone`: `dark` (default: the brand's deep green panel, white text, pink accents), `light` (white card, dark text) or
+  `clear` (no panel, light text on the video). `ink: "light" | "pop" | "#hex"` forces the text colour of text-only motions.
+- `replace` (status `replace` motions: lower thirds, the IG follow card...): `{"<exact English text>": "their text"}`. The
+  catalog lists the strings; build_reel warns when one isn't found.
+- Fonts: every catalog motion is drawn in the brand fonts (body weight for regular text, head for bold), whatever the motion
+  ships with. `"keep_fonts": true` keeps its own (rarely: a terminal's monospace).
+- `full` and `split` motions take over the frame for their seconds: keep them 2-4 s, at most two `full` per reel. Light
+  leaks and the flash (`layout: "transition"`) are see-through and go between two thoughts.
+- Carousels take `"images": [..]`, every slot is filled for you.
+
+## Adding more from the catalog (447 items)
+
+`cd engine/hf && npx hyperframes add <name>`, then `python3 scripts/wrap_snippets.py` (paste-in snippets get their own
+composition), then test it before using it in a reel: one card on a short test reel, `REEL_DRAFT=1 python3 build_reel.py`,
+`npx hyperframes@0.8.145 snapshot proj --at <t>`, look at the frame. Add it to `motion_catalog.json` with its moment, `ua`
+line, tested `card` and status. Skip ones whose text is English with no field to change it, ones with another brand's look
+baked in, and 3D/WebGPU shaders (slow on an 8 GB Mac). The 88 already rejected are in the catalog as `skip` with the reason.
+
+## Captions next to a motion
+
+Captions step aside while a motion sits on their line. With captions above the head (`caption_y` ~370), a `top` band motion
+and the captions share the spot, so for those seconds the motion carries the words: keep it to the phrase it shows, or use
+`chest`. Every text field needs a value: an empty string falls back to the motion's English default.

@@ -28,9 +28,10 @@ done
 H="$E/hf"; mkdir -p "$H"
 [ -f "$H/hyperframes.json" ] || printf '%s' '{"$schema":"https://hyperframes.heygen.com/schema/hyperframes.json","registry":"https://raw.githubusercontent.com/heygen-com/hyperframes/main/registry","paths":{"blocks":"compositions","components":"compositions/components","assets":"assets"}}' > "$H/hyperframes.json"
 [ -f "$H/package.json" ] || echo '{"name":"engine","private":true,"type":"module"}' > "$H/package.json"
-for m in caption-camera-follow carousel-vision-1 carousel-path-1 carousel-circle-1 carousel-orbit-1 hw-arrow hw-underline \
-         oversized-cursor notification-stack code-terminal-run chat-message yt-comment-card instagram-follow count-up \
-         animated-bar-chart mk-line-graph native-notification-pop x-follow-card chart-story; do
-  ls "$H"/compositions/"$m".html "$H"/compositions/components/"$m".html >/dev/null 2>&1 || (cd "$H" && npx -y hyperframes@0.8.145 add "$m" >/dev/null 2>&1) || echo "note: couldn't fetch motion $m" >&2
+# every motion the catalog marks ready/replace (references/motion_catalog.json), plus the follow card's caption-camera-follow
+MOTIONS="$(python3 -c "import json,sys;print(' '.join(['caption-camera-follow']+[m['name'] for m in json.load(open(sys.argv[1]))['motions'] if m['status']!='skip']))" "$(dirname "$E")/references/motion_catalog.json")"
+for m in $MOTIONS; do
+  [ -n "$(find "$H/compositions" -name "$m.html" 2>/dev/null)" ] || (cd "$H" && npx -y hyperframes@0.8.181 add "$m" --no-clipboard >/dev/null 2>&1) || echo "note: couldn't fetch motion $m" >&2
 done
+python3 "$(dirname "$0")/wrap_snippets.py" "$H/compositions" >/dev/null   # paste-in snippets get their own composition
 echo "engine ready: $E"

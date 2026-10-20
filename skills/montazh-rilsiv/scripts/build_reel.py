@@ -17,10 +17,17 @@ edit.json (written by auto_edit.py, then Claude marks accents and adds cards):
                                                      set y lower (e.g. 1000) when the face sits high in frame
      image  {src: ["a.png", "b.jpg"]}               1-3 images fanned out above the head (their own photos, screenshots, stock)
      sticker {src: "sticker.png", x: 760, y: 420, size: 260}  transparent PNG that bounces on (brand stickers, emoji, logos)
+     logo   {src: "logos/zoom.svg" | ["logos/meta.svg", ...], label?: "Zoom", y?: 300}   real brand logo(s) from Simple Icons
+                                                     (scripts/inserts.py --fetch) in a brand pill with the name; 1-3 logos;
+                                                     moves off the face like lists do. Never draw or imitate a logo: no file = tag
      page   {bg: "image.jpg" or "#hex", title: "how it works"}   full-screen background with the clip framed below it
                                                      (the fast green-screen look: no cut-out, renders in seconds)
-     motion {name: "carousel-vision-1", vars: {...}, box: [x, y, w, h]}   any HyperFrames catalog motion cached in
-                                                     engine/hf (see references/motions.md for names + vars). Carousels take
+     motion {name: "conic-progress-ring", vars: {...}}   one of the tested HyperFrames catalog motions in engine/hf
+                                                     (references/motion_catalog.json, scripts/motions.py menu). Its tested placement
+                                                     comes from the catalog; override with box: [x,y,w,h], place: "top"|"chest"|"panel"
+                                                     (top/chest = a band off this reel's face), scale (16:9 overlays shown bigger),
+                                                     tone: "dark"|"light"|"clear", ink: "light"|"pop"|"#hex", css: {"--var": v},
+                                                     replace: {"English text": "her words"}, keep_fonts: true. Carousels take
                                                      images: {"images": ["a.png", ...]} and the slots are filled for you.
      custom {src: "motion/key-phrase.html", layer?: "front"|"mid", box?: [x,y,w,h], full?: true, sfx?: "whoosh"}
                                                      a HyperFrames sub-composition written for this reel (own motion design
@@ -101,6 +108,17 @@ for c in edit.get("cards", []):
 
 C = brand["colors"]
 MAIN, POP, LIGHT = C["main"], C["pop"], C.get("light", "#FFFFFF")
+# Catalog motions read these CSS tokens. "dark" = a brand-dark panel with light text (reads over any footage), "light" = a white
+# card with brand-dark text, "clear" = no panel, light text straight on the video. --brand is the pop colour, never the dark main.
+_DEEP, _SOFT = C.get("deep", MAIN), C.get("soft", POP)
+def _tone(bg, surface, fg, muted, border, ink):
+    return (f"--brand:{POP};--accent:{POP};--accent-2:{_SOFT};--bg:{bg};--background:{bg};--surface:{surface};--fg:{fg};"
+            f"--ink:{ink};--hw-ink:{ink};--color:{fg};--muted:{muted};--border:{border};")
+TONES = {"dark": _tone(_DEEP, MAIN, LIGHT, "rgba(255,255,255,.66)", "rgba(255,255,255,.16)", LIGHT),
+         "light": _tone(LIGHT, "#FFFFFF", MAIN, "rgba(0,0,0,.55)", "rgba(0,0,0,.12)", MAIN),
+         "clear": _tone("transparent", "rgba(13,26,15,.55)", LIGHT, "rgba(255,255,255,.75)", "rgba(255,255,255,.22)", LIGHT)}
+_mp = Path(__file__).resolve().parent.parent / "references" / "motion_catalog.json"
+MOTION_PRESETS = {m["name"]: m for m in json.load(open(_mp))["motions"]} if _mp.exists() else {}
 CAP, CAP_ACC = C.get("caption", "#FFFFFF"), C.get("caption_accent", POP)
 ACC_COLS = [CAP_ACC] + ([C["caption_accent_2"]] if C.get("caption_accent_2") else [])   # 2 accent colours: accent words alternate
 _acc_n = [0]
@@ -214,6 +232,9 @@ if any(k["type"] in ("motion", "follow", "custom") for k in edit.get("cards", []
 def mount(src):
     """Copy one cached motion into the reel, minus any audio it ships with (our own sound effects do that job)."""
     rel = src.relative_to(HF).as_posix()
+    if src.parent not in (HF / "compositions", HF / "compositions" / "components"):   # newer catalog items live in their own folder with their files
+        shutil.copytree(src.parent, proj / src.parent.relative_to(HF), dirs_exist_ok=True)
+    (proj / rel).parent.mkdir(parents=True, exist_ok=True)
     (proj / rel).write_text(re.sub(r"<audio[^>]*>(</audio>)?", "", src.read_text()))
     return rel
 def img(src):
@@ -243,6 +264,12 @@ for role, default in (("head", {"family": "Helvetica Neue", "weight": 700}), ("b
     FAM[role] = (f"'{f['family']}', {FALLBACK}", f.get("weight", 400), f.get("style", "normal"))
 # caption fonts picked on the review page (edit.json "caption_fonts": {"body"|"accent": {family, file, weight, style}}); default: brand body/accent
 FAM["cap"], FAM["capacc"] = FAM["body"], FAM["accent"]
+# One family with real weights for catalog motions: light/regular text in the body font, bold text in the head font.
+BRAND_SANS = []
+for role, wr in (("body", "100 599"), ("head", "600 1000")):
+    if FONT_FILE.get(role):
+        fmt = {"otf": "opentype", "ttf": "truetype", "woff2": "woff2", "woff": "woff"}.get(FONT_FILE[role].suffix[1:].lower(), "opentype")
+        BRAND_SANS.append(f'@font-face {{ font-family: "BrandSans"; src: url("fonts/{FONT_FILE[role].name}") format("{fmt}"); font-weight: {wr}; font-display: block; }}')
 FONT_FILE["cap"], FONT_FILE["capacc"] = FONT_FILE.get("body"), FONT_FILE.get("accent")
 for role, key in (("body", "cap"), ("accent", "capacc")):
     f = (edit.get("caption_fonts") or {}).get(role)
@@ -325,6 +352,16 @@ def off_face(c, h, default_y):
         if h <= room: return int(top), 1.0
     top, room = max((below, above), key=lambda r: r[1])
     return int(top), max(0.5, room / h)
+def slot_y(c, h, default_y):
+    """Small inserts (tag, logo) with no "y": the free gap above the head or below the chin that the captions don't use
+    (a style can put captions above the head, then inserts go under the chin). An explicit "y" is kept as given."""
+    if "y" in c: return c["y"]
+    cap = (CAP_Y - 50, CAP_Y + CAP_PX * 1.4)
+    fx, fy, fw, fh = FACE or (0, 560, 0, 700)
+    for top in (max(240, fy - 0.12 * fh - 30 - h), fy + fh + 40, 1480 - h, 250):
+        if 230 <= top and top + h <= 1480 and (top + h < cap[0] or top > cap[1]) and (not FACE or top + h <= fy - 0.12 * fh or top >= fy + fh):
+            return int(top)
+    return default_y
 def zwrap(layer, y, z):
     """Shrink the block just added to a layer around its top centre (the block's own tweens stay untouched)."""
     if z < 0.999: layer[-1] = f'<div class="zw" style="transform:scale({z:.3f});transform-origin:540px {y}px">{layer[-1]}</div>'
@@ -349,7 +386,10 @@ for c in edit.get("cards", []):
         _turn = (LIST_LAYOUTS.index(pick) + 1) % len(LIST_LAYOUTS); c["layout"] = pick
     elif c["layout"] == _prev: print(f"variety: two lists in a row use the '{_prev}' layout ({c['start']:.1f}s) - pick another")
     _prev = c["layout"]
-_seq = [(k["type"] + ("/" + k["layout"] if k.get("layout") else "")) for k in sorted(edit.get("cards", []), key=lambda k: k["start"])]
+_seq = [(k["type"] + ("/" + k["layout"] if k.get("layout") else "") + ("/" + k.get("name", "") if k["type"] == "motion" else ""))   # different
+        for k in sorted(edit.get("cards", []), key=lambda k: k["start"])]                                                     # catalog motions differ
+_mnames = [k.get("name") for k in edit.get("cards", []) if k["type"] == "motion"]
+for n in sorted({n for n in _mnames if _mnames.count(n) > 1}): print(f"variety: motion '{n}' is used {_mnames.count(n)} times - pick another from scripts/motions.py menu")
 for k in range(len(_seq) - 2):
     if _seq[k] == _seq[k + 1] == _seq[k + 2]: print(f"variety: three '{_seq[k]}' graphics in a row - swap one for a list, split, push or steps")
 
@@ -364,6 +404,7 @@ for i, c in enumerate(edit.get("cards", [])):
     a, b, cid = c["start"], c.get("end") or phrase_end(c["start"]), f"k{i}"
     b = min(b, DUR)
     kind = c["type"]
+    if c.get("layout") == "behind": c["behind"] = True   # a catalog motion laid out behind her
     back, mid, front = (behind, behind, behind) if c.get("behind") else (_BACK, _MID, _FRONT)
     if c.get("quiet"): quiet.append((a, b))      # review_sync: no room for this card and the captions at once
     if c.get("behind"): BEHIND_WIN.append((a, b))
@@ -482,7 +523,8 @@ for i, c in enumerate(edit.get("cards", [])):
         sfx("swish", a - 0.05, -13)
         zone(cid, "card", a, b, (c.get("x", 90), c.get("y", 150), 900 * c.get("zoom", 1), (100 + 110 * len(rows)) * c.get("zoom", 1)))
     elif kind == "tag":
-        front.append(f'<div id="{cid}" class="tagw" style="top:{c.get("y", 300)}px"><span class="tag{" glass" if c.get("glass", GLASS_ALL) else ""}" style="background:{c.get("color", POP)};{font("head", 58)}">{esc(case(c["text"]))}</span></div>')
+        c["y"] = slot_y(c, 100, 300)
+        front.append(f'<div id="{cid}" class="tagw" style="top:{c["y"]}px"><span class="tag{" glass" if c.get("glass", GLASS_ALL) else ""}" style="background:{c.get("color", POP)};{font("head", 58)}">{esc(case(c["text"]))}</span></div>')
         show(f"#{cid}", a, b)
         js.append(f'tl.fromTo("#{cid} .tag",{{scale:0.4,y:30,opacity:0}},{{scale:1,y:0,opacity:1,duration:0.42,ease:"back.out(3)"}},{q(a)});')
         sfx("pop", a, -14)
@@ -514,6 +556,27 @@ for i, c in enumerate(edit.get("cards", [])):
         js.append(f'tl.fromTo("#{cid} .ph",{{y:-260,opacity:0,scale:0.7}},{{y:0,opacity:1,scale:1,duration:0.5,ease:"back.out(1.7)",stagger:0.18}},{q(a)});')
         sfx("swish", a, -13)
         zone(cid, "image", a, b, (90, 140, 900, 560), text=False)
+    elif kind == "logo":
+        srcs = c["src"] if isinstance(c["src"], list) else [c["src"]]
+        def _svg(src):
+            for cand in (reel / src, HOME / "assets" / src, Path(src).expanduser()):
+                if cand.exists() and cand.suffix.lower() == ".svg":
+                    return re.sub(r"<title>.*?</title>", "", cand.read_text()).replace("<svg ", f'<svg fill="{MAIN}" ', 1)
+                if cand.exists(): return f'<img src="{img(src)}" />'
+            print(f"warning: logo not found: {src}"); return ""
+        lp = c.get("size", 64)
+        label = c.get("label", "")
+        pw = len(srcs) * (lp + 22) + (tw(label, 56)[1] + 30 if label else 0) + 70
+        ly, lz = off_face({**c, "y": slot_y(c, lp + 56, 300)}, lp + 56, 300)
+        front.append(f'<div id="{cid}" class="tagw" style="top:{ly}px"><span class="logo{" glass" if c.get("glass") else ""}" style="background:{c.get("color", LIGHT)};{font("head", 56)};color:{MAIN}">'
+                     + "".join(f'<i class="lg" style="width:{lp}px;height:{lp}px">{_svg(x)}</i>' for x in srcs)
+                     + (f'<b>{esc(label)}</b>' if label else "") + "</span></div>")
+        zwrap(front, ly, lz)
+        show(f"#{cid}", a, b)
+        js.append(f'tl.fromTo("#{cid} .logo",{{scale:0.4,y:40,opacity:0}},{{scale:1,y:0,opacity:1,duration:0.45,ease:"back.out(2.6)"}},{q(a)});'
+                  f'tl.fromTo("#{cid} .lg",{{rotation:-30,scale:0}},{{rotation:0,scale:1,duration:0.4,ease:"back.out(3)",stagger:0.12}},{q(a + 0.12)});')
+        sfx("pop", a, -14)
+        zone(cid, "logo", a, b, (540 - pw * lz / 2, ly, pw * lz, (lp + 56) * lz))
     elif kind == "sticker":
         sz = c.get("size", 260)
         front.append(f'<div id="{cid}" class="stk" style="left:{c.get("x", 760) - sz // 2}px;top:{c.get("y", 420) - sz // 2}px;width:{sz}px"><img src="{img(c["src"])}" /></div>')
@@ -539,8 +602,21 @@ for i, c in enumerate(edit.get("cards", [])):
         src = next((f for f in (HF / "compositions").rglob(f"{c['name']}.html")), None)
         if not src:
             print(f"warning: motion {c['name']!r} not cached - add it: cd {HF} && npx hyperframes add {c['name']}"); continue
+        c = {**MOTION_PRESETS.get(c["name"], {}).get("card", {}), **c, "_own": tuple(c)}   # tested placement / tone, the card wins
         rel = mount(src); txt = src.read_text()
         comp_id = re.search(r'data-composition-id="([^"]+)"', txt).group(1)
+        mt = (proj / rel).read_text()
+        for k, v in (c.get("replace") or {}).items():    # motions with their text baked in: swap it for her words
+            if k not in mt: print(f"warning: motion {c['name']}: text {k!r} not found, nothing replaced")
+            mt = mt.replace(k, html.escape(v, quote=False))
+        if not c.get("keep_fonts"):                      # the brand's fonts on every catalog motion (their Oswald/Inter/Caveat
+            brand_font = (f'[data-composition-id="{comp_id}"], [data-composition-id="{comp_id}"] *:not(code):not(pre) '   # have no
+                          f'{{ font-family: "BrandSans", {FALLBACK} !important; }}')                           # Cyrillic either)
+            mt = mt.replace("<style>", "<style>\n" + "\n".join(font_css + BRAND_SANS) + "\n" + brand_font + "\n", 1)
+        if c.get("ink"):                                 # text-only motions with a hard-coded dark ink: "light" / "pop" / "#hex"
+            ink = {"light": LIGHT, "pop": POP, "soft": _SOFT, "dark": MAIN}.get(c["ink"], c["ink"])
+            mt = mt.replace("<style>", f'<style>\n[data-composition-id="{comp_id}"] *:not(svg):not(svg *) {{ color: {ink} !important; }}\n', 1)
+        (proj / rel).write_text(mt)
         nw, nh = (int(re.search(r'data-width="(\d+)"', txt).group(1)), int(re.search(r'data-height="(\d+)"', txt).group(1))) \
             if re.search(r'data-width="(\d+)"', txt) else (1080, 1080)
         vars_ = dict(c.get("vars", {}))
@@ -549,14 +625,67 @@ for i, c in enumerate(edit.get("cards", [])):
             ims = [img(x) for x in c["images"]]
             for k, sl in enumerate(slots): vars_[f"image{sl}"] = ims[k % len(ims)]
             vars_.setdefault("background", "transparent")
+        # Where a catalog motion goes. Never a panel half over her: it is either clear of her face, or it replaces the frame.
+        #   front  - transparent, light text on the video, in a band above the head or on the chest
+        #   behind - like front, but cut out behind her ("behind": true does the cut-out)
+        #   bubble - a rounded window (or "shape": "circle") in a band off the face
+        #   split  - the screen divides: the motion on a brand panel at the top, she slides into the lower part
+        #   full   - the whole frame is the motion on the brand colour for its seconds
+        own_box = "box" in c.get("_own", ())
+        fixed = bool(re.search(r'data-width="(\d+)"', txt))
+        layout = c.get("layout") or ("split" if c.get("place") == "panel" else "full" if c.get("full") else
+                                     "behind" if c.get("behind") else "front" if c.get("tone") == "clear" else
+                                     "bubble" if c.get("place") in ("top", "chest") else None)
+        if layout in ("front", "behind"): c.setdefault("tone", "clear")
+        panel_bg = {"light": LIGHT}.get(c.get("tone"), _DEEP)
+        def fit_into(ax, ay, aw, ah):                    # a fixed-size motion scaled to fit an area, centred
+            s_ = min(aw / nw, ah / nh); return [round(ax + (aw - nw * s_) / 2), round(ay + (ah - nh * s_) / 2), round(nw * s_), round(nh * s_)]
+        if c.get("place") in ("top", "chest") and not own_box and layout in ("front", "behind", "bubble"):   # a band off this reel's face
+            fx, fy, fw, fh = FACE or (300, 540, 480, 620)
+            if c["place"] == "top": c["box"] = [40, 225, 1000, max(240, min(440, int(fy + 0.15 * fh) - 225))]   # face.json starts at the hair
+            else: top = int(fy + fh + 10); c["box"] = [40, min(top, 1170), 1000, max(260, min(460, 1490 - min(top, 1170)))]
+            if layout == "bubble" and c.get("shape") == "circle":
+                bx, by, bw_, bh_ = c["box"]; c["box"] = [round(bx + (bw_ - bh_) / 2), by, bh_, bh_]
+            if fixed: c["box"] = fit_into(*c["box"])
+        if layout == "split":
+            PANEL = c.get("panel", 820)                  # the brand panel's height; she keeps the rest of the frame
+            fx, fy, fw, fh = FACE or (300, 500, 480, 600)
+            src_top = max(0, fy - 0.12 * fh - c.get("headroom", 70))
+            pos = f"50% {max(0, min(100, src_top / PANEL * 100)):.0f}%"
+            area = (40, 240, 1000, PANEL - 280)          # under Instagram's top bar, inside the panel
+            if not own_box: c["box"] = fit_into(*area) if fixed else list(area)
+            mid.append(f'<div id="{cid}s" class="sp" style="opacity:0;visibility:hidden">'
+                       f'<div class="spw" style="left:0;top:0;width:1080px;height:1920px"><video src="master.mp4" muted playsinline data-start="{q(a)}" '
+                       f'data-duration="{q(b - a)}" data-media-start="{q(a)}" data-track-index="{9 + i}" style="object-position:{pos}"></video></div>'
+                       f'<div class="spp" style="left:0;top:0;width:1080px;height:{PANEL}px;background:{panel_bg}"></div></div>')
+            js.append(f'tl.set("#{cid}s",{{autoAlpha:1}},{q(a)});'
+                      f'tl.to("#{cid}s .spw",{{top:{PANEL},height:{H - PANEL},duration:0.55,ease:"power3.inOut"}},{q(a)});'
+                      f'tl.fromTo("#{cid}s .spp",{{clipPath:"inset(0% 0% 100% 0%)"}},{{clipPath:"inset(0% 0% 0% 0%)",duration:0.55,ease:"power3.inOut"}},{q(a)});'
+                      f'tl.to("#{cid}s .spw",{{top:0,height:{H},duration:0.45,ease:"power3.inOut"}},{q(b - 0.45)});'
+                      f'tl.to("#{cid}s .spp",{{clipPath:"inset(0% 0% 100% 0%)",duration:0.45,ease:"power3.inOut"}},{q(b - 0.45)});tl.set("#{cid}s",{{autoAlpha:0}},{q(b)});')
+            sfx("whoosh_soft", b - 0.45, -16); quiet.append((a, b)); zone(cid, "split", a, b, (0, 0, W, H), full=True)
+        elif layout == "full":
+            if not own_box and not c.get("box"): c["box"] = fit_into(60, 260, 960, 1240) if fixed else [60, 260, 960, 1240]
+            elif not fixed and not own_box and c.get("box") == [0, 0, 1080, 1920]: pass
+            mid.append(f'<div id="{cid}f" style="position:absolute;inset:0;background:{panel_bg};opacity:0;visibility:hidden"></div>')
+            js.append(f'tl.fromTo("#{cid}f",{{autoAlpha:0}},{{autoAlpha:1,duration:0.25,ease:"power2.out"}},{q(a)});'
+                      f'tl.to("#{cid}f",{{autoAlpha:0,duration:0.25,ease:"power2.in"}},{q(b - 0.25)});')
+            quiet.append((a, b))
         x, y, bw, bh = c.get("box", [0, 160, W, int(W * nh / nw)])
         sc = bw / nw
+        if not re.search(r'data-width="(\d+)"', txt) and c.get("box"):   # size-free components fill whatever box they get:
+            nw, nh, sc = bw, bh, 1.0                     # a wide band above the head or across the chest, not a square on the face
+        if c.get("scale"):                               # "scale": wide 16:9 overlays (lower thirds, handwriting) shown bigger than
+            sc = float(c["scale"]); bw, bh = round(nw * sc), round(nh * sc)   # the 1080 frame; box x/y may go negative to crop
         if y + bh * 0.7 > CAP_Y: quiet.append((a, b))   # motion sits over the caption zone: captions step aside
         vals = html.escape(json.dumps(vars_), quote=True)
+        tone = TONES.get(c.get("tone", "dark"), TONES["dark"]) + "".join(f"{k}:{v};" for k, v in (c.get("css") or {}).items())
+        if layout == "bubble":                           # a rounded window (or a circle) with clean edges
+            tone += f'border-radius:{"50%" if c.get("shape") == "circle" else f"{round(40 / sc)}px"};overflow:hidden;'
         mid.append(f'<div id="{cid}" class="clip" data-composition-id="{comp_id}" data-composition-src="{rel}" data-variable-values="{vals}" '
                    f'data-start="{q(a)}" data-duration="{q(b - a)}" data-track-index="{40 + i}" data-width="{nw}" data-height="{nh}" '
                    f'style="position:absolute;left:{x}px;top:{y}px;width:{nw}px;height:{nh}px;transform:scale({sc:.4f});transform-origin:0 0;'
-                   f'--brand:{MAIN};--accent:{POP};--accent-2:{C.get("soft", POP)};--surface:{LIGHT};--fg:{MAIN};--muted:{C.get("soft", POP)}"></div>')
+                   f'{tone}--font-display:{FAM["head"][0]};--font-body:{FAM["body"][0]};--font-sans:{FAM["body"][0]};--font-serif:{FAM["accent"][0]}"></div>')
         sfx("swish", a - 0.05, -12)
         zone(cid, "motion", a, b, (x, y, bw, bh), text=False)
     elif kind == "custom":
@@ -907,6 +1036,10 @@ html, body {{ margin: 0; background: #000; overflow: hidden; }}
 .vp img {{ width: 100%; display: block; }}
 .imgs {{ position: absolute; left: 0; top: 140px; width: {W}px; height: 560px; }}
 .ph {{ position: absolute; top: 0; width: 420px; height: 520px; object-fit: cover; border: 12px solid #fff; border-radius: 18px; box-shadow: 0 26px 60px rgba(0,0,0,.28); }}
+.logo {{ display: inline-flex; align-items: center; gap: 22px; padding: 28px 46px; border-radius: 90px; letter-spacing: -.02em; box-shadow: 0 16px 40px rgba(0,0,0,.22); }}
+.logo .lg {{ display: inline-block; flex: none; }}
+.logo .lg svg, .logo .lg img {{ width: 100%; height: 100%; display: block; }}
+.logo b {{ font-weight: inherit; white-space: nowrap; }}
 .stk {{ position: absolute; }}
 .stk img {{ width: 100%; display: block; filter: drop-shadow(0 14px 22px rgba(0,0,0,.25)); }}
 .page {{ position: absolute; inset: 0; }}

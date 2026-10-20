@@ -1,0 +1,2444 @@
+{
+ "about": "Tested HyperFrames catalog motions (rendered on a real reel, Ukrainian text, brand tones and fonts). status: ready = vars take her words; replace = English text baked in, swap the listed strings with card \"replace\"; skip = don't use. card = tested placement, copied into the edit.json card by build_reel (card fields win).",
+ "moments": [
+  "хук / ключова фраза",
+  "цифра",
+  "ріст / падіння",
+  "список / кроки",
+  "до / після",
+  "питання / ШІ",
+  "повідомлення / чат",
+  "відгук / доказ",
+  "проблема / тиск",
+  "ім'я / хто я",
+  "заклик (CTA)",
+  "картинки / приклади",
+  "успіх / готово",
+  "перехід"
+ ],
+ "motions": [
+  {
+   "name": "push-in",
+   "ua": "заголовок на плашці бренду з повільним наїздом камери",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "split"
+   },
+   "text": "vars.headline",
+   "rank": 2,
+   "note": ""
+  },
+  {
+   "name": "per-word-rise",
+   "ua": "слова фрази піднімаються з розмиття одне за одним",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "bubble",
+    "place": "chest"
+   },
+   "text": "vars.text",
+   "rank": 2,
+   "note": ""
+  },
+  {
+   "name": "titlecard-calm",
+   "ua": "спокійна титульна: маленький підпис і великий заголовок",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "clear",
+    "layout": "front",
+    "place": "top"
+   },
+   "text": "vars.kicker, vars.headline",
+   "rank": 2,
+   "note": ""
+  },
+  {
+   "name": "headline-slam",
+   "ua": "важкий заголовок падає в кадр з поштовхом",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "clear",
+    "ink": "light",
+    "layout": "front",
+    "place": "top"
+   },
+   "text": "vars.headline",
+   "rank": 3,
+   "note": ""
+  },
+  {
+   "name": "kinetic-center-build",
+   "ua": "слова влітають справа і збирають фразу по центру",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "skip",
+   "card": {
+    "tone": "clear",
+    "ink": "light",
+    "layout": "front",
+    "place": "top"
+   },
+   "text": "vars.text",
+   "rank": 3,
+   "note": "перевірено: текст не з'являється в кадрі"
+  },
+  {
+   "name": "kinetic-type-swap",
+   "ua": "речення, де одне слово перебирає варіанти й зупиняється на правильному",
+   "moments": [
+    "хук / ключова фраза",
+    "до / після"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "clear",
+    "ink": "light",
+    "layout": "front",
+    "place": "top"
+   },
+   "text": "vars",
+   "rank": 3,
+   "note": ""
+  },
+  {
+   "name": "char-slam-explode",
+   "ua": "літери розлітаються і з ударом збираються в слово",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "clear",
+    "ink": "light",
+    "layout": "front",
+    "place": "top"
+   },
+   "text": "vars.text",
+   "rank": 3,
+   "note": ""
+  },
+  {
+   "name": "shutter-slam",
+   "ua": "одне слово влітає серією ударів з розмиттям",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "clear",
+    "ink": "light",
+    "layout": "front",
+    "place": "top"
+   },
+   "text": "vars.word",
+   "rank": 3,
+   "note": ""
+  },
+  {
+   "name": "text-shimmer",
+   "ua": "заголовок, по якому проходить відблиск світла",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "light",
+    "layout": "bubble",
+    "place": "chest"
+   },
+   "text": "vars.text",
+   "rank": 4,
+   "note": ""
+  },
+  {
+   "name": "variable-font-flex",
+   "ua": "слово розтягується і товщає",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "bubble",
+    "place": "chest"
+   },
+   "text": "vars.word",
+   "rank": 4,
+   "note": ""
+  },
+  {
+   "name": "vox-annotate",
+   "ua": "маркер виділяє слово в реченні, тонка лінія веде до підпису",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "bubble",
+    "place": "chest"
+   },
+   "text": "vars",
+   "rank": 3,
+   "note": ""
+  },
+  {
+   "name": "marker-highlight",
+   "ua": "маркер підкреслює або обводить слово у фразі",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "bubble",
+    "place": "chest"
+   },
+   "text": "vars",
+   "rank": 3,
+   "note": ""
+  },
+  {
+   "name": "particle-text-dissolve",
+   "ua": "текст збирається з хмари частинок",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "clear",
+    "ink": "light",
+    "layout": "front",
+    "place": "top"
+   },
+   "text": "vars.text",
+   "rank": 4,
+   "note": ""
+  },
+  {
+   "name": "scramble-reveal",
+   "ua": "текст розшифровується по літерах, як у терміналі",
+   "moments": [
+    "хук / ключова фраза",
+    "питання / ШІ"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "light",
+    "layout": "bubble",
+    "place": "chest"
+   },
+   "text": "vars.text",
+   "rank": 4,
+   "note": ""
+  },
+  {
+   "name": "outline-draw",
+   "ua": "рожева рамка обводиться навколо неї в кадрі",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "card": {
+    "box": [
+     40,
+     280,
+     1000,
+     1000
+    ],
+    "tone": "clear"
+   },
+   "text": "",
+   "rank": 3
+  },
+  {
+   "name": "gloss-sweep",
+   "ua": "картка-нагорода з відблиском",
+   "moments": [
+    "хук / ключова фраза",
+    "успіх / готово"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "front",
+    "place": "chest",
+    "tone": "clear"
+   },
+   "text": "vars",
+   "rank": 4,
+   "note": ""
+  },
+  {
+   "name": "typewriter",
+   "ua": "фраза друкується по літері з курсором",
+   "moments": [
+    "хук / ключова фраза",
+    "питання / ШІ"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "clear",
+    "ink": "light",
+    "css": {
+     "--snip-scale": 2.4
+    },
+    "layout": "front",
+    "place": "top"
+   },
+   "text": "vars.text",
+   "rank": 4,
+   "note": ""
+  },
+  {
+   "name": "matrix-decode",
+   "ua": "слово проявляється з випадкових символів",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "clear",
+    "ink": "light",
+    "css": {
+     "--snip-scale": 1.7
+    },
+    "layout": "front",
+    "place": "top"
+   },
+   "text": "vars.text (до 14 знаків)",
+   "rank": 5,
+   "note": ""
+  },
+  {
+   "name": "rgb-glitch-text",
+   "ua": "слово з глітч-ефектом (кольорові зсуви)",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "clear",
+    "ink": "light",
+    "css": {
+     "--snip-scale": 2.6
+    },
+    "layout": "front",
+    "place": "top"
+   },
+   "text": "vars.text",
+   "rank": 5,
+   "note": ""
+  },
+  {
+   "name": "top-down-letters",
+   "ua": "літери падають згори сходинкою",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "clear",
+    "ink": "light",
+    "css": {
+     "--snip-scale": 1.7
+    },
+    "layout": "front",
+    "place": "top"
+   },
+   "text": "vars.text (до 14 знаків)",
+   "rank": 5,
+   "note": ""
+  },
+  {
+   "name": "per-word-crossfade",
+   "ua": "спокійна поява фрази по словах",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "clear",
+    "ink": "light",
+    "css": {
+     "--snip-scale": 2.2
+    },
+    "layout": "front",
+    "place": "top"
+   },
+   "text": "vars.text",
+   "rank": 5,
+   "note": ""
+  },
+  {
+   "name": "staggered-fade-up",
+   "ua": "слова виринають знизу одне за одним",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "clear",
+    "ink": "light",
+    "css": {
+     "--snip-scale": 2.2
+    },
+    "layout": "front",
+    "place": "top"
+   },
+   "text": "vars.words",
+   "rank": 5,
+   "note": ""
+  },
+  {
+   "name": "caret-swap",
+   "ua": "курсор стирає стару фразу і друкує нову",
+   "moments": [
+    "до / після"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "clear",
+    "ink": "light",
+    "layout": "front",
+    "place": "top"
+   },
+   "text": "vars",
+   "rank": 2,
+   "note": ""
+  },
+  {
+   "name": "line-swap",
+   "ua": "рядок змінюється іншим через маску",
+   "moments": [
+    "до / після",
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "bubble",
+    "place": "chest"
+   },
+   "text": "vars",
+   "rank": 3,
+   "note": ""
+  },
+  {
+   "name": "text-match-cut",
+   "ua": "одна фраза на ходу перетікає в іншу",
+   "moments": [
+    "до / після",
+    "перехід"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "bubble",
+    "place": "chest"
+   },
+   "text": "vars",
+   "rank": 3,
+   "note": ""
+  },
+  {
+   "name": "split-tilt-cards",
+   "ua": "дві картки розкриваються як книжка: порівняння",
+   "moments": [
+    "до / після"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "split"
+   },
+   "text": "vars",
+   "rank": 3,
+   "note": ""
+  },
+  {
+   "name": "physical-exit",
+   "ua": "картка зі старою ідеєю відлітає з кадру",
+   "moments": [
+    "до / після",
+    "перехід"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "light",
+    "layout": "front",
+    "place": "chest"
+   },
+   "text": "vars",
+   "rank": 4,
+   "note": ""
+  },
+  {
+   "name": "count-up",
+   "ua": "цифра рахується до значення",
+   "moments": [
+    "цифра"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "front",
+    "place": "top",
+    "tone": "clear"
+   },
+   "text": "vars.start/end/prefix/suffix",
+   "rank": 1,
+   "note": ""
+  },
+  {
+   "name": "conic-progress-ring",
+   "ua": "кільце заповнюється до відсотка",
+   "moments": [
+    "цифра"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "clear",
+    "layout": "front",
+    "place": "top"
+   },
+   "text": "vars",
+   "rank": 2,
+   "note": ""
+  },
+  {
+   "name": "number-pop-in",
+   "ua": "число вискакує з розмиття, поруч підпис",
+   "moments": [
+    "цифра"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "clear",
+    "ink": "light",
+    "css": {
+     "--snip-scale": 2.6
+    },
+    "layout": "front",
+    "place": "top"
+   },
+   "text": "vars.value, vars.unit",
+   "rank": 3,
+   "note": ""
+  },
+  {
+   "name": "slot-machine-roll",
+   "ua": "барабан прокручується і зупиняється на числі",
+   "moments": [
+    "цифра"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "clear",
+    "ink": "light",
+    "css": {
+     "--snip-scale": 2.6
+    },
+    "layout": "front",
+    "place": "top"
+   },
+   "text": "vars.result",
+   "rank": 4,
+   "note": ""
+  },
+  {
+   "name": "star-rating-fill",
+   "ua": "зірки заповнюються до рейтингу",
+   "moments": [
+    "цифра",
+    "відгук / доказ"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "bubble",
+    "place": "chest"
+   },
+   "text": "vars",
+   "rank": 3,
+   "note": ""
+  },
+  {
+   "name": "decline-chart",
+   "ua": "лінія падає, цифра зменшується (ціна заявки, витрати)",
+   "moments": [
+    "ріст / падіння",
+    "цифра"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "split"
+   },
+   "text": "vars",
+   "rank": 2,
+   "note": ""
+  },
+  {
+   "name": "chart-story",
+   "ua": "графік будується з точними значеннями",
+   "moments": [
+    "ріст / падіння",
+    "цифра"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "split"
+   },
+   "text": "vars.data/labels",
+   "rank": 2,
+   "note": ""
+  },
+  {
+   "name": "mk-line-graph",
+   "ua": "лінія росту з точками",
+   "moments": [
+    "ріст / падіння"
+   ],
+   "status": "replace",
+   "card": {
+    "layout": "split"
+   },
+   "text": "",
+   "rank": 5,
+   "note": "значення зашиті у файлі"
+  },
+  {
+   "name": "badge-pop",
+   "ua": "значок сповіщення з лічильником",
+   "moments": [
+    "повідомлення / чат",
+    "цифра"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "clear",
+    "css": {
+     "--snip-scale": 2.6
+    },
+    "layout": "front",
+    "place": "top"
+   },
+   "text": "vars.count",
+   "rank": 4,
+   "note": ""
+  },
+  {
+   "name": "marker-checklist-card",
+   "ua": "паперова картка-чекліст, маркер обводить слово",
+   "moments": [
+    "список / кроки"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "split"
+   },
+   "text": "vars",
+   "rank": 1,
+   "note": ""
+  },
+  {
+   "name": "grid-card-assemble",
+   "ua": "картки з іконками збираються в сітку (2-4 пункти)",
+   "moments": [
+    "список / кроки"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "split"
+   },
+   "text": "vars",
+   "rank": 2,
+   "note": ""
+  },
+  {
+   "name": "constellation-hub",
+   "ua": "пункти розходяться від центру лініями",
+   "moments": [
+    "список / кроки"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "split"
+   },
+   "text": "vars",
+   "rank": 2,
+   "note": ""
+  },
+  {
+   "name": "radial-surround",
+   "ua": "ярлики кружляють навколо голови",
+   "moments": [
+    "список / кроки",
+    "проблема / тиск"
+   ],
+   "status": "skip",
+   "card": {
+    "box": [
+     40,
+     250,
+     1000,
+     1000
+    ],
+    "tone": "clear"
+   },
+   "text": "vars",
+   "rank": 1,
+   "note": "перевірено: центральний ярлик лягає на обличчя"
+  },
+  {
+   "name": "perspective-marquee",
+   "ua": "слова пливуть стрічкою в перспективі",
+   "moments": [
+    "список / кроки"
+   ],
+   "status": "skip",
+   "card": {
+    "box": [
+     0,
+     420,
+     1080,
+     540
+    ],
+    "tone": "clear",
+    "ink": "light",
+    "css": {
+     "--snip-scale": 2.2
+    }
+   },
+   "text": "vars.words (через кому)",
+   "rank": 4,
+   "note": "перевірено: англійські слова, ламається з кирилицею"
+  },
+  {
+   "name": "overwhelm-surround",
+   "ua": "задачі й сповіщення налітають з усіх боків",
+   "moments": [
+    "проблема / тиск"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "split"
+   },
+   "text": "vars",
+   "rank": 2,
+   "note": ""
+  },
+  {
+   "name": "ai-answer-rank",
+   "ua": "питання в чат ШІ, відповідь трійкою варіантів",
+   "moments": [
+    "питання / ШІ"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "light",
+    "layout": "split"
+   },
+   "text": "vars",
+   "rank": 2,
+   "note": ""
+  },
+  {
+   "name": "typed-prompt",
+   "ua": "промпт друкується в рядку",
+   "moments": [
+    "питання / ШІ"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "light",
+    "layout": "split"
+   },
+   "text": "vars.text",
+   "rank": 2,
+   "note": ""
+  },
+  {
+   "name": "ai-chat-reveal",
+   "ua": "повноекранний телефон: питання до ШІ і відповідь",
+   "moments": [
+    "питання / ШІ"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "full"
+   },
+   "text": "vars",
+   "rank": 3,
+   "note": "на весь екран, клавіатура англійська"
+  },
+  {
+   "name": "chatgpt-exchange",
+   "ua": "повноекранний ChatGPT: промпт і відповідь",
+   "moments": [
+    "питання / ШІ"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "full"
+   },
+   "text": "vars",
+   "rank": 3,
+   "note": "на весь екран"
+  },
+  {
+   "name": "claude-exchange",
+   "ua": "повноекранний Claude: промпт, пошук, відповідь",
+   "moments": [
+    "питання / ШІ"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "full"
+   },
+   "text": "vars",
+   "rank": 3,
+   "note": "на весь екран"
+  },
+  {
+   "name": "chat-thread",
+   "ua": "повноекранна переписка в месенджері",
+   "moments": [
+    "повідомлення / чат"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "full"
+   },
+   "text": "vars",
+   "rank": 2,
+   "note": "на весь екран"
+  },
+  {
+   "name": "message-thread-reveal",
+   "ua": "телефон з перепискою: бульбашки, набір тексту",
+   "moments": [
+    "повідомлення / чат"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "full"
+   },
+   "text": "vars",
+   "rank": 2,
+   "note": "на весь екран"
+  },
+  {
+   "name": "chat-message",
+   "ua": "одне повідомлення-бульбашка",
+   "moments": [
+    "повідомлення / чат"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "split"
+   },
+   "text": "vars.text",
+   "rank": 1,
+   "note": ""
+  },
+  {
+   "name": "typing-indicator",
+   "ua": "три крапки: хтось пише",
+   "moments": [
+    "повідомлення / чат"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "clear",
+    "css": {
+     "--snip-scale": 3
+    },
+    "layout": "front",
+    "place": "top"
+   },
+   "text": "",
+   "rank": 4,
+   "note": ""
+  },
+  {
+   "name": "native-notification-pop",
+   "ua": "одне сповіщення iPhone",
+   "moments": [
+    "повідомлення / чат"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "front",
+    "place": "top",
+    "tone": "clear"
+   },
+   "text": "vars.title/body/app_label",
+   "rank": 1,
+   "note": ""
+  },
+  {
+   "name": "notification-stack",
+   "ua": "сповіщення складаються стопкою",
+   "moments": [
+    "повідомлення / чат",
+    "відгук / доказ"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "split"
+   },
+   "text": "vars.titles/bodies",
+   "rank": 1,
+   "note": ""
+  },
+  {
+   "name": "notification-cascade",
+   "ua": "повноекранний телефон, сповіщення падають одне за одним",
+   "moments": [
+    "повідомлення / чат",
+    "відгук / доказ"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "full"
+   },
+   "text": "vars",
+   "rank": 3,
+   "note": "на весь екран"
+  },
+  {
+   "name": "notes-reveal",
+   "ua": "повноекранні нотатки: текст друкується",
+   "moments": [
+    "список / кроки",
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "full"
+   },
+   "text": "vars",
+   "rank": 3,
+   "note": "на весь екран"
+  },
+  {
+   "name": "notes-typing",
+   "ua": "аркуш нотаток: заголовок і рядки друкуються",
+   "moments": [
+    "список / кроки"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "light",
+    "layout": "split"
+   },
+   "text": "vars",
+   "rank": 3,
+   "note": ""
+  },
+  {
+   "name": "yt-comment-card",
+   "ua": "коментар друкується поверх відео",
+   "moments": [
+    "повідомлення / чат",
+    "відгук / доказ"
+   ],
+   "status": "skip",
+   "card": {
+    "box": [
+     0,
+     330,
+     1080,
+     608
+    ]
+   },
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: порожній кадр"
+  },
+  {
+   "name": "testimonial-card",
+   "ua": "картка відгуку: цитата, ім'я, аватар",
+   "moments": [
+    "відгук / доказ"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "light",
+    "layout": "split"
+   },
+   "text": "vars",
+   "rank": 2,
+   "note": "тільки справжні відгуки"
+  },
+  {
+   "name": "testimonial-proof-card",
+   "ua": "цитата відгуку проявляється рядками",
+   "moments": [
+    "відгук / доказ"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "split"
+   },
+   "text": "vars",
+   "rank": 2,
+   "note": "тільки справжні відгуки"
+  },
+  {
+   "name": "social-proof-card",
+   "ua": "зірки, фраза-доказ, іконки і кнопка",
+   "moments": [
+    "відгук / доказ",
+    "заклик (CTA)"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "light",
+    "layout": "split"
+   },
+   "text": "vars",
+   "rank": 3,
+   "note": ""
+  },
+  {
+   "name": "lt-accent-underline",
+   "ua": "нижній титр: ім'я і лінія-акцент",
+   "moments": [
+    "ім'я / хто я"
+   ],
+   "status": "replace",
+   "card": {
+    "box": [
+     -40,
+     300,
+     0,
+     0
+    ],
+    "scale": 1.05
+   },
+   "text": "",
+   "rank": 2,
+   "replace": {
+    "Dr. Maya Chen": "<ім'я>",
+    "Maya Chen": "<ім'я>",
+    "Host · Neuroscientist": "<роль>",
+    "Episode 47": "<надпис над ім'ям>"
+   }
+  },
+  {
+   "name": "lt-clean-bar",
+   "ua": "нижній титр: біла картка з ім'ям",
+   "moments": [
+    "ім'я / хто я"
+   ],
+   "status": "replace",
+   "card": {
+    "box": [
+     -40,
+     300,
+     0,
+     0
+    ],
+    "scale": 1.05
+   },
+   "text": "",
+   "rank": 2,
+   "replace": {
+    "Dr. Maya Chen": "<ім'я>",
+    "Maya Chen": "<ім'я>",
+    "Host · Neuroscientist": "<роль>",
+    "Episode 47": "<надпис над ім'ям>"
+   }
+  },
+  {
+   "name": "lt-dark-card",
+   "ua": "нижній титр: темна картка",
+   "moments": [
+    "ім'я / хто я"
+   ],
+   "status": "replace",
+   "card": {
+    "box": [
+     -40,
+     300,
+     0,
+     0
+    ],
+    "scale": 1.05
+   },
+   "text": "",
+   "rank": 2,
+   "replace": {
+    "Dr. Maya Chen": "<ім'я>",
+    "Maya Chen": "<ім'я>",
+    "Host · Neuroscientist": "<роль>",
+    "Episode 47": "<надпис над ім'ям>"
+   }
+  },
+  {
+   "name": "lt-kicker-name",
+   "ua": "нижній титр з надписом над ім'ям",
+   "moments": [
+    "ім'я / хто я"
+   ],
+   "status": "replace",
+   "card": {
+    "box": [
+     -40,
+     300,
+     0,
+     0
+    ],
+    "scale": 1.05
+   },
+   "text": "",
+   "rank": 2,
+   "replace": {
+    "Dr. Maya Chen": "<ім'я>",
+    "Maya Chen": "<ім'я>",
+    "Host · Neuroscientist": "<роль>",
+    "Episode 47": "<надпис над ім'ям>"
+   }
+  },
+  {
+   "name": "lt-mask-reveal",
+   "ua": "нижній титр: ім'я проявляється смугою",
+   "moments": [
+    "ім'я / хто я"
+   ],
+   "status": "replace",
+   "card": {
+    "box": [
+     -40,
+     300,
+     0,
+     0
+    ],
+    "scale": 1.05
+   },
+   "text": "",
+   "rank": 2,
+   "replace": {
+    "Dr. Maya Chen": "<ім'я>",
+    "Maya Chen": "<ім'я>",
+    "Host · Neuroscientist": "<роль>",
+    "Episode 47": "<надпис над ім'ям>"
+   }
+  },
+  {
+   "name": "lt-side-rule",
+   "ua": "нижній титр з вертикальною лінією",
+   "moments": [
+    "ім'я / хто я"
+   ],
+   "status": "replace",
+   "card": {
+    "box": [
+     -40,
+     300,
+     0,
+     0
+    ],
+    "scale": 1.05
+   },
+   "text": "",
+   "rank": 2,
+   "replace": {
+    "Dr. Maya Chen": "<ім'я>",
+    "Maya Chen": "<ім'я>",
+    "Host · Neuroscientist": "<роль>",
+    "Episode 47": "<надпис над ім'ям>"
+   }
+  },
+  {
+   "name": "lt-soft-pill",
+   "ua": "нижній титр: заокруглена пігулка",
+   "moments": [
+    "ім'я / хто я"
+   ],
+   "status": "replace",
+   "card": {
+    "box": [
+     -40,
+     300,
+     0,
+     0
+    ],
+    "scale": 1.05
+   },
+   "text": "",
+   "rank": 2,
+   "replace": {
+    "Dr. Maya Chen": "<ім'я>",
+    "Maya Chen": "<ім'я>",
+    "Host · Neuroscientist": "<роль>",
+    "Episode 47": "<надпис над ім'ям>"
+   }
+  },
+  {
+   "name": "cta-close",
+   "ua": "фінальна фраза і кнопка-капсула",
+   "moments": [
+    "заклик (CTA)"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "full"
+   },
+   "text": "vars",
+   "rank": 1,
+   "note": ""
+  },
+  {
+   "name": "cta-lockup",
+   "ua": "фінальний блок: фраза, кнопка, підпис",
+   "moments": [
+    "заклик (CTA)"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "clear",
+    "layout": "full"
+   },
+   "text": "vars",
+   "rank": 1,
+   "note": ""
+  },
+  {
+   "name": "instagram-follow",
+   "ua": "картка «підписатися» в Instagram",
+   "moments": [
+    "заклик (CTA)"
+   ],
+   "status": "replace",
+   "card": {
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ]
+   },
+   "text": "",
+   "rank": 4,
+   "note": "ім'я акаунта зашите у файлі (зараз HeyGen): replace на її нік"
+  },
+  {
+   "name": "success-check",
+   "ua": "галочка з'являється в кільці",
+   "moments": [
+    "успіх / готово"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "clear",
+    "css": {
+     "--snip-scale": 3
+    },
+    "layout": "front",
+    "place": "top"
+   },
+   "text": "",
+   "rank": 3,
+   "note": ""
+  },
+  {
+   "name": "icon-morph-beat",
+   "ua": "іконка перетворюється на галочку",
+   "moments": [
+    "успіх / готово"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "front",
+    "place": "top",
+    "tone": "clear"
+   },
+   "text": "",
+   "rank": 3,
+   "note": ""
+  },
+  {
+   "name": "toggle-flip",
+   "ua": "великий перемикач клацає в «увімкнено»",
+   "moments": [
+    "успіх / готово",
+    "до / після"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "front",
+    "place": "top",
+    "tone": "clear"
+   },
+   "text": "vars",
+   "rank": 3,
+   "note": ""
+  },
+  {
+   "name": "press-ripple",
+   "ua": "натискання на кнопку з хвилею",
+   "moments": [
+    "успіх / готово",
+    "заклик (CTA)"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "front",
+    "place": "top",
+    "tone": "clear"
+   },
+   "text": "vars",
+   "rank": 3,
+   "note": ""
+  },
+  {
+   "name": "carousel-circle-1",
+   "ua": "картинки по колу",
+   "moments": [
+    "картинки / приклади",
+    "список / кроки"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "split"
+   },
+   "text": "images: [...]",
+   "rank": 2,
+   "note": ""
+  },
+  {
+   "name": "carousel-circle-2",
+   "ua": "картинки по колу, інший ритм",
+   "moments": [
+    "картинки / приклади",
+    "список / кроки"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "split"
+   },
+   "text": "images: [...]",
+   "rank": 2,
+   "note": ""
+  },
+  {
+   "name": "carousel-circle-3",
+   "ua": "картинки по колу, третій варіант",
+   "moments": [
+    "картинки / приклади",
+    "список / кроки"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "split"
+   },
+   "text": "images: [...]",
+   "rank": 2,
+   "note": ""
+  },
+  {
+   "name": "carousel-path-1",
+   "ua": "картинки по дузі",
+   "moments": [
+    "картинки / приклади",
+    "список / кроки"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "split"
+   },
+   "text": "images: [...]",
+   "rank": 2,
+   "note": ""
+  },
+  {
+   "name": "carousel-path-2",
+   "ua": "картинки V-подібною траєкторією",
+   "moments": [
+    "картинки / приклади",
+    "список / кроки"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "split"
+   },
+   "text": "images: [...]",
+   "rank": 2,
+   "note": ""
+  },
+  {
+   "name": "carousel-path-3",
+   "ua": "картинки по діагоналі",
+   "moments": [
+    "картинки / приклади",
+    "список / кроки"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "split"
+   },
+   "text": "images: [...]",
+   "rank": 2,
+   "note": ""
+  },
+  {
+   "name": "carousel-orbit-1",
+   "ua": "картинки по орбіті",
+   "moments": [
+    "картинки / приклади",
+    "список / кроки"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "split"
+   },
+   "text": "images: [...]",
+   "rank": 2,
+   "note": ""
+  },
+  {
+   "name": "carousel-vision-1",
+   "ua": "картинки в глибину",
+   "moments": [
+    "картинки / приклади",
+    "список / кроки"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "split"
+   },
+   "text": "images: [...]",
+   "rank": 2,
+   "note": ""
+  },
+  {
+   "name": "carousel-text-circle-1",
+   "ua": "заголовок і карусель картинок навколо нього",
+   "moments": [
+    "картинки / приклади",
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "split",
+    "ink": "light"
+   },
+   "text": "vars.headline (до 14 знаків) + images",
+   "rank": 3,
+   "note": ""
+  },
+  {
+   "name": "carousel-text-circle-2",
+   "ua": "заголовок з каруселлю, другий варіант",
+   "moments": [
+    "картинки / приклади",
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "split",
+    "ink": "light"
+   },
+   "text": "vars.headline (до 14 знаків) + images",
+   "rank": 3,
+   "note": ""
+  },
+  {
+   "name": "device-frame-stage",
+   "ua": "телефон-мокап з твоїм скріном на екрані",
+   "moments": [
+    "картинки / приклади",
+    "питання / ШІ"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "split"
+   },
+   "text": "vars (картинка екрану)",
+   "rank": 3,
+   "note": "потрібна картинка екрана в vars, без неї телефон порожній"
+  },
+  {
+   "name": "scroll-feed",
+   "ua": "стрічка постів гортається",
+   "moments": [
+    "картинки / приклади",
+    "проблема / тиск"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "split"
+   },
+   "text": "",
+   "rank": 4,
+   "note": ""
+  },
+  {
+   "name": "whiteboard-ink",
+   "ua": "малюнок маркером (лампочка: ідея)",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "card": {
+    "tone": "light",
+    "layout": "split"
+   },
+   "text": "vars.sketch",
+   "rank": 4,
+   "note": ""
+  },
+  {
+   "name": "oversized-cursor",
+   "ua": "великий курсор клікає по кнопці на скріні",
+   "moments": [
+    "картинки / приклади",
+    "питання / ШІ"
+   ],
+   "status": "skip",
+   "card": {
+    "layout": "split"
+   },
+   "text": "vars",
+   "rank": 3,
+   "note": "перевірено: без скріна клікати нема по чому"
+  },
+  {
+   "name": "hw-arrow",
+   "ua": "рукописна стрілка вказує на щось у кадрі",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "skip",
+   "card": {
+    "box": [
+     0,
+     330,
+     1080,
+     608
+    ]
+   },
+   "text": "",
+   "rank": 3,
+   "note": "перевірено: зашитий англійський текст на своєму фоні"
+  },
+  {
+   "name": "hw-underline",
+   "ua": "рукописне підкреслення",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "skip",
+   "card": {
+    "box": [
+     0,
+     330,
+     1080,
+     608
+    ]
+   },
+   "text": "",
+   "rank": 4,
+   "note": "перевірено: зашитий англійський текст на своєму фоні"
+  },
+  {
+   "name": "code-terminal-run",
+   "ua": "команда друкується в терміналі",
+   "moments": [
+    "питання / ШІ"
+   ],
+   "status": "skip",
+   "card": {
+    "box": [
+     40,
+     280,
+     1000,
+     1000
+    ]
+   },
+   "text": "vars",
+   "rank": 5,
+   "note": "перевірено: дрібний текст терміналу"
+  },
+  {
+   "name": "editorial-flash-overlay",
+   "ua": "спалах камери між думками",
+   "moments": [
+    "перехід"
+   ],
+   "status": "ready",
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "text": "",
+   "rank": 2
+  },
+  {
+   "name": "organic-light-leak-overlay",
+   "ua": "теплий плівковий засвіт",
+   "moments": [
+    "перехід"
+   ],
+   "status": "ready",
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "text": "",
+   "rank": 2
+  },
+  {
+   "name": "hw-scribble-transition",
+   "ua": "каракулі закривають кадр і відкривають новий",
+   "moments": [
+    "перехід"
+   ],
+   "status": "ready",
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "text": "",
+   "rank": 3
+  },
+  {
+   "name": "freeze-frame-dressing",
+   "ua": "скрапбук: папір, скотч і спалах навколо кадру",
+   "moments": [
+    "перехід",
+    "хук / ключова фраза"
+   ],
+   "status": "skip",
+   "card": {
+    "box": [
+     0,
+     330,
+     1080,
+     608
+    ]
+   },
+   "text": "",
+   "rank": 4,
+   "note": "перевірено: напівпрозорий прямокутник на обличчі"
+  },
+  {
+   "name": "caption-camera-follow",
+   "ua": "речення пишеться по слову, камера відʼїжджає (картка follow)",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "використовуй картку follow"
+  },
+  {
+   "name": "apple-money-count",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "bar-chart-race",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "camcorder-hud",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "agent-cursor",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "before-after-wipe",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "comparison-split",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "camera-shake",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "caption-blend-difference",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "caption-clip-wipe",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "caption-emoji-pop",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "caption-gradient-fill",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "caption-highlight",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "caption-kinetic-slam",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "caption-matrix-decode",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "caption-pill-karaoke",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "cursor-annotate",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "cursor-drag-drop",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "cursor-marquee-select",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "cursor-text-select",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "curtain-reveal",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "focus-swap",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "gesture-tap",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "hw-box-label",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "hw-callout-circle",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "iris-reveal",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "logo-wall",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "mk-emphasis-type",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "mk-usage-arc",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "morph-text",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "notification-pileup",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "paper-collage-reveal",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "pull-back-reveal",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "spring-pop",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "yt-circle-pointer",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "yt-feather-highlight",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "data-chart",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "flowchart-vertical",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "hw-frame",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "hw-path-text",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "hw-pipeline",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "hw-text-cloud",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "hw-title",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "hw-write-title",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "lower-third-bild",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "lt-bold-block",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "lt-color-block",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "lt-stack-bars",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "lt-neon-border",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "macos-notification",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "mk-callout-highlight",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "mk-clone-wall-transition",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "mk-placeholder-grid",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "mk-progress-stat",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "mk-specs-list",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "news-ticker",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "reddit-post",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "spotify-card",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "thread-message-stack",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "tiktok-follow",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "weight-wave",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "x-post",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "yt-lower-third",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "yt-prism-title",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "share-sheet-carousel",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "split-flap-board",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "animated-bar-chart",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "blur-in",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "blur-out-up",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "bottom-up-letters",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "confetti",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "focus-blur-resolve",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "inline-highlight",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "line-by-line-slide",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "number-wheel",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "soft-blur-in",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "strikethrough-replace",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "tracking-in",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  },
+  {
+   "name": "x-follow-card",
+   "ua": "",
+   "moments": [],
+   "status": "skip",
+   "card": {},
+   "text": "",
+   "rank": 5,
+   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+  }
+ ]
+}
