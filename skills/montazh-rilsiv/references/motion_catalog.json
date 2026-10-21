@@ -4342,17 +4342,10 @@
    "quality": 3,
    "text_vars": [],
    "card": {
-    "box": [
-     -420,
-     0,
-     1920,
-     1920
-    ],
-    "scale": 1.78,
     "layout": "transition"
    },
-   "status": "manual",
-   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+   "status": "ready",
+   "note": "шейдерний перехід на склейці: start = час склейки, build_reel бере кадр до і після з master.mp4, ±0.3 с (half), перевірено 2026-10-22"
   },
   {
    "name": "chrome-orb",
@@ -4392,17 +4385,10 @@
    "quality": 4,
    "text_vars": [],
    "card": {
-    "box": [
-     -420,
-     0,
-     1920,
-     1920
-    ],
-    "scale": 1.78,
     "layout": "transition"
    },
-   "status": "manual",
-   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+   "status": "ready",
+   "note": "шейдерний перехід на склейці: start = час склейки, build_reel бере кадр до і після з master.mp4, ±0.3 с (half), перевірено 2026-10-22"
   },
   {
    "name": "code-3d-extrude",
@@ -4595,17 +4581,10 @@
    "quality": 3,
    "text_vars": [],
    "card": {
-    "box": [
-     -420,
-     0,
-     1920,
-     1920
-    ],
-    "scale": 1.78,
     "layout": "transition"
    },
-   "status": "manual",
-   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+   "status": "ready",
+   "note": "шейдерний перехід на склейці: start = час склейки, build_reel бере кадр до і після з master.mp4, ±0.3 с (half), перевірено 2026-10-22"
   },
   {
    "name": "cuboid-carousel",
@@ -4636,17 +4615,10 @@
    "quality": 3,
    "text_vars": [],
    "card": {
-    "box": [
-     -420,
-     0,
-     1920,
-     1920
-    ],
-    "scale": 1.78,
     "layout": "transition"
    },
    "status": "manual",
-   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+   "note": "шейдерний перехід на склейці; край розчинення неоново-рожевий і бірюзовий (зашито в шейдер, не кольори бренду)"
   },
   {
    "name": "exploded-stack",
@@ -4708,17 +4680,10 @@
    "quality": 4,
    "text_vars": [],
    "card": {
-    "box": [
-     -420,
-     0,
-     1920,
-     1920
-    ],
-    "scale": 1.78,
     "layout": "transition"
    },
-   "status": "manual",
-   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+   "status": "ready",
+   "note": "шейдерний перехід на склейці: start = час склейки, build_reel бере кадр до і після з master.mp4, ±0.3 с (half), перевірено 2026-10-22"
   },
   {
    "name": "flowchart",
@@ -4882,17 +4847,10 @@
    "quality": 4,
    "text_vars": [],
    "card": {
-    "box": [
-     -420,
-     0,
-     1920,
-     1920
-    ],
-    "scale": 1.78,
     "layout": "transition"
    },
-   "status": "manual",
-   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+   "status": "ready",
+   "note": "шейдерний перехід на склейці: start = час склейки, build_reel бере кадр до і після з master.mp4, ±0.3 с (half), перевірено 2026-10-22"
   },
   {
    "name": "godrays",
@@ -4951,17 +4909,10 @@
    "quality": 3,
    "text_vars": [],
    "card": {
-    "box": [
-     -420,
-     0,
-     1920,
-     1920
-    ],
-    "scale": 1.78,
     "layout": "transition"
    },
    "status": "manual",
-   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+   "note": "шейдерний перехід на склейці; чорна «діра» лягає на обличчя"
   },
   {
    "name": "halftone-field",
@@ -5103,17 +5054,10 @@
    "quality": 5,
    "text_vars": [],
    "card": {
-    "box": [
-     -420,
-     0,
-     1920,
-     1920
-    ],
-    "scale": 1.78,
     "layout": "transition"
    },
-   "status": "manual",
-   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+   "status": "ready",
+   "note": "шейдерний перехід на склейці: start = час склейки, build_reel бере кадр до і після з master.mp4, ±0.3 с (half), перевірено 2026-10-22"
   },
   {
    "name": "liquid-glass-notification",
@@ -5480,17 +5424,10 @@
    "quality": 3,
    "text_vars": [],
    "card": {
-    "box": [
-     -420,
-     0,
-     1920,
-     1920
-    ],
-    "scale": 1.78,
     "layout": "transition"
    },
    "status": "manual",
-   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+   "note": "шейдерний перехід на склейці; вогняний край зашитого кольору, лише для драматичного моменту"
   },
   {
    "name": "ripple-waves",
@@ -5502,17 +5439,10 @@
    "quality": 3,
    "text_vars": [],
    "card": {
-    "box": [
-     -420,
-     0,
-     1920,
-     1920
-    ],
-    "scale": 1.78,
     "layout": "transition"
    },
-   "status": "manual",
-   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+   "status": "ready",
+   "note": "шейдерний перехід на склейці: start = час склейки, build_reel бере кадр до і після з master.mp4, ±0.3 с (half), перевірено 2026-10-22"
   },
   {
    "name": "ripples",
@@ -5536,17 +5466,10 @@
    "quality": 3,
    "text_vars": [],
    "card": {
-    "box": [
-     -420,
-     0,
-     1920,
-     1920
-    ],
-    "scale": 1.78,
     "layout": "transition"
    },
-   "status": "manual",
-   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+   "status": "ready",
+   "note": "шейдерний перехід на склейці: start = час склейки, build_reel бере кадр до і після з master.mp4, ±0.3 с (half), перевірено 2026-10-22"
   },
   {
    "name": "sine-wave",
@@ -5715,17 +5638,10 @@
    "quality": 3,
    "text_vars": [],
    "card": {
-    "box": [
-     -420,
-     0,
-     1920,
-     1920
-    ],
-    "scale": 1.78,
     "layout": "transition"
    },
-   "status": "manual",
-   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+   "status": "ready",
+   "note": "шейдерний перехід на склейці: start = час склейки, build_reel бере кадр до і після з master.mp4, ±0.3 с (half), перевірено 2026-10-22"
   },
   {
    "name": "thermal-distortion",
@@ -5737,17 +5653,10 @@
    "quality": 3,
    "text_vars": [],
    "card": {
-    "box": [
-     -420,
-     0,
-     1920,
-     1920
-    ],
-    "scale": 1.78,
     "layout": "transition"
    },
-   "status": "manual",
-   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+   "status": "ready",
+   "note": "шейдерний перехід на склейці: start = час склейки, build_reel бере кадр до і після з master.mp4, ±0.3 с (half), перевірено 2026-10-22"
   },
   {
    "name": "thin-film",
@@ -6298,17 +6207,10 @@
    "quality": 4,
    "text_vars": [],
    "card": {
-    "box": [
-     -420,
-     0,
-     1920,
-     1920
-    ],
-    "scale": 1.78,
     "layout": "transition"
    },
-   "status": "manual",
-   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+   "status": "ready",
+   "note": "шейдерний перехід на склейці: start = час склейки, build_reel бере кадр до і після з master.mp4, ±0.3 с (half), перевірено 2026-10-22"
   },
   {
    "name": "wireframe-portal-title",
@@ -7211,7 +7113,7 @@
     "layout": "transition"
    },
    "status": "manual",
-   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+   "note": "не шейдер з двома кадрами (немає captureScene): на склейці не працює, лише вручну"
   },
   {
    "name": "hw-boil",
@@ -8896,7 +8798,7 @@
     "layout": "transition"
    },
    "status": "manual",
-   "note": "шейдерний перехід"
+   "note": "не шейдер з двома кадрами (немає captureScene): на склейці не працює, лише вручну"
   }
  ]
 }

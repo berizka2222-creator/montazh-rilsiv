@@ -60,7 +60,7 @@ edit.json (written by auto_edit.py, then Claude marks accents and adds cards):
   (brand overrides, allowed list looks and camera moves, rejected types, motion speed, caption entrance + accent look, sounds per event).
   Image paths: relative to the reel folder, or to ~/reels/assets/, or absolute.
 """
-import html, json, os, re, shutil, subprocess, sys
+import base64, html, json, os, re, shutil, subprocess, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import brand_recolor
 from pathlib import Path
@@ -349,6 +349,81 @@ PHRASE_ENDS = [w["end"] for k, w in enumerate(_tw) if re.search(r"[.,!?;:]$", w[
                or _tw[k + 1]["start"] - w["end"] > 0.35]
 def phrase_end(t):
     return next((e + 0.15 for e in PHRASE_ENDS if e > t + 1.0), min(t + 2.5, DUR))
+
+def cut_joins():
+    """Where the cuts sit in master.mp4: the ends of edl.json's kept pieces, at the brand's speed (as precheck.py prints them)."""
+    try:
+        from pacing import pacing
+        speed = pacing(brand)["speed"]
+        t, out = 0.0, []
+        for a_, b_ in json.load(open(reel / "edl.json"))["keep"][:-1]:
+            t += (b_ - a_) / speed; out.append(round(t, 3))
+        return out
+    except Exception:
+        return []
+JOINS = cut_joins()
+
+def shader_transition(src, comp, join, half, frame_px):
+    """A HyperFrames shader transition (cross-warp-morph, sdf-iris, ...) between the two real shots of a join.
+    The catalog file is a 1920x1080 demo that warps two drawn scenes (#s1/#s2) on a 1200x1080 canvas; here it becomes a
+    1080x1920 full-frame layer whose textures are the frame where the card starts and the frame where it ends, so the
+    shader starts exactly on the live picture before the cut and lands exactly on the one after it (no jump either side)."""
+    a_, b_ = q(join - half), q(join + half)
+    dur = q(b_ - a_)
+    shots = []
+    for t_ in (a_, b_ - 1 / FPS):
+        r = subprocess.run(["ffmpeg", "-nostdin", "-v", "error", "-ss", f"{t_:.4f}", "-i", str(reel / "master.mp4"), "-frames:v", "1",
+                            "-vf", f"scale={frame_px}:-2", "-q:v", "3", "-f", "image2pipe", "-c:v", "mjpeg", "-"], capture_output=True, check=True)
+        shots.append("data:image/jpeg;base64," + base64.b64encode(r.stdout).decode())
+    t = re.sub(r"<audio[^>]*>(</audio>)?", "", src.read_text())
+    t = t.replace('data-composition-id="main"', f'data-composition-id="{comp}"').replace('__timelines["main"]', f'__timelines["{comp}"]')
+    t = re.sub(r"width: 1920px;(\s*)height: 1080px;", r"width: 1080px;\1height: 1920px;", t)
+    t = t.replace('data-width="1920"', 'data-width="1080"').replace('data-height="1080"', 'data-height="1920"')
+    t = t.replace('data-duration="4"', f'data-duration="{dur}"')
+    t = re.sub(r'width="1200"(\s*)height="1080"', r'width="1080"\1height="1920"', t)
+    t = re.sub(r"width: 1200px;(\s*)height: 1080px;(\s*)z-index: 10;", r"width: 1080px;\1height: 1920px;\2z-index: 10;", t)
+    t = t.replace("gl.viewport(0, 0, 1200, 1080)", "gl.viewport(0, 0, 1080, 1920)").replace('"u_resolution"), 1200, 1080', '"u_resolution"), 1080, 1920')
+    # the demo's grid, side panel and drawn scenes never show; the root is see-through until the shots are on the canvas
+    sel = f'[data-composition-id="{comp}"]'
+    t = t.replace("</style>", f"{sel} {{ background: transparent !important; }}\n"
+                  + ", ".join(f"{sel} {k}" for k in (".bp-grid", ".bp-divider", ".bp-number", ".bp-right", ".scene")) + " { display: none !important; }\n</style>", 1)
+    t = t.replace('<div id="s1" class="scene"', f'<img id="tr_s1" src="{shots[0]}" alt="" style="display:none" />\n'
+                  f'      <img id="tr_s2" src="{shots[1]}" alt="" style="display:none" />\n      <div id="s1" class="scene"', 1)
+    # captureScene draws the real shot instead of the demo scene
+    t = t.replace("function captureScene(sceneId) {", """function shotReady(id) { var im = document.getElementById("tr_" + id); return im && im.complete && im.naturalWidth > 0; }
+        function captureScene(sceneId) {
+          var c = document.createElement("canvas");
+          c.width = 1080;
+          c.height = 1920;
+          c.getContext("2d").drawImage(document.getElementById("tr_" + sceneId), 0, 0, 1080, 1920);
+          var tex = gl.createTexture();
+          gl.bindTexture(gl.TEXTURE_2D, tex);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, c);
+          sceneTextures[sceneId] = tex;
+        }
+        function captureDemoScene(sceneId) {""", 1)
+    # textures only from decoded shots: until both are decoded the canvas stays hidden and the live video shows through
+    t = re.sub(r'captureScene\("s1"\);\s*captureScene\("s2"\);\s*glCanvas\.style\.display = "block";\s*renderShader\(progPass, sceneTextures\["s1"\], sceneTextures\["s1"\], 0\);',
+               """function shotsUp() {
+          if (sceneTextures["s1"] && sceneTextures["s2"]) return true;
+          if (!shotReady("s1") || !shotReady("s2")) return false;
+          captureScene("s1");
+          captureScene("s2");
+          glCanvas.style.display = "block";
+          return true;
+        }
+        ["s1", "s2"].forEach(function (id) { var im = document.getElementById("tr_" + id); if (im.decode) im.decode().then(shotsUp, function () {}); });
+        if (shotsUp()) renderShader(progPass, sceneTextures["s1"], sceneTextures["s1"], 0);""", t, count=1)
+    t = t.replace("onUpdate: function () {\n            var t = tl.time();", "onUpdate: function () {\n            if (!shotsUp()) return;\n            var t = tl.time();", 1)
+    t = t.replace("if (t >= 1.0 && t < 3.0) {", f"if (t < {dur}) {{").replace("easeInOut((t - 1.0) / 2.0)", f"easeInOut(Math.max(0, t) / {dur})")
+    t = t.replace("} else if (t >= 3.0) {", f"}} else if (t >= {dur}) {{")
+    t = t.replace('tl.to({ v: 0 }, { v: 1, duration: 4, ease: "none" }, 0);', f'tl.to({{ v: 0 }}, {{ v: 1, duration: {dur}, ease: "none" }}, 0);')
+    ok = all(s in t for s in ("if (!shotsUp()) return;", f"if (t < {dur})", f"duration: {dur}, ease", "gl.viewport(0, 0, 1080, 1920)", 'id="tr_s2"'))
+    return t, a_, b_, ok
 
 # the face (scripts/face_box.py -> face.json {"box": [x, y, w, h]}, cut-reel pixels): lists and steps never cover it
 _fj = reel / "face.json"
@@ -648,6 +723,25 @@ for i, c in enumerate(edit.get("cards", [])):
         if not re.search(r'data-composition-id="([^"]+)"', txt):
             print(f"warning: motion {c['name']!r} is a raw snippet with no composition (wrap_snippets.py could not wrap it): skipped"); continue
         comp_id = re.search(r'data-composition-id="([^"]+)"', txt).group(1)
+        if c.get("layout") == "transition":              # a shader transition: sits on a cut, warps the shot before into the shot after
+            if "captureScene" not in txt:
+                print(f"warning: motion {c['name']!r} is not a shader transition (no captureScene): skipped"); continue
+            near = min(JOINS, key=lambda j: abs(j - c["start"]), default=None)
+            join = c.get("join") or (near if near is not None and abs(near - c["start"]) <= 1.5 else None)
+            if join is None:
+                print(f"warning: transition {c['name']!r} at {c['start']:.1f}s has no cut within 1.5 s (edl.json): put it on a join"); join = c["start"]
+            comp = f"tr-{i}"
+            mt, a, b, ok = shader_transition(src, comp, join, float(c.get("half", 0.3)), 540 if DRAFT else 1080)
+            if not ok: print(f"warning: transition {c['name']!r}: this catalog file has a different layout, check it in the draft")
+            (proj / rel).unlink(missing_ok=True)
+            rel = f"compositions/{comp}.html"; (proj / rel).write_text(mt)
+            mid.append(f'<div id="{cid}" class="clip" data-composition-id="{comp}" data-composition-src="{rel}" '
+                       f'data-start="{a}" data-duration="{q(b - a)}" data-track-index="{40 + i}" data-width="1080" data-height="1920" '
+                       f'style="position:absolute;left:0;top:0;width:1080px;height:1920px;z-index:0"></div>')   # z-index: its canvas (z 10) stays under the captions
+            sfx("whoosh_soft", a, -14)
+            print(f"transition {c['name']} on the cut at {join:.2f}s ({a:.2f}-{b:.2f}s)")
+            zone(cid, "transition", a, b, (0, 0, W, H), text=False, full=True)
+            continue
         mt = (proj / rel).read_text()
         rep = {k: v for k, v in (c.get("replace") or {}).items() if k}   # motions with their text baked in: swap it for their words
         for k in rep:

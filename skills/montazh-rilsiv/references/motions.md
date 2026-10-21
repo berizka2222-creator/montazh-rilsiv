@@ -63,8 +63,17 @@ with what each one is for, its moment and its tested placement, is `references/m
   catalog lists the strings; build_reel warns when one isn't found.
 - Fonts: every catalog motion is drawn in the brand fonts (body weight for regular text, head for bold), whatever the motion
   ships with. `"keep_fonts": true` keeps its own (rarely: a terminal's monospace).
-- `full` and `split` motions take over the frame for their seconds: keep them 2-4 s, at most two `full` per reel. Light
-  leaks and the flash (`layout: "transition"`) are see-through and go between two thoughts.
+- `full` and `split` motions take over the frame for their seconds: keep them 2-4 s, at most two `full` per reel.
+- **Shader transitions on a cut** (`layout: "transition"`, moment «перехід»). Ready: cross-warp-morph, sdf-iris, swirl-vortex,
+  ripple-waves, light-leak, glitch, whip-pan, cinematic-zoom, flash-through-white, chromatic-radial-split, thermal-distortion.
+  Manual: domain-warp-dissolve (neon pink/cyan edge baked into the shader), gravitational-lens (a black hole over the face),
+  ridged-burn (fire edge). Card: `{"type": "motion", "name": "sdf-iris", "start": <the join>}`; no `end`.
+  build_reel snaps `start` to the nearest join of edl.json (within 1.5 s; `"join": 24.92` to name it exactly), takes the frame of
+  master.mp4 at join-0.3 s and at join+0.3 s, embeds them in the shader as its two scenes and plays the warp over those 0.6 s
+  (`"half": 0.4` for a slower one). The shader starts on the live picture and lands on the live picture, so neither side jumps;
+  the person freezes for the 0.6 s, which reads as part of the transition. Captions stay on top. At most one per 8-10 s, a
+  different one each time, only on a cut between two thoughts. Check them with a short draft render (`REEL_DRAFT=1 render.sh`),
+  not `hyperframes snapshot`.
 - Carousels take `"images": [..]`, every slot is filled for you.
 
 ## Transparent motion elements (WebM with alpha, ProRes 4444)
