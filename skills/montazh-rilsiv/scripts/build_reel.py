@@ -35,7 +35,10 @@ edit.json (written by auto_edit.py, then Claude marks accents and adds cards):
                                                      src file's folder is copied along (fonts, js). Default box = full frame.
      overlay {src: "overlays/<file or asset id>", mode: "tiny"|"small-r"|"small-l"|"big"|"full", effect: "soft"|"slide"|"polaroid"|"glass"|"zoom", box?: [x,y,w,h]}
                                                      an image or video they uploaded on the review page (or dropped in the folder):
-                                                     a small card top right/left, a wide panel above the head, or full screen; video muted
+                                                     a small card top right/left, a wide panel above the head, or full screen; video muted.
+                                                     A video with an alpha channel (VP8/VP9 WebM, ProRes 4444: a transparent
+                                                     motion element from Remotion, After Effects...) goes over the whole frame with no
+                                                     border or entrance of its own, and captions step aside ("captions": true keeps them)
      bigtext {text: "big / words", y?: 330, size?, color?}   huge words in the head font; with "behind": true they sit behind the person
      (any card) "behind": true   between the background and the person: the person is cut out for that window (local AI, ~13 s per second of video, cached)
      follow {words: [{text, accent}], framing: "wide"}   caption-camera-follow in brand colours/font: one sentence
@@ -197,6 +200,13 @@ def fit(text, want, extra=0, role="head"):
     adv = _advance(text, role)
     if adv: return max(24, min(int(want), int((SAFE - 2 * extra) / (adv * 1.04))))
     return max(24, min(int(want), int((SAFE - 2 * extra) / (max(len(text), 1) * EM))))
+
+def has_alpha(p):
+    """True for a video with a transparent channel (VP8/VP9 WebM with alpha_mode, ProRes 4444)."""
+    o = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "stream=pix_fmt:stream_tags=alpha_mode", "-of", "compact",
+                        str(p)], capture_output=True, text=True).stdout.lower()
+    return "alpha_mode=1" in o or "yuva" in o
+
 
 def dur_of(p):
     return float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(p)],
@@ -496,7 +506,23 @@ for i, c in enumerate(edit.get("cards", [])):
                 if _im.mode in ("RGBA", "LA", "P") and _im.convert("RGBA").getchannel("A").getextrema()[0] < 250:
                     frame, inner_r, cover = "", "0", "width:100%;height:100%;object-fit:contain;display:block"
             except Exception: pass
-        if src.suffix.lower() in (".mp4", ".mov", ".m4v", ".webm"):
+        alpha = src.suffix.lower() in (".webm", ".mov") and has_alpha(src)
+        if alpha:   # a transparent motion element (Remotion, After Effects...): whole frame, no frame, its own animation
+            frame, inner_r, cover = "", "0", "width:100%;height:100%;object-fit:contain;display:block"
+            if "box" not in c and c.get("mode", "full") == "full": x, y, ow, oh = 0, 0, 1080, 1920
+            full = False                                                     # in front of the person, not behind the camera
+            if not c.get("captions"): quiet.append((a, b))                   # the element carries the words: captions step aside
+        if alpha:
+            b = min(b, a + dur_of(src))
+            dst = proj / "img" / f"ov{i}.webm"                               # VP8 + alpha: the browser keeps the transparency
+            codec = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=codec_name", "-of", "csv=p=0",
+                                    str(src)], capture_output=True, text=True).stdout.strip()
+            dec = {"vp8": ["-c:v", "libvpx"], "vp9": ["-c:v", "libvpx-vp9"]}.get(codec, [])   # ffmpeg's own VP8/VP9 decoders drop the alpha
+            subprocess.run(["ffmpeg", "-v", "error", "-y", *dec, "-i", str(src), "-an", "-vf", "fps=30", "-c:v", "libvpx", "-pix_fmt", "yuva420p",
+                            "-auto-alt-ref", "0", "-b:v", "8M", "-crf", "6", str(dst)], check=True)
+            media = (f'<video id="{cid}v" src="img/{dst.name}" muted playsinline data-start="{q(a)}" data-duration="{q(b - a)}" '
+                     f'data-media-start="0" data-track-index="{9 + i}" style="{cover}"></video>')
+        elif src.suffix.lower() in (".mp4", ".mov", ".m4v", ".webm"):
             b = min(b, a + dur_of(src))                                      # never outlast the clip
             dst = proj / "img" / f"ov{i}.mp4"                                # one clean H.264 copy at its display size, no audio
             vf = "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920" if full else "scale=1280:-2"
@@ -511,6 +537,9 @@ for i, c in enumerate(edit.get("cards", [])):
             f'<div class="m" style="width:100%;height:100%;overflow:hidden;border-radius:{inner_r}">{media}</div></div>')
         show(f"#{cid}", a, b, 0.15)
         side = -1 if x + ow / 2 < 540 else 1                               # flies in / tilts from the side of the frame it sits on
+        if alpha:                       # the element animates itself (no entrance, no sfx) and keeps to the Reels safe area itself
+            if c.get("box"): zone(cid, "overlay", a, b, (x, y, ow, oh), text=False, full=False)
+            continue
         js.append({
             "slide": f'tl.fromTo("#{cid}",{{x:{side * 760},rotation:{side * 6}}},{{x:0,rotation:0,duration:0.55,ease:"back.out(1.3)"}},{q(a)});',
             "polaroid": f'tl.fromTo("#{cid}",{{y:-260,rotation:{-side * 16},scale:0.9}},{{y:0,rotation:{-side * 4},scale:1,duration:0.6,ease:"back.out(1.5)"}},{q(a)});',

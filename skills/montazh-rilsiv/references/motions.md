@@ -57,6 +57,21 @@ with what each one is for, its moment and its tested placement, is `references/m
   leaks and the flash (`layout: "transition"`) are see-through and go between two thoughts.
 - Carousels take `"images": [..]`, every slot is filled for you.
 
+## Transparent motion elements (WebM with alpha, ProRes 4444)
+
+A second source of motions besides the catalog: an element rendered with a transparent background in any tool (Remotion,
+After Effects, Jitter...). Remotion: `npx remotion render <Element> out.webm --codec=vp9 --pixel-format=yuva420p --image-format=png`.
+
+```json
+{"type": "overlay", "src": "overlays/roi.webm", "start": 12.4, "end": 15.0}
+```
+- build_reel detects the alpha channel: full frame, no border, no extra entrance or sfx (the element animates itself), captions
+  step aside for its seconds (`"captions": true` keeps them). A `box` on the card places a smaller one (and gets the safe-zone check).
+- Render it with the element above the head or on the chest (`face.json` says where the face is), full screen only as a takeover.
+  Never half over the face.
+- Their words in every text, numbers exactly as said. Counts toward the reel's motion number and the «never twice» rule;
+  `motions.py log` doesn't see it.
+
 ## Adding more from the catalog (447 items)
 
 `cd engine/hf && npx hyperframes add <name>`, then `python3 scripts/wrap_snippets.py` (paste-in snippets get their own
