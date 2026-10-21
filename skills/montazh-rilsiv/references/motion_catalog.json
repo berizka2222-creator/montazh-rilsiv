@@ -1,5 +1,5 @@
 {
- "about": "Tested HyperFrames catalog motions (rendered on a real reel, Ukrainian text, brand tones and fonts). status: ready = vars take her words; replace = English text baked in, swap the listed strings with card \"replace\"; skip = don't use. card = tested placement, copied into the edit.json card by build_reel (card fields win).",
+ "about": "All 456 HyperFrames registry items, classified for a vertical talking-head reel; the usable ones are rendered alone on a real reel (Ukrainian text, brand colours via scripts/brand_recolor.py, over the video, never moving the person). status: ready = checked in the frame, suggested; replace = checked, English text baked in: swap the listed strings with card \"replace\"; full_only = works only as a whole-frame takeover for 2-3 s, suggested marked «на весь кадр»; manual = works but small or niche, only when the person asks; candidate = not checked in the frame yet, never suggested; skip = don't use (reason in note). keep_ui = a real product UI (ChatGPT, Claude, iPhone...), keeps its own colours. card = placement copied into the edit.json card by build_reel (card fields win).",
  "moments": [
   "хук / ключова фраза",
   "цифра",
@@ -19,669 +19,807 @@
  "motions": [
   {
    "name": "push-in",
-   "ua": "заголовок на плашці бренду з повільним наїздом камери",
+   "ua": "Слово в центрі повільно наближається",
    "moments": [
     "хук / ключова фраза"
    ],
    "status": "ready",
    "card": {
-    "layout": "split"
+    "place": "low",
+    "layout": "front",
+    "zoom": 1.4
    },
    "text": "vars.headline",
    "rank": 2,
-   "note": ""
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [
+    "text"
+   ]
   },
   {
    "name": "per-word-rise",
-   "ua": "слова фрази піднімаються з розмиття одне за одним",
+   "ua": "Слова піднімаються з розмиття і чітко стають на місце",
    "moments": [
     "хук / ключова фраза"
    ],
    "status": "ready",
    "card": {
+    "place": "low",
     "layout": "bubble",
-    "place": "chest"
+    "zoom": 1.4
    },
    "text": "vars.text",
    "rank": 2,
-   "note": ""
+   "use": "overlay",
+   "quality": 5,
+   "text_vars": [
+    "text"
+   ]
   },
   {
    "name": "titlecard-calm",
-   "ua": "спокійна титульна: маленький підпис і великий заголовок",
+   "ua": "Спокійний заголовок з підписом зверху",
    "moments": [
     "хук / ключова фраза"
    ],
    "status": "ready",
    "card": {
-    "tone": "clear",
-    "layout": "front",
-    "place": "top"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars.kicker, vars.headline",
    "rank": 2,
-   "note": ""
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "headline",
+    "kicker"
+   ]
   },
   {
    "name": "headline-slam",
-   "ua": "важкий заголовок падає в кадр з поштовхом",
+   "ua": "Жирний заголовок падає з тряскою",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "card": {
+    "place": "low",
+    "layout": "front",
+    "zoom": 1.4
+   },
+   "text": "vars.headline",
+   "rank": 3,
+   "use": "overlay",
+   "quality": 5,
+   "text_vars": [
+    "text"
+   ]
+  },
+  {
+   "name": "kinetic-center-build",
+   "ua": "Слова входять справа і збираються по центру",
    "moments": [
     "хук / ключова фраза"
    ],
    "status": "manual",
    "card": {
-    "tone": "clear",
-    "ink": "light",
-    "layout": "front",
-    "place": "top"
-   },
-   "text": "vars.headline",
-   "rank": 3,
-   "note": "2026-10-21: у вертикальному кадрі з великим обличчям виходить дрібно (зроблено під 16:9). Тільки на прохання людини, у мікс не береться."
-  },
-  {
-   "name": "kinetic-center-build",
-   "ua": "слова влітають справа і збирають фразу по центру",
-   "moments": [
-    "хук / ключова фраза"
-   ],
-   "status": "skip",
-   "card": {
-    "tone": "clear",
-    "ink": "light",
-    "layout": "front",
-    "place": "top"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars.text",
    "rank": 3,
-   "note": "перевірено: текст не з'являється в кадрі"
+   "note": "чорний текст на відео",
+   "use": "overlay",
+   "quality": 5,
+   "text_vars": [
+    "text"
+   ]
   },
   {
    "name": "kinetic-type-swap",
-   "ua": "речення, де одне слово перебирає варіанти й зупиняється на правильному",
+   "ua": "Одне слово в реченні прокручується варіантами",
    "moments": [
     "хук / ключова фраза",
     "до / після"
    ],
-   "status": "manual",
+   "status": "ready",
    "card": {
-    "tone": "clear",
-    "ink": "light",
-    "layout": "front",
-    "place": "top"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars",
    "rank": 3,
-   "note": "2026-10-21: у вертикальному кадрі з великим обличчям виходить дрібно (зроблено під 16:9). Тільки на прохання людини, у мікс не береться."
+   "use": "overlay",
+   "quality": 5,
+   "text_vars": [
+    "prefix",
+    "options",
+    "suffix"
+   ]
   },
   {
    "name": "char-slam-explode",
-   "ua": "літери розлітаються і з ударом збираються в слово",
+   "ua": "Розсипані літери злітаються в заголовок з ударом",
    "moments": [
     "хук / ключова фраза"
    ],
    "status": "ready",
    "card": {
-    "tone": "clear",
-    "ink": "light",
+    "place": "low",
     "layout": "front",
-    "place": "top"
+    "zoom": 1.4
    },
    "text": "vars.text",
    "rank": 3,
-   "note": ""
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "text"
+   ]
   },
   {
    "name": "shutter-slam",
-   "ua": "одне слово влітає серією ударів з розмиттям",
+   "ua": "Одне слово влітає ривками з розмиттям руху",
    "moments": [
     "хук / ключова фраза"
    ],
    "status": "ready",
    "card": {
-    "tone": "clear",
-    "ink": "light",
+    "place": "low",
     "layout": "front",
-    "place": "top"
+    "zoom": 1.4
    },
    "text": "vars.word",
    "rank": 3,
-   "note": ""
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "text-shimmer",
-   "ua": "заголовок, по якому проходить відблиск світла",
+   "ua": "По заголовку проходить блиск",
    "moments": [
     "хук / ключова фраза"
    ],
    "status": "ready",
    "card": {
-    "tone": "light",
-    "layout": "bubble",
-    "place": "chest"
+    "place": "low",
+    "layout": "bubble"
    },
    "text": "vars.text",
    "rank": 4,
-   "note": ""
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "text"
+   ]
   },
   {
    "name": "variable-font-flex",
-   "ua": "слово розтягується і товщає",
+   "ua": "Слово розтягується з тонкого вузького в жирне широке",
    "moments": [
     "хук / ключова фраза"
    ],
    "status": "ready",
    "card": {
-    "layout": "bubble",
-    "place": "chest"
+    "place": "low",
+    "layout": "bubble"
    },
    "text": "vars.word",
    "rank": 4,
-   "note": ""
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "text"
+   ]
   },
   {
    "name": "vox-annotate",
-   "ua": "маркер виділяє слово в реченні, тонка лінія веде до підпису",
-   "moments": [
-    "хук / ключова фраза"
-   ],
-   "status": "manual",
-   "card": {
-    "layout": "bubble",
-    "place": "chest"
-   },
-   "text": "vars",
-   "rank": 3,
-   "note": "2026-10-21: у вертикальному кадрі з великим обличчям виходить дрібно (зроблено під 16:9). Тільки на прохання людини, у мікс не береться."
-  },
-  {
-   "name": "marker-highlight",
-   "ua": "маркер підкреслює або обводить слово у фразі",
-   "moments": [
-    "хук / ключова фраза"
-   ],
-   "status": "manual",
-   "card": {
-    "layout": "bubble",
-    "place": "chest"
-   },
-   "text": "vars",
-   "rank": 3,
-   "note": "2026-10-21: у вертикальному кадрі з великим обличчям виходить дрібно (зроблено під 16:9). Тільки на прохання людини, у мікс не береться."
-  },
-  {
-   "name": "particle-text-dissolve",
-   "ua": "текст збирається з хмари частинок",
+   "ua": "Ключове слово обводиться маркером з підписом",
    "moments": [
     "хук / ключова фраза"
    ],
    "status": "ready",
    "card": {
-    "tone": "clear",
-    "ink": "light",
-    "layout": "front",
-    "place": "top"
+    "place": "low",
+    "layout": "bubble"
+   },
+   "text": "vars",
+   "rank": 3,
+   "use": "overlay",
+   "quality": 5,
+   "text_vars": [
+    "text",
+    "keyword",
+    "note"
+   ]
+  },
+  {
+   "name": "marker-highlight",
+   "ua": "Маркером виділено або обведено ключове слово",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "card": {
+    "place": "low",
+    "layout": "bubble",
+    "zoom": 1.4
+   },
+   "text": "vars",
+   "rank": 3,
+   "use": "overlay",
+   "quality": 5,
+   "text_vars": [
+    "text",
+    "emphasis_word"
+   ]
+  },
+  {
+   "name": "particle-text-dissolve",
+   "ua": "Слово збирається з хмари частинок",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "card": {
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars.text",
    "rank": 4,
-   "note": ""
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "text"
+   ]
   },
   {
    "name": "scramble-reveal",
-   "ua": "текст розшифровується по літерах, як у терміналі",
+   "ua": "Літери перебираються як у хакера і складаються в слово",
    "moments": [
     "хук / ключова фраза",
     "питання / ШІ"
    ],
    "status": "ready",
    "card": {
-    "tone": "light",
-    "layout": "bubble",
-    "place": "chest"
+    "place": "low",
+    "layout": "bubble"
    },
    "text": "vars.text",
    "rank": 4,
-   "note": ""
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "text"
+   ]
   },
   {
    "name": "outline-draw",
-   "ua": "рожева рамка обводиться навколо неї в кадрі",
+   "ua": "Навколо блоку малюється обведена рамка",
    "moments": [
     "хук / ключова фраза"
    ],
-   "status": "ready",
+   "status": "manual",
    "card": {
-    "box": [
-     40,
-     280,
-     1000,
-     1000
-    ],
-    "tone": "clear"
+    "place": "low",
+    "layout": "front"
    },
    "text": "",
-   "rank": 3
+   "rank": 3,
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [],
+   "note": "лінії через кадр"
   },
   {
    "name": "gloss-sweep",
-   "ua": "картка-нагорода з відблиском",
+   "ua": "Картка падає і по ній пробігає відблиск",
    "moments": [
     "хук / ключова фраза",
     "успіх / готово"
    ],
    "status": "ready",
    "card": {
-    "layout": "front",
-    "place": "chest",
-    "tone": "clear"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars",
    "rank": 4,
-   "note": ""
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "text"
+   ]
   },
   {
    "name": "typewriter",
-   "ua": "фраза друкується по літері з курсором",
+   "ua": "Текст друкується по літері з курсором",
    "moments": [
     "хук / ключова фраза",
     "питання / ШІ"
    ],
    "status": "ready",
    "card": {
-    "tone": "clear",
-    "ink": "light",
-    "css": {
-     "--snip-scale": 2.4
-    },
-    "layout": "front",
-    "place": "top"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars.text",
    "rank": 4,
-   "note": ""
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "text"
+   ]
   },
   {
    "name": "matrix-decode",
-   "ua": "слово проявляється з випадкових символів",
+   "ua": "Символи хаосу складаються в текст",
    "moments": [
     "хук / ключова фраза"
    ],
    "status": "ready",
    "card": {
-    "tone": "clear",
-    "ink": "light",
-    "css": {
-     "--snip-scale": 1.7
-    },
-    "layout": "front",
-    "place": "top"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars.text (до 14 знаків)",
    "rank": 5,
-   "note": ""
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [
+    "text"
+   ]
   },
   {
    "name": "rgb-glitch-text",
-   "ua": "слово з глітч-ефектом (кольорові зсуви)",
+   "ua": "Текст коротко глючить кольоровими зсувами",
    "moments": [
     "хук / ключова фраза"
    ],
    "status": "ready",
    "card": {
-    "tone": "clear",
-    "ink": "light",
-    "css": {
-     "--snip-scale": 2.6
-    },
-    "layout": "front",
-    "place": "top"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars.text",
    "rank": 5,
-   "note": ""
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "text"
+   ]
   },
   {
    "name": "top-down-letters",
-   "ua": "літери падають згори сходинкою",
+   "ua": "Літери падають згори сходинкою",
    "moments": [
     "хук / ключова фраза"
    ],
    "status": "ready",
    "card": {
-    "tone": "clear",
-    "ink": "light",
-    "css": {
-     "--snip-scale": 1.7
-    },
-    "layout": "front",
-    "place": "top"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars.text (до 14 знаків)",
    "rank": 5,
-   "note": ""
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [
+    "text"
+   ]
   },
   {
    "name": "per-word-crossfade",
-   "ua": "спокійна поява фрази по словах",
+   "ua": "Слова м'яко проявляються одне за одним",
    "moments": [
     "хук / ключова фраза"
    ],
    "status": "ready",
    "card": {
-    "tone": "clear",
-    "ink": "light",
-    "css": {
-     "--snip-scale": 2.2
-    },
-    "layout": "front",
-    "place": "top"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars.text",
    "rank": 5,
-   "note": ""
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "text"
+   ]
   },
   {
    "name": "staggered-fade-up",
-   "ua": "слова виринають знизу одне за одним",
+   "ua": "Слова по черзі виїжджають знизу",
    "moments": [
     "хук / ключова фраза"
    ],
    "status": "ready",
    "card": {
-    "tone": "clear",
-    "ink": "light",
-    "css": {
-     "--snip-scale": 2.2
-    },
-    "layout": "front",
-    "place": "top"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars.words",
    "rank": 5,
-   "note": ""
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "words"
+   ]
   },
   {
    "name": "caret-swap",
-   "ua": "курсор стирає стару фразу і друкує нову",
+   "ua": "Курсор стирає фразу і друкує нову",
    "moments": [
     "до / після"
    ],
    "status": "manual",
    "card": {
-    "tone": "clear",
-    "ink": "light",
-    "layout": "front",
-    "place": "top"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars",
    "rank": 2,
-   "note": "2026-10-21: у вертикальному кадрі з великим обличчям виходить дрібно (зроблено під 16:9). Тільки на прохання людини, у мікс не береться."
+   "note": "чорний текст на відео",
+   "use": "overlay",
+   "quality": 5,
+   "text_vars": [
+    "from_text",
+    "to_text"
+   ]
   },
   {
    "name": "line-swap",
-   "ua": "рядок змінюється іншим через маску",
+   "ua": "Один рядок їде вгору, на його місце новий",
    "moments": [
     "до / після",
     "хук / ключова фраза"
    ],
-   "status": "manual",
+   "status": "ready",
    "card": {
-    "layout": "bubble",
-    "place": "chest"
+    "place": "low",
+    "layout": "bubble"
    },
    "text": "vars",
    "rank": 3,
-   "note": "2026-10-21: у вертикальному кадрі з великим обличчям виходить дрібно (зроблено під 16:9). Тільки на прохання людини, у мікс не береться."
+   "use": "overlay",
+   "quality": 5,
+   "text_vars": [
+    "line_a",
+    "line_b",
+    "underline_word"
+   ]
   },
   {
    "name": "text-match-cut",
-   "ua": "одна фраза на ходу перетікає в іншу",
+   "ua": "Один рядок тексту на льоту перетворюється на інший",
    "moments": [
     "до / після",
     "перехід"
    ],
-   "status": "manual",
+   "status": "full_only",
    "card": {
-    "layout": "bubble",
-    "place": "chest"
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "full"
    },
    "text": "vars",
    "rank": 3,
-   "note": "2026-10-21: у вертикальному кадрі з великим обличчям виходить дрібно (зроблено під 16:9). Тільки на прохання людини, у мікс не береться."
+   "note": "2026-10-21: у вертикальному кадрі з великим обличчям виходить дрібно (зроблено під 16:9). Тільки на прохання людини, у мікс не береться.",
+   "use": "transition",
+   "quality": 4,
+   "text_vars": [
+    "text_a",
+    "text_b"
+   ]
   },
   {
    "name": "split-tilt-cards",
-   "ua": "дві картки розкриваються як книжка: порівняння",
+   "ua": "Дві картки до і після розкриваються як книжка",
    "moments": [
     "до / після"
    ],
    "status": "manual",
    "card": {
-    "layout": "split"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars",
    "rank": 3,
-   "note": "2026-10-21: у вертикальному кадрі з великим обличчям виходить дрібно (зроблено під 16:9). Тільки на прохання людини, у мікс не береться."
+   "note": "потрібні картинки",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "label_a",
+    "label_b",
+    "badge_a",
+    "badge_b"
+   ],
+   "image_vars": true
   },
   {
    "name": "physical-exit",
-   "ua": "картка зі старою ідеєю відлітає з кадру",
+   "ua": "Картка з написом відлітає з кадру",
    "moments": [
     "до / після",
     "перехід"
    ],
-   "status": "ready",
+   "status": "manual",
    "card": {
-    "tone": "light",
-    "layout": "front",
-    "place": "chest"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars",
    "rank": 4,
-   "note": ""
+   "note": "порожня картка",
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [
+    "text"
+   ]
   },
   {
    "name": "count-up",
-   "ua": "цифра рахується до значення",
+   "ua": "Цифра швидко рахує до потрібного значення",
    "moments": [
     "цифра"
    ],
    "status": "ready",
    "card": {
-    "layout": "front",
-    "place": "top",
-    "tone": "clear"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars.start/end/prefix/suffix",
    "rank": 1,
-   "note": ""
+   "use": "overlay",
+   "quality": 5,
+   "text_vars": [
+    "prefix",
+    "suffix"
+   ]
   },
   {
    "name": "conic-progress-ring",
-   "ua": "кільце заповнюється до відсотка",
+   "ua": "Кільце прогресу заповнюється до відсотка",
    "moments": [
     "цифра"
    ],
-   "status": "ready",
+   "status": "manual",
    "card": {
-    "tone": "clear",
-    "layout": "front",
-    "place": "top"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars",
    "rank": 2,
-   "note": ""
+   "note": "кільце майже не видно",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "label"
+   ]
   },
   {
    "name": "number-pop-in",
-   "ua": "число вискакує з розмиття, поруч підпис",
+   "ua": "Цифра вискакує з розмиття з одиницею поруч",
    "moments": [
     "цифра"
    ],
    "status": "ready",
    "card": {
-    "tone": "clear",
-    "ink": "light",
-    "css": {
-     "--snip-scale": 2.6
-    },
-    "layout": "front",
-    "place": "top"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars.value, vars.unit",
    "rank": 3,
-   "note": ""
+   "use": "overlay",
+   "quality": 5,
+   "text_vars": [
+    "value",
+    "unit"
+   ]
   },
   {
    "name": "slot-machine-roll",
-   "ua": "барабан прокручується і зупиняється на числі",
+   "ua": "Символи прокручуються як в ігровому автоматі",
    "moments": [
     "цифра"
    ],
    "status": "ready",
    "card": {
-    "tone": "clear",
-    "ink": "light",
-    "css": {
-     "--snip-scale": 2.6
-    },
-    "layout": "front",
-    "place": "top"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars.result",
    "rank": 4,
-   "note": ""
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "result"
+   ]
   },
   {
    "name": "star-rating-fill",
-   "ua": "зірки заповнюються до рейтингу",
+   "ua": "Зірки заповнюються до оцінки з цифрою",
    "moments": [
     "цифра",
     "відгук / доказ"
    ],
    "status": "ready",
    "card": {
-    "layout": "bubble",
-    "place": "chest"
+    "place": "low",
+    "layout": "bubble"
    },
    "text": "vars",
    "rank": 3,
-   "note": ""
+   "use": "overlay",
+   "quality": 5,
+   "text_vars": []
   },
   {
    "name": "decline-chart",
-   "ua": "лінія падає, цифра зменшується (ціна заявки, витрати)",
+   "ua": "Лінія падає, цифра зменшується, фон темнішає",
    "moments": [
     "ріст / падіння",
     "цифра"
    ],
    "status": "manual",
    "card": {
-    "layout": "split"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars",
    "rank": 2,
-   "note": "2026-10-21: у вертикальному кадрі з великим обличчям виходить дрібно (зроблено під 16:9). Тільки на прохання людини, у мікс не береться."
+   "note": "велика темна панель збоку",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "label"
+   ]
   },
   {
    "name": "chart-story",
-   "ua": "графік будується з точними значеннями",
+   "ua": "Графік будується і показує точні цифри",
    "moments": [
     "ріст / падіння",
     "цифра"
    ],
    "status": "manual",
    "card": {
-    "layout": "split"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars.data/labels",
    "rank": 2,
-   "note": "2026-10-21: у вертикальному кадрі з великим обличчям виходить дрібно (зроблено під 16:9). Тільки на прохання людини, у мікс не береться."
+   "note": "дрібні підписи",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "labels",
+    "unit"
+   ]
   },
   {
    "name": "mk-line-graph",
-   "ua": "лінія росту з точками",
+   "ua": "Лінія графіка малюється вгору з цифрами",
    "moments": [
     "ріст / падіння"
    ],
    "status": "manual",
    "card": {
-    "layout": "split"
+    "place": "low",
+    "layout": "front"
    },
    "text": "",
    "rank": 5,
-   "note": "значення зашиті у файлі 2026-10-21: у вертикальному кадрі з великим обличчям виходить дрібно (зроблено під 16:9). Тільки на прохання людини, у мікс не береться."
+   "note": "дрібно",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "badge-pop",
-   "ua": "значок сповіщення з лічильником",
+   "ua": "Бейдж сповіщення пружно вистрибує з цифрою",
    "moments": [
     "повідомлення / чат",
     "цифра"
    ],
    "status": "ready",
    "card": {
-    "tone": "clear",
-    "css": {
-     "--snip-scale": 2.6
-    },
-    "layout": "front",
-    "place": "top"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars.count",
    "rank": 4,
-   "note": ""
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "count"
+   ]
   },
   {
    "name": "marker-checklist-card",
-   "ua": "паперова картка-чекліст, маркер обводить слово",
+   "ua": "Паперова картка з маркерним чеклістом",
    "moments": [
     "список / кроки"
    ],
    "status": "manual",
    "card": {
-    "layout": "split"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars",
    "rank": 1,
-   "note": "2026-10-21: у вертикальному кадрі з великим обличчям виходить дрібно (зроблено під 16:9). Тільки на прохання людини, у мікс не береться."
+   "note": "порожня картка",
+   "use": "overlay",
+   "quality": 5,
+   "text_vars": [
+    "top",
+    "mid",
+    "circled",
+    "rest",
+    "l1",
+    "v1",
+    "l2",
+    "v2",
+    "l3",
+    "v3"
+   ]
   },
   {
    "name": "grid-card-assemble",
-   "ua": "картки з іконками збираються в сітку (2-4 пункти)",
+   "ua": "Картки з іконками збираються в список",
    "moments": [
     "список / кроки"
    ],
    "status": "manual",
    "card": {
-    "layout": "split"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars",
    "rank": 2,
-   "note": "2026-10-21: у вертикальному кадрі з великим обличчям виходить дрібно (зроблено під 16:9). Тільки на прохання людини, у мікс не береться."
+   "note": "дрібно",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "items"
+   ]
   },
   {
    "name": "constellation-hub",
-   "ua": "пункти розходяться від центру лініями",
+   "ua": "Від центру розходяться лінії до пунктів",
    "moments": [
     "список / кроки"
    ],
-   "status": "manual",
+   "status": "ready",
    "card": {
-    "layout": "split"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars",
    "rank": 2,
-   "note": "2026-10-21: у вертикальному кадрі з великим обличчям виходить дрібно (зроблено під 16:9). Тільки на прохання людини, у мікс не береться."
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [
+    "hub_label",
+    "nodes"
+   ]
   },
   {
    "name": "radial-surround",
-   "ua": "ярлики кружляють навколо голови",
+   "ua": "Підписи збираються колом навколо центру",
    "moments": [
     "список / кроки",
     "проблема / тиск"
    ],
-   "status": "skip",
+   "status": "candidate",
    "card": {
     "box": [
      40,
@@ -693,327 +831,488 @@
    },
    "text": "vars",
    "rank": 1,
-   "note": "перевірено: центральний ярлик лягає на обличчя"
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "use": "full",
+   "quality": 3,
+   "text_vars": [
+    "center_label",
+    "chips"
+   ]
   },
   {
    "name": "perspective-marquee",
-   "ua": "слова пливуть стрічкою в перспективі",
+   "ua": "Слова біжать у перспективі до горизонту",
    "moments": [
     "список / кроки"
    ],
-   "status": "skip",
+   "status": "ready",
    "card": {
-    "box": [
-     0,
-     420,
-     1080,
-     540
-    ],
-    "tone": "clear",
-    "ink": "light",
-    "css": {
-     "--snip-scale": 2.2
-    }
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars.words (через кому)",
    "rank": 4,
-   "note": "перевірено: англійські слова, ламається з кирилицею"
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [
+    "words"
+   ]
   },
   {
    "name": "overwhelm-surround",
-   "ua": "задачі й сповіщення налітають з усіх боків",
+   "ua": "Задачі й сповіщення злітаються навколо тебе з усіх боків",
    "moments": [
     "проблема / тиск"
    ],
-   "status": "manual",
+   "status": "candidate",
    "card": {
     "layout": "split"
    },
    "text": "vars",
    "rank": 2,
-   "note": "2026-10-21: у вертикальному кадрі з великим обличчям виходить дрібно (зроблено під 16:9). Тільки на прохання людини, у мікс не береться."
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "use": "full",
+   "quality": 4,
+   "text_vars": [
+    "centerLabel"
+   ]
   },
   {
    "name": "ai-answer-rank",
-   "ua": "питання в чат ШІ, відповідь трійкою варіантів",
+   "ua": "Чат ШІ відповідає списком і бренд піднімається на перше місце",
    "moments": [
     "питання / ШІ"
    ],
    "status": "manual",
    "card": {
-    "tone": "light",
-    "layout": "split"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars",
    "rank": 2,
-   "note": "2026-10-21: у вертикальному кадрі з великим обличчям виходить дрібно (зроблено під 16:9). Тільки на прохання людини, у мікс не береться."
+   "note": "дрібно",
+   "use": "ui",
+   "quality": 4,
+   "text_vars": [
+    "prompt",
+    "lead",
+    "rowA",
+    "rowB",
+    "rowC",
+    "brand"
+   ],
+   "keep_ui": true
   },
   {
    "name": "typed-prompt",
-   "ua": "промпт друкується в рядку",
+   "ua": "Запит до ШІ друкується з курсором",
    "moments": [
     "питання / ШІ"
    ],
-   "status": "manual",
+   "status": "ready",
    "card": {
-    "tone": "light",
-    "layout": "split"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars.text",
    "rank": 2,
-   "note": "2026-10-21: у вертикальному кадрі з великим обличчям виходить дрібно (зроблено під 16:9). Тільки на прохання людини, у мікс не береться."
+   "use": "overlay",
+   "quality": 5,
+   "text_vars": [
+    "text",
+    "prompt_glyph",
+    "correction"
+   ]
   },
   {
    "name": "ai-chat-reveal",
-   "ua": "повноекранний телефон: питання до ШІ і відповідь",
+   "ua": "Питання друкується, ШІ відповідає слово за словом",
    "moments": [
     "питання / ШІ"
    ],
-   "status": "ready",
+   "status": "full_only",
    "card": {
     "layout": "full"
    },
    "text": "vars",
    "rank": 3,
-   "note": "на весь екран, клавіатура англійська"
+   "note": "на весь екран, клавіатура англійська",
+   "use": "ui",
+   "quality": 5,
+   "text_vars": [
+    "botName",
+    "userMessage",
+    "answer1",
+    "answer2",
+    "answer3",
+    "bullet1",
+    "bullet2",
+    "bullet3",
+    "ecHeadline",
+    "ecSub",
+    "ecCta",
+    "ecFooter"
+   ],
+   "image_vars": true,
+   "keep_ui": true
   },
   {
    "name": "chatgpt-exchange",
-   "ua": "повноекранний ChatGPT: промпт і відповідь",
+   "ua": "Діалог у ChatGPT з відповіддю і таблицею",
    "moments": [
     "питання / ШІ"
    ],
-   "status": "ready",
+   "status": "full_only",
    "card": {
     "layout": "full"
    },
    "text": "vars",
    "rank": 3,
-   "note": "на весь екран"
+   "note": "на весь екран",
+   "use": "ui",
+   "quality": 4,
+   "text_vars": [],
+   "keep_ui": true
   },
   {
    "name": "claude-exchange",
-   "ua": "повноекранний Claude: промпт, пошук, відповідь",
+   "ua": "Діалог у Claude з пошуком і детальною відповіддю",
    "moments": [
     "питання / ШІ"
    ],
-   "status": "ready",
+   "status": "full_only",
    "card": {
     "layout": "full"
    },
    "text": "vars",
    "rank": 3,
-   "note": "на весь екран"
+   "note": "на весь екран",
+   "use": "ui",
+   "quality": 4,
+   "text_vars": [],
+   "keep_ui": true
   },
   {
    "name": "chat-thread",
-   "ua": "повноекранна переписка в месенджері",
+   "ua": "Переписка в месенджері на весь екран",
    "moments": [
     "повідомлення / чат"
    ],
-   "status": "ready",
+   "status": "full_only",
    "card": {
     "layout": "full"
    },
    "text": "vars",
    "rank": 2,
-   "note": "на весь екран"
+   "note": "на весь екран",
+   "use": "ui",
+   "quality": 4,
+   "text_vars": [
+    "contact",
+    "messages"
+   ],
+   "keep_ui": true
   },
   {
    "name": "message-thread-reveal",
-   "ua": "телефон з перепискою: бульбашки, набір тексту",
+   "ua": "Переписка на телефоні, бульбашки зʼявляються одна за одною",
    "moments": [
     "повідомлення / чат"
    ],
-   "status": "ready",
+   "status": "candidate",
    "card": {
     "layout": "full"
    },
    "text": "vars",
    "rank": 2,
-   "note": "на весь екран"
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "use": "full",
+   "quality": 4,
+   "text_vars": [
+    "contactName",
+    "questionMessage",
+    "teaserMessage",
+    "cardTitle",
+    "cardDomain",
+    "reactionMessage",
+    "reactionEmoji",
+    "benefitMessage",
+    "discoveryMessage",
+    "sourceMessage",
+    "workflowMessage",
+    "ownershipMessage",
+    "installMessage"
+   ],
+   "image_vars": true,
+   "keep_ui": true
   },
   {
    "name": "chat-message",
-   "ua": "одне повідомлення-бульбашка",
+   "ua": "Бульбашка повідомлення вискакує з кута",
    "moments": [
     "повідомлення / чат"
    ],
    "status": "manual",
    "card": {
-    "layout": "split"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars.text",
    "rank": 1,
-   "note": "2026-10-21: у вертикальному кадрі з великим обличчям виходить дрібно (зроблено під 16:9). Тільки на прохання людини, у мікс не береться."
+   "note": "майже не видно",
+   "use": "overlay",
+   "quality": 5,
+   "text_vars": [
+    "text",
+    "cardTitle",
+    "cardDomain"
+   ]
   },
   {
    "name": "typing-indicator",
-   "ua": "три крапки: хтось пише",
+   "ua": "Бульбашка з трьома крапками, хтось пише",
    "moments": [
     "повідомлення / чат"
    ],
    "status": "ready",
    "card": {
-    "tone": "clear",
-    "css": {
-     "--snip-scale": 3
-    },
-    "layout": "front",
-    "place": "top"
+    "place": "low",
+    "layout": "front"
    },
    "text": "",
    "rank": 4,
-   "note": ""
+   "use": "ui",
+   "quality": 4,
+   "text_vars": [],
+   "keep_ui": true
   },
   {
    "name": "native-notification-pop",
-   "ua": "одне сповіщення iPhone",
+   "ua": "Сповіщення iPhone падає зверху",
    "moments": [
     "повідомлення / чат"
    ],
    "status": "manual",
    "card": {
-    "layout": "front",
-    "place": "top",
-    "tone": "clear"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars.title/body/app_label",
    "rank": 1,
-   "note": "2026-10-21: у вертикальному кадрі з великим обличчям виходить дрібно (зроблено під 16:9). Тільки на прохання людини, у мікс не береться."
+   "note": "лягає на рот",
+   "use": "ui",
+   "quality": 5,
+   "text_vars": [
+    "title",
+    "body",
+    "app_label"
+   ],
+   "keep_ui": true
   },
   {
    "name": "notification-stack",
-   "ua": "сповіщення складаються стопкою",
-   "moments": [
-    "повідомлення / чат",
-    "відгук / доказ"
-   ],
-   "status": "manual",
-   "card": {
-    "layout": "split"
-   },
-   "text": "vars.titles/bodies",
-   "rank": 1,
-   "note": "2026-10-21: у вертикальному кадрі з великим обличчям виходить дрібно (зроблено під 16:9). Тільки на прохання людини, у мікс не береться."
-  },
-  {
-   "name": "notification-cascade",
-   "ua": "повноекранний телефон, сповіщення падають одне за одним",
+   "ua": "Кілька карток сповіщень стають стопкою, одна виділяється",
    "moments": [
     "повідомлення / чат",
     "відгук / доказ"
    ],
    "status": "ready",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "text": "vars.titles/bodies",
+   "rank": 1,
+   "use": "ui",
+   "quality": 3,
+   "text_vars": [
+    "titles",
+    "bodies"
+   ],
+   "keep_ui": true
+  },
+  {
+   "name": "notification-cascade",
+   "ua": "Сповіщення на телефоні падають одне за одним",
+   "moments": [
+    "повідомлення / чат",
+    "відгук / доказ"
+   ],
+   "status": "full_only",
    "card": {
     "layout": "full"
    },
    "text": "vars",
    "rank": 3,
-   "note": "на весь екран"
+   "note": "на весь екран",
+   "use": "ui",
+   "quality": 4,
+   "text_vars": [
+    "notifTitle",
+    "message1",
+    "message2",
+    "message3",
+    "message4",
+    "appName",
+    "headlineTop",
+    "headlineAccent",
+    "footerText"
+   ],
+   "image_vars": true,
+   "keep_ui": true
   },
   {
    "name": "notes-reveal",
-   "ua": "повноекранні нотатки: текст друкується",
+   "ua": "Нотатка друкується в додатку на телефоні",
    "moments": [
     "список / кроки",
     "хук / ключова фраза"
    ],
-   "status": "ready",
+   "status": "candidate",
    "card": {
     "layout": "full"
    },
    "text": "vars",
    "rank": 3,
-   "note": "на весь екран"
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "use": "full",
+   "quality": 4,
+   "text_vars": [
+    "titleL1",
+    "titleL2",
+    "noteLine1",
+    "noteLine2",
+    "noteLine3",
+    "noteLine4",
+    "noteLine5",
+    "noteLine6",
+    "noteLine7",
+    "cardTop",
+    "cardMid",
+    "cardBottom",
+    "check1Label",
+    "check1Value"
+   ],
+   "keep_ui": true
   },
   {
    "name": "notes-typing",
-   "ua": "аркуш нотаток: заголовок і рядки друкуються",
+   "ua": "Нотатки телефону, де заголовок і рядки друкуються по літері",
    "moments": [
     "список / кроки"
    ],
-   "status": "ready",
+   "status": "manual",
    "card": {
-    "tone": "light",
-    "layout": "split"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars",
    "rank": 3,
-   "note": ""
+   "note": "обрізано",
+   "use": "ui",
+   "quality": 4,
+   "text_vars": [
+    "title",
+    "lines"
+   ],
+   "keep_ui": true
   },
   {
    "name": "yt-comment-card",
-   "ua": "коментар друкується поверх відео",
+   "ua": "Коментар друкується з аватаркою і лайками",
    "moments": [
     "повідомлення / чат",
     "відгук / доказ"
    ],
    "status": "skip",
    "card": {
-    "box": [
-     0,
-     330,
-     1080,
-     608
-    ]
+    "place": "low",
+    "layout": "front"
    },
    "text": "",
    "rank": 5,
-   "note": "перевірено: порожній кадр"
+   "note": "нічого не видно",
+   "use": "overlay",
+   "quality": 5,
+   "text_vars": []
   },
   {
    "name": "testimonial-card",
-   "ua": "картка відгуку: цитата, ім'я, аватар",
-   "moments": [
-    "відгук / доказ"
-   ],
-   "status": "manual",
-   "card": {
-    "tone": "light",
-    "layout": "split"
-   },
-   "text": "vars",
-   "rank": 2,
-   "note": "тільки справжні відгуки 2026-10-21: у вертикальному кадрі з великим обличчям виходить дрібно (зроблено під 16:9). Тільки на прохання людини, у мікс не береться."
-  },
-  {
-   "name": "testimonial-proof-card",
-   "ua": "цитата відгуку проявляється рядками",
+   "ua": "Цитата клієнта, потім аватар, імʼя і зірки",
    "moments": [
     "відгук / доказ"
    ],
    "status": "ready",
    "card": {
-    "layout": "split"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars",
    "rank": 2,
-   "note": "тільки справжні відгуки"
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "quote",
+    "author",
+    "handle"
+   ]
+  },
+  {
+   "name": "testimonial-proof-card",
+   "ua": "Картка відгуку з виділеною фразою, імʼям і роллю",
+   "moments": [
+    "відгук / доказ"
+   ],
+   "status": "ready",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "text": "vars",
+   "rank": 2,
+   "use": "overlay",
+   "quality": 5,
+   "text_vars": [
+    "quote",
+    "name",
+    "role",
+    "company",
+    "emphasis"
+   ],
+   "image_vars": true
   },
   {
    "name": "social-proof-card",
-   "ua": "зірки, фраза-доказ, іконки і кнопка",
+   "ua": "Картка з зірками, цифрою довіри, перевагами і кнопкою",
    "moments": [
     "відгук / доказ",
     "заклик (CTA)"
    ],
-   "status": "manual",
+   "status": "ready",
    "card": {
-    "tone": "light",
-    "layout": "split"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars",
    "rank": 3,
-   "note": "2026-10-21: у вертикальному кадрі з великим обличчям виходить дрібно (зроблено під 16:9). Тільки на прохання людини, у мікс не береться."
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "brand",
+    "proof",
+    "cta",
+    "f1",
+    "f2",
+    "f3"
+   ]
   },
   {
    "name": "lt-accent-underline",
-   "ua": "нижній титр: ім'я і лінія-акцент",
+   "ua": "Ім'я з'являється з лінією і роллю знизу",
    "moments": [
     "ім'я / хто я"
    ],
-   "status": "replace",
+   "status": "ready",
    "card": {
     "box": [
      -40,
@@ -1030,15 +1329,18 @@
     "Maya Chen": "<ім'я>",
     "Host · Neuroscientist": "<роль>",
     "Episode 47": "<надпис над ім'ям>"
-   }
+   },
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "lt-clean-bar",
-   "ua": "нижній титр: біла картка з ім'ям",
+   "ua": "Біла картка внизу з ім'ям і роллю",
    "moments": [
     "ім'я / хто я"
    ],
-   "status": "replace",
+   "status": "ready",
    "card": {
     "box": [
      -40,
@@ -1055,15 +1357,18 @@
     "Maya Chen": "<ім'я>",
     "Host · Neuroscientist": "<роль>",
     "Episode 47": "<надпис над ім'ям>"
-   }
+   },
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "lt-dark-card",
-   "ua": "нижній титр: темна картка",
+   "ua": "Темна картка з ім'ям і підкресленням",
    "moments": [
     "ім'я / хто я"
    ],
-   "status": "replace",
+   "status": "ready",
    "card": {
     "box": [
      -40,
@@ -1080,15 +1385,18 @@
     "Maya Chen": "<ім'я>",
     "Host · Neuroscientist": "<роль>",
     "Episode 47": "<надпис над ім'ям>"
-   }
+   },
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "lt-kicker-name",
-   "ua": "нижній титр з надписом над ім'ям",
+   "ua": "Маленький ярлик і велике ім'я з лінією",
    "moments": [
     "ім'я / хто я"
    ],
-   "status": "replace",
+   "status": "ready",
    "card": {
     "box": [
      -40,
@@ -1105,15 +1413,18 @@
     "Maya Chen": "<ім'я>",
     "Host · Neuroscientist": "<роль>",
     "Episode 47": "<надпис над ім'ям>"
-   }
+   },
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "lt-mask-reveal",
-   "ua": "нижній титр: ім'я проявляється смугою",
+   "ua": "Смуга проходить і відкриває ім'я",
    "moments": [
     "ім'я / хто я"
    ],
-   "status": "replace",
+   "status": "ready",
    "card": {
     "box": [
      -40,
@@ -1130,15 +1441,18 @@
     "Maya Chen": "<ім'я>",
     "Host · Neuroscientist": "<роль>",
     "Episode 47": "<надпис над ім'ям>"
-   }
+   },
+   "use": "overlay",
+   "quality": 5,
+   "text_vars": []
   },
   {
    "name": "lt-side-rule",
-   "ua": "нижній титр з вертикальною лінією",
+   "ua": "Ім'я з вертикальною кольоровою рискою збоку",
    "moments": [
     "ім'я / хто я"
    ],
-   "status": "replace",
+   "status": "ready",
    "card": {
     "box": [
      -40,
@@ -1155,15 +1469,18 @@
     "Maya Chen": "<ім'я>",
     "Host · Neuroscientist": "<роль>",
     "Episode 47": "<надпис над ім'ям>"
-   }
+   },
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "lt-soft-pill",
-   "ua": "нижній титр: заокруглена пігулка",
+   "ua": "Біла кругла плашка з точкою, ім'я і роль",
    "moments": [
     "ім'я / хто я"
    ],
-   "status": "replace",
+   "status": "ready",
    "card": {
     "box": [
      -40,
@@ -1180,397 +1497,484 @@
     "Maya Chen": "<ім'я>",
     "Host · Neuroscientist": "<роль>",
     "Episode 47": "<надпис над ім'ям>"
-   }
+   },
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "cta-close",
-   "ua": "фінальна фраза і кнопка-капсула",
+   "ua": "Велика фраза і кнопка з закликом",
    "moments": [
     "заклик (CTA)"
    ],
    "status": "ready",
    "card": {
-    "layout": "full"
+    "place": "low",
+    "layout": "front",
+    "zoom": 1.4
    },
    "text": "vars",
    "rank": 1,
-   "note": ""
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "action_line",
+    "button_label"
+   ]
   },
   {
    "name": "cta-lockup",
-   "ua": "фінальний блок: фраза, кнопка, підпис",
+   "ua": "Фінальний заклик з кнопкою і підписом",
    "moments": [
     "заклик (CTA)"
    ],
    "status": "ready",
    "card": {
-    "tone": "clear",
-    "layout": "full"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars",
    "rank": 1,
-   "note": ""
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "action_line",
+    "button_label",
+    "microcopy"
+   ]
   },
   {
    "name": "instagram-follow",
-   "ua": "картка «підписатися» в Instagram",
+   "ua": "Картка профілю Instagram з кнопкою Стежити",
    "moments": [
     "заклик (CTA)"
    ],
    "status": "skip",
    "card": {
-    "box": [
-     0,
-     0,
-     1080,
-     1920
-    ]
+    "layout": "full"
    },
    "text": "",
    "rank": 4,
-   "note": "логотип і акаунт HeyGen зашиті картинкою: чужий бренд, не використовувати"
+   "note": "логотип HeyGen зашитий картинкою",
+   "use": "ui",
+   "quality": 4,
+   "text_vars": [],
+   "keep_ui": true
   },
   {
    "name": "success-check",
-   "ua": "галочка з'являється в кільці",
+   "ua": "Зелене коло з галочкою",
    "moments": [
     "успіх / готово"
    ],
    "status": "ready",
    "card": {
-    "tone": "clear",
-    "css": {
-     "--snip-scale": 3
-    },
-    "layout": "front",
-    "place": "top"
+    "place": "low",
+    "layout": "front"
    },
    "text": "",
    "rank": 3,
-   "note": ""
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "icon-morph-beat",
-   "ua": "іконка перетворюється на галочку",
+   "ua": "Іконка перетворюється і блимає готово",
    "moments": [
     "успіх / готово"
    ],
    "status": "ready",
    "card": {
-    "layout": "front",
-    "place": "top",
-    "tone": "clear"
+    "place": "low",
+    "layout": "front"
    },
    "text": "",
    "rank": 3,
-   "note": ""
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "toggle-flip",
-   "ua": "великий перемикач клацає в «увімкнено»",
+   "ua": "Великий перемикач клацає в увімкнено",
    "moments": [
     "успіх / готово",
     "до / після"
    ],
-   "status": "ready",
+   "status": "manual",
    "card": {
-    "layout": "front",
-    "place": "top",
-    "tone": "clear"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars",
    "rank": 3,
-   "note": ""
+   "note": "бліде",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "label"
+   ]
   },
   {
    "name": "press-ripple",
-   "ua": "натискання на кнопку з хвилею",
+   "ua": "Курсор натискає кнопку, вона змінюється на готово",
    "moments": [
     "успіх / готово",
     "заклик (CTA)"
    ],
    "status": "manual",
    "card": {
-    "layout": "front",
-    "place": "top",
-    "tone": "clear"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars",
    "rank": 3,
-   "note": "2026-10-21: у вертикальному кадрі з великим обличчям виходить дрібно (зроблено під 16:9). Тільки на прохання людини, у мікс не береться."
+   "note": "дрібно",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "label",
+    "done_label"
+   ]
   },
   {
    "name": "carousel-circle-1",
-   "ua": "картинки по колу",
+   "ua": "Картки з картинками крутяться по колу",
    "moments": [
     "картинки / приклади",
     "список / кроки"
    ],
-   "status": "ready",
+   "status": "candidate",
    "card": {
     "layout": "split"
    },
    "text": "images: [...]",
    "rank": 2,
-   "note": ""
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "use": "full",
+   "quality": 3,
+   "text_vars": [],
+   "image_vars": true
   },
   {
    "name": "carousel-circle-2",
-   "ua": "картинки по колу, інший ритм",
+   "ua": "Картки з картинками крутяться по колу",
    "moments": [
     "картинки / приклади",
     "список / кроки"
    ],
-   "status": "ready",
+   "status": "candidate",
    "card": {
     "layout": "split"
    },
    "text": "images: [...]",
    "rank": 2,
-   "note": ""
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "use": "full",
+   "quality": 2,
+   "text_vars": [],
+   "image_vars": true
   },
   {
    "name": "carousel-circle-3",
-   "ua": "картинки по колу, третій варіант",
+   "ua": "Картки з картинками крутяться по колу",
    "moments": [
     "картинки / приклади",
     "список / кроки"
    ],
-   "status": "ready",
+   "status": "candidate",
    "card": {
     "layout": "split"
    },
    "text": "images: [...]",
    "rank": 2,
-   "note": ""
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "use": "full",
+   "quality": 2,
+   "text_vars": [],
+   "image_vars": true
   },
   {
    "name": "carousel-path-1",
-   "ua": "картинки по дузі",
+   "ua": "Картки з картинками їдуть по кривій",
    "moments": [
     "картинки / приклади",
     "список / кроки"
    ],
-   "status": "ready",
+   "status": "candidate",
    "card": {
     "layout": "split"
    },
    "text": "images: [...]",
    "rank": 2,
-   "note": ""
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "use": "full",
+   "quality": 3,
+   "text_vars": [],
+   "image_vars": true
   },
   {
    "name": "carousel-path-2",
-   "ua": "картинки V-подібною траєкторією",
+   "ua": "Картки з картинками їдуть по кривій",
    "moments": [
     "картинки / приклади",
     "список / кроки"
    ],
-   "status": "ready",
+   "status": "candidate",
    "card": {
     "layout": "split"
    },
    "text": "images: [...]",
    "rank": 2,
-   "note": ""
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "use": "full",
+   "quality": 2,
+   "text_vars": [],
+   "image_vars": true
   },
   {
    "name": "carousel-path-3",
-   "ua": "картинки по діагоналі",
+   "ua": "Картки з картинками їдуть по кривій",
    "moments": [
     "картинки / приклади",
     "список / кроки"
    ],
-   "status": "ready",
+   "status": "candidate",
    "card": {
     "layout": "split"
    },
    "text": "images: [...]",
    "rank": 2,
-   "note": ""
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "use": "full",
+   "quality": 2,
+   "text_vars": [],
+   "image_vars": true
   },
   {
    "name": "carousel-orbit-1",
-   "ua": "картинки по орбіті",
+   "ua": "Картинки на 3D сфері, що обертається",
    "moments": [
     "картинки / приклади",
     "список / кроки"
    ],
-   "status": "ready",
+   "status": "candidate",
    "card": {
     "layout": "split"
    },
    "text": "images: [...]",
    "rank": 2,
-   "note": ""
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "use": "full",
+   "quality": 3,
+   "text_vars": [],
+   "image_vars": true
   },
   {
    "name": "carousel-vision-1",
-   "ua": "картинки в глибину",
+   "ua": "Кільце великих карток з картинками в 3D",
    "moments": [
     "картинки / приклади",
     "список / кроки"
    ],
-   "status": "ready",
+   "status": "candidate",
    "card": {
     "layout": "split"
    },
    "text": "images: [...]",
    "rank": 2,
-   "note": ""
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "use": "full",
+   "quality": 3,
+   "text_vars": [],
+   "image_vars": true
   },
   {
    "name": "carousel-text-circle-1",
-   "ua": "заголовок і карусель картинок навколо нього",
+   "ua": "Заголовок по словах і коло з картинок навколо",
    "moments": [
     "картинки / приклади",
     "хук / ключова фраза"
    ],
-   "status": "ready",
+   "status": "candidate",
    "card": {
     "layout": "split",
     "ink": "light"
    },
    "text": "vars.headline (до 14 знаків) + images",
    "rank": 3,
-   "note": ""
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "use": "full",
+   "quality": 3,
+   "text_vars": [
+    "line1",
+    "line2"
+   ],
+   "image_vars": true
   },
   {
    "name": "carousel-text-circle-2",
-   "ua": "заголовок з каруселлю, другий варіант",
+   "ua": "Заголовок по словах і коло з картинок навколо",
    "moments": [
     "картинки / приклади",
     "хук / ключова фраза"
    ],
-   "status": "ready",
+   "status": "candidate",
    "card": {
     "layout": "split",
     "ink": "light"
    },
    "text": "vars.headline (до 14 знаків) + images",
    "rank": 3,
-   "note": ""
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "use": "full",
+   "quality": 2,
+   "text_vars": [
+    "line1",
+    "line2"
+   ],
+   "image_vars": true
   },
   {
    "name": "device-frame-stage",
-   "ua": "телефон-мокап з твоїм скріном на екрані",
+   "ua": "Макет телефону з екраном виїжджає на сцену",
    "moments": [
     "картинки / приклади",
     "питання / ШІ"
    ],
    "status": "manual",
    "card": {
-    "layout": "split"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars (картинка екрану)",
    "rank": 3,
-   "note": "потрібна картинка екрана в vars, без неї телефон порожній 2026-10-21: у вертикальному кадрі з великим обличчям виходить дрібно (зроблено під 16:9). Тільки на прохання людини, у мікс не береться."
+   "note": "потрібна картинка",
+   "use": "ui",
+   "quality": 3,
+   "text_vars": [],
+   "image_vars": true,
+   "keep_ui": true
   },
   {
    "name": "scroll-feed",
-   "ua": "стрічка постів гортається",
+   "ua": "Стрічка постів-заглушок швидко скролиться вгору",
    "moments": [
     "картинки / приклади",
     "проблема / тиск"
    ],
-   "status": "manual",
+   "status": "candidate",
    "card": {
     "layout": "split"
    },
    "text": "",
    "rank": 4,
-   "note": "2026-10-21: у вертикальному кадрі з великим обличчям виходить дрібно (зроблено під 16:9). Тільки на прохання людини, у мікс не береться."
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "use": "full",
+   "quality": 3,
+   "text_vars": []
   },
   {
    "name": "whiteboard-ink",
-   "ua": "малюнок маркером (лампочка: ідея)",
+   "ua": "Ручка малює скетч лампочки чи ракети з підписом",
    "moments": [
     "хук / ключова фраза"
    ],
-   "status": "manual",
+   "status": "ready",
    "card": {
-    "tone": "light",
-    "layout": "split"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars.sketch",
    "rank": 4,
-   "note": "2026-10-21: у вертикальному кадрі з великим обличчям виходить дрібно (зроблено під 16:9). Тільки на прохання людини, у мікс не береться."
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "caption"
+   ]
   },
   {
    "name": "oversized-cursor",
-   "ua": "великий курсор клікає по кнопці на скріні",
+   "ua": "Великий курсор наводиться і натискає кнопку",
    "moments": [
     "картинки / приклади",
     "питання / ШІ"
    ],
-   "status": "skip",
+   "status": "ready",
    "card": {
-    "layout": "split"
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars",
    "rank": 3,
-   "note": "перевірено: без скріна клікати нема по чому"
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "click_label"
+   ]
   },
   {
    "name": "hw-arrow",
-   "ua": "рукописна стрілка вказує на щось у кадрі",
+   "ua": "Намальована від руки стрілка",
    "moments": [
     "хук / ключова фраза"
    ],
-   "status": "skip",
+   "status": "manual",
    "card": {
-    "box": [
-     0,
-     330,
-     1080,
-     608
-    ]
+    "place": "low",
+    "layout": "front"
    },
    "text": "",
    "rank": 3,
-   "note": "перевірено: зашитий англійський текст на своєму фоні"
+   "note": "англійський текст зашитий",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "hw-underline",
-   "ua": "рукописне підкреслення",
+   "ua": "Підкреслення та закреслення від руки",
    "moments": [
     "хук / ключова фраза"
    ],
-   "status": "skip",
+   "status": "manual",
    "card": {
-    "box": [
-     0,
-     330,
-     1080,
-     608
-    ]
+    "place": "low",
+    "layout": "front"
    },
    "text": "",
    "rank": 4,
-   "note": "перевірено: зашитий англійський текст на своєму фоні"
+   "note": "англійський текст зашитий",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "code-terminal-run",
-   "ua": "команда друкується в терміналі",
+   "ua": "Термінал друкує команду і виконує її",
    "moments": [
     "питання / ШІ"
    ],
    "status": "skip",
    "card": {
-    "box": [
-     40,
-     280,
-     1000,
-     1000
-    ]
+    "place": "low",
+    "layout": "front"
    },
    "text": "vars",
    "rank": 5,
-   "note": "перевірено: дрібний текст терміналу"
+   "note": "демо для розробників",
+   "use": "ui",
+   "quality": 3,
+   "text_vars": [
+    "prompt_glyph"
+   ],
+   "keep_ui": true
   },
   {
    "name": "editorial-flash-overlay",
-   "ua": "спалах камери між думками",
+   "ua": "Теплий спалах світла як від камери",
    "moments": [
     "перехід"
    ],
@@ -1586,11 +1990,14 @@
     "layout": "transition"
    },
    "text": "",
-   "rank": 2
+   "rank": 2,
+   "use": "transition",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "organic-light-leak-overlay",
-   "ua": "теплий плівковий засвіт",
+   "ua": "Теплий кінематографічний відблиск світла",
    "moments": [
     "перехід"
    ],
@@ -1606,11 +2013,14 @@
     "layout": "transition"
    },
    "text": "",
-   "rank": 2
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "hw-scribble-transition",
-   "ua": "каракулі закривають кадр і відкривають новий",
+   "ua": "Каракулі замальовують кадр і відкривають новий",
    "moments": [
     "перехід"
    ],
@@ -1626,819 +2036,5796 @@
     "layout": "transition"
    },
    "text": "",
-   "rank": 3
+   "rank": 3,
+   "use": "transition",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "freeze-frame-dressing",
-   "ua": "скрапбук: папір, скотч і спалах навколо кадру",
+   "ua": "Папір, скотч і спалах навколо застиглої людини",
    "moments": [
     "перехід",
     "хук / ключова фраза"
    ],
-   "status": "skip",
+   "status": "manual",
    "card": {
-    "box": [
-     0,
-     330,
-     1080,
-     608
-    ]
+    "place": "low",
+    "layout": "front"
    },
    "text": "",
    "rank": 4,
-   "note": "перевірено: напівпрозорий прямокутник на обличчі"
+   "note": "не видно поверх відео",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "caption-camera-follow",
-   "ua": "речення пишеться по слову, камера відʼїжджає (картка follow)",
+   "ua": "Камера летить за словами великого речення",
    "moments": [
     "хук / ключова фраза"
+   ],
+   "status": "candidate",
+   "card": {
+    "layout": "full"
+   },
+   "text": "",
+   "rank": 5,
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "use": "full",
+   "quality": 4,
+   "text_vars": []
+  },
+  {
+   "name": "apple-money-count",
+   "ua": "Лічильник грошей від 0 до 10 000 з вибухом іконок",
+   "moments": [
+    "цифра",
+    "ріст / падіння",
+    "успіх / готово"
+   ],
+   "status": "ready",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "text": "",
+   "rank": 5,
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": []
+  },
+  {
+   "name": "bar-chart-race",
+   "ua": "Стовпчики ростуть і обганяють один одного",
+   "moments": [
+    "ріст / падіння",
+    "цифра"
+   ],
+   "status": "candidate",
+   "card": {
+    "layout": "full"
+   },
+   "text": "",
+   "rank": 5,
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "use": "full",
+   "quality": 4,
+   "text_vars": [
+    "title",
+    "subtitle"
+   ]
+  },
+  {
+   "name": "camcorder-hud",
+   "ua": "Рамка камери REC з батареєю і таймером",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "skip",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "text": "",
+   "rank": 5,
+   "note": "нічого не видно",
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": []
+  },
+  {
+   "name": "agent-cursor",
+   "ua": "Курсор ШІ агента клацає кроки і ставить галочку",
+   "moments": [
+    "питання / ШІ",
+    "список / кроки",
+    "успіх / готово"
+   ],
+   "status": "manual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "text": "",
+   "rank": 5,
+   "note": "дрібно",
+   "use": "overlay",
+   "quality": 5,
+   "text_vars": [
+    "agent_name",
+    "steps"
+   ]
+  },
+  {
+   "name": "before-after-wipe",
+   "ua": "Шторка порівнює було і стало",
+   "moments": [
+    "до / після"
+   ],
+   "status": "candidate",
+   "card": {
+    "layout": "full"
+   },
+   "text": "",
+   "rank": 5,
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "use": "full",
+   "quality": 4,
+   "text_vars": [
+    "label_a",
+    "label_b"
+   ],
+   "image_vars": true
+  },
+  {
+   "name": "comparison-split",
+   "ua": "Два екрани було і стало з розділювачем",
+   "moments": [
+    "до / після"
+   ],
+   "status": "candidate",
+   "card": {
+    "layout": "full"
+   },
+   "text": "",
+   "rank": 5,
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "use": "full",
+   "quality": 3,
+   "text_vars": [
+    "labelA",
+    "labelB"
+   ],
+   "image_vars": true
+  },
+  {
+   "name": "camera-shake",
+   "ua": "Кадр трясеться як ручна камера",
+   "moments": [
+    "проблема / тиск",
+    "перехід"
+   ],
+   "status": "skip",
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "text": "",
+   "rank": 5,
+   "note": "тестова картка, не оверлей",
+   "use": "transition",
+   "quality": 3,
+   "text_vars": []
+  },
+  {
+   "name": "caption-blend-difference",
+   "ua": "Субтитри інвертують колір під фоном",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "skip",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "text": "",
+   "rank": 5,
+   "note": "англійський текст субтитрів",
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": []
+  },
+  {
+   "name": "caption-clip-wipe",
+   "ua": "Слова субтитрів відкриваються шторкою",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "skip",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "text": "",
+   "rank": 5,
+   "note": "англійський текст субтитрів",
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": []
+  },
+  {
+   "name": "caption-emoji-pop",
+   "ua": "Субтитри з обведенням та емодзі",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "skip",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "text": "",
+   "rank": 5,
+   "note": "англійський текст субтитрів",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
+  },
+  {
+   "name": "caption-gradient-fill",
+   "ua": "Субтитри з градієнтом і пружним входом",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "skip",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "text": "",
+   "rank": 5,
+   "note": "англійський текст субтитрів",
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": []
+  },
+  {
+   "name": "caption-highlight",
+   "ua": "Плашка підсвічує активне слово як у TikTok",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "skip",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "text": "",
+   "rank": 5,
+   "note": "англійський текст субтитрів",
+   "use": "overlay",
+   "quality": 5,
+   "text_vars": []
+  },
+  {
+   "name": "caption-kinetic-slam",
+   "ua": "Одне слово на весь екран влітає з різних боків",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "candidate",
+   "card": {
+    "layout": "full"
+   },
+   "text": "",
+   "rank": 5,
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "use": "full",
+   "quality": 3,
+   "text_vars": []
+  },
+  {
+   "name": "caption-matrix-decode",
+   "ua": "Субтитри розшифровуються з хаосу символів",
+   "moments": [
+    "питання / ШІ"
+   ],
+   "status": "skip",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "text": "",
+   "rank": 5,
+   "note": "англійський текст субтитрів",
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": []
+  },
+  {
+   "name": "caption-pill-karaoke",
+   "ua": "Субтитри в плашці, слово підсвічується караоке",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "skip",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "text": "",
+   "rank": 5,
+   "note": "англійський текст субтитрів",
+   "use": "overlay",
+   "quality": 5,
+   "text_vars": []
+  },
+  {
+   "name": "cursor-annotate",
+   "ua": "Маркер обводить або підкреслює місце на екрані",
+   "moments": [
+    "хук / ключова фраза",
+    "картинки / приклади"
+   ],
+   "status": "ready",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "text": "",
+   "rank": 5,
+   "use": "overlay",
+   "quality": 5,
+   "text_vars": []
+  },
+  {
+   "name": "cursor-drag-drop",
+   "ua": "Курсор перетягує картку задачі в колонку",
+   "moments": [
+    "успіх / готово"
+   ],
+   "status": "skip",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "text": "",
+   "rank": 5,
+   "note": "англійський інтерфейс",
+   "use": "ui",
+   "quality": 2,
+   "text_vars": [
+    "card_label"
+   ],
+   "keep_ui": true
+  },
+  {
+   "name": "cursor-marquee-select",
+   "ua": "Курсор виділяє фото в сітці галочками",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "status": "skip",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "text": "",
+   "rank": 5,
+   "note": "англійський інтерфейс",
+   "use": "ui",
+   "quality": 3,
+   "text_vars": [
+    "pill_label"
+   ],
+   "keep_ui": true
+  },
+  {
+   "name": "cursor-text-select",
+   "ua": "Курсор виділяє фразу в документі",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "skip",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "text": "",
+   "rank": 5,
+   "note": "англійський інтерфейс",
+   "use": "ui",
+   "quality": 3,
+   "text_vars": [
+    "title",
+    "text",
+    "phrase"
+   ],
+   "keep_ui": true
+  },
+  {
+   "name": "curtain-reveal",
+   "ua": "Театральні куліси розходяться",
+   "moments": [
+    "перехід",
+    "ім'я / хто я"
+   ],
+   "status": "candidate",
+   "card": {
+    "layout": "full"
+   },
+   "text": "",
+   "rank": 5,
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "use": "full",
+   "quality": 2,
+   "text_vars": []
+  },
+  {
+   "name": "focus-swap",
+   "ua": "Дві картки по черзі виходять у фокус",
+   "moments": [
+    "до / після"
+   ],
+   "status": "skip",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "text": "",
+   "rank": 5,
+   "note": "нічого не видно",
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": []
+  },
+  {
+   "name": "gesture-tap",
+   "ua": "Палець тапає кнопку і вона змінює стан",
+   "moments": [
+    "заклик (CTA)",
+    "успіх / готово"
+   ],
+   "status": "skip",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "text": "",
+   "rank": 5,
+   "note": "англійський інтерфейс",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "tap_label",
+    "response_label"
+   ]
+  },
+  {
+   "name": "hw-box-label",
+   "ua": "Рамка від руки з підписом",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "manual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "text": "",
+   "rank": 5,
+   "note": "англійський текст зашитий",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
+  },
+  {
+   "name": "hw-callout-circle",
+   "ua": "Від руки обведено коло з підписом",
+   "moments": [
+    "хук / ключова фраза",
+    "картинки / приклади"
+   ],
+   "status": "manual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "text": "",
+   "rank": 5,
+   "note": "дрібно",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
+  },
+  {
+   "name": "iris-reveal",
+   "ua": "Коло розкривається і показує новий кадр",
+   "moments": [
+    "перехід"
+   ],
+   "status": "skip",
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "text": "",
+   "rank": 5,
+   "note": "панель на пів кадру",
+   "use": "transition",
+   "quality": 3,
+   "text_vars": []
+  },
+  {
+   "name": "logo-wall",
+   "ua": "Стіна логотипів партнерів",
+   "moments": [
+    "відгук / доказ"
    ],
    "status": "skip",
    "card": {},
    "text": "",
    "rank": 5,
-   "note": "використовуй картку follow"
-  },
-  {
-   "name": "apple-money-count",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
-   "text": "",
-   "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
-  },
-  {
-   "name": "bar-chart-race",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
-   "text": "",
-   "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
-  },
-  {
-   "name": "camcorder-hud",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
-   "text": "",
-   "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
-  },
-  {
-   "name": "agent-cursor",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
-   "text": "",
-   "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
-  },
-  {
-   "name": "before-after-wipe",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
-   "text": "",
-   "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
-  },
-  {
-   "name": "comparison-split",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
-   "text": "",
-   "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
-  },
-  {
-   "name": "camera-shake",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
-   "text": "",
-   "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
-  },
-  {
-   "name": "caption-blend-difference",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
-   "text": "",
-   "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
-  },
-  {
-   "name": "caption-clip-wipe",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
-   "text": "",
-   "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
-  },
-  {
-   "name": "caption-emoji-pop",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
-   "text": "",
-   "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
-  },
-  {
-   "name": "caption-gradient-fill",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
-   "text": "",
-   "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
-  },
-  {
-   "name": "caption-highlight",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
-   "text": "",
-   "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
-  },
-  {
-   "name": "caption-kinetic-slam",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
-   "text": "",
-   "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
-  },
-  {
-   "name": "caption-matrix-decode",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
-   "text": "",
-   "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
-  },
-  {
-   "name": "caption-pill-karaoke",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
-   "text": "",
-   "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
-  },
-  {
-   "name": "cursor-annotate",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
-   "text": "",
-   "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
-  },
-  {
-   "name": "cursor-drag-drop",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
-   "text": "",
-   "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
-  },
-  {
-   "name": "cursor-marquee-select",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
-   "text": "",
-   "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
-  },
-  {
-   "name": "cursor-text-select",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
-   "text": "",
-   "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
-  },
-  {
-   "name": "curtain-reveal",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
-   "text": "",
-   "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
-  },
-  {
-   "name": "focus-swap",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
-   "text": "",
-   "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
-  },
-  {
-   "name": "gesture-tap",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
-   "text": "",
-   "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
-  },
-  {
-   "name": "hw-box-label",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
-   "text": "",
-   "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
-  },
-  {
-   "name": "hw-callout-circle",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
-   "text": "",
-   "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
-  },
-  {
-   "name": "iris-reveal",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
-   "text": "",
-   "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
-  },
-  {
-   "name": "logo-wall",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
-   "text": "",
-   "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "Placeholder logos only",
+   "use": "skip",
+   "quality": 2,
+   "text_vars": []
   },
   {
    "name": "mk-emphasis-type",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Велике прозоре слово пливе за людиною",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "candidate",
+   "card": {
+    "layout": "full"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "use": "full",
+   "quality": 3,
+   "text_vars": []
   },
   {
    "name": "mk-usage-arc",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Тонка шкала заповнюється з відсотком",
+   "moments": [
+    "цифра"
+   ],
+   "status": "manual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "дрібно",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "morph-text",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Слова перетікають одне в інше",
+   "moments": [
+    "хук / ключова фраза",
+    "список / кроки"
+   ],
+   "status": "replace",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [],
+   "replace": {
+    "Morph Text": "<її слова>",
+    "Do more with less.": "<її слова>",
+    "Built for what's next.": "<її слова>",
+    "Fast. Focused. Powerful.": "<її слова>",
+    "Your work, amplified.": "<її слова>",
+    "Start free today.": "<її слова>"
+   }
   },
   {
    "name": "notification-pileup",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Сповіщення сиплються все швидше і складаються у високу стопку",
+   "moments": [
+    "проблема / тиск",
+    "повідомлення / чат"
+   ],
+   "status": "manual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "дрібно",
+   "use": "ui",
+   "quality": 4,
+   "text_vars": [],
+   "keep_ui": true
   },
   {
    "name": "paper-collage-reveal",
-   "ua": "",
-   "moments": [],
+   "ua": "Клаптики рваного паперу розлітаються і відкривають кадр",
+   "moments": [
+    "перехід",
+    "картинки / приклади"
+   ],
    "status": "skip",
-   "card": {},
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "протікає поза своїм часом",
+   "use": "transition",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "pull-back-reveal",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Велика цифра, потім камера відʼїжджає і показує заголовок",
+   "moments": [
+    "цифра",
+    "ріст / падіння"
+   ],
+   "status": "candidate",
+   "card": {
+    "layout": "full"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "use": "full",
+   "quality": 4,
+   "text_vars": [
+    "detail_text",
+    "headline"
+   ]
   },
   {
    "name": "spring-pop",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Значок пружно вискакує",
+   "moments": [
+    "хук / ключова фраза",
+    "успіх / готово"
+   ],
+   "status": "ready",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "text"
+   ]
   },
   {
    "name": "yt-circle-pointer",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Довкола обʼєкта малюється коло з відліком",
+   "moments": [
+    "хук / ключова фраза",
+    "цифра"
+   ],
+   "status": "replace",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [],
+   "replace": {
+    "the thing": "<її слова>",
+    "sec": "<її слова>"
+   }
   },
   {
    "name": "yt-feather-highlight",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Кадр темніє, світла пляма виділяє головне",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "manual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "майже не видно",
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": []
   },
   {
    "name": "data-chart",
-   "ua": "",
-   "moments": [],
+   "ua": "Стовпчики і лінія графіка з підписами",
+   "moments": [
+    "ріст / падіння",
+    "цифра"
+   ],
    "status": "skip",
    "card": {},
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "landscape chart with baked data, no vars",
+   "use": "skip",
+   "quality": 2,
+   "text_vars": []
   },
   {
    "name": "flowchart-vertical",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Вертикальна блок-схема зі стікерами",
+   "moments": [
+    "список / кроки"
+   ],
+   "status": "candidate",
+   "card": {
+    "layout": "full"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "use": "full",
+   "quality": 3,
+   "text_vars": []
   },
   {
    "name": "hw-frame",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Картинка в намальованій рамці з підписом від руки",
+   "moments": [
+    "картинки / приклади",
+    "відгук / доказ"
+   ],
+   "status": "manual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "потрібна картинка",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "hw-path-text",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Рукописний текст біжить по кривій",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "manual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "текст не підставляється",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "hw-pipeline",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Намальовані від руки блоки зі стрілками по черзі",
+   "moments": [
+    "список / кроки"
+   ],
+   "status": "manual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "дрібно",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "hw-text-cloud",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Намальована бульбашка з текстом від руки",
+   "moments": [
+    "повідомлення / чат",
+    "питання / ШІ",
+    "хук / ключова фраза"
+   ],
+   "status": "replace",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "use": "overlay",
+   "quality": 5,
+   "text_vars": [],
+   "replace": {
+    "what are you looking at?": "<її слова>"
+   }
   },
   {
    "name": "hw-title",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Рукописний заголовок з підкресленням і маркером",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "replace",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "use": "overlay",
+   "quality": 5,
+   "text_vars": [],
+   "replace": {
+    "shine like the star you are": "<її слова>"
+   }
   },
   {
    "name": "hw-write-title",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Слово пишеться від руки буква за буквою",
+   "moments": [
+    "хук / ключова фраза",
+    "ім'я / хто я"
+   ],
+   "status": "replace",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "use": "overlay",
+   "quality": 5,
+   "text_vars": [],
+   "replace": {
+    "write it on": "<її слова>"
+   }
   },
   {
    "name": "lower-third-bild",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Новинна плашка з заголовком і червоним рядком",
+   "moments": [
+    "ім'я / хто я",
+    "хук / ключова фраза"
+   ],
+   "status": "manual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "дрібно",
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [
+    "TXT_MAIN_1_Line",
+    "TXT_SUB"
+   ]
   },
   {
    "name": "lt-bold-block",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
+   "ua": "Темна плашка внизу, ім'я вистрибує великими літерами",
+   "moments": [
+    "ім'я / хто я"
+   ],
+   "status": "replace",
    "card": {},
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [],
+   "replace": {
+    "Maya Chen": "<її слова>",
+    "Host · Neuroscientist": "<її слова>"
+   }
   },
   {
    "name": "lt-color-block",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
+   "ua": "Кольоровий блок виїжджає, на ньому ім'я і роль",
+   "moments": [
+    "ім'я / хто я"
+   ],
+   "status": "replace",
    "card": {},
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [],
+   "replace": {
+    "Dr. Maya Chen": "<її слова>",
+    "Host · Neuroscientist": "<її слова>"
+   }
   },
   {
    "name": "lt-stack-bars",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
+   "ua": "Дві смуги з ім'ям і роллю виїжджають з боків",
+   "moments": [
+    "ім'я / хто я"
+   ],
+   "status": "replace",
    "card": {},
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [],
+   "replace": {
+    "Maya Chen": "<її слова>",
+    "Host · Neuroscientist": "<її слова>"
+   }
   },
   {
    "name": "lt-neon-border",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
+   "ua": "Світні дуги біжать по рамці картки з ім'ям",
+   "moments": [
+    "ім'я / хто я"
+   ],
+   "status": "ready",
    "card": {},
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "name",
+    "role"
+   ]
   },
   {
    "name": "macos-notification",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Сповіщення macOS з іконкою і текстом",
+   "moments": [
+    "повідомлення / чат"
+   ],
+   "status": "manual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "дрібно",
+   "use": "ui",
+   "quality": 3,
+   "text_vars": [],
+   "keep_ui": true
   },
   {
    "name": "mk-callout-highlight",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Речення, де слова підсвічуються по черзі",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "manual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "дрібно",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "mk-clone-wall-transition",
-   "ua": "",
-   "moments": [],
+   "ua": "Стіна зі слів накриває кадр і зникає",
+   "moments": [
+    "перехід"
+   ],
    "status": "skip",
-   "card": {},
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "зашитий напис HyperFrames",
+   "use": "transition",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "mk-placeholder-grid",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Сітка з кількох фото чи відео",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "status": "candidate",
+   "card": {
+    "layout": "full"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "use": "full",
+   "quality": 3,
+   "text_vars": []
   },
   {
    "name": "mk-progress-stat",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Велика цифра рахує вгору і заповнюється шкала",
+   "moments": [
+    "цифра",
+    "ріст / падіння"
+   ],
+   "status": "manual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "англійський текст",
+   "use": "overlay",
+   "quality": 5,
+   "text_vars": []
   },
   {
    "name": "mk-specs-list",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Список пунктів виїжджає по черзі з підкресленням",
+   "moments": [
+    "список / кроки"
+   ],
+   "status": "manual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "англійський текст",
+   "use": "overlay",
+   "quality": 5,
+   "text_vars": []
   },
   {
    "name": "news-ticker",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Стрічка новин внизу з біжучим рядком",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "manual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "англійський текст",
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": []
   },
   {
    "name": "reddit-post",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Картка посту з Reddit з голосами",
+   "moments": [
+    "відгук / доказ"
+   ],
+   "status": "manual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "дрібно",
+   "use": "ui",
+   "quality": 3,
+   "text_vars": [],
+   "keep_ui": true
   },
   {
    "name": "spotify-card",
-   "ua": "",
-   "moments": [],
+   "ua": "Картка Spotify з обкладинкою і прогресом",
+   "moments": [
+    "картинки / приклади"
+   ],
    "status": "skip",
-   "card": {},
+   "card": {
+    "layout": "full"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "зашитий напис HyperFrames",
+   "use": "ui",
+   "quality": 2,
+   "text_vars": [],
+   "keep_ui": true
   },
   {
    "name": "thread-message-stack",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Стопка повідомлень вхідних і вихідних",
+   "moments": [
+    "повідомлення / чат"
+   ],
+   "status": "manual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "англійський текст",
+   "use": "ui",
+   "quality": 4,
+   "text_vars": [],
+   "keep_ui": true
   },
   {
    "name": "tiktok-follow",
-   "ua": "",
-   "moments": [],
+   "ua": "Картка профілю TikTok з кнопкою підписатися",
+   "moments": [
+    "заклик (CTA)"
+   ],
    "status": "skip",
-   "card": {},
+   "card": {
+    "layout": "full"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "зашитий HeyGen",
+   "use": "ui",
+   "quality": 3,
+   "text_vars": [],
+   "keep_ui": true
   },
   {
    "name": "weight-wave",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Хвиля товщини пробігає по літерах заголовка",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "text"
+   ]
   },
   {
    "name": "x-post",
-   "ua": "",
-   "moments": [],
+   "ua": "Картка посту з X з лайками",
+   "moments": [
+    "відгук / доказ"
+   ],
    "status": "skip",
-   "card": {},
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "чужий бренд",
+   "use": "ui",
+   "quality": 3,
+   "text_vars": [],
+   "keep_ui": true
   },
   {
    "name": "yt-lower-third",
-   "ua": "",
-   "moments": [],
+   "ua": "Плашка YouTube з аватаркою і кнопкою підписатися",
+   "moments": [
+    "заклик (CTA)",
+    "ім'я / хто я"
+   ],
    "status": "skip",
-   "card": {},
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "зашитий HeyGen",
+   "use": "ui",
+   "quality": 3,
+   "text_vars": [],
+   "keep_ui": true
   },
   {
    "name": "yt-prism-title",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Заголовок з кольоровою окантовкою, що дихає",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "manual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "текст не підставляється",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "share-sheet-carousel",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Меню поділитись на телефоні з прев'ю картинок",
+   "moments": [
+    "картинки / приклади",
+    "заклик (CTA)"
+   ],
+   "status": "candidate",
+   "card": {
+    "layout": "full"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "use": "full",
+   "quality": 3,
+   "text_vars": [
+    "shareTitle",
+    "senderName",
+    "itemLabel",
+    "stripText",
+    "acceptLabel",
+    "declineLabel"
+   ],
+   "image_vars": true,
+   "keep_ui": true
   },
   {
    "name": "split-flap-board",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Табло як на вокзалі перегортає літери в слово",
+   "moments": [
+    "хук / ключова фраза",
+    "цифра"
+   ],
+   "status": "manual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "дивні літери",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "boardText"
+   ]
   },
   {
    "name": "animated-bar-chart",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Картка зі стовпчиками, що ростуть",
+   "moments": [
+    "ріст / падіння",
+    "цифра"
+   ],
+   "status": "manual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "велика біла панель",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "blur-in",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Слова проявляються з розмиття",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "replace",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [],
+   "replace": {
+    "Design": "<її слова>",
+    "systems": "<її слова>",
+    "for": "<її слова>",
+    "video": "<її слова>"
+   }
   },
   {
    "name": "blur-out-up",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Слова відлітають вгору з розмиттям",
+   "moments": [
+    "хук / ключова фраза",
+    "перехід"
+   ],
+   "status": "replace",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [],
+   "replace": {
+    "HELLO": "<її слова>"
+   }
   },
   {
    "name": "bottom-up-letters",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Літери виринають знизу по одній",
+   "moments": [
+    "хук / ключова фраза",
+    "ім'я / хто я"
+   ],
+   "status": "manual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "текст не підставляється",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "confetti",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Вибух конфеті",
+   "moments": [
+    "успіх / готово"
+   ],
+   "status": "manual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "кольорова пляма на пів кадру",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "focus-blur-resolve",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Текст фокусується з розмиття і зникає",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "replace",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [],
+   "replace": {
+    "Crystal": "<її слова>",
+    "clear": "<її слова>"
+   }
   },
   {
    "name": "inline-highlight",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Маркер підсвічує слово в тексті",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "manual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "не видно",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "line-by-line-slide",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Рядки виїжджають зліва по черзі",
+   "moments": [
+    "список / кроки",
+    "хук / ключова фраза"
+   ],
+   "status": "replace",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [],
+   "replace": {
+    "Design faster": "<її слова>",
+    "Render cleaner": "<її слова>",
+    "Ship louder": "<її слова>"
+   }
   },
   {
    "name": "number-wheel",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Цифри прокручуються як лічильник до потрібного значення",
+   "moments": [
+    "цифра",
+    "ріст / падіння"
+   ],
+   "status": "manual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "не видно",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "soft-blur-in",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Заголовок мʼяко проявляється з розмиття",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "manual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "не видно",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "strikethrough-replace",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Старий текст закреслюється, зʼявляється новий",
+   "moments": [
+    "до / після",
+    "хук / ключова фраза"
+   ],
+   "status": "replace",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "use": "overlay",
+   "quality": 5,
+   "text_vars": [],
+   "replace": {
+    "Slow": "<її слова>",
+    "Fast": "<її слова>"
+   }
   },
   {
    "name": "tracking-in",
-   "ua": "",
-   "moments": [],
-   "status": "skip",
-   "card": {},
+   "ua": "Літери заголовка зсуваються до купи",
+   "moments": [
+    "хук / ключова фраза",
+    "ім'я / хто я"
+   ],
+   "status": "manual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "не видно",
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": []
   },
   {
    "name": "x-follow-card",
-   "ua": "",
-   "moments": [],
+   "ua": "Картка підписки в X з аватаром",
+   "moments": [
+    "ім'я / хто я",
+    "заклик (CTA)"
+   ],
    "status": "skip",
    "card": {},
    "text": "",
    "rank": 5,
-   "note": "перевірено: англійський текст або чужий бренд без поля для тексту, порожній кадр чи не вертикаль"
+   "note": "X branding baked in, no text vars",
+   "use": "skip",
+   "quality": 2,
+   "text_vars": []
+  },
+  {
+   "name": "decision-tree",
+   "ua": "Блок-схема з розгалуженнями",
+   "moments": [
+    "список / кроки"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "example scene, baked copy, landscape"
+  },
+  {
+   "name": "kinetic-type",
+   "ua": "Промо з великою кінетичною типографікою",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "example scene, baked copy, landscape"
+  },
+  {
+   "name": "nyt-graph",
+   "ua": "Газетний графік з даними",
+   "moments": [
+    "ріст / падіння"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "example scene, baked copy, landscape"
+  },
+  {
+   "name": "play-mode",
+   "ua": "Пружні грайливі анімації",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "example scene, baked copy, landscape"
+  },
+  {
+   "name": "product-promo",
+   "ua": "Багатосценне промо продукту",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "example scene, baked copy, landscape"
+  },
+  {
+   "name": "swiss-grid",
+   "ua": "Сітка в швейцарському стилі",
+   "moments": [
+    "список / кроки"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "example scene, baked copy, landscape"
+  },
+  {
+   "name": "vignelli",
+   "ua": "Велика типографіка з червоними акцентами",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "example scene with baked copy, no text vars"
+  },
+  {
+   "name": "warm-grain",
+   "ua": "Кремова сцена з зерном",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "example scene, baked copy, landscape"
+  },
+  {
+   "name": "app-showcase",
+   "ua": "Три телефони з фітнес застосунком",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "baked fitness app scene, no vars"
+  },
+  {
+   "name": "aurora",
+   "ua": "Північне сяйво на нічному небі",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader, decorative"
+  },
+  {
+   "name": "beat-freeze-cut",
+   "ua": "Стоп кадр і різкі склейки в такт",
+   "moments": [
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "skip",
+   "note": "протікає поза своїм часом"
+  },
+  {
+   "name": "blob",
+   "ua": "М'яка рожева пляма змінює форму",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader, decorative"
+  },
+  {
+   "name": "blue-sweater-intro-video",
+   "ua": "Інтро чужого автора з карткою X",
+   "moments": [
+    "ім'я / хто я"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "another creator's branding baked in"
+  },
+  {
+   "name": "camera-dolly-zoom",
+   "ua": "Ефект запаморочення камери на людині",
+   "moments": [
+    "проблема / тиск",
+    "хук / ключова фраза"
+   ],
+   "use": "transition",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "skip",
+   "note": "тестова картка"
+  },
+  {
+   "name": "canopy-part-title",
+   "ua": "Листя розходиться і відкриває заголовок",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "3D title with baked copy, no text vars"
+  },
+  {
+   "name": "carousel-circle-4",
+   "ua": "Картки з картинками крутяться по колу",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "full",
+   "quality": 2,
+   "text_vars": [],
+   "image_vars": true,
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "carousel-circle-5",
+   "ua": "Картки з картинками крутяться по колу",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "full",
+   "quality": 2,
+   "text_vars": [],
+   "image_vars": true,
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "carousel-orbit-2",
+   "ua": "Картинки на 3D сфері, що обертається",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "full",
+   "quality": 2,
+   "text_vars": [],
+   "image_vars": true,
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "carousel-orbit-3",
+   "ua": "Картинки на 3D сфері, що обертається",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "full",
+   "quality": 2,
+   "text_vars": [],
+   "image_vars": true,
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "carousel-orbit-4",
+   "ua": "Картинки на 3D сфері, що обертається",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "full",
+   "quality": 2,
+   "text_vars": [],
+   "image_vars": true,
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "carousel-orbit-5",
+   "ua": "Картинки на 3D сфері, що обертається",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "full",
+   "quality": 2,
+   "text_vars": [],
+   "image_vars": true,
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "carousel-path-4",
+   "ua": "Картки з картинками їдуть по кривій",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "full",
+   "quality": 2,
+   "text_vars": [],
+   "image_vars": true,
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "carousel-path-5",
+   "ua": "Картки з картинками їдуть по кривій",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "full",
+   "quality": 2,
+   "text_vars": [],
+   "image_vars": true,
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "carousel-text-circle-3",
+   "ua": "Заголовок по словах і коло з картинок навколо",
+   "moments": [
+    "картинки / приклади",
+    "хук / ключова фраза"
+   ],
+   "use": "full",
+   "quality": 2,
+   "text_vars": [
+    "line1",
+    "line2"
+   ],
+   "image_vars": true,
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "carousel-text-circle-4",
+   "ua": "Заголовок по словах і коло з картинок навколо",
+   "moments": [
+    "картинки / приклади",
+    "хук / ключова фраза"
+   ],
+   "use": "full",
+   "quality": 2,
+   "text_vars": [
+    "line1",
+    "line2"
+   ],
+   "image_vars": true,
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "carousel-text-circle-5",
+   "ua": "Заголовок по словах і коло з картинок навколо",
+   "moments": [
+    "картинки / приклади",
+    "хук / ключова фраза"
+   ],
+   "use": "full",
+   "quality": 2,
+   "text_vars": [
+    "line1",
+    "line2"
+   ],
+   "image_vars": true,
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "carousel-vision-2",
+   "ua": "Кільце великих карток з картинками в 3D",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "full",
+   "quality": 2,
+   "text_vars": [],
+   "image_vars": true,
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "carousel-vision-3",
+   "ua": "Кільце великих карток з картинками в 3D",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "full",
+   "quality": 2,
+   "text_vars": [],
+   "image_vars": true,
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "carousel-vision-4",
+   "ua": "Кільце великих карток з картинками в 3D",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "full",
+   "quality": 2,
+   "text_vars": [],
+   "image_vars": true,
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "carousel-vision-5",
+   "ua": "Кільце великих карток з картинками в 3D",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "full",
+   "quality": 2,
+   "text_vars": [],
+   "image_vars": true,
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "chromatic-radial-split",
+   "ua": "Перехід з кольоровим розщепленням від центру",
+   "moments": [
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "manual",
+   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+  },
+  {
+   "name": "chrome-orb",
+   "ua": "Дзеркальна хромована куля",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader, decorative"
+  },
+  {
+   "name": "cinemagraph",
+   "ua": "Застигле фото, де рухається одна частина",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "needs a still photo, not for talking head"
+  },
+  {
+   "name": "cinematic-zoom",
+   "ua": "Перехід з різким зумом і розмиттям",
+   "moments": [
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 4,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "manual",
+   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+  },
+  {
+   "name": "code-3d-extrude",
+   "ua": "Код на 3D плиті обертається",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "developer-only code demo"
+  },
+  {
+   "name": "code-diff",
+   "ua": "Код з червоними і зеленими рядками змін",
+   "moments": [
+    "до / після"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "developer-only code demo"
+  },
+  {
+   "name": "code-highlight",
+   "ua": "Підсвічується один рядок коду",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "developer-only code demo"
+  },
+  {
+   "name": "code-morph",
+   "ua": "Один фрагмент коду перетікає в інший",
+   "moments": [
+    "до / після"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "developer-only code demo"
+  },
+  {
+   "name": "code-particle-assemble",
+   "ua": "Частинки збираються в код",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "developer-only code demo"
+  },
+  {
+   "name": "code-scroll",
+   "ua": "Прокрутка довгого файлу коду",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "developer-only code demo"
+  },
+  {
+   "name": "code-shader-dissolve",
+   "ua": "Код проявляється з шуму",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "developer-only code demo"
+  },
+  {
+   "name": "code-slice-hero",
+   "ua": "Плитки перевертаються і відкривають новий заголовок",
+   "moments": [
+    "перехід",
+    "хук / ключова фраза"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "heavy WebGL2, baked headline, no text vars"
+  },
+  {
+   "name": "code-snippet-apple-terminal-pro",
+   "ua": "Термінал Mac друкує текст",
+   "moments": [
+    "питання / ШІ"
+   ],
+   "use": "ui",
+   "quality": 2,
+   "text_vars": [],
+   "keep_ui": true,
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "skip",
+   "note": "демо для розробників"
+  },
+  {
+   "name": "code-snippet-dark-2026",
+   "ua": "Редактор VS Code друкує код",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "developer-only code editor"
+  },
+  {
+   "name": "code-snippet-dark-modern",
+   "ua": "Редактор VS Code друкує код",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "developer-only code editor"
+  },
+  {
+   "name": "code-typing",
+   "ua": "Код друкується з курсором",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "developer-only code demo"
+  },
+  {
+   "name": "color-wheel",
+   "ua": "Веселковий градієнт повільно пливе",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader, decorative"
+  },
+  {
+   "name": "cosmic-orb",
+   "ua": "Райдужна космічна куля обертається",
+   "moments": [
+    "перехід"
+   ],
+   "use": "background",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "decorative 3D orb background"
+  },
+  {
+   "name": "cross-warp-morph",
+   "ua": "Перехід з перехресним перетіканням кадрів",
+   "moments": [
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "manual",
+   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+  },
+  {
+   "name": "cuboid-carousel",
+   "ua": "Ланцюг 3D кубів хвилею як карусель",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "heavy 3D, no vars"
+  },
+  {
+   "name": "domain-warp-dissolve",
+   "ua": "Перехід через фрактальне розчинення",
+   "moments": [
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "manual",
+   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+  },
+  {
+   "name": "exploded-stack",
+   "ua": "Шари розлітаються і складаються назад",
+   "moments": [
+    "список / кроки"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "heavy three.js, no vars"
+  },
+  {
+   "name": "extruded-logo",
+   "ua": "Об'ємні 3D літери перевертаються",
+   "moments": [
+    "ім'я / хто я"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "three.js logo, baked text"
+  },
+  {
+   "name": "falling-lines",
+   "ua": "Білі лінії падають як дощ",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader, decorative"
+  },
+  {
+   "name": "flash-through-white",
+   "ua": "Перехід через білий спалах",
+   "moments": [
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 4,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "manual",
+   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+  },
+  {
+   "name": "flowchart",
+   "ua": "Блок-схема зі стікерами і курсором",
+   "moments": [
+    "список / кроки"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "landscape diagram scene, baked copy"
+  },
+  {
+   "name": "flowing-gradient",
+   "ua": "Помаранчево фіолетовий градієнт пливе",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader, decorative"
+  },
+  {
+   "name": "fractal-noise",
+   "ua": "Сірий шум пливе як хмари",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader, decorative"
+  },
+  {
+   "name": "frost",
+   "ua": "Крижана куля вкривається інеєм",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader, decorative"
+  },
+  {
+   "name": "frost-sequence-camera-orbit",
+   "ua": "Крижаний логотип розбивається і збирається",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "heavy 3D, baked logo/text"
+  },
+  {
+   "name": "gabor-noise",
+   "ua": "Сірий смугастий шум",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader, decorative"
+  },
+  {
+   "name": "gallery-tunnel",
+   "ua": "Нескінченний тунель з картинок",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "full",
+   "quality": 3,
+   "text_vars": [],
+   "image_vars": true,
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "glass-hero",
+   "ua": "Скляний об'єкт заломлює великий заголовок",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "heavy three.js, baked headline"
+  },
+  {
+   "name": "glass-shard-title",
+   "ua": "Скляні уламки складаються в заголовок",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "heavy 3D, baked headline"
+  },
+  {
+   "name": "glitch",
+   "ua": "Перехід з цифровим глітчем",
+   "moments": [
+    "перехід",
+    "проблема / тиск"
+   ],
+   "use": "transition",
+   "quality": 4,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "manual",
+   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+  },
+  {
+   "name": "godrays",
+   "ua": "Промені світла з кута",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader, decorative"
+  },
+  {
+   "name": "goo",
+   "ua": "Зелена рідка куля брижиться",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader, decorative"
+  },
+  {
+   "name": "gooey-split",
+   "ua": "Крапка ділиться на три і крутиться в логотип",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "logo morph, no vars"
+  },
+  {
+   "name": "gravitational-lens",
+   "ua": "Перехід з викривленням як від чорної діри",
+   "moments": [
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "manual",
+   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+  },
+  {
+   "name": "halftone-field",
+   "ua": "Поле з крапок пливе",
+   "moments": [
+    "перехід"
+   ],
+   "use": "background",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "full-bleed decorative texture"
+  },
+  {
+   "name": "heatmap",
+   "ua": "Тепловізійна світна куля",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader, decorative"
+  },
+  {
+   "name": "heygen-avatar-promo-card",
+   "ua": "Промо картка HeyGen з аватарами",
+   "moments": [
+    "заклик (CTA)"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "HeyGen branding baked in"
+  },
+  {
+   "name": "hologram",
+   "ua": "Блакитна голограмна куля",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader, decorative"
+  },
+  {
+   "name": "holographic",
+   "ua": "Райдужна фольгована куля",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader, decorative"
+  },
+  {
+   "name": "ios26-liquid-glass",
+   "ua": "3D iPhone з екраном iOS і сповіщеннями",
+   "moments": [
+    "повідомлення / чат"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "heavy WebGPU 3D iPhone, baked content"
+  },
+  {
+   "name": "lens-flare",
+   "ua": "Відблиск об'єктива сяє",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader, decorative"
+  },
+  {
+   "name": "light-edge",
+   "ua": "Неонове світло біжить по краю кулі",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader, decorative"
+  },
+  {
+   "name": "light-leak",
+   "ua": "Перехід з кінематографічним засвіченням",
+   "moments": [
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 5,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "manual",
+   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+  },
+  {
+   "name": "liquid-glass-notification",
+   "ua": "Скляні картки сповіщень на фоні сяйва",
+   "moments": [
+    "повідомлення / чат"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU scene with own background, no vars"
+  },
+  {
+   "name": "liquid-glass-widgets",
+   "ua": "Скляні картки з цифрами на фоні сяйва",
+   "moments": [
+    "цифра"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU scene with own background, no vars"
+  },
+  {
+   "name": "liquid-metal",
+   "ua": "Хромована куля тече як метал",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader, decorative"
+  },
+  {
+   "name": "logo-outro",
+   "ua": "Логотип збирається з кнопкою сайту",
+   "moments": [
+    "заклик (CTA)",
+    "ім'я / хто я"
+   ],
+   "use": "full",
+   "quality": 2,
+   "text_vars": [],
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "lottie-character-walk",
+   "ua": "Мультяшний персонаж підходить і показує на картку",
+   "moments": [
+    "список / кроки",
+    "хук / ключова фраза"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [
+    "title",
+    "body"
+   ],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "manual",
+   "note": "дрібна фігурка"
+  },
+  {
+   "name": "macos-tahoe-liquid-glass",
+   "ua": "3D ноутбук з робочим столом macOS",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 3,
+   "text_vars": [],
+   "status": "skip",
+   "note": "heavy 3D scene, baked content"
+  },
+  {
+   "name": "marble",
+   "ua": "Мармурові візерунки повільно пливуть",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader background"
+  },
+  {
+   "name": "mesh-gradient",
+   "ua": "Мʼякий кольоровий градієнт переливається",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader background"
+  },
+  {
+   "name": "mk-background",
+   "ua": "Мʼякі кольорові плями пливуть на фоні",
+   "moments": [
+    "перехід"
+   ],
+   "use": "background",
+   "quality": 3,
+   "text_vars": [],
+   "status": "skip",
+   "note": "decorative gradient backdrop"
+  },
+  {
+   "name": "nebula",
+   "ua": "Рожево-синя туманність у кулі",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader background"
+  },
+  {
+   "name": "north-korea-locked-down",
+   "ua": "Карта Північної Кореї з червоним колом",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "baked map scene, no vars"
+  },
+  {
+   "name": "nyc-paris-flight",
+   "ua": "Літак летить з Нью-Йорка в Париж на карті",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "baked travel map scene"
+  },
+  {
+   "name": "obsidian",
+   "ua": "Темна скляна куля з переливами",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader background"
+  },
+  {
+   "name": "orbit-card",
+   "ua": "Картка обертається навколо кулі з точок",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "3D scene, baked content"
+  },
+  {
+   "name": "oscilloscope-trace",
+   "ua": "Хвиля осцилографа на ретро екрані",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "retro instrument demo"
+  },
+  {
+   "name": "plasma",
+   "ua": "Фіолетова плазма на весь кадр",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader background"
+  },
+  {
+   "name": "plastic",
+   "ua": "Біла глянцева куля",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader background"
+  },
+  {
+   "name": "prism",
+   "ua": "Промінь світла розкладається у веселку",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader background"
+  },
+  {
+   "name": "product-turntable",
+   "ua": "3D продукт обертається на підставці",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "3D product turntable"
+  },
+  {
+   "name": "rack-focus",
+   "ua": "Фокус переїжджає з близького на далекий план",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGL camera shader demo"
+  },
+  {
+   "name": "ridged-burn",
+   "ua": "Кадр згоряє і показує наступний",
+   "moments": [
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "manual",
+   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+  },
+  {
+   "name": "ripple-waves",
+   "ua": "Хвилі розходяться і змінюють кадр",
+   "moments": [
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "manual",
+   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+  },
+  {
+   "name": "ripples",
+   "ua": "Білі кола на чорному розходяться",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader background"
+  },
+  {
+   "name": "sdf-iris",
+   "ua": "Коло розкривається і показує наступний кадр",
+   "moments": [
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "manual",
+   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+  },
+  {
+   "name": "sine-wave",
+   "ua": "Світна хвиля біжить по чорному",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader background"
+  },
+  {
+   "name": "slack-notification-ad",
+   "ua": "Екран блокування заповнюють повідомлення Slack",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "HeyGen-branded ad, baked copy"
+  },
+  {
+   "name": "snow",
+   "ua": "Сніг падає поверх кадру",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "manual",
+   "note": "майже не видно"
+  },
+  {
+   "name": "spain-map",
+   "ua": "Карта Іспанії по регіонах",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "geo data map, irrelevant"
+  },
+  {
+   "name": "spiral",
+   "ua": "Чорно-біла спіраль обертається",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader background"
+  },
+  {
+   "name": "spiral-galaxy",
+   "ua": "Спіральна галактика обертається",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "particle space background"
+  },
+  {
+   "name": "starfield",
+   "ua": "Зірки мерехтять поверх кадру",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "overlay",
+   "quality": 2,
+   "text_vars": [],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "manual",
+   "note": "майже не видно"
+  },
+  {
+   "name": "strands",
+   "ua": "Рожево-сині стрічки світла",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader background"
+  },
+  {
+   "name": "stripes",
+   "ua": "Чорно-білі смуги їдуть по кадру",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader background"
+  },
+  {
+   "name": "sun-burst",
+   "ua": "Промені розходяться з центру",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader background"
+  },
+  {
+   "name": "swirl",
+   "ua": "Помаранчево-сині кольори закручуються",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader background"
+  },
+  {
+   "name": "swirl-vortex",
+   "ua": "Кадр закручується у вир і змінюється",
+   "moments": [
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "manual",
+   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+  },
+  {
+   "name": "thermal-distortion",
+   "ua": "Кадр пливе як від спеки і змінюється",
+   "moments": [
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "manual",
+   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+  },
+  {
+   "name": "thin-film",
+   "ua": "Куля з переливами як мильна бульбашка",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader background"
+  },
+  {
+   "name": "transitions-3d",
+   "ua": "Набір 3D переходів",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "showcase reel of examples"
+  },
+  {
+   "name": "transitions-blur",
+   "ua": "Набір переходів з розмиттям",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "showcase reel of examples"
+  },
+  {
+   "name": "transitions-cover",
+   "ua": "Набір переходів з накриттям",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "showcase reel of examples"
+  },
+  {
+   "name": "transitions-destruction",
+   "ua": "Набір переходів з руйнуванням",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "showcase reel of examples"
+  },
+  {
+   "name": "transitions-dissolve",
+   "ua": "Набір переходів з розчиненням",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "showcase reel of examples"
+  },
+  {
+   "name": "transitions-distortion",
+   "ua": "Набір переходів з викривленням",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "showcase reel of examples"
+  },
+  {
+   "name": "transitions-grid",
+   "ua": "Набір переходів плитками",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "showcase reel of examples"
+  },
+  {
+   "name": "transitions-light",
+   "ua": "Набір переходів зі спалахом",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "showcase reel of examples"
+  },
+  {
+   "name": "transitions-mechanical",
+   "ua": "Набір переходів як затвор камери",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "showcase reel of examples"
+  },
+  {
+   "name": "transitions-other",
+   "ua": "Різні креативні переходи",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "showcase reel of examples"
+  },
+  {
+   "name": "transitions-push",
+   "ua": "Набір переходів зсувом",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "showcase reel of examples"
+  },
+  {
+   "name": "transitions-radial",
+   "ua": "Набір круглих переходів",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "showcase reel of examples"
+  },
+  {
+   "name": "transitions-scale",
+   "ua": "Набір переходів із зумом",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "showcase reel of examples"
+  },
+  {
+   "name": "ui-3d-reveal",
+   "ua": "Інтерфейс зʼявляється в 3D перспективі",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "13s showcase demo, baked UI"
+  },
+  {
+   "name": "us-map",
+   "ua": "Карта США по штатах",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "geo data map, irrelevant"
+  },
+  {
+   "name": "us-map-bubble",
+   "ua": "Карта США з бульбашками міст",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "geo data map, irrelevant"
+  },
+  {
+   "name": "us-map-flow",
+   "ua": "Карта США з дугами між містами",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "geo data map, irrelevant"
+  },
+  {
+   "name": "us-map-hex",
+   "ua": "Карта США з шестикутників",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "geo data map, irrelevant"
+  },
+  {
+   "name": "vfx-anamorphic-flare",
+   "ua": "Сині кінематографічні відблиски лінзи",
+   "moments": [
+    "перехід"
+   ],
+   "use": "background",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "optical VFX backdrop on dark stage"
+  },
+  {
+   "name": "vfx-iphone-device",
+   "ua": "3D айфон і макбук з екраном",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 3,
+   "text_vars": [],
+   "status": "skip",
+   "note": "heavy 3D gltf scene"
+  },
+  {
+   "name": "vfx-liquid-background",
+   "ua": "Рідка поверхня хвилюється на фоні",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGL background"
+  },
+  {
+   "name": "vfx-liquid-glass",
+   "ua": "Ефект рідкого скла",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "undocumented WebGL demo"
+  },
+  {
+   "name": "vfx-magnetic",
+   "ua": "Магнітний WebGL ефект",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "undocumented WebGL demo"
+  },
+  {
+   "name": "vfx-portal",
+   "ua": "Ефект порталу",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "undocumented WebGL demo"
+  },
+  {
+   "name": "vfx-shatter",
+   "ua": "Кадр розбивається на шматки",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "undocumented WebGL demo"
+  },
+  {
+   "name": "vfx-text-cursor",
+   "ua": "Текст зʼявляється за світним курсором",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "use": "skip",
+   "quality": 3,
+   "text_vars": [],
+   "status": "skip",
+   "note": "shader text on black stage, no vars"
+  },
+  {
+   "name": "voronoi",
+   "ua": "Пурпурові клітинки змінюють форму",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader background"
+  },
+  {
+   "name": "vpn-youtube-spot",
+   "ua": "Телефон встановлює VPN додаток",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "baked VPN ad scene"
+  },
+  {
+   "name": "water",
+   "ua": "Водяна куля з відбиттям неба",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader background"
+  },
+  {
+   "name": "waveform",
+   "ua": "Еквалайзер пульсує як аудіо",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader background"
+  },
+  {
+   "name": "week-in-merges",
+   "ua": "Рейтинг з аватарками, що стрибають по рядках",
+   "moments": [
+    "цифра",
+    "список / кроки"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [
+    "eyebrow",
+    "title",
+    "period",
+    "total",
+    "footer",
+    "source"
+   ],
+   "status": "skip",
+   "note": "dev pull-request leaderboard"
+  },
+  {
+   "name": "whip-pan",
+   "ua": "Різкий змах камери між кадрами",
+   "moments": [
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 4,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "manual",
+   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+  },
+  {
+   "name": "wireframe-portal-title",
+   "ua": "Каркасний портал вибухає, з нього виходить заголовок",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "use": "skip",
+   "quality": 3,
+   "text_vars": [],
+   "status": "skip",
+   "note": "3D title, baked text, no vars"
+  },
+  {
+   "name": "world-map",
+   "ua": "Карта світу по країнах з глобусом",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "geo data map, irrelevant"
+  },
+  {
+   "name": "worley-noise",
+   "ua": "Клітинки шуму пливуть",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "WebGPU shader background"
+  },
+  {
+   "name": "yt-lcd-background",
+   "ua": "Паперова дошка з лініями і текстом",
+   "moments": [
+    "перехід"
+   ],
+   "use": "background",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "textured board backdrop"
+  },
+  {
+   "name": "yt-logo-intro",
+   "ua": "Лого штампом, потім заголовок зі стрілкою",
+   "moments": [
+    "хук / ключова фраза",
+    "ім'я / хто я"
+   ],
+   "use": "full",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "yt-vertical-fill",
+   "ua": "Вертикальне відео з розмитими боками",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "widescreen fill, not for vertical reels"
+  },
+  {
+   "name": "arc-motion-path",
+   "ua": "Виноска летить по дузі",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "manual",
+   "note": "порожня пляма"
+  },
+  {
+   "name": "ascii-render-pass",
+   "ua": "Сцена перетворюється на ASCII символи",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "experimental texture effect"
+  },
+  {
+   "name": "ascii-trail-reveal",
+   "ua": "Хвиля символів відкриває панель з підписом",
+   "moments": [
+    "хук / ключова фраза",
+    "перехід"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [
+    "label"
+   ],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "ready"
+  },
+  {
+   "name": "aurora-drift",
+   "ua": "Мʼяке сяйво пливе на темному фоні",
+   "moments": [
+    "перехід"
+   ],
+   "use": "background",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "ambient background"
+  },
+  {
+   "name": "avatar-cloud",
+   "ua": "Хмара аватарок звʼязується з підписом у центрі",
+   "moments": [
+    "відгук / доказ"
+   ],
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "label"
+   ],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "ready"
+  },
+  {
+   "name": "avatar-group-hover",
+   "ua": "Ряд аватарок піднімається хвилею",
+   "moments": [
+    "відгук / доказ"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "ready"
+  },
+  {
+   "name": "beat-accent",
+   "ua": "Спалах і поштовх кадру на ударі",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "text"
+   ],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "ready"
+  },
+  {
+   "name": "beat-pulse-background",
+   "ua": "Фон пульсує світлом у ритм",
+   "moments": [
+    "перехід"
+   ],
+   "use": "background",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "Pulsing backdrop, would cover the speaker"
+  },
+  {
+   "name": "beat-timeline",
+   "ua": "Рядки з підписами з'являються по черзі",
+   "moments": [
+    "список / кроки"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [
+    "labels"
+   ],
+   "status": "skip",
+   "note": "Orchestration spine for developers, not a visual effect"
+  },
+  {
+   "name": "browser-device-stage",
+   "ua": "Вікно браузера або телефону з твоїм скрином",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "ui",
+   "quality": 4,
+   "text_vars": [
+    "title"
+   ],
+   "image_vars": true,
+   "keep_ui": true,
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "manual",
+   "note": "дрібно"
+  },
+  {
+   "name": "camera-rig-depth-stack",
+   "ua": "Стопка карток у 3D з глибиною",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "3D demo, no editable content"
+  },
+  {
+   "name": "camera-scan-gate",
+   "ua": "Видошукач сканує і підтверджує ціль",
+   "moments": [
+    "успіх / готово"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [
+    "targetLabel"
+   ],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "ready"
+  },
+  {
+   "name": "caption-editorial-emphasis",
+   "ua": "Субтитри з великим акцентним словом іншим шрифтом",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "use": "overlay",
+   "quality": 5,
+   "text_vars": [],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "skip",
+   "note": "англійський текст зашитий"
+  },
+  {
+   "name": "caption-glitch-rgb",
+   "ua": "Субтитри з RGB глітчем і сканлайнами",
+   "moments": [
+    "проблема / тиск"
+   ],
+   "use": "overlay",
+   "quality": 2,
+   "text_vars": [],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "skip",
+   "note": "англійський текст зашитий"
+  },
+  {
+   "name": "caption-neon-accent",
+   "ua": "Субтитри з неоновими кольоровими акцентами",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "use": "overlay",
+   "quality": 2,
+   "text_vars": [],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "skip",
+   "note": "англійський текст зашитий"
+  },
+  {
+   "name": "caption-neon-glow",
+   "ua": "Субтитри з неоновим сяйвом",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "use": "overlay",
+   "quality": 2,
+   "text_vars": [],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "skip",
+   "note": "англійський текст зашитий"
+  },
+  {
+   "name": "caption-parallax-layers",
+   "ua": "Текст стоїть за людиною в об'ємі",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "use": "full",
+   "quality": 4,
+   "text_vars": [],
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "caption-particle-burst",
+   "ua": "Ключові слова вибухають частинками",
+   "moments": [
+    "хук / ключова фраза",
+    "успіх / готово"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "skip",
+   "note": "англійський текст зашитий"
+  },
+  {
+   "name": "caption-texture",
+   "ua": "Великий текст з текстурою мармуру чи металу",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "use": "overlay",
+   "quality": 2,
+   "text_vars": [],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "skip",
+   "note": "англійський текст зашитий"
+  },
+  {
+   "name": "caption-weight-shift",
+   "ua": "Рядки субтитрів плавно змінюють товщину шрифту",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "skip",
+   "note": "англійський текст зашитий"
+  },
+  {
+   "name": "card-resize",
+   "ua": "Маленька картка розгортається в панель",
+   "moments": [
+    "список / кроки"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "skip",
+   "note": "англійський текст зашитий"
+  },
+  {
+   "name": "chromatic-aberration-wipe",
+   "ua": "Швидка шторка з розщепленням кольорів",
+   "moments": [
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "skip",
+   "note": "англійський текст зашитий"
+  },
+  {
+   "name": "colorama-wipe",
+   "ua": "Заголовок проявляється кольоровою хвилею",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "skip",
+   "note": "сирий фрагмент без композиції: wrap_snippets не обгортає"
+  },
+  {
+   "name": "cursor-context-menu",
+   "ua": "Курсор відкриває меню і обирає пункт",
+   "moments": [
+    "список / кроки"
+   ],
+   "use": "ui",
+   "quality": 2,
+   "text_vars": [
+    "items"
+   ],
+   "keep_ui": true,
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "skip",
+   "note": "англійський текст зашитий"
+  },
+  {
+   "name": "cursor-glyph-trail",
+   "ua": "Курсор клікає кроки, лишаючи пунктир",
+   "moments": [
+    "список / кроки"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [
+    "glyphs"
+   ],
+   "status": "skip",
+   "note": "Baked settings-screen tutorial scene"
+  },
+  {
+   "name": "cursor-zoom-follow",
+   "ua": "Камера наїжджає на кліки в записі екрана",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "full",
+   "quality": 4,
+   "text_vars": [],
+   "image_vars": true,
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "cut-the-curve",
+   "ua": "Різкий проліт зі зміною кадру на швидкості",
+   "moments": [
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 4,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "manual",
+   "note": "не видно"
+  },
+  {
+   "name": "dart-cursor",
+   "ua": "Стрілка влітає і клікає двічі",
+   "moments": [
+    "заклик (CTA)"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "manual",
+   "note": "дрібно"
+  },
+  {
+   "name": "directional-wipe",
+   "ua": "Панель зсуває один кадр іншим",
+   "moments": [
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "skip",
+   "note": "англійський текст зашитий"
+  },
+  {
+   "name": "drift-hold",
+   "ua": "Картка з текстом ледь дихає і блищить",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [
+    "text"
+   ],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "ready"
+  },
+  {
+   "name": "dynamic-grid",
+   "ua": "Анімована сітка на фоні",
+   "moments": [],
+   "use": "background",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "Decorative grid background"
+  },
+  {
+   "name": "echo-smear",
+   "ua": "Шлейф за рухомим елементом",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "Developer motion helper, no content"
+  },
+  {
+   "name": "echo-trail",
+   "ua": "Елемент рухається з примарними копіями",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "Abstract demo primitive"
+  },
+  {
+   "name": "extended-keyframe",
+   "ua": "Елемент прилітає і довго доповзає",
+   "moments": [],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "Easing helper, not a visual"
+  },
+  {
+   "name": "facet-morph",
+   "ua": "Багатогранна фігура перетікає між формами",
+   "moments": [
+    "ім'я / хто я"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [
+    "forms"
+   ],
+   "status": "skip",
+   "note": "Abstract 3D-like shape, no text"
+  },
+  {
+   "name": "fade-through",
+   "ua": "Плавне згасання через заливку",
+   "moments": [
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "manual",
+   "note": "не видно"
+  },
+  {
+   "name": "filmed-screen",
+   "ua": "Сцена ніби знята з екрана монітора",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "Heavy full-scene filter"
+  },
+  {
+   "name": "focus-rack",
+   "ua": "Фокус переходить між двома картками",
+   "moments": [
+    "до / після"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [
+    "label_a",
+    "label_b"
+   ],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "manual",
+   "note": "не видно"
+  },
+  {
+   "name": "grade-split-reveal",
+   "ua": "Одне фото до і після кольорокорекції",
+   "moments": [
+    "до / після"
+   ],
+   "use": "full",
+   "quality": 2,
+   "text_vars": [],
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "grain-field",
+   "ua": "Точкове поле дрейфує на фоні",
+   "moments": [],
+   "use": "background",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "Decorative background"
+  },
+  {
+   "name": "grain-overlay",
+   "ua": "Плівкове зерно поверх кадру",
+   "moments": [],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "skip",
+   "note": "сирий фрагмент без композиції: wrap_snippets не обгортає"
+  },
+  {
+   "name": "grid-pixelate-wipe",
+   "ua": "Екран розсипається на квадрати",
+   "moments": [
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "skip",
+   "note": "сирий фрагмент без композиції: wrap_snippets не обгортає"
+  },
+  {
+   "name": "halftone-dissolve",
+   "ua": "Перехід через поле точок растру",
+   "moments": [
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "manual",
+   "note": "шейдерний перехід, на одному відео дає суцільну заливку"
+  },
+  {
+   "name": "hw-boil",
+   "ua": "Ефект тремтіння ручного малюнка",
+   "moments": [],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "Helper library, not a standalone visual"
+  },
+  {
+   "name": "icon-swap",
+   "ua": "Іконка змінюється з розмиттям",
+   "moments": [
+    "успіх / готово"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "ready"
+  },
+  {
+   "name": "ink-bleed-reveal",
+   "ua": "Чорнило розтікається і стає знаком",
+   "moments": [
+    "ім'я / хто я",
+    "перехід"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "manual",
+   "note": "пляма"
+  },
+  {
+   "name": "input-feedback",
+   "ua": "Поле вводу трясеться або показує успіх",
+   "moments": [
+    "проблема / тиск",
+    "успіх / готово"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [
+    "value",
+    "hint"
+   ],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "skip",
+   "note": "англійський текст зашитий"
+  },
+  {
+   "name": "keyframe-scrub-stack",
+   "ua": "Стопка карток з'являється з затримкою",
+   "moments": [
+    "список / кроки"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "No content vars, demo stack"
+  },
+  {
+   "name": "light-sweep-pass",
+   "ua": "Смуга світла проходить по кадру",
+   "moments": [
+    "перехід",
+    "успіх / готово"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "manual",
+   "note": "не видно"
+  },
+  {
+   "name": "locked-nucleus-orbit",
+   "ua": "Навколо підпису обертаються супутники",
+   "moments": [
+    "ім'я / хто я"
+   ],
+   "use": "overlay",
+   "quality": 2,
+   "text_vars": [
+    "label"
+   ],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "manual",
+   "note": "дрібно"
+  },
+  {
+   "name": "logo-brand-close",
+   "ua": "Ім'я складається по літерах з підписом",
+   "moments": [
+    "ім'я / хто я",
+    "заклик (CTA)"
+   ],
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "wordmark",
+    "tagline"
+   ],
+   "card": {
+    "place": "low",
+    "layout": "front",
+    "zoom": 1.4
+   },
+   "status": "ready"
+  },
+  {
+   "name": "logo-sting",
+   "ua": "Ім'я вдаряє з кільцем і спалахом",
+   "moments": [
+    "ім'я / хто я"
+   ],
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "wordmark"
+   ],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "ready"
+  },
+  {
+   "name": "magnetic-cursor",
+   "ua": "Курсор прилипає до кнопок панелі",
+   "moments": [],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [
+    "visits"
+   ],
+   "status": "skip",
+   "note": "Editor toolbar demo"
+  },
+  {
+   "name": "match-cut",
+   "ua": "Коло перелітає в новий кадр",
+   "moments": [
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 3,
+   "text_vars": [
+    "label_a",
+    "label_b"
+   ],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "skip",
+   "note": "англійський текст зашитий"
+  },
+  {
+   "name": "menu-morph",
+   "ua": "Кнопка меню перетворюється на список дій",
+   "moments": [
+    "список / кроки"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [
+    "actions"
+   ],
+   "status": "skip",
+   "note": "UI micro-primitive for apps"
+  },
+  {
+   "name": "mesh-gradient-bg",
+   "ua": "Плавний градієнтний фон",
+   "moments": [],
+   "use": "background",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "Decorative background"
+  },
+  {
+   "name": "micro-transitions",
+   "ua": "Набір мікроанімацій бейджа, підказки, галочки",
+   "moments": [
+    "успіх / готово"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [
+    "badge",
+    "tooltip"
+   ],
+   "status": "skip",
+   "note": "Dev micro-transition pack"
+  },
+  {
+   "name": "modal-morph",
+   "ua": "Маленька картка розгортається у велику панель",
+   "moments": [
+    "список / кроки"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "Slot-based structural primitive"
+  },
+  {
+   "name": "morph-swap",
+   "ua": "Один елемент перетікає в інший",
+   "moments": [
+    "до / після",
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "skip",
+   "note": "англійський текст зашитий"
+  },
+  {
+   "name": "motion-blur",
+   "ua": "Розмиття руху як в After Effects",
+   "moments": [],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "Render helper"
+  },
+  {
+   "name": "multi-device-splay",
+   "ua": "Телефон, планшет і ноутбук розкриваються віялом",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "full",
+   "quality": 2,
+   "text_vars": [],
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "multiplayer-cursors",
+   "ua": "Курсори з іменами з'їжджаються в центр",
+   "moments": [
+    "відгук / доказ"
+   ],
+   "use": "overlay",
+   "quality": 2,
+   "text_vars": [
+    "labels"
+   ],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "ready"
+  },
+  {
+   "name": "offset-path-traveler",
+   "ua": "Мітка летить по кривій траєкторії через кадр",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [
+    "traveler_label"
+   ],
+   "status": "skip",
+   "note": "Abstract product-demo path motion, little use over a talking head"
+  },
+  {
+   "name": "onboarding-stepper-flow",
+   "ua": "Екран онбордингу з кроками і кнопкою далі",
+   "moments": [
+    "список / кроки"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "Generic UI flow scene with baked copy and no text vars"
+  },
+  {
+   "name": "ordered-dither-pass",
+   "ua": "Картинка проявляється з піксельного шуму",
+   "moments": [
+    "картинки / приклади",
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 3,
+   "text_vars": [],
+   "image_vars": true,
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "skip",
+   "note": "англійський текст зашитий"
+  },
+  {
+   "name": "page-slide",
+   "ua": "Одна панель виїжджає, на її місце заїжджає інша",
+   "moments": [
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 2,
+   "text_vars": [
+    "label_a",
+    "label_b"
+   ],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "skip",
+   "note": "англійський текст зашитий"
+  },
+  {
+   "name": "pan-stations",
+   "ua": "Камера пливе вздовж ряду підписаних блоків",
+   "moments": [
+    "список / кроки"
+   ],
+   "use": "full",
+   "quality": 3,
+   "text_vars": [
+    "labels"
+   ],
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "panel-reveal",
+   "ua": "Панель розгортається вниз і показує заголовок",
+   "moments": [
+    "хук / ключова фраза",
+    "список / кроки"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [
+    "title"
+   ],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "skip",
+   "note": "англійський текст зашитий"
+  },
+  {
+   "name": "parallax-device-dive",
+   "ua": "Телефон піднімається, і камера пірнає в його екран",
+   "moments": [
+    "перехід",
+    "питання / ШІ"
+   ],
+   "use": "full",
+   "quality": 3,
+   "text_vars": [
+    "app_title"
+   ],
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "parallax-unzoom",
+   "ua": "Картка зменшується і стає частиною сітки",
+   "moments": [
+    "картинки / приклади",
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "Full-frame grid transition with no text or image vars"
+  },
+  {
+   "name": "parallax-zoom",
+   "ua": "Центральна картка росте на весь кадр серед сітки",
+   "moments": [
+    "картинки / приклади",
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "Full-frame grid transition with no text or image vars"
+  },
+  {
+   "name": "particle-image-reveal",
+   "ua": "Частинки збираються і проявляють картинку",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [],
+   "image_vars": true,
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "manual",
+   "note": "потрібна картинка"
+  },
+  {
+   "name": "pendulum-swing",
+   "ua": "Табличка гойдається на гачку і зупиняється",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "skip",
+   "note": "сирий фрагмент"
+  },
+  {
+   "name": "pull-to-refresh",
+   "ua": "Список на телефоні тягнуть вниз для оновлення",
+   "moments": [
+    "питання / ШІ"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "Mobile gesture demo with no text vars, low fit for a talking head"
+  },
+  {
+   "name": "rubber-band-bumper",
+   "ua": "Панель тягнеться, а потім різко відскакує",
+   "moments": [
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 2,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "skip",
+   "note": "англійський текст зашитий"
+  },
+  {
+   "name": "scan-band",
+   "ua": "Смуга сканування проходить по слову з кольоровим зсувом",
+   "moments": [
+    "хук / ключова фраза",
+    "ім'я / хто я"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [
+    "wordmark"
+   ],
+   "card": {
+    "place": "low",
+    "layout": "front",
+    "zoom": 1.4
+   },
+   "status": "ready"
+  },
+  {
+   "name": "screen-flow-carousel",
+   "ua": "Кілька екранів застосунку їдуть каруселлю",
+   "moments": [
+    "картинки / приклади",
+    "список / кроки"
+   ],
+   "use": "full",
+   "quality": 3,
+   "text_vars": [
+    "captions"
+   ],
+   "image_vars": true,
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "scroll-camera-story",
+   "ua": "Камера прокручує довгу сторінку з секціями",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "full",
+   "quality": 2,
+   "text_vars": [],
+   "image_vars": true,
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "segmentation-flood",
+   "ua": "ШІ розпізнає обʼєкт і заливає зони кольоровими масками",
+   "moments": [
+    "питання / ШІ",
+    "картинки / приклади"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [
+    "regions"
+   ],
+   "image_vars": true,
+   "status": "skip",
+   "note": "Developer-style machine-vision HUD experiment"
+  },
+  {
+   "name": "separator",
+   "ua": "Тонка лінія-розділювач малюється по кадру",
+   "moments": [
+    "список / кроки"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "Structural layout primitive, not a visible moment"
+  },
+  {
+   "name": "settings-toggle-flow",
+   "ua": "Екран налаштувань з перемикачами",
+   "moments": [
+    "список / кроки"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "Generic UI flow scene with baked copy and no text vars"
+  },
+  {
+   "name": "shared-axis-y",
+   "ua": "Слова змінюються, зсуваючись вертикально",
+   "moments": [
+    "перехід",
+    "хук / ключова фраза"
+   ],
+   "use": "transition",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "skip",
+   "note": "англійський текст зашитий"
+  },
+  {
+   "name": "shared-axis-z",
+   "ua": "Текст змінюється через наближення і віддалення",
+   "moments": [
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "skip",
+   "note": "не видно"
+  },
+  {
+   "name": "sheet-spring-up",
+   "ua": "Знизу пружно виїжджає панель як у iPhone",
+   "moments": [
+    "повідомлення / чат",
+    "питання / ШІ"
+   ],
+   "use": "ui",
+   "quality": 3,
+   "text_vars": [],
+   "keep_ui": true,
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "skip",
+   "note": "сирий фрагмент"
+  },
+  {
+   "name": "shimmer-sweep",
+   "ua": "По тексту пробігає світловий блиск",
+   "moments": [
+    "хук / ключова фраза",
+    "питання / ШІ"
+   ],
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "skip",
+   "note": "сирий фрагмент"
+  },
+  {
+   "name": "signup-flow",
+   "ua": "Форма реєстрації з полями і кнопкою",
+   "moments": [
+    "заклик (CTA)"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "Generic UI flow scene with baked copy and no text vars"
+  },
+  {
+   "name": "skeleton-reveal",
+   "ua": "Сірий заглушковий блок перетворюється на картку з імʼям",
+   "moments": [
+    "ім'я / хто я"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [
+    "name",
+    "detail"
+   ],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "ready"
+  },
+  {
+   "name": "slit-scan-reveal",
+   "ua": "Кадр проявляється смугами з часовим зсувом",
+   "moments": [
+    "перехід",
+    "картинки / приклади"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "image_vars": true,
+   "status": "skip",
+   "note": "Experimental canvas effect, heavy and abstract"
+  },
+  {
+   "name": "soft-blob-touch",
+   "ua": "Мʼяка пляма тягнеться до точки дотику",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "Decorative material demo"
+  },
+  {
+   "name": "spotlight-card",
+   "ua": "Картка з світловою плямою від курсора",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "No text vars, decorative card demo"
+  },
+  {
+   "name": "spring-stack-shuffle",
+   "ua": "Стопка карток перетасовується",
+   "moments": [
+    "картинки / приклади",
+    "список / кроки"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [],
+   "image_vars": true,
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "manual",
+   "note": "потрібні картинки"
+  },
+  {
+   "name": "stagger-cascade",
+   "ua": "Сітка плиток по черзі заїжджає на місце",
+   "moments": [
+    "картинки / приклади",
+    "список / кроки"
+   ],
+   "use": "full",
+   "quality": 2,
+   "text_vars": [],
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "stagger-lattice",
+   "ua": "Сітка точок проявляється хвилею",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "Decorative grid demo with no vars"
+  },
+  {
+   "name": "state-chip-rail",
+   "ua": "Ряд статусів перемикається від черги до готово",
+   "moments": [
+    "список / кроки",
+    "успіх / готово"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [
+    "states",
+    "badges"
+   ],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "ready"
+  },
+  {
+   "name": "sticky-mock-swap",
+   "ua": "Макет продукту змінює стани, поруч підписи",
+   "moments": [
+    "список / кроки",
+    "картинки / приклади"
+   ],
+   "use": "full",
+   "quality": 2,
+   "text_vars": [
+    "captions"
+   ],
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "stitched-text-draw",
+   "ua": "Слово вишивається ниткою стібок за стібком",
+   "moments": [
+    "хук / ключова фраза",
+    "ім'я / хто я"
+   ],
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "text"
+   ],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "manual",
+   "note": "не видно"
+  },
+  {
+   "name": "stop-motion-cadence",
+   "ua": "Паперові фігурки рухаються в стилі стоп моушн",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "Time-law demo primitive, decorative"
+  },
+  {
+   "name": "store-badge-lockup",
+   "ua": "Заголовок і значки App Store та Google Play",
+   "moments": [
+    "заклик (CTA)"
+   ],
+   "use": "ui",
+   "quality": 3,
+   "text_vars": [
+    "headline"
+   ],
+   "keep_ui": true,
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "manual",
+   "note": "значки App Store"
+  },
+  {
+   "name": "streaming-text",
+   "ua": "Текст зʼявляється рваними порціями, як відповідь ШІ",
+   "moments": [
+    "питання / ШІ",
+    "повідомлення / чат"
+   ],
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "skip",
+   "note": "сирий фрагмент"
+  },
+  {
+   "name": "svg-line-draw-loader",
+   "ua": "Лінія малює фігуру як завантажувач",
+   "moments": [
+    "перехід"
+   ],
+   "use": "skip",
+   "quality": 1,
+   "text_vars": [],
+   "status": "skip",
+   "note": "Decorative loader with no vars"
+  },
+  {
+   "name": "svg-mask-reveal",
+   "ua": "Картинка видна крізь великі літери слова",
+   "moments": [
+    "хук / ключова фраза",
+    "картинки / приклади"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [
+    "text"
+   ],
+   "image_vars": true,
+   "card": {
+    "place": "low",
+    "layout": "front",
+    "zoom": 1.4
+   },
+   "status": "ready"
+  },
+  {
+   "name": "svg-stroke-trace",
+   "ua": "Лінія малюється по заданому контуру",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "use": "overlay",
+   "quality": 2,
+   "text_vars": [],
+   "card": {
+    "place": "low",
+    "layout": "front",
+    "zoom": 1.4
+   },
+   "status": "ready"
+  },
+  {
+   "name": "swipe-rail",
+   "ua": "Палець свайпає ряд карток",
+   "moments": [
+    "список / кроки",
+    "картинки / приклади"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [
+    "card_label_prefix"
+   ],
+   "status": "skip",
+   "note": "Gesture demo with placeholder cards"
+  },
+  {
+   "name": "tabs-slide-indicator",
+   "ua": "Плашка ковзає між вкладками",
+   "moments": [
+    "список / кроки"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [
+    "labels"
+   ],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "ready"
+  },
+  {
+   "name": "telemetry-hud",
+   "ua": "Технічні показники в кутах кадру",
+   "moments": [
+    "цифра",
+    "питання / ШІ"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [
+    "readouts"
+   ],
+   "image_vars": true,
+   "status": "skip",
+   "note": "Developer debug HUD readouts"
+  },
+  {
+   "name": "terminal-simulator",
+   "ua": "Вікно терміналу друкує команди",
+   "moments": [
+    "питання / ШІ"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "Developer terminal demo with baked copy, no vars"
+  },
+  {
+   "name": "text-stagger",
+   "ua": "Слова фрази заходять по черзі з блиском",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "text"
+   ],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "ready"
+  },
+  {
+   "name": "text-state-swap",
+   "ua": "Напис розмивається і змінюється на новий",
+   "moments": [
+    "до / після",
+    "успіх / готово"
+   ],
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "from-text",
+    "to-text"
+   ],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "ready"
+  },
+  {
+   "name": "texture-mask-text",
+   "ua": "Літери з текстурою всередині",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "No text vars, texture library demo"
+  },
+  {
+   "name": "three-orbiting-cards",
+   "ua": "Три картки обертаються в 3D",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "Three.js/WebGL 3D scene"
+  },
+  {
+   "name": "ticker-takeover",
+   "ua": "Слова перебираються і зупиняються на головному",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "options",
+    "final_word"
+   ],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "ready"
+  },
+  {
+   "name": "tilt-card",
+   "ua": "Картка з заголовком нахиляється з глибиною",
+   "moments": [
+    "хук / ключова фраза",
+    "ім'я / хто я"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [
+    "eyebrow",
+    "headline"
+   ],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "manual",
+   "note": "порожня картка"
+  },
+  {
+   "name": "titlecard-lockup",
+   "ua": "Назва по центру, підпис і лінія під нею",
+   "moments": [
+    "ім'я / хто я",
+    "хук / ключова фраза"
+   ],
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "wordmark",
+    "label",
+    "kicker"
+   ],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "ready"
+  },
+  {
+   "name": "torn-paper-rip",
+   "ua": "Кадр рветься як папір і відкриває наступний",
+   "moments": [
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 4,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "skip",
+   "note": "протікає поза своїм часом"
+  },
+  {
+   "name": "touch-indicator",
+   "ua": "Коло дотику пальця на екрані",
+   "moments": [
+    "заклик (CTA)"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "manual",
+   "note": "не видно"
+  },
+  {
+   "name": "tracing-beam",
+   "ua": "Світлий промінь по черзі підсвічує три кроки",
+   "moments": [
+    "список / кроки"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [
+    "labels"
+   ],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "manual",
+   "note": "дрібно"
+  },
+  {
+   "name": "trust-strip",
+   "ua": "Ряд назв компаній, яким довіряють",
+   "moments": [
+    "відгук / доказ"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [
+    "marks"
+   ],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "manual",
+   "note": "дрібно"
+  },
+  {
+   "name": "type-match-cut",
+   "ua": "Заголовок розходиться, з середини росте панель",
+   "moments": [
+    "перехід",
+    "хук / ключова фраза"
+   ],
+   "use": "transition",
+   "quality": 3,
+   "text_vars": [
+    "text"
+   ],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "skip",
+   "note": "англійський текст зашитий"
+  },
+  {
+   "name": "ui-focus-zoom",
+   "ua": "Камера наближається до частини екрана застосунку",
+   "moments": [
+    "картинки / приклади",
+    "питання / ШІ"
+   ],
+   "use": "full",
+   "quality": 3,
+   "text_vars": [],
+   "image_vars": true,
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "variable-axis-type",
+   "ua": "Слово з тонкого стає жирним",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "use": "overlay",
+   "quality": 4,
+   "text_vars": [
+    "text"
+   ],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "manual",
+   "note": "не видно"
+  },
+  {
+   "name": "vector-editor-rig",
+   "ua": "Вікно редактора графіки з малюванням пером",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "skip",
+   "quality": 2,
+   "text_vars": [
+    "pathLabel"
+   ],
+   "status": "skip",
+   "note": "Design-tool app chrome, niche demo"
+  },
+  {
+   "name": "velocity-throw-snap",
+   "ua": "Ряд кадрів промчить і зупиниться на головному",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "use": "full",
+   "quality": 3,
+   "text_vars": [
+    "card_label_prefix"
+   ],
+   "card": {
+    "layout": "full"
+   },
+   "status": "candidate",
+   "note": "на весь кадр, ще не перевірено в кадрі"
+  },
+  {
+   "name": "vignette",
+   "ua": "Краї кадру затемнюються",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "use": "background",
+   "quality": 3,
+   "text_vars": [],
+   "status": "skip",
+   "note": "сирий фрагмент без композиції: wrap_snippets не обгортає"
+  },
+  {
+   "name": "whip-pan-cut",
+   "ua": "Різкий змах камери вбік до наступної сцени",
+   "moments": [
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 4,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "manual",
+   "note": "чорний кадр"
+  },
+  {
+   "name": "wordmark-tiles",
+   "ua": "Слово складається з кольорових плиток",
+   "moments": [
+    "хук / ключова фраза",
+    "ім'я / хто я"
+   ],
+   "use": "overlay",
+   "quality": 3,
+   "text_vars": [
+    "text"
+   ],
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "status": "ready"
+  },
+  {
+   "name": "yt-camera-move",
+   "ua": "Різкий наїзд камери на кадр",
+   "moments": [
+    "хук / ключова фраза",
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 4,
+   "text_vars": [],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "skip",
+   "note": "англійський текст зашитий"
+  },
+  {
+   "name": "yt-screen-warp",
+   "ua": "Відео виглядає як на екрані зі сканлініями",
+   "moments": [
+    "перехід"
+   ],
+   "use": "background",
+   "quality": 2,
+   "text_vars": [],
+   "status": "skip",
+   "note": "Texture overlay making footage look like a display"
+  },
+  {
+   "name": "zoom-through-transition",
+   "ua": "Камера пролітає крізь картку до наступної сцени",
+   "moments": [
+    "перехід"
+   ],
+   "use": "transition",
+   "quality": 3,
+   "text_vars": [
+    "from-label",
+    "to-label"
+   ],
+   "card": {
+    "box": [
+     -420,
+     0,
+     1920,
+     1920
+    ],
+    "scale": 1.78,
+    "layout": "transition"
+   },
+   "status": "manual",
+   "note": "шейдерний перехід"
   }
  ]
 }

@@ -25,9 +25,11 @@ with what each one is for, its moment and its tested placement, is `references/m
   above the head). Split and full-screen layouts only when the person picked them.
 - Keep every text field short: 2-4 words, about 18 characters a line. Ukrainian words are longer than the English defaults and
   one-line effects clip or run off the frame past that.
-- `status: "manual"` (26 motions: charts, node maps, card grids, chat bubbles, notifications, a few one-line text effects): drawn for
-  16:9 and still small on a phone. `ideas` and `menu` leave them out of the suggestions (menu lists them at the end); use one only
-  when the person asks for it.
+- Statuses: `ready` / `replace` = checked in the frame, suggested by `menu` / `ideas`; `full_only` = only as a whole-frame takeover
+  (2-3 s), suggested marked «на весь кадр», at most one per phrase and below the overlays; `manual` = works but small or niche, only
+  when the person asks (menu lists it at the end); `candidate` = not checked in the frame yet, never suggested; `skip` = don't use.
+  Elements from an own Remotion library (~/motion, `brand:<Element>`) are suggested next to the catalog like `ready` ones.
+  `hyperframes snapshot` shows transparent WebM overlays as black: check them with a short real render (`REEL_DRAFT=1 render.sh`).
 
 ## The card
 

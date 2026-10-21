@@ -15,7 +15,13 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 CAT = json.load(open(HERE.parent / "references" / "motion_catalog.json"))
-READY = [m for m in CAT["motions"] if m.get("status") in ("ready", "replace")]
+# Statuses (references/motion_catalog.json "about"): ready / replace = checked in a real vertical reel, suggested;
+# full_only = works only as a whole-frame takeover, suggested marked «на весь кадр» and below the overlays;
+# manual = works but small or niche, only when the person asks; candidate = not checked in the frame yet, never suggested;
+# skip = unusable. Brand elements (Remotion, below) are "brand" and suggested like ready ones.
+SUGGEST = ("ready", "replace")
+READY = [m for m in CAT["motions"] if m.get("status") in SUGGEST]
+FULL = [m for m in CAT["motions"] if m.get("status") == "full_only"]
 HOME = Path(os.environ.get("REELS_HOME", "~/reels")).expanduser()
 # Own motion library (Remotion project, ~/motion/library.json), only when it exists: suggested on equal terms with the catalog,
 # as "brand:<Element>". They go in as transparent overlay cards with "brand": "<Element>" (how the log and "used here" see them).
@@ -64,10 +70,17 @@ def menu(moment=None):
     if any(m["status"] == "brand" for m in READY) and not moment:
         print("\n[бренд] = Remotion-елемент: ~/motion/scripts/render-overlay.sh <Element> '<props>' <reel>/overlays/brand-<Element>-<slug>.webm,"
               "\n          картка {\"type\": \"overlay\", \"brand\": \"<Element>\", \"src\": ..., \"start\": .., \"end\": ..}")
+    full = [m for m in FULL if not moment or any(moment in x for x in m.get("moments", []))]
+    if full:
+        print(f"\n## на весь кадр ({len(full)}): займають увесь екран на 2-3 с, лише для повноекранних моментів")
+        for m in full: print(f"  {m['name']:26s} {m['ua']}")
     manual = [m for m in CAT["motions"] if m.get("status") == "manual"]
     if manual and not moment:
-        print(f"\n## тільки вручну ({len(manual)}): дрібні у вертикальному кадрі, лише коли людина сама попросить")
+        print(f"\n## тільки вручну ({len(manual)}): лише коли людина сама попросить")
         for m in manual: print(f"  {m['name']:26s} {m['ua']}")
+    if not moment:
+        n = {k: sum(1 for m in CAT["motions"] if m.get("status") == k) for k in ("candidate", "skip")}
+        print(f"\n(ще не перевірені в кадрі: {n['candidate']}, не пропонуються; непридатні: {n['skip']})")
 
 
 # words in a phrase -> the moment it calls for
@@ -89,7 +102,7 @@ CUES = [
 
 
 def ideas(reel):
-    reel = Path(reel).expanduser()
+    reel = Path(reel).expanduser().resolve()
     words = [w for w in json.load(open(reel / "master_transcript.json")) if w["text"].strip()]
     used_here = set()
     if (reel / "edit.json").exists():
@@ -105,21 +118,22 @@ def ideas(reel):
     offered = {}
     for ph in phrases:
         text = " ".join(w["text"] for w in ph)
-        moments = [mo for mo, rx in CUES if re.search(rx, text.lower())]
-        if not moments: continue
-        pool = [m for m in READY if set(m["moments"]) & set(moments)]
+        moments = [mo for mo, rx in CUES if re.search(rx, text.lower())] or ["хук / ключова фраза"]   # any line can carry a text effect
+        seen = set()
+        pool = [m for m in READY + FULL if set(m["moments"]) & set(moments) and not (m["name"] in seen or seen.add(m["name"]))]
         # fresh first: not in this reel, not in the last reels, offered least so far
         order = {mo: k for k, mo in enumerate(moments)}           # the more specific moment (a number before a key phrase) first
         pool.sort(key=lambda m: (m["name"] in used_here, m["name"] in rec, min(order.get(x, 99) for x in m["moments"]),
-                                 offered.get(m["name"], 0), m.get("rank", 5)))
-        picks = pool[:3]
+                                 m.get("status") == "full_only", offered.get(m["name"], 0), -m.get("quality", 3), m.get("rank", 5)))
+        picks = [m for m in pool if m.get("status") != "full_only"][:4] + [m for m in pool if m.get("status") == "full_only"][:1]
         for m in picks: offered[m["name"]] = offered.get(m["name"], 0) + 1
         print(f"{ph[0]['start']:6.1f}s  [{', '.join(moments)}]  {text[:90]}")
-        for m in picks: print(f"         -> {m['name']}: {m['ua']}" + ("  [render-overlay.sh, картка overlay + \"brand\"]" if m["status"] == "brand" else ""))
+        for m in picks: print(f"         -> {m['name']}: {m['ua']}" + (f"  [текст: {', '.join(m['text_vars'])}]" if m.get("text_vars") else "") + (" [інтерфейс, свої кольори]" if m.get("keep_ui") else "") + (" [на весь кадр]" if m.get("status") == "full_only" else "")
+                              + ("  [render-overlay.sh, картка overlay + \"brand\"]" if m["status"] == "brand" else ""))
 
 
 def log(reel):
-    reel = Path(reel).expanduser()
+    reel = Path(reel).expanduser().resolve()
     names = sorted(card_names(json.load(open(reel / "edit.json"))))
     d = [e for e in log_data() if e["reel"] != reel.name] + [{"reel": reel.name, "at": int(time.time()), "motions": names}]
     LOG.parent.mkdir(parents=True, exist_ok=True)

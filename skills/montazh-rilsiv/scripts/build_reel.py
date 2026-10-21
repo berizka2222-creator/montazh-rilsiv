@@ -61,6 +61,8 @@ edit.json (written by auto_edit.py, then Claude marks accents and adds cards):
   Image paths: relative to the reel folder, or to ~/reels/assets/, or absolute.
 """
 import html, json, os, re, shutil, subprocess, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import brand_recolor
 from pathlib import Path
 
 reel = Path(sys.argv[1]).expanduser()
@@ -643,6 +645,8 @@ for i, c in enumerate(edit.get("cards", [])):
             print(f"warning: motion {c['name']!r} not cached - add it: cd {HF} && npx hyperframes add {c['name']}"); continue
         c = {**MOTION_PRESETS.get(c["name"], {}).get("card", {}), **c, "_own": tuple(c)}   # tested placement / tone, the card wins
         rel = mount(src); txt = src.read_text()
+        if not re.search(r'data-composition-id="([^"]+)"', txt):
+            print(f"warning: motion {c['name']!r} is a raw snippet with no composition (wrap_snippets.py could not wrap it): skipped"); continue
         comp_id = re.search(r'data-composition-id="([^"]+)"', txt).group(1)
         mt = (proj / rel).read_text()
         for k, v in (c.get("replace") or {}).items():    # motions with their text baked in: swap it for her words
@@ -652,6 +656,12 @@ for i, c in enumerate(edit.get("cards", [])):
             brand_font = (f'[data-composition-id="{comp_id}"], [data-composition-id="{comp_id}"] *:not(code):not(pre) '   # have no
                           f'{{ font-family: "BrandSans", {FALLBACK} !important; }}')                           # Cyrillic either)
             mt = mt.replace("<style>", "<style>\n" + "\n".join(font_css + BRAND_SANS) + "\n" + brand_font + "\n", 1)
+        if not c.get("keep_ui"):                         # into her palette: the motion's own greens/blues/oranges become her accents,
+            _lay = c.get("layout") or ("front" if c.get("tone") == "clear" else None)
+            mt = brand_recolor.recolor(mt, C, over=_lay in ("front", "behind", "over") or c.get("place") == "low")   # its darks/lights her dark/light (real product UIs keep theirs: "keep_ui")
+        _lay = c.get("layout") or ("front" if c.get("tone") == "clear" else None)
+        if _lay in ("front", "behind", "over") or c.get("place") == "low":   # over the video: its own full-frame background goes
+            mt = brand_recolor.transparent_bg(mt, comp_id)
         if c.get("ink"):                                 # text-only motions with a hard-coded dark ink: "light" / "pop" / "#hex"
             ink = {"light": LIGHT, "pop": POP, "soft": _SOFT, "dark": MAIN}.get(c["ink"], c["ink"])
             mt = mt.replace("<style>", f'<style>\n[data-composition-id="{comp_id}"] *:not(svg):not(svg *) {{ color: {ink} !important; }}\n', 1)
@@ -661,6 +671,8 @@ for i, c in enumerate(edit.get("cards", [])):
         nw, nh = (int(re.search(r'data-width="(\d+)"', txt).group(1)), int(re.search(r'data-height="(\d+)"', txt).group(1))) \
             if re.search(r'data-width="(\d+)"', txt) else (1080, 1080)
         vars_ = dict(c.get("vars", {}))
+        if (c.get("place") == "low" or c.get("layout") in ("front", "behind", "over") or c.get("tone") == "clear") and not c.get("keep_ui"):
+            vars_ = brand_recolor.over_vars(txt, vars_)   # light ink over the video: tone "ink" (for light frames) -> "paper"
         if c.get("images"):                              # carousels: fill every image slot, cycling the supplied images
             slots = sorted({int(m) for m in re.findall(r'"id":\s*"image(\d+)"', txt)})
             ims = [img(x) for x in c["images"]]
@@ -681,7 +693,17 @@ for i, c in enumerate(edit.get("cards", [])):
         panel_bg = {"light": LIGHT}.get(c.get("tone"), _DEEP)
         def fit_into(ax, ay, aw, ah):                    # a fixed-size motion scaled to fit an area, centred
             s_ = min(aw / nw, ah / nh); return [round(ax + (aw - nw * s_) / 2), round(ay + (ah - nh * s_) / 2), round(nw * s_), round(nh * s_)]
-        if c.get("place") in ("top", "chest") and not own_box and layout in ("front", "behind", "bubble"):   # a band off this reel's face
+        if layout == "over": layout = "front"
+        if c.get("place") == "low" and not own_box:      # over the video from the chin down: never moves or crops her
+            fx, fy, fw, fh = FACE or (300, 540, 480, 620)
+            top = min(int(fy + 0.86 * fh) + 10, 1260)    # face.json pads the face box below the chin
+            c["box"] = [40, top, 1000, 1660 - top]
+            if fixed:
+                z = c.get("zoom", 1.5); bx, by, bw_, bh_ = fit_into(*c["box"])   # 16:9 motions have wide empty margins: blown up, the overspill is transparent
+                c["box"] = [round(bx - bw_ * (z - 1) / 2), round(by - bh_ * (z - 1) / 2), round(bw_ * z), round(bh_ * z)]
+            if layout not in ("front", "behind", "bubble"): layout = "front"
+            if layout != "bubble": c.setdefault("tone", "clear")
+        elif c.get("place") in ("top", "chest") and not own_box and layout in ("front", "behind", "bubble"):   # a band off this reel's face
             fx, fy, fw, fh = FACE or (300, 540, 480, 620)
             if c["place"] == "top": c["box"] = [40, 225, 1000, max(240, min(440, int(fy + 0.15 * fh) - 225))]   # face.json starts at the hair
             else: top = int(fy + fh + 10); c["box"] = [40, min(top, 1170), 1000, max(260, min(460, 1490 - min(top, 1170)))]
@@ -720,9 +742,12 @@ for i, c in enumerate(edit.get("cards", [])):
         sc = bw / nw
         if not re.search(r'data-width="(\d+)"', txt) and c.get("box"):   # size-free components fill whatever box they get:
             nw, nh, sc = bw, bh, 1.0                     # a wide band above the head or across the chest, not a square on the face
+            if c.get("place") == "low" and not own_box:   # their text is a share of the box (cq units): scale the whole band up from
+                sc = float(c.get("zoom", 1.9)); x, y = round(x - bw * (sc - 1) / 2), round(y - bh * (sc - 1) / 2)   # its centre (transparent, short text)
+                bw, bh = round(bw * sc), round(bh * sc)
         if c.get("scale"):                               # "scale": wide 16:9 overlays (lower thirds, handwriting) shown bigger than
             sc = float(c["scale"]); bw, bh = round(nw * sc), round(nh * sc)   # the 1080 frame; box x/y may go negative to crop
-        if y + bh * 0.7 > CAP_Y: quiet.append((a, b))   # motion sits over the caption zone: captions step aside
+        if y + bh * 0.7 > CAP_Y or c.get("place") == "low": quiet.append((a, b))   # motion sits over the caption zone: captions step aside
         vals = html.escape(json.dumps(vars_), quote=True)
         tone = TONES.get(c.get("tone", "dark"), TONES["dark"]) + "".join(f"{k}:{v};" for k, v in (c.get("css") or {}).items())
         if layout == "bubble":                           # a rounded window (or a circle) with clean edges
@@ -1002,7 +1027,7 @@ def acc_look(col):
     return fill(col)
 cap_json = []
 for i, c in enumerate(edit.get("captions", [])):
-    if any(a - 0.05 <= c["start"] < b for a, b in quiet): continue
+    if any(a - 0.05 <= c["start"] < b or (c["start"] < b and c.get("end", c["start"]) > a + 0.2) for a, b in quiet): continue   # overlapping a card that carries its words
     ws = c["words"]
     plain = c.get("plain")                                             # "before" captions: basic white sans, no brand styling
     cap_json.append({"start": c["start"], "end": c["end"], "over_light": False,
