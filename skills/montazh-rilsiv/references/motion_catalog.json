@@ -606,7 +606,10 @@
    "quality": 4,
    "text_vars": [
     "label"
-   ]
+   ],
+   "replace": {
+    "Conic Progress Ring": "<її слова>"
+   }
   },
   {
    "name": "number-pop-in",
@@ -1088,7 +1091,10 @@
     "text",
     "cardTitle",
     "cardDomain"
-   ]
+   ],
+   "replace": {
+    "Chat Message": "<її слова>"
+   }
   },
   {
    "name": "typing-indicator",
@@ -1114,14 +1120,13 @@
    "moments": [
     "повідомлення / чат"
    ],
-   "status": "manual",
+   "status": "replace",
    "card": {
     "place": "low",
     "layout": "front"
    },
    "text": "vars.title/body/app_label",
    "rank": 1,
-   "note": "лягає на рот",
    "use": "ui",
    "quality": 5,
    "text_vars": [
@@ -1129,7 +1134,10 @@
     "body",
     "app_label"
    ],
-   "keep_ui": true
+   "keep_ui": true,
+   "replace": {
+    "Native Notification Pop": "<її слова>"
+   }
   },
   {
    "name": "notification-stack",
@@ -1236,7 +1244,12 @@
     "title",
     "lines"
    ],
-   "keep_ui": true
+   "keep_ui": true,
+   "replace": {
+    "Notes Typing": "<її слова>",
+    "Things nobody told me": "<її слова>",
+    "about video.": "<її слова>"
+   }
   },
   {
    "name": "yt-comment-card",
@@ -1569,25 +1582,37 @@
    "name": "instagram-follow",
    "ua": "Картка профілю Instagram з кнопкою Стежити",
    "moments": [
-    "заклик (CTA)"
+    "заклик (CTA)",
+    "ім'я / хто я"
    ],
-   "status": "manual",
+   "status": "ready",
    "card": {
-    "layout": "dim"
+    "layout": "front",
+    "tone": "clear",
+    "box": [
+     0,
+     -290,
+     1080,
+     1920
+    ]
    },
    "text": "",
    "rank": 4,
-   "note": "логотип HeyGen зашитий картинкою",
    "use": "ui",
    "quality": 4,
    "text_vars": [],
    "keep_ui": true,
-   "replace": {
-    "HeyGen": "<її назва або слова>",
-    "@heygen_official": "<її назва або слова>",
-    "47.5K followers": "<її назва або слова>",
-    "Follow": "<її назва або слова>",
-    "Following": "<її назва або слова>"
+   "brand_text": {
+    "HeyGen": "name",
+    "@heygen_official": "handle"
+   },
+   "avatar": true,
+   "replace_default": {
+    "Follow": "Стежити",
+    "Following": "Ви стежите",
+    "Subscribe": "Підписатися",
+    "Subscribed": "Ви підписані",
+    "47.5K followers": ""
    }
   },
   {
@@ -1631,19 +1656,24 @@
     "успіх / готово",
     "до / після"
    ],
-   "status": "manual",
+   "status": "replace",
    "card": {
     "place": "low",
     "layout": "front"
    },
    "text": "vars",
    "rank": 3,
-   "note": "бліде",
    "use": "overlay",
    "quality": 4,
    "text_vars": [
     "label"
-   ]
+   ],
+   "replace": {
+    "contents (everything outside": "<її слова>",
+    ", including the\n  entire": "<її слова>",
+    "Toggle Flip": "<її слова>",
+    "(not\n         inside": "<її слова>"
+   }
   },
   {
    "name": "press-ripple",
@@ -1972,17 +2002,19 @@
    "moments": [
     "хук / ключова фраза"
    ],
-   "status": "manual",
+   "status": "replace",
    "card": {
     "place": "low",
     "layout": "front"
    },
    "text": "",
    "rank": 3,
-   "note": "англійський текст зашитий",
    "use": "overlay",
    "quality": 4,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "point at things": "<її слова>"
+   }
   },
   {
    "name": "hw-underline",
@@ -1990,17 +2022,21 @@
    "moments": [
     "хук / ключова фраза"
    ],
-   "status": "manual",
+   "status": "replace",
    "card": {
     "place": "low",
     "layout": "front"
    },
    "text": "",
    "rank": 4,
-   "note": "англійський текст зашитий",
    "use": "overlay",
    "quality": 4,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "underline the point": "<її слова>",
+    "cross this out": "<її слова>",
+    "bracket the aside": "<її слова>"
+   }
   },
   {
    "name": "code-terminal-run",
@@ -2480,14 +2516,13 @@
    "moments": [
     "успіх / готово"
    ],
-   "status": "manual",
+   "status": "replace",
    "card": {
     "place": "low",
     "layout": "front"
    },
    "text": "",
    "rank": 5,
-   "note": "англійський інтерфейс",
    "use": "ui",
    "quality": 2,
    "text_vars": [
@@ -2515,14 +2550,13 @@
    "moments": [
     "картинки / приклади"
    ],
-   "status": "manual",
+   "status": "replace",
    "card": {
     "place": "low",
     "layout": "front"
    },
    "text": "",
    "rank": 5,
-   "note": "англійський інтерфейс",
    "use": "ui",
    "quality": 3,
    "text_vars": [
@@ -2608,14 +2642,13 @@
     "заклик (CTA)",
     "успіх / готово"
    ],
-   "status": "manual",
+   "status": "replace",
    "card": {
     "place": "low",
     "layout": "front"
    },
    "text": "",
    "rank": 5,
-   "note": "англійський інтерфейс",
    "use": "overlay",
    "quality": 4,
    "text_vars": [
@@ -2635,17 +2668,19 @@
    "moments": [
     "хук / ключова фраза"
    ],
-   "status": "manual",
+   "status": "replace",
    "card": {
     "place": "low",
     "layout": "front"
    },
    "text": "",
    "rank": 5,
-   "note": "англійський текст зашитий",
    "use": "overlay",
    "quality": 4,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "Europe": "<її слова>"
+   }
   },
   {
    "name": "hw-callout-circle",
@@ -3316,17 +3351,29 @@
    "moments": [
     "хук / ключова фраза"
    ],
-   "status": "manual",
+   "status": "replace",
    "card": {
     "place": "low",
     "layout": "front"
    },
    "text": "",
    "rank": 5,
-   "note": "англійський текст",
    "use": "overlay",
    "quality": 3,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "News Ticker": "<її слова>",
+    "Live": "<її слова>",
+    "Global Desk": "<її слова>",
+    "AI video tools move from": "<її слова>",
+    "prototype": "<її слова>",
+    "to\n                production": "<її слова>",
+    "09:41 UTC": "<її слова>",
+    "Breaking": "<її слова>",
+    "Creator teams shorten launch cycles by": "<її слова>",
+    "Rendering queues clear in under": "<її слова>",
+    "2 min": "<її слова>"
+   }
   },
   {
    "name": "reddit-post",
@@ -3385,31 +3432,46 @@
    "use": "ui",
    "quality": 4,
    "text_vars": [],
-   "keep_ui": true
+   "keep_ui": true,
+   "replace": {
+    "Thread Message Stack": "<її слова>"
+   }
   },
   {
    "name": "tiktok-follow",
    "ua": "Картка профілю TikTok з кнопкою підписатися",
    "moments": [
-    "заклик (CTA)"
+    "заклик (CTA)",
+    "ім'я / хто я"
    ],
-   "status": "manual",
+   "status": "ready",
    "card": {
-    "layout": "dim"
+    "layout": "front",
+    "tone": "clear",
+    "box": [
+     0,
+     -290,
+     1080,
+     1920
+    ]
    },
    "text": "",
    "rank": 5,
-   "note": "зашитий HeyGen",
    "use": "ui",
    "quality": 3,
    "text_vars": [],
    "keep_ui": true,
-   "replace": {
-    "HeyGen": "<її назва або слова>",
-    "@heygen.com": "<її назва або слова>",
-    "1,999 followers": "<її назва або слова>",
-    "Follow": "<її назва або слова>",
-    "Following": "<її назва або слова>"
+   "brand_text": {
+    "HeyGen": "name",
+    "@heygen.com": "handle"
+   },
+   "avatar": true,
+   "replace_default": {
+    "Follow": "Стежити",
+    "Following": "Ви стежите",
+    "Subscribe": "Підписатися",
+    "Subscribed": "Ви підписані",
+    "1,999 followers": ""
    }
   },
   {
@@ -3437,21 +3499,31 @@
    "moments": [
     "відгук / доказ"
    ],
-   "status": "manual",
+   "status": "replace",
    "card": {
-    "layout": "dim"
+    "place": "low",
+    "zoom": 2.0
    },
    "text": "",
    "rank": 5,
-   "note": "чужий бренд",
    "use": "ui",
    "quality": 3,
    "text_vars": [],
    "keep_ui": true,
    "replace": {
-    "Hyperframes": "<її назва або слова>",
-    "@hyperframes": "<її назва або слова>",
-    "#YourHashtag": "<її назва або слова>"
+    "#YourHashtag": "<її назва або слова>",
+    "Prompt to replace this text with your tweet. Change the display name, handle, timestamp,\n          and engagement counts to match your content. ": "<її слова>"
+   },
+   "brand_text": {
+    "Hyperframes": "name",
+    "@hyperframes": "handle"
+   },
+   "avatar": true,
+   "replace_default": {
+    "Follow": "Стежити",
+    "Following": "Ви стежите",
+    "Subscribe": "Підписатися",
+    "Subscribed": "Ви підписані"
    }
   },
   {
@@ -3461,22 +3533,33 @@
     "заклик (CTA)",
     "ім'я / хто я"
    ],
-   "status": "manual",
+   "status": "ready",
    "card": {
-    "layout": "dim"
+    "layout": "front",
+    "tone": "clear",
+    "box": [
+     -420,
+     420,
+     1920,
+     1080
+    ]
    },
    "text": "",
    "rank": 5,
-   "note": "зашитий HeyGen",
    "use": "ui",
    "quality": 3,
    "text_vars": [],
    "keep_ui": true,
-   "replace": {
-    "HeyGen": "<її назва або слова>",
-    "82.2K subscribers": "<її назва або слова>",
-    "Subscribe": "<її назва або слова>",
-    "Subscribed": "<її назва або слова>"
+   "brand_text": {
+    "HeyGen": "name"
+   },
+   "avatar": true,
+   "replace_default": {
+    "Follow": "Стежити",
+    "Following": "Ви стежите",
+    "Subscribe": "Підписатися",
+    "Subscribed": "Ви підписані",
+    "82.2K subscribers": ""
    }
   },
   {
@@ -3626,7 +3709,10 @@
    "note": "текст не підставляється",
    "use": "overlay",
    "quality": 4,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "bottom-up-letters": "<її слова>"
+   }
   },
   {
    "name": "confetti",
@@ -3807,6 +3893,14 @@
    "text_vars": [],
    "replace": {
     "X Follow Card": "<її слова>"
+   },
+   "brand_text": {},
+   "avatar": true,
+   "replace_default": {
+    "Follow": "Стежити",
+    "Following": "Ви стежите",
+    "Subscribe": "Підписатися",
+    "Subscribed": "Ви підписані"
    }
   },
   {
@@ -3989,8 +4083,8 @@
    "use": "skip",
    "quality": 1,
    "text_vars": [],
-   "status": "manual",
-   "note": "another creator's branding baked in",
+   "status": "skip",
+   "note": "службовий елемент або чужий ролик, не ефект для рілса",
    "replace": {
     "Blue Sweater Intro Video": "<її слова>",
     "Introducing": "<її слова>",
@@ -6311,8 +6405,8 @@
    "use": "skip",
    "quality": 1,
    "text_vars": [],
-   "status": "manual",
-   "note": "widescreen fill, not for vertical reels",
+   "status": "skip",
+   "note": "службовий елемент або чужий ролик, не ефект для рілса",
    "card": {
     "place": "low",
     "layout": "front"
@@ -6482,8 +6576,12 @@
    "card": {
     "layout": "dim"
    },
-   "status": "manual",
-   "note": "дрібно"
+   "status": "replace",
+   "replace": {
+    "Slot content may be an": "<її слова>",
+    ", a muted": "<її слова>",
+    "Browser Device Stage": "<її слова>"
+   }
   },
   {
    "name": "camera-rig-depth-stack",
@@ -6744,8 +6842,7 @@
     "place": "low",
     "layout": "front"
    },
-   "status": "manual",
-   "note": "англійський текст зашитий",
+   "status": "replace",
    "replace": {
     "Context Menu Cursor": "<її слова>",
     "Launch assets": "<її слова>"
@@ -6796,8 +6893,7 @@
    "card": {
     "layout": "dim"
    },
-   "status": "manual",
-   "note": "на весь кадр, ще не перевірено в кадрі",
+   "status": "replace",
    "replace": {
     "Zoom Follow Cursor": "<її слова>",
     "Overview": "<її слова>",
@@ -6927,8 +7023,8 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "manual",
-   "note": "Abstract demo primitive",
+   "status": "skip",
+   "note": "службовий елемент або чужий ролик, не ефект для рілса",
    "card": {
     "place": "low",
     "layout": "front"
@@ -6944,8 +7040,8 @@
    "use": "skip",
    "quality": 1,
    "text_vars": [],
-   "status": "manual",
-   "note": "Easing helper, not a visual",
+   "status": "skip",
+   "note": "службовий елемент або чужий ролик, не ефект для рілса",
    "card": {
     "place": "low",
     "layout": "front"
@@ -6999,8 +7095,8 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "manual",
-   "note": "Heavy full-scene filter",
+   "status": "skip",
+   "note": "службовий елемент або чужий ролик, не ефект для рілса",
    "card": {
     "place": "low",
     "layout": "front"
@@ -7122,8 +7218,8 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "manual",
-   "note": "Helper library, not a standalone visual",
+   "status": "skip",
+   "note": "службовий елемент або чужий ролик, не ефект для рілса",
    "card": {
     "place": "low",
     "layout": "front"
@@ -7186,8 +7282,7 @@
     "place": "low",
     "layout": "front"
    },
-   "status": "manual",
-   "note": "англійський текст зашитий",
+   "status": "replace",
    "replace": {
     "Email": "<її слова>",
     "mia@example.com": "<її слова>",
@@ -7204,8 +7299,8 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "manual",
-   "note": "No content vars, demo stack",
+   "status": "skip",
+   "note": "службовий елемент або чужий ролик, не ефект для рілса",
    "card": {
     "place": "low",
     "layout": "front"
@@ -7388,8 +7483,8 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "manual",
-   "note": "Slot-based structural primitive",
+   "status": "skip",
+   "note": "службовий елемент або чужий ролик, не ефект для рілса",
    "card": {
     "place": "low",
     "layout": "front"
@@ -7433,8 +7528,8 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "manual",
-   "note": "Render helper",
+   "status": "skip",
+   "note": "службовий елемент або чужий ролик, не ефект для рілса",
    "card": {
     "place": "low",
     "layout": "front"
@@ -7490,8 +7585,8 @@
    "text_vars": [
     "traveler_label"
    ],
-   "status": "manual",
-   "note": "Abstract product-demo path motion, little use over a talking head",
+   "status": "skip",
+   "note": "службовий елемент або чужий ролик, не ефект для рілса",
    "card": {
     "place": "low",
     "layout": "front"
@@ -7588,8 +7683,7 @@
    "card": {
     "layout": "dim"
    },
-   "status": "manual",
-   "note": "на весь кадр, ще не перевірено в кадрі",
+   "status": "replace",
    "replace": {
     "Pan Stations": "<її слова>"
    }
@@ -7856,8 +7950,8 @@
    "use": "skip",
    "quality": 1,
    "text_vars": [],
-   "status": "manual",
-   "note": "Structural layout primitive, not a visible moment",
+   "status": "skip",
+   "note": "службовий елемент або чужий ролик, не ефект для рілса",
    "card": {
     "place": "low",
     "layout": "front"
@@ -8207,8 +8301,14 @@
     "place": "low",
     "layout": "front"
    },
-   "status": "manual",
-   "note": "значки App Store"
+   "status": "replace",
+   "replace": {
+    "Store Badge Lockup": "<її слова>",
+    "Download on the": "<її слова>",
+    "App Store": "<її слова>",
+    "GET IT ON": "<її слова>",
+    "Google Play": "<її слова>"
+   }
   },
   {
    "name": "streaming-text",
@@ -8516,7 +8616,10 @@
     "layout": "front"
    },
    "status": "manual",
-   "note": "не видно"
+   "note": "не видно",
+   "replace": {
+    "Touch Indicator": "<її слова>"
+   }
   },
   {
    "name": "tracing-beam",
@@ -8532,8 +8635,7 @@
    "card": {
     "layout": "dim"
    },
-   "status": "manual",
-   "note": "дрібно",
+   "status": "replace",
    "replace": {
     "Tracing Beam": "<її слова>",
     "Step one": "<її слова>",
@@ -8605,8 +8707,7 @@
    "card": {
     "layout": "dim"
    },
-   "status": "manual",
-   "note": "на весь кадр, ще не перевірено в кадрі",
+   "status": "replace",
    "replace": {
     "UI Focus Zoom": "<її слова>"
    }

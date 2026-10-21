@@ -52,8 +52,11 @@ with what each one is for, its moment and its tested placement, is `references/m
     phone chats and notes, maps, before/after, device mocks. Status `full_only`, marked «на весь кадр».
 - Image slots (carousels, galleries, device and placeholder grids): fill `"images"` with their photos or screenshots; an
   empty slot never goes in.
-- Brand-name examples (IG/TikTok follow cards, Spotify, X post, YouTube lower third, avatar promo): `replace` swaps the
-  company name for theirs; the logo is an image and must be their own. Status `manual`.
+- Follow cards (`instagram-follow`, `tiktok-follow`, `yt-lower-third`, `x-post`) are suggested: name and handle come from
+  brand.json `name` / `handle`, the buttons are in Ukrainian («Стежити», «Ви стежите»), the avatar is brand.json `"avatar"`
+  (a path) or a square crop of the face from the reel. A follower count shows only if `replace` gives a real one.
+- Effects that work but are never suggested on their own (`manual`: maps, shader transitions, caption styles, 3D scenes) are
+  listed on the review page under «Ефекти» → «Тільки вручну»; the person picks one for a second there.
 - The tested placement comes from the catalog automatically (layout, place, tone, ink, css); set them on the card only to move it.
   `box: [x, y, w, h]` on the 1080x1920 frame; `scale` shows a 1920-wide overlay bigger than the frame (lower thirds, light
   leaks: x may go negative).

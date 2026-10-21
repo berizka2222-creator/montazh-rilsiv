@@ -52,6 +52,23 @@ captions:C.capsAround(R,D,C.captions(R,D,P),C.graphics(R,D,P)),graphics:C.graphi
     return json.loads(subprocess.run(["node", "-e", js], input=json.dumps({"r": reel_json, "d": decisions}),
                                      capture_output=True, text=True, check=True).stdout)
 
+def lib_count():
+    """How many effects Claude picks from on its own: checked catalog motions plus the Remotion brand elements."""
+    cat = json.load(open(Path(__file__).resolve().parent.parent / "references" / "motion_catalog.json"))["motions"]
+    lib = Path(os.environ.get("MOTION_HOME", "~/motion")).expanduser() / "library.json"
+    return sum(1 for m in cat if m.get("status") in ("ready", "replace", "full_only")) + (len(json.load(open(lib))["elements"]) if lib.exists() else 0)
+
+def manual_effects():
+    """Catalog effects that work but are never suggested on their own («Тільки вручну» on the page's «Ефекти» tab)."""
+    cat = json.load(open(Path(__file__).resolve().parent.parent / "references" / "motion_catalog.json"))["motions"]
+    def group(m):
+        n, note = m["name"], m.get("note") or ""
+        return ("Мапи" if "мапа" in note else "Переходи між склейками" if "перехід" in note or m.get("card", {}).get("layout") == "transition"
+                else "Стилі субтитрів" if n.startswith("caption-") else "Потрібен свій логотип" if "лого" in note or "бренд" in note
+                else "Переходи між склейками" if "перехід" in (m.get("moments") or [""])[0] else (lambda x: x[:1].upper() + x[1:])((m.get("moments") or ["інше"])[0]))
+    out = [{"n": m["name"], "ua": m.get("ua") or m["name"], "g": group(m)} for m in cat if m.get("status") == "manual"]
+    return sorted(out, key=lambda x: (x["g"], x["ua"]))
+
 def export(reel, proposal, out):
     out.mkdir(parents=True, exist_ok=True)
     brand = json.load(open(HOME / "brand.json"))
@@ -122,7 +139,7 @@ def export(reel, proposal, out):
     reel_json = {"title": proposal["title"], "srcDur": float(subprocess.run(["ffprobe", "-v", "error", "-show_entries",
                  "format=duration", "-of", "csv=p=0", str(raw_clip(reel))], capture_output=True, text=True).stdout),
                  "theme": _theme(brand), "handle": brand.get("handle", ""), "speed": pacing(brand)["speed"], "pacing": pacing(brand), "words": words, "proposedCut": proposed_cut, "keepPauses": keep_pauses,
-                 "captions": caps, "board": board,
+                 "captions": caps, "board": board, "manual": manual_effects(), "libCount": lib_count(),
                  "style": {"capSize": brand["captions"].get("size", 104), "capY": brand["captions"].get("y", 1250),
                            "mode": mode, "editorial": brand["captions"].get("style") == "editorial",
                            "cap": brand["colors"].get("caption", "#FFFFFF"), "acc": brand["colors"].get("caption_accent", "#FF7DB8"), "acc2": brand["colors"].get("caption_accent_2"),

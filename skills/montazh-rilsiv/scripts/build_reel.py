@@ -259,6 +259,19 @@ def img(src):
             subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(cand), "-vf", "scale='min(1280,iw)':-2", str(dst)], check=True)
             return f"img/{dst.name}"
     print(f"warning: image not found: {src}"); return ""
+def avatar_img(own=None):
+    """Their profile photo for follow cards: the card's "avatar", brand.json "avatar", else a square crop of their face from the reel."""
+    src = own or brand.get("avatar")
+    if src: return img(src)
+    out = reel / "elements" / "_avatar.png"
+    if not out.exists():
+        fj = reel / "face.json"
+        x, y, w, h = json.load(open(fj))["box"] if fj.exists() else (290, 400, 500, 500)
+        s = min(1080, int(min(w, h) * 1.15)); x0 = max(0, min(1080 - s, x + w // 2 - s // 2)); y0 = max(0, min(1920 - s, y + h // 2 - s // 2))
+        out.parent.mkdir(parents=True, exist_ok=True)
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", "1", "-i", str(reel / "master.mp4"), "-frames:v", "1",
+                        "-vf", f"scale=1080:1920,crop={s}:{s}:{x0}:{y0},scale=400:400", str(out)])
+    return img(str(out)) if out.exists() else ""
 
 # fonts: brand.json "fonts": {"head": {...}, "body": {...}, "accent": {...}}, each {family, file?, weight?, style?}
 FALLBACK = "'Helvetica Neue', Helvetica, Arial, sans-serif"   # single quotes: these go inside style="..." attributes
@@ -741,7 +754,16 @@ for i, c in enumerate(edit.get("cards", [])):
             zone(cid, "transition", a, b, (0, 0, W, H), text=False, full=True)
             continue
         mt = (proj / rel).read_text()
-        rep = {k: v for k, v in (c.get("replace") or {}).items() if k}   # motions with their text baked in: swap it for their words
+        _cm = MOTION_PRESETS.get(c["name"], {})          # follow cards etc.: their name / handle from brand.json, UI words in their language
+        rep = {**_cm.get("replace_default", {}), **{k: brand[f] for k, f in _cm.get("brand_text", {}).items() if brand.get(f)},
+               **(c.get("replace") or {})}
+        rep = {k: v for k, v in rep.items() if k and not str(v).startswith("<")}   # motions with their text baked in: swap it for their words
+        if _cm.get("avatar") or c.get("avatar"):         # someone else's logo in the avatar slot -> their photo
+            av = avatar_img(c.get("avatar"))
+            if av:
+                mt = re.sub(r'src="assets/(?:avatar|logo)[^"]*"', f'src="{av}"', mt)
+                mt = mt.replace("<style>", f'<style>\n[data-composition-id="{comp_id}"] .avatar {{ background: url({av}) center/cover no-repeat !important; }}'
+                                f' [data-composition-id="{comp_id}"] .avatar svg {{ display: none !important; }}\n', 1)
         for k in rep:
             if k not in mt: print(f"warning: motion {c['name']}: text {k!r} not found, nothing replaced")
         if rep:                                          # one pass, longest first, whole words only: "Follow" never eats "Following"

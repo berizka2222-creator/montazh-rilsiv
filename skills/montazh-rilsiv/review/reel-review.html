@@ -49,6 +49,10 @@ h1{font-family:var(--f-display);font-size:44px;line-height:1;margin:0;color:var(
 .tab{font:inherit;font-weight:700;font-size:14px;border:2px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer;display:flex;gap:7px;align-items:center}
 .tab[aria-selected="true"]{border-color:var(--pink);background:var(--pink);color:var(--on-accent)}
 .tab .dot{width:8px;height:8px;border-radius:50%;background:var(--keep)}
+.manlib summary{cursor:pointer;display:flex;gap:8px;align-items:baseline}
+.manlib h4{margin:14px 0 6px;font-size:13px;color:var(--muted);font-weight:600}
+.manrow{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:7px 0;border-top:1px solid var(--line)}
+.manrow .nm{font:500 11px var(--f-mono);color:var(--muted)}
 .lede{margin:0 0 8px;color:var(--muted);font-size:14px;max-width:62ch}
 .tally{font:500 13px var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums;margin-bottom:10px;display:flex;gap:6px 14px;flex-wrap:wrap}
 .tally b{color:var(--ink)}
@@ -549,6 +553,12 @@ section[data-p="effects"].with{margin-top:34px;padding-top:24px;border-top:1px s
         <div class="ctl" style="margin-top:10px"><button class="b primary" id="efadd" type="button">Додати ефект</button><span class="mode" id="efmsg" aria-live="polite"></span></div>
       </div>
       <div class="cards" id="eflist"></div>
+      <details class="panel manlib" id="manlib" hidden>
+        <summary><b>Тільки вручну</b> <span class="mode" id="mancount"></span></summary>
+        <p class="lede">Claude сам їх не пропонує: вони для особливих моментів. Постав чорновий монтаж на потрібну секунду і натисни «На цю секунду».</p>
+        <input type="text" id="mansearch" placeholder="Пошук: мапа, перехід, субтитри, 3D…" aria-label="Пошук ефекту">
+        <div id="manlist"></div>
+      </details>
     </section>
 
     <section data-p="graphics" hidden>
@@ -1408,6 +1418,26 @@ $("#ovadd").addEventListener("click", async () => {
   finally { btn.disabled = false; }
 });
 
+// ---------- «Тільки вручну»: catalog effects Claude never suggests on its own (reel.json "manual"), one tap puts one on this second ----------
+function renderManual() {
+  const box = $("#manlist"), all = (R && R.manual) || []; $("#manlib").hidden = !all.length; if (!all.length) return;
+  const q = ($("#mansearch").value || "").trim().toLowerCase();
+  const list = all.filter(m => !q || (m.ua + " " + m.n + " " + m.g).toLowerCase().includes(q));
+  $("#mancount").textContent = q ? `${list.length} з ${all.length}` : `${all.length}`; box.textContent = "";
+  let g = null;
+  for (const m of list) {
+    if (m.g !== g) { g = m.g; const h = document.createElement("h4"); h.textContent = g; box.appendChild(h); }
+    const row = document.createElement("div"); row.className = "manrow";
+    const t = document.createElement("div"); const a = document.createElement("div"); a.textContent = m.ua;
+    const n = document.createElement("div"); n.className = "nm"; n.textContent = m.n + (m.why ? " · " + m.why : ""); t.append(a, n);
+    const b = document.createElement("button"); b.type = "button"; b.className = "b quiet"; b.textContent = "На цю секунду";
+    b.addEventListener("click", () => { $("#eftext").value = `${m.n}: ${m.ua}. `; $("#efbox").scrollIntoView({ behavior: "smooth", block: "center" });
+      $("#eftext").focus(); $("#efmsg").textContent = "Допиши свої слова для ефекту, перевір секунду і натисни «Додати ефект»."; });
+    row.append(t, b); box.appendChild(row);
+  }
+}
+$("#mansearch").addEventListener("input", renderManual);
+
 // ---------- effects they ask for: a moment, what to do (a library name or their words) and files for it ----------
 function renderEffects() {
   const box = $("#eflist"); box.textContent = "";
@@ -1475,7 +1505,7 @@ function renderStylePick() {
   }
   const pick = STYLE_LIST.find(x => x.name === cur);
   const go = document.createElement("button"); go.type = "button"; go.className = "b quiet"; go.textContent = "Зібрати стилі"; go.addEventListener("click", () => showTab("style"));
-  $("#stylehint").textContent = (!STYLE_LIST.length ? "Стилів ще немає. Збери їх на вкладці «Стиль» або монтуй тільки з брендом." : cur === "brand" ? "Монтаж у кольорах і шрифтах бренду, без стилю: картки й списки бренду плюс кілька ефектів з бібліотеки." : cur === "mix" ? "Без стилю: Claude бере ефекти з бібліотеки (59 анімацій, що читаються у вертикальному відео), щоразу інші, ніколи не повторює в одному рілсі. Кольори й шрифти бренду." : pick ? pick.what : "Обери стиль до «Готово → Claude»: пропозиції графіки й звуки будуть у ньому.") + " ";
+  $("#stylehint").textContent = (!STYLE_LIST.length ? "Стилів ще немає. Збери їх на вкладці «Стиль» або монтуй тільки з брендом." : cur === "brand" ? "Монтаж у кольорах і шрифтах бренду, без стилю: картки й списки бренду плюс кілька ефектів з бібліотеки." : cur === "mix" ? `Без стилю: Claude бере ефекти з бібліотеки (${R && R.libCount ? R.libCount : "понад 100"} анімацій, перевірених у вертикальному відео), щоразу інші, ніколи не повторює в одному рілсі. Кольори й шрифти бренду.` : pick ? pick.what : "Обери стиль до «Готово → Claude»: пропозиції графіки й звуки будуть у ньому.") + " ";
   if (STYLE_LIST.length) go.textContent = "Подивитись приклади стилів";
   $("#stylehint").appendChild(go);
   const box1 = $("#stylepick1"); if (!box1) return; box1.textContent = "";   // the same picker on step 1 («Стиль монтажу» tab)
@@ -1905,7 +1935,7 @@ $("#revadd").addEventListener("click", () => {
 });
 
 function renderAll() {
-  renderCuts(); renderGraphics(); renderEffects(); renderCaptions(); renderSound(); renderPreview(); syncHookCta(); renderStage(); renderCapPlace(); renderStylePick(); renderCutBox();
+  renderCuts(); renderGraphics(); renderEffects(); renderManual(); renderCaptions(); renderSound(); renderPreview(); syncHookCta(); renderStage(); renderCapPlace(); renderStylePick(); renderCutBox();
   const sent = { mystyle: !!S.style, cuts: S.cut != null, overlays: (S.overlays || []).length, effects: (S.effects || []).length, graphics: Object.keys(S.board).length || (S.hook != null) || !!S.cta || !!S.style || !!S.speedMul, captions: S.captions != null, sound: Object.keys(S.sfxOff).length || S.voiceClean === false || !ReelCore.isNeutral(S.grade) };
   $$(".tab:not(.tabx)").forEach(b => { const d = b.querySelector(".dot"); if (d) d.hidden = !sent[b.dataset.tab]; });
   styleDot();
