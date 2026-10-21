@@ -1475,7 +1475,7 @@ function renderStylePick() {
   }
   const pick = STYLE_LIST.find(x => x.name === cur);
   const go = document.createElement("button"); go.type = "button"; go.className = "b quiet"; go.textContent = "Зібрати стилі"; go.addEventListener("click", () => showTab("style"));
-  $("#stylehint").textContent = (!STYLE_LIST.length ? "Стилів ще немає. Збери їх на вкладці «Стиль» або монтуй тільки з брендом." : cur === "brand" ? "Монтаж у кольорах і шрифтах бренду, без стилю: картки й списки бренду плюс кілька ефектів з бібліотеки." : cur === "mix" ? "Без стилю: Claude бере ефекти з усієї бібліотеки (86 анімацій), щоразу інші, ніколи не повторює в одному рілсі. Кольори й шрифти бренду." : pick ? pick.what : "Обери стиль до «Готово → Claude»: пропозиції графіки й звуки будуть у ньому.") + " ";
+  $("#stylehint").textContent = (!STYLE_LIST.length ? "Стилів ще немає. Збери їх на вкладці «Стиль» або монтуй тільки з брендом." : cur === "brand" ? "Монтаж у кольорах і шрифтах бренду, без стилю: картки й списки бренду плюс кілька ефектів з бібліотеки." : cur === "mix" ? "Без стилю: Claude бере ефекти з бібліотеки (59 анімацій, що читаються у вертикальному відео), щоразу інші, ніколи не повторює в одному рілсі. Кольори й шрифти бренду." : pick ? pick.what : "Обери стиль до «Готово → Claude»: пропозиції графіки й звуки будуть у ньому.") + " ";
   if (STYLE_LIST.length) go.textContent = "Подивитись приклади стилів";
   $("#stylehint").appendChild(go);
   const box1 = $("#stylepick1"); if (!box1) return; box1.textContent = "";   // the same picker on step 1 («Стиль монтажу» tab)
@@ -1787,6 +1787,7 @@ function stage() {
   if (B?.final) return { n: 4, wait: false };
   if (B?.url && S.finalRequest?.hash === B.hash) return { n: 4, wait: true };
   if (B?.url && S.fixRequest?.hash === B.hash && B.fixedFor !== S.fixRequest.at) return { n: 3, wait: true };   // notes sent: waiting for the draft that answers them (builds doc carries fixedFor)
+  if (B?.url && S.buildRequest && S.buildRequest.hash !== B.hash && S.buildRequest.hash === ReelCore.hash(decisions())) return { n: 3, wait: true };   // asked to rebuild after a change
   if (B?.url) return { n: 3, wait: false };
   if (S.buildRequest) return { n: 3, wait: true };
   if ((R?.claudeRound || 0) > 0) return { n: 2, wait: false };
@@ -1833,6 +1834,7 @@ function renderStage() {
   else if (st.n === 2 && st.wait) set("Claude готує пропозиції", "Сторінка оновиться сама. Можеш далі правити своє.", `<span class="spin"></span>Claude працює`);
   else if (st.n === 2) set("Крок 2 · пропозиції Claude", "На «Графіці» все з позначкою «від Claude»: залиш, зміни або прибери.", "Зібрати чернетку", "build");
   else if (st.n === 3 && st.wait) { const r = renderEta(); set("Claude збирає чернетку", r ? `Минуло ${r.done} хв з ~${r.total}. Сторінка відкриє «Чернетку» сама.` : "~6–10 хв. Сторінка відкриє «Чернетку» сама.", `<span class="spin"></span>${r ? r.pct + "%" : "Рендериться"}`); }
+  else if (st.n === 3 && B?.url && B.hash !== ReelCore.hash(decisions())) set("Крок 3 · рішення змінились", "Чернетка зібрана до твоїх змін (стиль, нарізка, графіка). Збери її заново.", "Зібрати чернетку заново", "build");
   else if (st.n === 3 && newRevs) set("Крок 3 · чернетка", `Нотаток: ${newRevs}. Віддай їх Claude одним натиском.`, "Виправити за нотатками", "fixes");
   else if (st.n === 3) set("Крок 3 · чернетка", "Подивись чернетку. Є що змінити? Лиши нотатку на секунді.", "Це фінал", "final");
   else if (st.wait) set("Claude видає фінал", "Перевірка звуку, MP4 у папку Reels.", `<span class="spin"></span>Готується`);
