@@ -495,6 +495,7 @@ section[data-p="effects"].with{margin-top:34px;padding-top:24px;border-top:1px s
       <button class="tab gone" role="tab" data-tab="graphics">Графіка <span class="dot" hidden></span></button>
       <button class="tab" role="tab" data-tab="captions">Субтитри <span class="dot" hidden></span></button>
       <button class="tab" role="tab" data-tab="sound">Звук і колір <span class="dot" hidden></span></button>
+      <button class="tab" role="tab" data-tab="mystyle">Стиль монтажу <span class="dot" hidden></span></button>
       <button class="tab gone" role="tab" data-tab="preview">Чернетка</button>
       <button class="tab tabx gone" role="tab" data-tab="style">Стиль <span class="dot" hidden></span></button>
     </div>
@@ -624,6 +625,16 @@ section[data-p="effects"].with{margin-top:34px;padding-top:24px;border-top:1px s
         <p class="mode" style="margin-top:6px">Напиши в нотатці, що саме подобається в референсі. Claude зробить за ним напрям у наступному раунді.</p></div>
     </section>
 
+    <section data-p="mystyle" hidden>
+      <div class="sechead"><h2>Стиль <em>монтажу</em></h2></div>
+      <p class="lede">Обери, яким із твоїх стилів монтуємо цей рілс. У ньому будуть графіка, рух і звуки.</p>
+      <div class="panel">
+        <label id="stylepick1label">Стиль</label>
+        <div class="gpre" id="stylepick1" role="group" aria-labelledby="stylepick1label"></div>
+        <p class="mode" id="stylehint1" style="margin-top:8px"></p>
+      </div>
+    </section>
+
     <section data-p="preview" hidden>
       <div class="sechead"><h2>Чернетка</h2><div class="sectools"><button class="icon notebtn" type="button">+ Нотатка</button></div></div>
       <p class="lede">Claude збирає відео з твоїми рішеннями (<span id="preveta">~7 хв</span>). Потім залиш нотатки на потрібних секундах.</p>
@@ -725,7 +736,7 @@ function decisions() { return { ...S, cut: S.cut || R.proposedCut, captions: S.c
 function recompute() { const d = decisions(); P = ReelCore.plan(R, d); CAPS = ReelCore.captions(R, d, P); GFX = ReelCore.graphics(R, d, P); ReelCore.capsAround(R, d, CAPS, GFX); }
 
 // ---------- tabs ----------
-const STEP_OF = { cuts: 1, overlays: 1, effects: 1, captions: 1, sound: 1, graphics: 2, preview: 3 };
+const STEP_OF = { cuts: 1, overlays: 1, effects: 1, captions: 1, sound: 1, mystyle: 1, graphics: 2, preview: 3 };
 let lastSub = "cuts";
 function showTab(t) {
   if (t === "effects") t = "overlays";   // «Накладення й ефекти» is one screen
@@ -740,7 +751,7 @@ function showTab(t) {
   $("#notesbox").hidden = t === "style"; document.querySelector(".wrap").classList.toggle("stylemode", t === "style");
   if (t === "style") { $("#nextbox").hidden = true; stopPlay(); renderStyle(); renderStage(); return; }
   if (!R) return;
-  $("#notetab").textContent = { cuts: "нарізка", overlays: "накладення", effects: "ефекти", graphics: "графіка", captions: "субтитри", sound: "звук і колір", preview: "чернетка" }[t];
+  $("#notetab").textContent = { cuts: "нарізка", overlays: "накладення", effects: "ефекти", graphics: "графіка", captions: "субтитри", sound: "звук і колір", mystyle: "стиль монтажу", preview: "чернетка" }[t];
   $("#notes").value = S.notes[t] || ""; $("#notesdet").open = !!(S.notes[t] || "").trim() || !!((S.refs || {})[t] || []).length; $("#resetbox").hidden = t === "preview";
   renderRefs();
   $("#nextbox").hidden = true;   // the steps on top and the bar at the bottom lead the way now
@@ -1453,16 +1464,23 @@ function renderSpeedPick() {
 function renderStylePick() {
   renderSpeedPick();
   const box = $("#stylepick"); if (!box) return; box.textContent = "";
-  const cur = S.style || null, opts = [...STYLE_LIST.map(x => [x.name, x.title || x.name, x.what || ""]), ["brand", "Тільки бренд", "Кольори й шрифти бренду, без стилю"]];
+  const cur = S.style || null, opts = [...STYLE_LIST.map(x => [x.name, x.title || x.name, x.what || ""]), ["brand", "Тільки бренд", "Кольори й шрифти бренду, без стилю"], ["mix", "Без стилю: мікс ефектів", "Без стилю: графіка з усієї бібліотеки ефектів, щоразу інші анімації"]];
   for (const [name, title, what] of opts) {
     const b = document.createElement("button"); b.type = "button"; b.textContent = title; b.title = what; b.setAttribute("aria-pressed", cur === name);
     b.addEventListener("click", () => mutate(() => { S.style = cur === name ? null : name; })); box.appendChild(b);
   }
   const pick = STYLE_LIST.find(x => x.name === cur);
   const go = document.createElement("button"); go.type = "button"; go.className = "b quiet"; go.textContent = "Зібрати стилі"; go.addEventListener("click", () => showTab("style"));
-  $("#stylehint").textContent = (!STYLE_LIST.length ? "Стилів ще немає. Збери їх на вкладці «Стиль» або монтуй тільки з брендом." : cur === "brand" ? "Монтаж у кольорах і шрифтах бренду, без стилю." : pick ? pick.what : "Обери стиль до «Готово → Claude»: пропозиції графіки й звуки будуть у ньому.") + " ";
+  $("#stylehint").textContent = (!STYLE_LIST.length ? "Стилів ще немає. Збери їх на вкладці «Стиль» або монтуй тільки з брендом." : cur === "brand" ? "Монтаж у кольорах і шрифтах бренду, без стилю: картки й списки бренду плюс кілька ефектів з бібліотеки." : cur === "mix" ? "Без стилю: Claude бере ефекти з усієї бібліотеки (86 анімацій), щоразу інші, ніколи не повторює в одному рілсі. Кольори й шрифти бренду." : pick ? pick.what : "Обери стиль до «Готово → Claude»: пропозиції графіки й звуки будуть у ньому.") + " ";
   if (STYLE_LIST.length) go.textContent = "Подивитись приклади стилів";
   $("#stylehint").appendChild(go);
+  const box1 = $("#stylepick1"); if (!box1) return; box1.textContent = "";   // the same picker on step 1 («Стиль монтажу» tab)
+  for (const [name, title, what] of opts) {
+    const b = document.createElement("button"); b.type = "button"; b.textContent = title; b.title = what; b.setAttribute("aria-pressed", cur === name);
+    b.addEventListener("click", () => mutate(() => { S.style = cur === name ? null : name; })); box1.appendChild(b);
+  }
+  $("#stylehint1").textContent = $("#stylehint").firstChild ? $("#stylehint").firstChild.textContent : "";
+  const go1 = go.cloneNode(true); go1.addEventListener("click", () => showTab("style")); $("#stylehint1").appendChild(go1);
 }
 
 // ---------- hook + CTA typed on the page ----------
@@ -1835,7 +1853,7 @@ function askStep(kind) {
 }
 function fillModalStyles() {   // the style is picked as she hands step 1 over (Claude makes the graphics in it)
   const box = document.getElementById("mstylepick"); if (!box) return; box.textContent = "";
-  for (const [name, title] of [...STYLE_LIST.map(x => [x.name, x.title || x.name]), ["brand", "Тільки бренд"]]) {
+  for (const [name, title] of [...STYLE_LIST.map(x => [x.name, x.title || x.name]), ["brand", "Тільки бренд"], ["mix", "Без стилю: мікс ефектів"]]) {
     const b = document.createElement("button"); b.type = "button"; b.textContent = title; b.setAttribute("aria-pressed", S.style === name);
     b.addEventListener("click", () => { mutate(() => { S.style = name; }); fillModalStyles(); }); box.appendChild(b);
   }
@@ -1882,7 +1900,7 @@ $("#revadd").addEventListener("click", () => {
 
 function renderAll() {
   renderCuts(); renderGraphics(); renderEffects(); renderCaptions(); renderSound(); renderPreview(); syncHookCta(); renderStage(); renderCapPlace(); renderStylePick(); renderCutBox();
-  const sent = { cuts: S.cut != null, overlays: (S.overlays || []).length, effects: (S.effects || []).length, graphics: Object.keys(S.board).length || (S.hook != null) || !!S.cta || !!S.style || !!S.speedMul, captions: S.captions != null, sound: Object.keys(S.sfxOff).length || S.voiceClean === false || !ReelCore.isNeutral(S.grade) };
+  const sent = { mystyle: !!S.style, cuts: S.cut != null, overlays: (S.overlays || []).length, effects: (S.effects || []).length, graphics: Object.keys(S.board).length || (S.hook != null) || !!S.cta || !!S.style || !!S.speedMul, captions: S.captions != null, sound: Object.keys(S.sfxOff).length || S.voiceClean === false || !ReelCore.isNeutral(S.grade) };
   $$(".tab:not(.tabx)").forEach(b => { const d = b.querySelector(".dot"); if (d) d.hidden = !sent[b.dataset.tab]; });
   styleDot();
 }
@@ -2199,7 +2217,7 @@ async function load(id) {
     recompute();
     $("#reelname").textContent = `${R.title} · оригінал ${fmt(R.srcDur)} → рілс ${fmt(P.cutDur)}`; setPos(0);
     $("#brand").value = S.brandRequest || "";
-    renderAll(); showTab(["cuts", "overlays", "effects", "graphics", "captions", "sound", "preview", "style"].includes(location.hash.slice(1)) ? location.hash.slice(1) : tab || "cuts");
+    renderAll(); showTab(["cuts", "overlays", "effects", "graphics", "captions", "sound", "mystyle", "preview", "style"].includes(location.hash.slice(1)) ? location.hash.slice(1) : tab || "cuts");
     pill(rv.exists ? "Збережені рішення завантажено" : "Готово");
     useDefaultStyle();
   } catch (e) { if (live()) pill("Не вдалося завантажити рілс (" + (e?.code || "error") + "). Онови сторінку.", true); }

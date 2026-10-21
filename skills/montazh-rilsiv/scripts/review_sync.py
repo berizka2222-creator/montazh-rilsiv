@@ -188,7 +188,9 @@ def do_import(reel, review):
         if g["state"] == "c": changes.append(f"{g['id']} @ cut {g['start']:.1f}s: {note or '(no note)'}")
         spec = {k: v for k, v in g.items() if k not in ("id", "kind", "what", "w0", "w1", "state", "place", "moved", "gone", "own", "shifted", "capsAside")}
         if g.get("capsAside"): spec["quiet"] = True   # captions step aside while this card shows (no room for both)
-        if g.get("shifted"):   # core.js moved it off the face / captions: the render uses the new spot
+        if g.get("shifted") and g.get("type") in ("motion", "custom") and not g.get("user"):
+            pass   # catalog motions keep their tested placement (band / split / full, see build_reel); the page only shifts their preview box
+        elif g.get("shifted"):   # core.js moved it off the face / captions: the render uses the new spot
             if g.get("type") in ("card", "tag", "title", "bigtext", "cta"):
                 spec["y"] = g["place"][1]
                 if g.get("zoom"): spec["x"] = g["place"][0]   # shrunk to fit above the head (behind the person)

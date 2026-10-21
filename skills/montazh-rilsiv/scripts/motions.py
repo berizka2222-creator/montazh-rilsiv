@@ -43,6 +43,10 @@ def menu(moment=None):
         for m in ms:
             flag = "  [був у останніх рілсах]" if m["name"] in rec else ""
             print(f"  {m['name']:26s} {m['ua']}{' · текст через replace' if m['status'] == 'replace' else ''}{flag}")
+    manual = [m for m in CAT["motions"] if m.get("status") == "manual"]
+    if manual and not moment:
+        print(f"\n## тільки вручну ({len(manual)}): дрібні у вертикальному кадрі, лише коли людина сама попросить")
+        for m in manual: print(f"  {m['name']:26s} {m['ua']}")
 
 
 # words in a phrase -> the moment it calls for

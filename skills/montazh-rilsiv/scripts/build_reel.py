@@ -78,7 +78,9 @@ def _merge(a, b):
     return out
 _st = reel / "style.txt"
 STYLE, STYLE_NAME = {}, edit.get("style") or (_st.read_text().strip() if _st.exists() else "") or os.environ.get("REEL_STYLE") or brand.get("style")
-if STYLE_NAME:
+if STYLE_NAME in ("brand", "mix"):   # «Тільки бренд» / «Без стилю: мікс ефектів» on the page: brand colours and fonts, no style file
+    print(f"style: none ({STYLE_NAME})")
+elif STYLE_NAME:
     _sp = Path(STYLE_NAME).expanduser()
     if not _sp.suffix: _sp = HOME / "styles" / f"{STYLE_NAME}.json"
     if not _sp.exists(): sys.exit(f"style not found: {_sp} (ls ~/reels/styles)")
@@ -429,7 +431,7 @@ for i, c in enumerate(edit.get("cards", [])):
         zone(cid, "bigtext", a, b, (*tw(max(lines, key=len), px)[:1], c.get("y", 430), tw(max(lines, key=len), px)[1], len(lines) * px * 0.86))
         continue
     if kind == "title":
-        lines = [case(x.strip()) for x in c["text"].split("/")]
+        lines = [x.strip().upper() if brand.get("title_case") == "upper" else case(x.strip()) for x in c["text"].split("/")]   # brand "title_case": "upper" = hook in capitals even when captions are lowercase
         if c.get("quiet", True): quiet.append((a, b))                    # the hook says it: captions step aside ("quiet": false keeps them)
         sizes = [c.get("size") or min(fit(x, 230, 230 // 16), brand.get("title_max_px", 999)) for x in lines]   # each line fitted on its own, outline included; "size" overrides (tight-tracked fonts fit bigger)
         ol = brand.get("title_outline", "#FFFFFF")                     # outline is for the hook title only, never captions
@@ -444,7 +446,7 @@ for i, c in enumerate(edit.get("cards", [])):
                                   f'<span style="{look_bg(LH)}">{look_run(lk(j), esc(x), "hk")}</span></div>' for j, (x, px, r) in enumerate(zip(lines, sizes, roles))) + "</div>")
         else: back.append(f'<div id="{cid}" class="title" style="{font("head", sizes[0])};top:{c.get("y", brand.get("title_y", 360))}px;color:{c.get("color", TITLE_COLOR)};letter-spacing:{brand.get("title_tracking", -0.045)}em">'
                     + ('<div class="tg glass">' if brand.get("title_glass") else "")
-                    + "".join(f'<div class="tl" style="font-size:{px}px;text-align:{("left", "right")[j % 2] if len(lines) > 1 and not brand.get("title_glass") else "center"}{st(px)}">{esc(x)}</div>' for j, (x, px) in enumerate(zip(lines, sizes)))
+                    + "".join(f'<div class="tl" style="font-size:{px}px;text-align:{brand.get("title_align") or (("left", "right")[j % 2] if len(lines) > 1 and not brand.get("title_glass") else "center")}{st(px)}">{esc(x)}</div>' for j, (x, px) in enumerate(zip(lines, sizes)))
                     + ("</div>" if brand.get("title_glass") else "") + "</div>")
         show(f"#{cid}", a, b)
         if brand.get("title_glass"): js.append(f'tl.fromTo("#{cid} .tg",{{scale:0.9,opacity:0,filter:"blur(10px)"}},{{scale:1,opacity:1,filter:"blur(0px)",duration:0.4,ease:"power3.out"}},{q(a - 0.05)});')
@@ -624,6 +626,8 @@ for i, c in enumerate(edit.get("cards", [])):
         if c.get("ink"):                                 # text-only motions with a hard-coded dark ink: "light" / "pop" / "#hex"
             ink = {"light": LIGHT, "pop": POP, "soft": _SOFT, "dark": MAIN}.get(c["ink"], c["ink"])
             mt = mt.replace("<style>", f'<style>\n[data-composition-id="{comp_id}"] *:not(svg):not(svg *) {{ color: {ink} !important; }}\n', 1)
+        if "endTime" in mt and not re.search(r"(var|let|const)\s+endTime\b", mt):   # a catalog snippet (typing-indicator) uses endTime
+            mt = re.sub(r"(var startTime\s*=\s*[\d.]+;)", lambda m_: m_.group(1) + " var endTime = " + str(max(0.5, float(re.search(r'data-duration="([\d.]+)"', txt).group(1)) - 0.2) if re.search(r'data-duration="([\d.]+)"', txt) else 3.8) + ";", mt, count=1)   # without declaring it: the render would stop
         (proj / rel).write_text(mt)
         nw, nh = (int(re.search(r'data-width="(\d+)"', txt).group(1)), int(re.search(r'data-height="(\d+)"', txt).group(1))) \
             if re.search(r'data-width="(\d+)"', txt) else (1080, 1080)
@@ -655,13 +659,20 @@ for i, c in enumerate(edit.get("cards", [])):
             if layout == "bubble" and c.get("shape") == "circle":
                 bx, by, bw_, bh_ = c["box"]; c["box"] = [round(bx + (bw_ - bh_) / 2), by, bh_, bh_]
             if fixed: c["box"] = fit_into(*c["box"])
+            if c["box"][3] < 380 and not c.get("keep_band"):   # catalog text sizes follow the box height (cqh): a thin band
+                layout = "split"; c.pop("box", None)          # around a big face makes them unreadable, so the screen divides instead
+                if c.get("tone") == "clear": c["tone"] = "dark"
         if layout == "split":
-            PANEL = c.get("panel", 820)                  # the brand panel's height; she keeps the rest of the frame
+            PANEL = c.get("panel", 820 if fixed else 1080)   # size-free motions size their text by the panel: a taller panel reads on a phone                  # the brand panel's height; she keeps the rest of the frame
             fx, fy, fw, fh = FACE or (300, 500, 480, 600)
             src_top = max(0, fy - 0.12 * fh - c.get("headroom", 70))
             pos = f"50% {max(0, min(100, src_top / PANEL * 100)):.0f}%"
             area = (40, 240, 1000, PANEL - 280)          # under Instagram's top bar, inside the panel
-            if not own_box: c["box"] = fit_into(*area) if fixed else list(area)
+            if not own_box:
+                c["box"] = fit_into(*area) if fixed else list(area)
+                if fixed:   # catalog motions are drawn for 16:9 with wide margins: blow them up to fill the panel (the overspill is panel colour)
+                    z = c.get("zoom", 1.25); bx, by, bw_, bh_ = c["box"]
+                    c["box"] = [round(bx - bw_ * (z - 1) / 2), round(by - bh_ * (z - 1) / 2), round(bw_ * z), round(bh_ * z)]
             mid.append(f'<div id="{cid}s" class="sp" style="opacity:0;visibility:hidden">'
                        f'<div class="spw" style="left:0;top:0;width:1080px;height:1920px"><video src="master.mp4" muted playsinline data-start="{q(a)}" '
                        f'data-duration="{q(b - a)}" data-media-start="{q(a)}" data-track-index="{9 + i}" style="object-position:{pos}"></video></div>'
