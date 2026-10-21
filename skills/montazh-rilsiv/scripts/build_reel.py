@@ -723,9 +723,7 @@ for i, c in enumerate(edit.get("cards", [])):
         if not re.search(r'data-composition-id="([^"]+)"', txt):
             print(f"warning: motion {c['name']!r} is a raw snippet with no composition (wrap_snippets.py could not wrap it): skipped"); continue
         comp_id = re.search(r'data-composition-id="([^"]+)"', txt).group(1)
-        if c.get("layout") == "transition":              # a shader transition: sits on a cut, warps the shot before into the shot after
-            if "captureScene" not in txt:
-                print(f"warning: motion {c['name']!r} is not a shader transition (no captureScene): skipped"); continue
+        if c.get("layout") == "transition" and "captureScene" in txt:   # a shader transition: sits on a cut, warps the shot before into the shot after
             near = min(JOINS, key=lambda j: abs(j - c["start"]), default=None)
             join = c.get("join") or (near if near is not None and abs(near - c["start"]) <= 1.5 else None)
             if join is None:
