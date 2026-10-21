@@ -659,9 +659,6 @@ for i, c in enumerate(edit.get("cards", [])):
             if layout == "bubble" and c.get("shape") == "circle":
                 bx, by, bw_, bh_ = c["box"]; c["box"] = [round(bx + (bw_ - bh_) / 2), by, bh_, bh_]
             if fixed: c["box"] = fit_into(*c["box"])
-            if c["box"][3] < 380 and not c.get("keep_band"):   # catalog text sizes follow the box height (cqh): a thin band
-                layout = "split"; c.pop("box", None)          # around a big face makes them unreadable, so the screen divides instead
-                if c.get("tone") == "clear": c["tone"] = "dark"
         if layout == "split":
             PANEL = c.get("panel", 820 if fixed else 1080)   # size-free motions size their text by the panel: a taller panel reads on a phone                  # the brand panel's height; she keeps the rest of the frame
             fx, fy, fw, fh = FACE or (300, 500, 480, 600)

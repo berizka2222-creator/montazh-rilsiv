@@ -21,10 +21,8 @@ with what each one is for, its moment and its tested placement, is `references/m
 
 ## Vertical frame and Ukrainian text (checked 2026-10-21 on all 86, big-face framing)
 
-- Catalog text sizes follow the height of the box they get (`cqh`). A band above the head or on the chest thinner than
-  380 px (a big face leaves no more) makes them unreadable, so build_reel turns such a `front` / `bubble` / `behind` motion into a
-  `split` panel by itself (`"keep_band": true` keeps the band). Size-free motions get a 1080-tall panel, 16:9 ones are blown up
-  1.25x to fill theirs.
+- A catalog motion never moves or crops the person to make room: it plays over the video in a free area (chest, low third,
+  above the head). Split and full-screen layouts only when the person picked them.
 - Keep every text field short: 2-4 words, about 18 characters a line. Ukrainian words are longer than the English defaults and
   one-line effects clip or run off the frame past that.
 - `status: "manual"` (26 motions: charts, node maps, card grids, chat bubbles, notifications, a few one-line text effects): drawn for
