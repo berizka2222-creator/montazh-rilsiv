@@ -1581,7 +1581,14 @@
    "use": "ui",
    "quality": 4,
    "text_vars": [],
-   "keep_ui": true
+   "keep_ui": true,
+   "replace": {
+    "HeyGen": "<її назва або слова>",
+    "@heygen_official": "<її назва або слова>",
+    "47.5K followers": "<її назва або слова>",
+    "Follow": "<її назва або слова>",
+    "Following": "<її назва або слова>"
+   }
   },
   {
    "name": "success-check",
@@ -3355,7 +3362,11 @@
    "use": "ui",
    "quality": 2,
    "text_vars": [],
-   "keep_ui": true
+   "keep_ui": true,
+   "replace": {
+    "HyperFrames": "<її назва або слова>",
+    "HeyGen": "<її назва або слова>"
+   }
   },
   {
    "name": "thread-message-stack",
@@ -3392,7 +3403,14 @@
    "use": "ui",
    "quality": 3,
    "text_vars": [],
-   "keep_ui": true
+   "keep_ui": true,
+   "replace": {
+    "HeyGen": "<її назва або слова>",
+    "@heygen.com": "<її назва або слова>",
+    "1,999 followers": "<її назва або слова>",
+    "Follow": "<її назва або слова>",
+    "Following": "<її назва або слова>"
+   }
   },
   {
    "name": "weight-wave",
@@ -3429,7 +3447,12 @@
    "use": "ui",
    "quality": 3,
    "text_vars": [],
-   "keep_ui": true
+   "keep_ui": true,
+   "replace": {
+    "Hyperframes": "<її назва або слова>",
+    "@hyperframes": "<її назва або слова>",
+    "#YourHashtag": "<її назва або слова>"
+   }
   },
   {
    "name": "yt-lower-third",
@@ -3448,7 +3471,13 @@
    "use": "ui",
    "quality": 3,
    "text_vars": [],
-   "keep_ui": true
+   "keep_ui": true,
+   "replace": {
+    "HeyGen": "<її назва або слова>",
+    "82.2K subscribers": "<її назва або слова>",
+    "Subscribe": "<її назва або слова>",
+    "Subscribed": "<її назва або слова>"
+   }
   },
   {
    "name": "yt-prism-title",

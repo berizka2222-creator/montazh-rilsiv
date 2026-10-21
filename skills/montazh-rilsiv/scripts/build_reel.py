@@ -649,9 +649,12 @@ for i, c in enumerate(edit.get("cards", [])):
             print(f"warning: motion {c['name']!r} is a raw snippet with no composition (wrap_snippets.py could not wrap it): skipped"); continue
         comp_id = re.search(r'data-composition-id="([^"]+)"', txt).group(1)
         mt = (proj / rel).read_text()
-        for k, v in (c.get("replace") or {}).items():    # motions with their text baked in: swap it for her words
+        rep = {k: v for k, v in (c.get("replace") or {}).items() if k}   # motions with their text baked in: swap it for their words
+        for k in rep:
             if k not in mt: print(f"warning: motion {c['name']}: text {k!r} not found, nothing replaced")
-            mt = mt.replace(k, html.escape(v, quote=False))
+        if rep:                                          # one pass, longest first, whole words only: "Follow" never eats "Following"
+            rx = re.compile("|".join(r"(?<![\w-])" + re.escape(k) + r"(?![\w-])" for k in sorted(rep, key=len, reverse=True)))
+            mt = rx.sub(lambda m: html.escape(rep[m.group(0)], quote=False), mt)
         if not c.get("keep_fonts"):                      # the brand's fonts on every catalog motion (their Oswald/Inter/Caveat
             brand_font = (f'[data-composition-id="{comp_id}"], [data-composition-id="{comp_id}"] *:not(code):not(pre) '   # have no
                           f'{{ font-family: "BrandSans", {FALLBACK} !important; }}')                           # Cyrillic either)
