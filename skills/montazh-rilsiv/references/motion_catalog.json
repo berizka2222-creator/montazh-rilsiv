@@ -1,5 +1,5 @@
 {
- "about": "All 456 HyperFrames registry items, classified for a vertical talking-head reel; the usable ones are rendered alone on a real reel (Ukrainian text, brand colours via scripts/brand_recolor.py, over the video, never moving the person). status: ready = checked in the frame, suggested; replace = checked, English text baked in: swap the listed strings with card \"replace\"; full_only = works only as a whole-frame takeover for 2-3 s, suggested marked «на весь кадр»; manual = works but small or niche, only when the person asks; candidate = not checked in the frame yet, never suggested; skip = don't use (reason in note). keep_ui = a real product UI (ChatGPT, Claude, iPhone...), keeps its own colours. card = placement copied into the edit.json card by build_reel (card fields win).",
+ "about": "All 456 HyperFrames registry items, classified for a vertical talking-head reel; the usable ones are rendered alone on a real reel (Ukrainian text, brand colours via scripts/brand_recolor.py, over the video, never moving the person). status: ready = checked in the frame, suggested; replace = checked, English text baked in: swap the listed strings with card \"replace\"; full_only = works only as a whole-frame moment for 2-3 s, suggested marked «на весь кадр»; card \"layout\": \"dim\" keeps the video as a darkened background (card \"dim\" = opacity, default 0.82) with the effect on top, captions step aside; image slots (carousels, galleries, device mocks) take card \"images\" (her photos, screenshots); manual = works but small or niche, only when the person asks (maps; brand-name examples where card \"replace\" swaps the company name and the logo image must be hers); candidate = not checked in the frame yet, never suggested; skip = don't use (reason in note). keep_ui = a real product UI (ChatGPT, Claude, iPhone...), keeps its own colours. card = placement copied into the edit.json card by build_reel (card fields win).",
  "moments": [
   "хук / ключова фраза",
   "цифра",
@@ -526,14 +526,12 @@
    "moments": [
     "до / після"
    ],
-   "status": "manual",
+   "status": "full_only",
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
    "text": "vars",
    "rank": 3,
-   "note": "потрібні картинки",
    "use": "overlay",
    "quality": 4,
    "text_vars": [
@@ -542,7 +540,10 @@
     "badge_a",
     "badge_b"
    ],
-   "image_vars": true
+   "image_vars": true,
+   "replace": {
+    "Split Tilt Cards": "<її слова>"
+   }
   },
   {
    "name": "physical-exit",
@@ -551,19 +552,21 @@
     "до / після",
     "перехід"
    ],
-   "status": "manual",
+   "status": "skip",
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
    "text": "vars",
    "rank": 4,
-   "note": "порожня картка",
+   "note": "у режимі затемнення: порожньо, дрібно або англійський текст",
    "use": "overlay",
    "quality": 3,
    "text_vars": [
     "text"
-   ]
+   ],
+   "replace": {
+    "Physical Exit": "<її слова>"
+   }
   },
   {
    "name": "count-up",
@@ -669,19 +672,20 @@
     "ріст / падіння",
     "цифра"
    ],
-   "status": "manual",
+   "status": "full_only",
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
    "text": "vars",
    "rank": 2,
-   "note": "велика темна панель збоку",
    "use": "overlay",
    "quality": 4,
    "text_vars": [
     "label"
-   ]
+   ],
+   "replace": {
+    "Decline Chart": "<її слова>"
+   }
   },
   {
    "name": "chart-story",
@@ -711,17 +715,25 @@
    "moments": [
     "ріст / падіння"
    ],
-   "status": "manual",
+   "status": "full_only",
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
    "text": "",
    "rank": 5,
-   "note": "дрібно",
    "use": "overlay",
    "quality": 4,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "Renders": "<її слова>",
+    "Projects": "<її слова>",
+    "Jan": "<її слова>",
+    "Feb": "<її слова>",
+    "Mar": "<її слова>",
+    "Apr": "<її слова>",
+    "May": "<її слова>",
+    "Jun": "<її слова>"
+   }
   },
   {
    "name": "badge-pop",
@@ -749,14 +761,13 @@
    "moments": [
     "список / кроки"
    ],
-   "status": "manual",
+   "status": "skip",
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
    "text": "vars",
    "rank": 1,
-   "note": "порожня картка",
+   "note": "у режимі затемнення: порожньо, дрібно або англійський текст",
    "use": "overlay",
    "quality": 5,
    "text_vars": [
@@ -770,7 +781,20 @@
     "v2",
     "l3",
     "v3"
-   ]
+   ],
+   "replace": {
+    "Marker Checklist Card": "<її слова>",
+    "THE POWER": "<її слова>",
+    "OF": "<її слова>",
+    "ONE": "<її слова>",
+    "FILE": "<її слова>",
+    "WRITE": "<її слова>",
+    "HTML": "<її слова>",
+    "RENDER": "<її слова>",
+    "IN 4K": "<її слова>",
+    "SHIP": "<її слова>",
+    "TODAY": "<її слова>"
+   }
   },
   {
    "name": "grid-card-assemble",
@@ -778,19 +802,20 @@
    "moments": [
     "список / кроки"
    ],
-   "status": "manual",
+   "status": "full_only",
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
    "text": "vars",
    "rank": 2,
-   "note": "дрібно",
    "use": "overlay",
    "quality": 4,
    "text_vars": [
     "items"
-   ]
+   ],
+   "replace": {
+    "Grid Card Assemble": "<її слова>"
+   }
   },
   {
    "name": "constellation-hub",
@@ -819,25 +844,22 @@
     "список / кроки",
     "проблема / тиск"
    ],
-   "status": "candidate",
+   "status": "full_only",
    "card": {
-    "box": [
-     40,
-     250,
-     1000,
-     1000
-    ],
-    "tone": "clear"
+    "tone": "clear",
+    "layout": "dim"
    },
    "text": "vars",
    "rank": 1,
-   "note": "на весь кадр, ще не перевірено в кадрі",
    "use": "full",
    "quality": 3,
    "text_vars": [
     "center_label",
     "chips"
-   ]
+   ],
+   "replace": {
+    "Radial Surround": "<її слова>"
+   }
   },
   {
    "name": "perspective-marquee",
@@ -864,18 +886,20 @@
    "moments": [
     "проблема / тиск"
    ],
-   "status": "candidate",
+   "status": "full_only",
    "card": {
-    "layout": "split"
+    "layout": "dim"
    },
    "text": "vars",
    "rank": 2,
-   "note": "на весь кадр, ще не перевірено в кадрі",
    "use": "full",
    "quality": 4,
    "text_vars": [
     "centerLabel"
-   ]
+   ],
+   "replace": {
+    "Overwhelm Surround": "<її слова>"
+   }
   },
   {
    "name": "ai-answer-rank",
@@ -883,14 +907,13 @@
    "moments": [
     "питання / ШІ"
    ],
-   "status": "manual",
+   "status": "skip",
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
    "text": "vars",
    "rank": 2,
-   "note": "дрібно",
+   "note": "у режимі затемнення: порожньо, дрібно або англійський текст",
    "use": "ui",
    "quality": 4,
    "text_vars": [
@@ -1019,13 +1042,12 @@
    "moments": [
     "повідомлення / чат"
    ],
-   "status": "candidate",
+   "status": "full_only",
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
    "text": "vars",
    "rank": 2,
-   "note": "на весь кадр, ще не перевірено в кадрі",
    "use": "full",
    "quality": 4,
    "text_vars": [
@@ -1168,13 +1190,12 @@
     "список / кроки",
     "хук / ключова фраза"
    ],
-   "status": "candidate",
+   "status": "full_only",
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
    "text": "vars",
    "rank": 3,
-   "note": "на весь кадр, ще не перевірено в кадрі",
    "use": "full",
    "quality": 4,
    "text_vars": [
@@ -1550,9 +1571,9 @@
    "moments": [
     "заклик (CTA)"
    ],
-   "status": "skip",
+   "status": "manual",
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
    "text": "",
    "rank": 4,
@@ -1624,20 +1645,22 @@
     "успіх / готово",
     "заклик (CTA)"
    ],
-   "status": "manual",
+   "status": "skip",
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
    "text": "vars",
    "rank": 3,
-   "note": "дрібно",
+   "note": "у режимі затемнення: порожньо, дрібно або англійський текст",
    "use": "overlay",
    "quality": 4,
    "text_vars": [
     "label",
     "done_label"
-   ]
+   ],
+   "replace": {
+    "Press Ripple": "<її слова>"
+   }
   },
   {
    "name": "carousel-circle-1",
@@ -1646,17 +1669,19 @@
     "картинки / приклади",
     "список / кроки"
    ],
-   "status": "candidate",
+   "status": "full_only",
    "card": {
-    "layout": "split"
+    "layout": "dim"
    },
    "text": "images: [...]",
    "rank": 2,
-   "note": "на весь кадр, ще не перевірено в кадрі",
    "use": "full",
    "quality": 3,
    "text_vars": [],
-   "image_vars": true
+   "image_vars": true,
+   "replace": {
+    "Image Carousel · Circle 1": "<її слова>"
+   }
   },
   {
    "name": "carousel-circle-2",
@@ -1665,17 +1690,19 @@
     "картинки / приклади",
     "список / кроки"
    ],
-   "status": "candidate",
+   "status": "full_only",
    "card": {
-    "layout": "split"
+    "layout": "dim"
    },
    "text": "images: [...]",
    "rank": 2,
-   "note": "на весь кадр, ще не перевірено в кадрі",
    "use": "full",
    "quality": 2,
    "text_vars": [],
-   "image_vars": true
+   "image_vars": true,
+   "replace": {
+    "Image Carousel · Circle 2": "<її слова>"
+   }
   },
   {
    "name": "carousel-circle-3",
@@ -1684,17 +1711,19 @@
     "картинки / приклади",
     "список / кроки"
    ],
-   "status": "candidate",
+   "status": "full_only",
    "card": {
-    "layout": "split"
+    "layout": "dim"
    },
    "text": "images: [...]",
    "rank": 2,
-   "note": "на весь кадр, ще не перевірено в кадрі",
    "use": "full",
    "quality": 2,
    "text_vars": [],
-   "image_vars": true
+   "image_vars": true,
+   "replace": {
+    "Image Carousel · Circle 3": "<її слова>"
+   }
   },
   {
    "name": "carousel-path-1",
@@ -1703,17 +1732,19 @@
     "картинки / приклади",
     "список / кроки"
    ],
-   "status": "candidate",
+   "status": "full_only",
    "card": {
-    "layout": "split"
+    "layout": "dim"
    },
    "text": "images: [...]",
    "rank": 2,
-   "note": "на весь кадр, ще не перевірено в кадрі",
    "use": "full",
    "quality": 3,
    "text_vars": [],
-   "image_vars": true
+   "image_vars": true,
+   "replace": {
+    "Image Carousel · Path 1": "<її слова>"
+   }
   },
   {
    "name": "carousel-path-2",
@@ -1722,17 +1753,19 @@
     "картинки / приклади",
     "список / кроки"
    ],
-   "status": "candidate",
+   "status": "full_only",
    "card": {
-    "layout": "split"
+    "layout": "dim"
    },
    "text": "images: [...]",
    "rank": 2,
-   "note": "на весь кадр, ще не перевірено в кадрі",
    "use": "full",
    "quality": 2,
    "text_vars": [],
-   "image_vars": true
+   "image_vars": true,
+   "replace": {
+    "Image Carousel · Path 2": "<її слова>"
+   }
   },
   {
    "name": "carousel-path-3",
@@ -1741,17 +1774,19 @@
     "картинки / приклади",
     "список / кроки"
    ],
-   "status": "candidate",
+   "status": "full_only",
    "card": {
-    "layout": "split"
+    "layout": "dim"
    },
    "text": "images: [...]",
    "rank": 2,
-   "note": "на весь кадр, ще не перевірено в кадрі",
    "use": "full",
    "quality": 2,
    "text_vars": [],
-   "image_vars": true
+   "image_vars": true,
+   "replace": {
+    "Image Carousel · Path 3": "<її слова>"
+   }
   },
   {
    "name": "carousel-orbit-1",
@@ -1760,17 +1795,19 @@
     "картинки / приклади",
     "список / кроки"
    ],
-   "status": "candidate",
+   "status": "full_only",
    "card": {
-    "layout": "split"
+    "layout": "dim"
    },
    "text": "images: [...]",
    "rank": 2,
-   "note": "на весь кадр, ще не перевірено в кадрі",
    "use": "full",
    "quality": 3,
    "text_vars": [],
-   "image_vars": true
+   "image_vars": true,
+   "replace": {
+    "Image Carousel · Orbit 1": "<її слова>"
+   }
   },
   {
    "name": "carousel-vision-1",
@@ -1779,17 +1816,19 @@
     "картинки / приклади",
     "список / кроки"
    ],
-   "status": "candidate",
+   "status": "full_only",
    "card": {
-    "layout": "split"
+    "layout": "dim"
    },
    "text": "images: [...]",
    "rank": 2,
-   "note": "на весь кадр, ще не перевірено в кадрі",
    "use": "full",
    "quality": 3,
    "text_vars": [],
-   "image_vars": true
+   "image_vars": true,
+   "replace": {
+    "Image Carousel · Vision 1": "<її слова>"
+   }
   },
   {
    "name": "carousel-text-circle-1",
@@ -1798,21 +1837,23 @@
     "картинки / приклади",
     "хук / ключова фраза"
    ],
-   "status": "candidate",
+   "status": "full_only",
    "card": {
-    "layout": "split",
+    "layout": "dim",
     "ink": "light"
    },
    "text": "vars.headline (до 14 знаків) + images",
    "rank": 3,
-   "note": "на весь кадр, ще не перевірено в кадрі",
    "use": "full",
    "quality": 3,
    "text_vars": [
     "line1",
     "line2"
    ],
-   "image_vars": true
+   "image_vars": true,
+   "replace": {
+    "Carousels are so in — Circle 1": "<її слова>"
+   }
   },
   {
    "name": "carousel-text-circle-2",
@@ -1821,21 +1862,23 @@
     "картинки / приклади",
     "хук / ключова фраза"
    ],
-   "status": "candidate",
+   "status": "full_only",
    "card": {
-    "layout": "split",
+    "layout": "dim",
     "ink": "light"
    },
    "text": "vars.headline (до 14 знаків) + images",
    "rank": 3,
-   "note": "на весь кадр, ще не перевірено в кадрі",
    "use": "full",
    "quality": 2,
    "text_vars": [
     "line1",
     "line2"
    ],
-   "image_vars": true
+   "image_vars": true,
+   "replace": {
+    "Carousels are so in — Circle 2": "<її слова>"
+   }
   },
   {
    "name": "device-frame-stage",
@@ -1844,14 +1887,13 @@
     "картинки / приклади",
     "питання / ШІ"
    ],
-   "status": "manual",
+   "status": "skip",
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
    "text": "vars (картинка екрану)",
    "rank": 3,
-   "note": "потрібна картинка",
+   "note": "у режимі затемнення: порожньо, дрібно або англійський текст",
    "use": "ui",
    "quality": 3,
    "text_vars": [],
@@ -1865,16 +1907,18 @@
     "картинки / приклади",
     "проблема / тиск"
    ],
-   "status": "candidate",
+   "status": "full_only",
    "card": {
-    "layout": "split"
+    "layout": "dim"
    },
    "text": "",
    "rank": 4,
-   "note": "на весь кадр, ще не перевірено в кадрі",
    "use": "full",
    "quality": 3,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "Scroll Feed": "<її слова>"
+   }
   },
   {
    "name": "whiteboard-ink",
@@ -2066,16 +2110,19 @@
    "moments": [
     "хук / ключова фраза"
    ],
-   "status": "candidate",
+   "status": "skip",
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
    "text": "",
    "rank": 5,
-   "note": "на весь кадр, ще не перевірено в кадрі",
+   "note": "у режимі затемнення: порожньо, дрібно або англійський текст",
    "use": "full",
    "quality": 4,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "Camera Follow Captions": "<її слова>"
+   }
   },
   {
    "name": "apple-money-count",
@@ -2103,9 +2150,9 @@
     "ріст / падіння",
     "цифра"
    ],
-   "status": "candidate",
+   "status": "manual",
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
    "text": "",
    "rank": 5,
@@ -2115,7 +2162,14 @@
    "text_vars": [
     "title",
     "subtitle"
-   ]
+   ],
+   "replace": {
+    "Bar Chart Race": "<її слова>",
+    "Streaming Subscribers by Service": "<її слова>",
+    "Ranked by reported subscribers": "<її слова>",
+    "Period": "<її слова>",
+    "Placeholder data": "<її слова>"
+   }
   },
   {
    "name": "camcorder-hud",
@@ -2143,20 +2197,22 @@
     "список / кроки",
     "успіх / готово"
    ],
-   "status": "manual",
+   "status": "skip",
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
    "text": "",
    "rank": 5,
-   "note": "дрібно",
+   "note": "у режимі затемнення: порожньо, дрібно або англійський текст",
    "use": "overlay",
    "quality": 5,
    "text_vars": [
     "agent_name",
     "steps"
-   ]
+   ],
+   "replace": {
+    "Agent Cursor": "<її слова>"
+   }
   },
   {
    "name": "before-after-wipe",
@@ -2164,20 +2220,22 @@
    "moments": [
     "до / після"
    ],
-   "status": "candidate",
+   "status": "full_only",
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
    "text": "",
    "rank": 5,
-   "note": "на весь кадр, ще не перевірено в кадрі",
    "use": "full",
    "quality": 4,
    "text_vars": [
     "label_a",
     "label_b"
    ],
-   "image_vars": true
+   "image_vars": true,
+   "replace": {
+    "Before After Wipe": "<її слова>"
+   }
   },
   {
    "name": "comparison-split",
@@ -2185,20 +2243,22 @@
    "moments": [
     "до / після"
    ],
-   "status": "candidate",
+   "status": "full_only",
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
    "text": "",
    "rank": 5,
-   "note": "на весь кадр, ще не перевірено в кадрі",
    "use": "full",
    "quality": 3,
    "text_vars": [
     "labelA",
     "labelB"
    ],
-   "image_vars": true
+   "image_vars": true,
+   "replace": {
+    "use strict": "<її слова>"
+   }
   },
   {
    "name": "camera-shake",
@@ -2231,14 +2291,14 @@
    "moments": [
     "хук / ключова фраза"
    ],
-   "status": "skip",
+   "status": "manual",
    "card": {
     "place": "low",
     "layout": "front"
    },
    "text": "",
    "rank": 5,
-   "note": "англійський текст субтитрів",
+   "note": "стиль субтитрів: англійське речення в окремому списку слів, треба підключати до субтитрів",
    "use": "overlay",
    "quality": 3,
    "text_vars": []
@@ -2249,17 +2309,20 @@
    "moments": [
     "хук / ключова фраза"
    ],
-   "status": "skip",
+   "status": "manual",
    "card": {
     "place": "low",
     "layout": "front"
    },
    "text": "",
    "rank": 5,
-   "note": "англійський текст субтитрів",
+   "note": "стиль субтитрів: англійське речення в окремому списку слів, треба підключати до субтитрів",
    "use": "overlay",
    "quality": 3,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "Clip Wipe": "<її слова>"
+   }
   },
   {
    "name": "caption-emoji-pop",
@@ -2267,17 +2330,20 @@
    "moments": [
     "хук / ключова фраза"
    ],
-   "status": "skip",
+   "status": "manual",
    "card": {
     "place": "low",
     "layout": "front"
    },
    "text": "",
    "rank": 5,
-   "note": "англійський текст субтитрів",
+   "note": "стиль субтитрів: англійське речення в окремому списку слів, треба підключати до субтитрів",
    "use": "overlay",
    "quality": 4,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "Emoji Pop": "<її слова>"
+   }
   },
   {
    "name": "caption-gradient-fill",
@@ -2285,17 +2351,20 @@
    "moments": [
     "хук / ключова фраза"
    ],
-   "status": "skip",
+   "status": "manual",
    "card": {
     "place": "low",
     "layout": "front"
    },
    "text": "",
    "rank": 5,
-   "note": "англійський текст субтитрів",
+   "note": "стиль субтитрів: англійське речення в окремому списку слів, треба підключати до субтитрів",
    "use": "overlay",
    "quality": 3,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "Gradient Fill": "<її слова>"
+   }
   },
   {
    "name": "caption-highlight",
@@ -2303,17 +2372,20 @@
    "moments": [
     "хук / ключова фраза"
    ],
-   "status": "skip",
+   "status": "manual",
    "card": {
     "place": "low",
     "layout": "front"
    },
    "text": "",
    "rank": 5,
-   "note": "англійський текст субтитрів",
+   "note": "стиль субтитрів: англійське речення в окремому списку слів, треба підключати до субтитрів",
    "use": "overlay",
    "quality": 5,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "Highlight": "<її слова>"
+   }
   },
   {
    "name": "caption-kinetic-slam",
@@ -2321,16 +2393,19 @@
    "moments": [
     "хук / ключова фраза"
    ],
-   "status": "candidate",
+   "status": "skip",
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
    "text": "",
    "rank": 5,
-   "note": "на весь кадр, ще не перевірено в кадрі",
+   "note": "у режимі затемнення: порожньо, дрібно або англійський текст",
    "use": "full",
    "quality": 3,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "Kinetic Slam": "<її слова>"
+   }
   },
   {
    "name": "caption-matrix-decode",
@@ -2338,17 +2413,20 @@
    "moments": [
     "питання / ШІ"
    ],
-   "status": "skip",
+   "status": "manual",
    "card": {
     "place": "low",
     "layout": "front"
    },
    "text": "",
    "rank": 5,
-   "note": "англійський текст субтитрів",
+   "note": "стиль субтитрів: англійське речення в окремому списку слів, треба підключати до субтитрів",
    "use": "overlay",
    "quality": 3,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "Matrix Decode": "<її слова>"
+   }
   },
   {
    "name": "caption-pill-karaoke",
@@ -2356,17 +2434,20 @@
    "moments": [
     "хук / ключова фраза"
    ],
-   "status": "skip",
+   "status": "manual",
    "card": {
     "place": "low",
     "layout": "front"
    },
    "text": "",
    "rank": 5,
-   "note": "англійський текст субтитрів",
+   "note": "стиль субтитрів: англійське речення в окремому списку слів, треба підключати до субтитрів",
    "use": "overlay",
    "quality": 5,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "Pill Karaoke": "<її слова>"
+   }
   },
   {
    "name": "cursor-annotate",
@@ -2392,7 +2473,7 @@
    "moments": [
     "успіх / готово"
    ],
-   "status": "skip",
+   "status": "manual",
    "card": {
     "place": "low",
     "layout": "front"
@@ -2405,7 +2486,21 @@
    "text_vars": [
     "card_label"
    ],
-   "keep_ui": true
+   "keep_ui": true,
+   "replace": {
+    "Drag and Drop Cursor": "<її слова>",
+    "To do": "<її слова>",
+    "In progress": "<її слова>",
+    "Marketing": "<її слова>",
+    "Draft onboarding email": "<її слова>",
+    "Thu": "<її слова>",
+    "AR": "<її слова>",
+    "Video": "<її слова>",
+    "Record product walkthrough": "<її слова>",
+    "Mon": "<її слова>",
+    "KL": "<її слова>",
+    "Docs": "<її слова>"
+   }
   },
   {
    "name": "cursor-marquee-select",
@@ -2413,7 +2508,7 @@
    "moments": [
     "картинки / приклади"
    ],
-   "status": "skip",
+   "status": "manual",
    "card": {
     "place": "low",
     "layout": "front"
@@ -2426,7 +2521,12 @@
    "text_vars": [
     "pill_label"
    ],
-   "keep_ui": true
+   "keep_ui": true,
+   "replace": {
+    "Marquee Select Cursor": "<її слова>",
+    "Summer shoot": "<її слова>",
+    "12 photos, edited yesterday": "<її слова>"
+   }
   },
   {
    "name": "cursor-text-select",
@@ -2434,7 +2534,7 @@
    "moments": [
     "хук / ключова фраза"
    ],
-   "status": "skip",
+   "status": "manual",
    "card": {
     "place": "low",
     "layout": "front"
@@ -2449,7 +2549,11 @@
     "text",
     "phrase"
    ],
-   "keep_ui": true
+   "keep_ui": true,
+   "replace": {
+    "Text Select Cursor": "<її слова>",
+    "Draft · edited just now": "<її слова>"
+   }
   },
   {
    "name": "curtain-reveal",
@@ -2458,16 +2562,19 @@
     "перехід",
     "ім'я / хто я"
    ],
-   "status": "candidate",
+   "status": "full_only",
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
    "text": "",
    "rank": 5,
-   "note": "на весь кадр, ще не перевірено в кадрі",
    "use": "full",
    "quality": 2,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "Curtain Reveal": "<її слова>",
+    "Stage": "<її слова>"
+   }
   },
   {
    "name": "focus-swap",
@@ -2494,7 +2601,7 @@
     "заклик (CTA)",
     "успіх / готово"
    ],
-   "status": "skip",
+   "status": "manual",
    "card": {
     "place": "low",
     "layout": "front"
@@ -2507,7 +2614,13 @@
    "text_vars": [
     "tap_label",
     "response_label"
-   ]
+   ],
+   "replace": {
+    "Gesture Tap": "<її слова>",
+    "Profile": "<її слова>",
+    "Maya Chen": "<її слова>",
+    "Product designer sharing practical interaction notes.": "<її слова>"
+   }
   },
   {
    "name": "hw-box-label",
@@ -2536,15 +2649,17 @@
    ],
    "status": "manual",
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
    "text": "",
    "rank": 5,
    "note": "дрібно",
    "use": "overlay",
    "quality": 4,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "subject": "<її слова>"
+   }
   },
   {
    "name": "iris-reveal",
@@ -2565,10 +2680,13 @@
    },
    "text": "",
    "rank": 5,
-   "note": "панель на пів кадру",
+   "note": "чорний або порожній кадр поверх відео",
    "use": "transition",
    "quality": 3,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "Iris Reveal": "<її слова>"
+   }
   },
   {
    "name": "logo-wall",
@@ -2576,14 +2694,21 @@
    "moments": [
     "відгук / доказ"
    ],
-   "status": "skip",
-   "card": {},
+   "status": "manual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
    "note": "Placeholder logos only",
    "use": "skip",
    "quality": 2,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "Logo Wall": "<її слова>",
+    "Trusted by teams": "<її слова>"
+   }
   },
   {
    "name": "mk-emphasis-type",
@@ -2591,16 +2716,19 @@
    "moments": [
     "хук / ключова фраза"
    ],
-   "status": "candidate",
+   "status": "skip",
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
    "text": "",
    "rank": 5,
-   "note": "на весь кадр, ще не перевірено в кадрі",
+   "note": "у режимі затемнення: порожньо, дрібно або англійський текст",
    "use": "full",
    "quality": 3,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "Emphasis": "<її слова>"
+   }
   },
   {
    "name": "mk-usage-arc",
@@ -2610,15 +2738,17 @@
    ],
    "status": "manual",
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
    "text": "",
    "rank": 5,
    "note": "дрібно",
    "use": "overlay",
    "quality": 4,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "Usage": "<її слова>"
+   }
   },
   {
    "name": "morph-text",
@@ -2653,14 +2783,12 @@
     "проблема / тиск",
     "повідомлення / чат"
    ],
-   "status": "manual",
+   "status": "full_only",
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
    "text": "",
    "rank": 5,
-   "note": "дрібно",
    "use": "ui",
    "quality": 4,
    "text_vars": [],
@@ -2698,19 +2826,25 @@
     "цифра",
     "ріст / падіння"
    ],
-   "status": "candidate",
+   "status": "full_only",
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
    "text": "",
    "rank": 5,
-   "note": "на весь кадр, ще не перевірено в кадрі",
    "use": "full",
    "quality": 4,
    "text_vars": [
     "detail_text",
     "headline"
-   ]
+   ],
+   "replace": {
+    "Pull Back Reveal": "<її слова>",
+    "Net growth": "<її слова>",
+    "Across every active workspace": "<її слова>",
+    "Retention": "<її слова>",
+    "Teams": "<її слова>"
+   }
   },
   {
    "name": "spring-pop",
@@ -2779,14 +2913,25 @@
     "ріст / падіння",
     "цифра"
    ],
-   "status": "skip",
-   "card": {},
+   "status": "manual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
    "text": "",
    "rank": 5,
    "note": "landscape chart with baked data, no vars",
    "use": "skip",
    "quality": 2,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "Data Chart": "<її слова>",
+    "Monthly Revenue vs. Conversion Rate": "<її слова>",
+    "Jan–Jun 2024, in thousands": "<її слова>",
+    "Revenue": "<її слова>",
+    "Conversion Rate": "<її слова>",
+    "Source: Internal analytics": "<її слова>"
+   }
   },
   {
    "name": "flowchart-vertical",
@@ -2794,16 +2939,27 @@
    "moments": [
     "список / кроки"
    ],
-   "status": "candidate",
+   "status": "manual",
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
    "text": "",
    "rank": 5,
    "note": "на весь кадр, ще не перевірено в кадрі",
    "use": "full",
    "quality": 3,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "Flowchart Vertical": "<її слова>",
+    "Yes": "<її слова>",
+    "Not sure": "<її слова>",
+    "Should I learn to code?": "<її слова>",
+    "Start with Pythom": "<її слова>",
+    "Try no-code first": "<її слова>",
+    "Build a personal website": "<її слова>",
+    "Take a free intro course": "<її слова>",
+    "You": "<її слова>"
+   }
   },
   {
    "name": "hw-frame",
@@ -2812,17 +2968,18 @@
     "картинки / приклади",
     "відгук / доказ"
    ],
-   "status": "manual",
+   "status": "full_only",
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
    "text": "",
    "rank": 5,
-   "note": "потрібна картинка",
    "use": "overlay",
    "quality": 4,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "photo": "<її слова>"
+   }
   },
   {
    "name": "hw-path-text",
@@ -2848,17 +3005,22 @@
    "moments": [
     "список / кроки"
    ],
-   "status": "manual",
+   "status": "skip",
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
    "text": "",
    "rank": 5,
-   "note": "дрібно",
+   "note": "у режимі затемнення: порожньо, дрібно або англійський текст",
    "use": "overlay",
    "quality": 4,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "Idea": "<її слова>",
+    "Record": "<її слова>",
+    "Shine!": "<її слова>",
+    "M": "<її слова>"
+   }
   },
   {
    "name": "hw-text-cloud",
@@ -2932,8 +3094,7 @@
    ],
    "status": "manual",
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
    "text": "",
    "rank": 5,
@@ -2943,7 +3104,11 @@
    "text_vars": [
     "TXT_MAIN_1_Line",
     "TXT_SUB"
-   ]
+   ],
+   "replace": {
+    "BILD EXKLUSIV": "<її слова>",
+    "Sonderbericht": "<її слова>"
+   }
   },
   {
    "name": "lt-bold-block",
@@ -3022,14 +3187,13 @@
    "moments": [
     "повідомлення / чат"
    ],
-   "status": "manual",
+   "status": "skip",
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
    "text": "",
    "rank": 5,
-   "note": "дрібно",
+   "note": "у режимі затемнення: порожньо, дрібно або англійський текст",
    "use": "ui",
    "quality": 3,
    "text_vars": [],
@@ -3041,17 +3205,19 @@
    "moments": [
     "хук / ключова фраза"
    ],
-   "status": "manual",
+   "status": "skip",
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
    "text": "",
    "rank": 5,
-   "note": "дрібно",
+   "note": "у режимі затемнення: порожньо, дрібно або англійський текст",
    "use": "overlay",
    "quality": 4,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "highlight amount": "<її слова>"
+   }
   },
   {
    "name": "mk-clone-wall-transition",
@@ -3059,7 +3225,7 @@
    "moments": [
     "перехід"
    ],
-   "status": "skip",
+   "status": "manual",
    "card": {
     "box": [
      -420,
@@ -3075,7 +3241,10 @@
    "note": "зашитий напис HyperFrames",
    "use": "transition",
    "quality": 4,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "s shrink IS the wall": "<її слова>"
+   }
   },
   {
    "name": "mk-placeholder-grid",
@@ -3083,16 +3252,19 @@
    "moments": [
     "картинки / приклади"
    ],
-   "status": "candidate",
+   "status": "full_only",
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
    "text": "",
    "rank": 5,
-   "note": "на весь кадр, ще не перевірено в кадрі",
    "use": "full",
    "quality": 3,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "inside scale": "<її слова>",
+    "box, box, box": "<її слова>"
+   }
   },
   {
    "name": "mk-progress-stat",
@@ -3155,14 +3327,13 @@
    "moments": [
     "відгук / доказ"
    ],
-   "status": "manual",
+   "status": "skip",
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
    "text": "",
    "rank": 5,
-   "note": "дрібно",
+   "note": "у режимі затемнення: порожньо, дрібно або англійський текст",
    "use": "ui",
    "quality": 3,
    "text_vars": [],
@@ -3174,9 +3345,9 @@
    "moments": [
     "картинки / приклади"
    ],
-   "status": "skip",
+   "status": "manual",
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
    "text": "",
    "rank": 5,
@@ -3211,9 +3382,9 @@
    "moments": [
     "заклик (CTA)"
    ],
-   "status": "skip",
+   "status": "manual",
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
    "text": "",
    "rank": 5,
@@ -3248,10 +3419,9 @@
    "moments": [
     "відгук / доказ"
    ],
-   "status": "skip",
+   "status": "manual",
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
    "text": "",
    "rank": 5,
@@ -3268,10 +3438,9 @@
     "заклик (CTA)",
     "ім'я / хто я"
    ],
-   "status": "skip",
+   "status": "manual",
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
    "text": "",
    "rank": 5,
@@ -3306,13 +3475,12 @@
     "картинки / приклади",
     "заклик (CTA)"
    ],
-   "status": "candidate",
+   "status": "full_only",
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
    "text": "",
    "rank": 5,
-   "note": "на весь кадр, ще не перевірено в кадрі",
    "use": "full",
    "quality": 3,
    "text_vars": [
@@ -3356,15 +3524,17 @@
    ],
    "status": "manual",
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
    "text": "",
    "rank": 5,
    "note": "велика біла панель",
    "use": "overlay",
    "quality": 4,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "Animated Bar Chart": "<її слова>"
+   }
   },
   {
    "name": "blur-in",
@@ -3437,15 +3607,17 @@
    ],
    "status": "manual",
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
    "text": "",
    "rank": 5,
    "note": "кольорова пляма на пів кадру",
    "use": "overlay",
    "quality": 4,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "Confetti": "<її слова>"
+   }
   },
   {
    "name": "focus-blur-resolve",
@@ -3594,14 +3766,19 @@
     "ім'я / хто я",
     "заклик (CTA)"
    ],
-   "status": "skip",
-   "card": {},
+   "status": "manual",
+   "card": {
+    "layout": "dim"
+   },
    "text": "",
    "rank": 5,
    "note": "X branding baked in, no text vars",
    "use": "skip",
    "quality": 2,
-   "text_vars": []
+   "text_vars": [],
+   "replace": {
+    "X Follow Card": "<її слова>"
+   }
   },
   {
    "name": "decision-tree",
@@ -3708,8 +3885,25 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "baked fitness app scene, no vars"
+   "status": "manual",
+   "note": "baked fitness app scene, no vars",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Unleash Full Potential": "<її слова>",
+    "START NOW": "<її слова>",
+    "JM": "<її слова>",
+    "James Medrano": "<її слова>",
+    "Premium Member": "<її слова>",
+    "Weekly Goal": "<її слова>",
+    "Your Progress": "<її слова>",
+    "See all": "<її слова>",
+    "Running": "<її слова>",
+    "5.2 km": "<її слова>",
+    "Cycling": "<її слова>"
+   }
   },
   {
    "name": "aurora",
@@ -3766,8 +3960,25 @@
    "use": "skip",
    "quality": 1,
    "text_vars": [],
-   "status": "skip",
-   "note": "another creator's branding baked in"
+   "status": "manual",
+   "note": "another creator's branding baked in",
+   "replace": {
+    "Blue Sweater Intro Video": "<її слова>",
+    "Introducing": "<її слова>",
+    "Intro": "<її слова>",
+    "ducin": "<її слова>",
+    "tro": "<її слова>",
+    "blu": "<її слова>",
+    "swea": "<її слова>",
+    "ter": "<її слова>",
+    "blue": "<її слова>",
+    "sweater": "<її слова>",
+    "How can I help you today?": "<її слова>",
+    "Opus 5.0": "<її слова>"
+   },
+   "card": {
+    "layout": "dim"
+   }
   },
   {
    "name": "camera-dolly-zoom",
@@ -3801,8 +4012,14 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "3D title with baked copy, no text vars"
+   "status": "replace",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Aa": "<її слова>"
+   }
   },
   {
    "name": "carousel-circle-4",
@@ -3815,10 +4032,12 @@
    "text_vars": [],
    "image_vars": true,
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "full_only",
+   "replace": {
+    "Image Carousel · Circle 4": "<її слова>"
+   }
   },
   {
    "name": "carousel-circle-5",
@@ -3831,10 +4050,12 @@
    "text_vars": [],
    "image_vars": true,
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "full_only",
+   "replace": {
+    "Image Carousel · Circle 5": "<її слова>"
+   }
   },
   {
    "name": "carousel-orbit-2",
@@ -3847,10 +4068,12 @@
    "text_vars": [],
    "image_vars": true,
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "full_only",
+   "replace": {
+    "Image Carousel · Orbit 2": "<її слова>"
+   }
   },
   {
    "name": "carousel-orbit-3",
@@ -3863,10 +4086,12 @@
    "text_vars": [],
    "image_vars": true,
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "full_only",
+   "replace": {
+    "Image Carousel · Orbit 3": "<її слова>"
+   }
   },
   {
    "name": "carousel-orbit-4",
@@ -3879,10 +4104,12 @@
    "text_vars": [],
    "image_vars": true,
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "full_only",
+   "replace": {
+    "Image Carousel · Orbit 4": "<її слова>"
+   }
   },
   {
    "name": "carousel-orbit-5",
@@ -3895,10 +4122,12 @@
    "text_vars": [],
    "image_vars": true,
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "full_only",
+   "replace": {
+    "Image Carousel · Orbit 5": "<її слова>"
+   }
   },
   {
    "name": "carousel-path-4",
@@ -3911,10 +4140,12 @@
    "text_vars": [],
    "image_vars": true,
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "full_only",
+   "replace": {
+    "Image Carousel · Path 4": "<її слова>"
+   }
   },
   {
    "name": "carousel-path-5",
@@ -3927,10 +4158,12 @@
    "text_vars": [],
    "image_vars": true,
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "full_only",
+   "replace": {
+    "Image Carousel · Path 5": "<її слова>"
+   }
   },
   {
    "name": "carousel-text-circle-3",
@@ -3947,10 +4180,12 @@
    ],
    "image_vars": true,
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "full_only",
+   "replace": {
+    "Carousels are so in — Circle 3": "<її слова>"
+   }
   },
   {
    "name": "carousel-text-circle-4",
@@ -3967,10 +4202,12 @@
    ],
    "image_vars": true,
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "full_only",
+   "replace": {
+    "Carousels are so in — Circle 4": "<її слова>"
+   }
   },
   {
    "name": "carousel-text-circle-5",
@@ -3987,10 +4224,12 @@
    ],
    "image_vars": true,
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "full_only",
+   "replace": {
+    "Carousels are so in — Circle 5": "<її слова>"
+   }
   },
   {
    "name": "carousel-vision-2",
@@ -4003,10 +4242,12 @@
    "text_vars": [],
    "image_vars": true,
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "full_only",
+   "replace": {
+    "Image Carousel · Vision 2": "<її слова>"
+   }
   },
   {
    "name": "carousel-vision-3",
@@ -4019,10 +4260,12 @@
    "text_vars": [],
    "image_vars": true,
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "full_only",
+   "replace": {
+    "Image Carousel · Vision 3": "<її слова>"
+   }
   },
   {
    "name": "carousel-vision-4",
@@ -4035,10 +4278,12 @@
    "text_vars": [],
    "image_vars": true,
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "full_only",
+   "replace": {
+    "Image Carousel · Vision 4": "<її слова>"
+   }
   },
   {
    "name": "carousel-vision-5",
@@ -4051,10 +4296,12 @@
    "text_vars": [],
    "image_vars": true,
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "full_only",
+   "replace": {
+    "Image Carousel · Vision 5": "<її слова>"
+   }
   },
   {
    "name": "chromatic-radial-split",
@@ -4099,8 +4346,12 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "needs a still photo, not for talking head"
+   "status": "manual",
+   "note": "needs a still photo, not for talking head",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   }
   },
   {
    "name": "cinematic-zoom",
@@ -4218,8 +4469,15 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "heavy WebGL2, baked headline, no text vars"
+   "status": "manual",
+   "note": "heavy WebGL2, baked headline, no text vars",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Code Slice Hero": "<її слова>"
+   }
   },
   {
    "name": "code-snippet-apple-terminal-pro",
@@ -4329,8 +4587,15 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "heavy 3D, no vars"
+   "status": "manual",
+   "note": "heavy 3D, no vars",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Aa": "<її слова>"
+   }
   },
   {
    "name": "domain-warp-dissolve",
@@ -4363,8 +4628,15 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "heavy three.js, no vars"
+   "status": "manual",
+   "note": "heavy three.js, no vars",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Exploded Stack": "<її слова>"
+   }
   },
   {
    "name": "extruded-logo",
@@ -4375,8 +4647,15 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "three.js logo, baked text"
+   "status": "manual",
+   "note": "three.js logo, baked text",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Extruded Logo": "<її слова>"
+   }
   },
   {
    "name": "falling-lines",
@@ -4421,8 +4700,23 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "landscape diagram scene, baked copy"
+   "status": "manual",
+   "note": "landscape diagram scene, baked copy",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Flowchart": "<її слова>",
+    "Yes": "<її слова>",
+    "Not sure": "<її слова>",
+    "Should I learn to code?": "<її слова>",
+    "Start with Pythom": "<її слова>",
+    "Try no-code first": "<її слова>",
+    "Build a personal website": "<її слова>",
+    "Take a free intro course": "<її слова>",
+    "You": "<її слова>"
+   }
   },
   {
    "name": "flowing-gradient",
@@ -4469,8 +4763,17 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "heavy 3D, baked logo/text"
+   "status": "manual",
+   "note": "heavy 3D, baked logo/text",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Frost Sequence Rig": "<її слова>",
+    "Building Frost · ": "<її слова>",
+    "Frost failed: ": "<її слова>"
+   }
   },
   {
    "name": "gabor-noise",
@@ -4495,10 +4798,12 @@
    "text_vars": [],
    "image_vars": true,
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "full_only",
+   "replace": {
+    "Gallery Tunnel": "<її слова>"
+   }
   },
   {
    "name": "glass-hero",
@@ -4509,8 +4814,14 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "heavy three.js, baked headline"
+   "status": "replace",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Glass Hero": "<її слова>"
+   }
   },
   {
    "name": "glass-shard-title",
@@ -4521,8 +4832,15 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "heavy 3D, baked headline"
+   "status": "replace",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Glass Shard Title": "<її слова>",
+    "Aa": "<її слова>"
+   }
   },
   {
    "name": "glitch",
@@ -4580,8 +4898,19 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "logo morph, no vars"
+   "status": "manual",
+   "note": "logo morph, no vars",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "s own marker is": "<її слова>",
+    "s own containing block, so the element": "<її слова>",
+    "needs a number for": "<її слова>",
+    "use strict": "<її слова>",
+    "s tracker needs the timeline": "<її слова>"
+   }
   },
   {
    "name": "gravitational-lens",
@@ -4627,7 +4956,10 @@
    "quality": 1,
    "text_vars": [],
    "status": "skip",
-   "note": "WebGPU shader, decorative"
+   "note": "у режимі затемнення: порожньо, дрібно або англійський текст",
+   "card": {
+    "layout": "dim"
+   }
   },
   {
    "name": "heygen-avatar-promo-card",
@@ -4638,8 +4970,21 @@
    "use": "skip",
    "quality": 1,
    "text_vars": [],
-   "status": "skip",
-   "note": "HeyGen branding baked in"
+   "status": "manual",
+   "note": "HeyGen branding baked in",
+   "replace": {
+    "OFF": "<її слова>",
+    "CODE": "<її слова>",
+    "GEN": "<її слова>",
+    "Your avatar,": "<її слова>",
+    "by HeyGen.": "<її слова>",
+    "AI video, camera-free.": "<її слова>",
+    "4K AVATARS": "<її слова>",
+    "NO CAMERA NEEDED": "<її слова>"
+   },
+   "card": {
+    "layout": "dim"
+   }
   },
   {
    "name": "hologram",
@@ -4674,8 +5019,26 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "heavy WebGPU 3D iPhone, baked content"
+   "status": "manual",
+   "note": "heavy WebGPU 3D iPhone, baked content",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Devices Canvas — HTML-in-Canvas API Showcase": "<її слова>",
+    "Weather": "<її слова>",
+    "Stocks": "<її слова>",
+    "Find My": "<її слова>",
+    "Home": "<її слова>",
+    "Books": "<її слова>",
+    "iTunes Store": "<її слова>",
+    "Fitness": "<її слова>",
+    "Watch": "<її слова>",
+    "Contacts": "<її слова>",
+    "Files": "<її слова>",
+    "Translate": "<її слова>"
+   }
   },
   {
    "name": "lens-flare",
@@ -4732,8 +5095,24 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "WebGPU scene with own background, no vars"
+   "status": "manual",
+   "note": "WebGPU scene with own background, no vars",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Render complete": "<її слова>",
+    "rendering": "<її слова>",
+    "Liquid glass preview is encoding with GPU capture.": "<її слова>",
+    "Messages": "<її слова>",
+    "now": "<її слова>",
+    "Miguel: can it feel alive but still native?": "<її слова>",
+    "Reply": "<її слова>",
+    "Mark Read": "<її слова>",
+    "complete": "<її слова>",
+    "liquid-glass-notification.mp4 is ready.": "<її слова>"
+   }
   },
   {
    "name": "liquid-glass-widgets",
@@ -4744,8 +5123,24 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "WebGPU scene with own background, no vars"
+   "status": "manual",
+   "note": "WebGPU scene with own background, no vars",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Liquid Glass Widgets": "<її слова>",
+    "Temperature": "<її слова>",
+    "Battery": "<її слова>",
+    "Steps": "<її слова>",
+    "Preview pipeline": "<її слова>",
+    "Encoding frames": "<її слова>",
+    "Connected": "<її слова>",
+    "Bluetooth": "<її слова>",
+    "Focus": "<її слова>",
+    "Preview ready": "<її слова>"
+   }
   },
   {
    "name": "liquid-metal",
@@ -4770,10 +5165,15 @@
    "quality": 2,
    "text_vars": [],
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "manual",
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "replace": {
+    "Logo Outro": "<її слова>",
+    "Nothing great is made alone.": "<її слова>",
+    "figma.com": "<її слова>"
+   }
   },
   {
    "name": "lottie-character-walk",
@@ -4804,8 +5204,26 @@
    "use": "skip",
    "quality": 3,
    "text_vars": [],
-   "status": "skip",
-   "note": "heavy 3D scene, baked content"
+   "status": "manual",
+   "note": "heavy 3D scene, baked content",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Devices Canvas — HTML-in-Canvas API Showcase": "<її слова>",
+    "HyperFrames": "<її слова>",
+    "Log in": "<її слова>",
+    "Community Playground": "<її слова>",
+    "Made with HyperFrames": "<її слова>",
+    "Examples": "<її слова>",
+    "Catalog 0": "<її слова>",
+    "Finder": "<її слова>",
+    "File": "<її слова>",
+    "Edit": "<її слова>",
+    "View": "<її слова>",
+    "Go": "<її слова>"
+   }
   },
   {
    "name": "marble",
@@ -4864,8 +5282,17 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "baked map scene, no vars"
+   "status": "manual",
+   "note": "мапа: на запит людини",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "LOCKED": "<її слова>",
+    "DOWN": "<її слова>",
+    "© OpenStreetMap contributors © CARTO": "<її слова>"
+   }
   },
   {
    "name": "nyc-paris-flight",
@@ -4876,8 +5303,25 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "baked travel map scene"
+   "status": "manual",
+   "note": "мапа: на запит людини",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "New York": "<її слова>",
+    "JFK / NYC": "<її слова>",
+    "Paris": "<її слова>",
+    "CDG / FR": "<її слова>",
+    "ARRIVED": "<її слова>",
+    "Six-second transatlantic hop": "<її слова>",
+    "NEW YORK": "<її слова>",
+    "TO": "<її слова>",
+    "PARIS": "<її слова>",
+    "5,837 km compressed": "<її слова>",
+    "© OpenStreetMap contributors © CARTO": "<її слова>"
+   }
   },
   {
    "name": "obsidian",
@@ -4900,8 +5344,16 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "3D scene, baked content"
+   "status": "manual",
+   "note": "3D scene, baked content",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Orbit Card — approved Blender motion": "<її слова>",
+    "Aa": "<її слова>"
+   }
   },
   {
    "name": "oscilloscope-trace",
@@ -4912,8 +5364,22 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "retro instrument demo"
+   "status": "manual",
+   "note": "retro instrument demo",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Oscilloscope Trace": "<її слова>",
+    "OSCILLOSCOPE": "<її слова>",
+    "SOURCE": "<її слова>",
+    "SINE": "<її слова>",
+    "FREQ": "<її слова>",
+    "TIMEBASE": "<її слова>",
+    "VERT": "<її слова>",
+    "PHOSPHOR": "<її слова>"
+   }
   },
   {
    "name": "plasma",
@@ -5074,8 +5540,14 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "HeyGen-branded ad, baked copy"
+   "status": "manual",
+   "note": "HeyGen-branded ad, baked copy",
+   "replace": {
+    "Thursday, August 14": "<її слова>"
+   },
+   "card": {
+    "layout": "dim"
+   }
   },
   {
    "name": "snow",
@@ -5102,8 +5574,19 @@
    "use": "skip",
    "quality": 1,
    "text_vars": [],
-   "status": "skip",
-   "note": "geo data map, irrelevant"
+   "status": "manual",
+   "note": "мапа: на запит людини, режим затемнення",
+   "replace": {
+    "Spain Map": "<її слова>",
+    "PIB per cápita por Comunidad Autónoma": "<її слова>",
+    "Producto Interior Bruto per cápita, estimación 2024": "<її слова>",
+    "Bajo": "<її слова>",
+    "Alto": "<її слова>",
+    "Fuente: Instituto Nacional de Estadística": "<її слова>"
+   },
+   "card": {
+    "layout": "dim"
+   }
   },
   {
    "name": "spiral",
@@ -5414,8 +5897,25 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "13s showcase demo, baked UI"
+   "status": "manual",
+   "note": "13s showcase demo, baked UI",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "App Redesign": "<її слова>",
+    "Design System": "<її слова>",
+    "Design": "<її слова>",
+    "Dev": "<її слова>",
+    "Share": "<її слова>",
+    "Layers": "<її слова>",
+    "Assets": "<її слова>",
+    "Search layers": "<її слова>",
+    "Page 1": "<її слова>",
+    "HeyGen — Home": "<її слова>",
+    "Navigation": "<її слова>"
+   }
   },
   {
    "name": "us-map",
@@ -5426,8 +5926,19 @@
    "use": "skip",
    "quality": 1,
    "text_vars": [],
-   "status": "skip",
-   "note": "geo data map, irrelevant"
+   "status": "manual",
+   "note": "мапа: на запит людини, режим затемнення",
+   "replace": {
+    "US Map": "<її слова>",
+    "Population Density by State": "<її слова>",
+    "Residents per square mile, 2024 Census estimates": "<її слова>",
+    "Low": "<її слова>",
+    "High": "<її слова>",
+    "Source: U.S. Census Bureau": "<її слова>"
+   },
+   "card": {
+    "layout": "dim"
+   }
   },
   {
    "name": "us-map-bubble",
@@ -5438,8 +5949,17 @@
    "use": "skip",
    "quality": 1,
    "text_vars": [],
-   "status": "skip",
-   "note": "geo data map, irrelevant"
+   "status": "manual",
+   "note": "мапа: на запит людини, режим затемнення",
+   "replace": {
+    "US Bubble Map": "<її слова>",
+    "Top 20 US Cities by Population": "<її слова>",
+    "Proportional bubble markers by metropolitan population": "<її слова>",
+    "Source: U.S. Census Bureau, 2024": "<її слова>"
+   },
+   "card": {
+    "layout": "dim"
+   }
   },
   {
    "name": "us-map-flow",
@@ -5450,8 +5970,17 @@
    "use": "skip",
    "quality": 1,
    "text_vars": [],
-   "status": "skip",
-   "note": "geo data map, irrelevant"
+   "status": "manual",
+   "note": "мапа: на запит людини, режим затемнення",
+   "replace": {
+    "US Flow Map": "<її слова>",
+    "Interstate Flow Connections": "<її слова>",
+    "Relative volume of major city-to-city corridors": "<її слова>",
+    "Source: Illustrative data": "<її слова>"
+   },
+   "card": {
+    "layout": "dim"
+   }
   },
   {
    "name": "us-map-hex",
@@ -5462,8 +5991,17 @@
    "use": "skip",
    "quality": 1,
    "text_vars": [],
-   "status": "skip",
-   "note": "geo data map, irrelevant"
+   "status": "manual",
+   "note": "мапа: на запит людини, режим затемнення",
+   "replace": {
+    "US Hex Grid Map": "<її слова>",
+    "Median Household Income by State": "<її слова>",
+    "American Community Survey, 2024": "<її слова>",
+    "Source: U.S. Census Bureau, American Community Survey 2024": "<її слова>"
+   },
+   "card": {
+    "layout": "dim"
+   }
   },
   {
    "name": "vfx-anamorphic-flare",
@@ -5510,8 +6048,21 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "undocumented WebGL demo"
+   "status": "manual",
+   "note": "undocumented WebGL demo",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Liquid Glass Parallax": "<її слова>",
+    "Write HTML → Render Video": "<її слова>",
+    "Ship videos": "<її слова>",
+    "10x faster": "<її слова>",
+    "Faster than AE": "<її слова>",
+    "Creators": "<її слова>",
+    "Videos Rendered": "<її слова>"
+   }
   },
   {
    "name": "vfx-magnetic",
@@ -5522,8 +6073,24 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "undocumented WebGL demo"
+   "status": "manual",
+   "note": "undocumented WebGL demo",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Magnetic Cursor — HTML-in-Canvas": "<її слова>",
+    "Pixels bend toward": "<її слова>",
+    "your": "<її слова>",
+    "cursor": "<її слова>",
+    "HTML-in-Canvas API + WebGL2 shader distortion": "<її слова>",
+    "Real-time": "<її слова>",
+    "60fps distortion on live DOM content via texElementImage2D": "<її слова>",
+    "Native API": "<її слова>",
+    "No html2canvas. Browser's own rasterizer at full fidelity.": "<її слова>",
+    "GPU Shaders": "<її слова>"
+   }
   },
   {
    "name": "vfx-portal",
@@ -5534,8 +6101,24 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "undocumented WebGL demo"
+   "status": "manual",
+   "note": "undocumented WebGL demo",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "HTML Portal Transition": "<її слова>",
+    "HyperFrames": "<її слова>",
+    "Docs": "<її слова>",
+    "Catalog": "<її слова>",
+    "GitHub": "<її слова>",
+    "Sign In": "<її слова>",
+    "Write HTML": "<її слова>",
+    "Render Video": "<її слова>",
+    "Start Creating": "<її слова>",
+    "Lightning Fast": "<її слова>"
+   }
   },
   {
    "name": "vfx-shatter",
@@ -5546,8 +6129,26 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "undocumented WebGL demo"
+   "status": "manual",
+   "note": "undocumented WebGL demo",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "HTML Glass Shatter": "<її слова>",
+    "Write HTML, Render Video": "<її слова>",
+    "Everything you loved.": "<її слова>",
+    "Now 10x faster.": "<її слова>",
+    "Render Speed": "<її слова>",
+    "Throughput": "<її слова>",
+    "Reliability": "<її слова>",
+    "Instant Deploys": "<її слова>",
+    "Zero-downtime rollouts in under 3 seconds globally.": "<її слова>",
+    "End-to-End Encryption": "<її слова>",
+    "AES-256 at rest, TLS 1.3 in transit. SOC2 certified.": "<її слова>",
+    "Real-time Analytics": "<її слова>"
+   }
   },
   {
    "name": "vfx-text-cursor",
@@ -5558,8 +6159,19 @@
    "use": "skip",
    "quality": 3,
    "text_vars": [],
-   "status": "skip",
-   "note": "shader text on black stage, no vars"
+   "status": "manual",
+   "note": "shader text on black stage, no vars",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "VFX Text Cursor": "<її слова>",
+    "in": "<її слова>",
+    "canvas": "<її слова>",
+    "Now available": "<її слова>",
+    "in HyperFrames": "<її слова>"
+   }
   },
   {
    "name": "voronoi",
@@ -5582,8 +6194,26 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "baked VPN ad scene"
+   "status": "manual",
+   "note": "baked VPN ad scene",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "PRIVATE": "<її слова>",
+    "SIMPLY": "<її слова>",
+    "A calmer way to browse.": "<її слова>",
+    "SAFE": "<її слова>",
+    "Search": "<її слова>",
+    "privacy apps": "<її слова>",
+    "CloudPocket": "<її слова>",
+    "Files and backups": "<її слова>",
+    "GET": "<її слова>",
+    "LensLab": "<її слова>",
+    "Photo editor": "<її слова>",
+    "BeatShelf": "<її слова>"
+   }
   },
   {
    "name": "water",
@@ -5660,8 +6290,15 @@
    "use": "skip",
    "quality": 3,
    "text_vars": [],
-   "status": "skip",
-   "note": "3D title, baked text, no vars"
+   "status": "replace",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Wireframe Portal Title": "<її слова>",
+    "HYPERFRAMES PRESENTS": "<її слова>"
+   }
   },
   {
    "name": "world-map",
@@ -5672,8 +6309,19 @@
    "use": "skip",
    "quality": 1,
    "text_vars": [],
-   "status": "skip",
-   "note": "geo data map, irrelevant"
+   "status": "manual",
+   "note": "мапа: на запит людини, режим затемнення",
+   "replace": {
+    "World Map": "<її слова>",
+    "Global GDP per Capita": "<її слова>",
+    "Nominal GDP per capita, 2024 IMF estimates": "<її слова>",
+    "Low": "<її слова>",
+    "High": "<її слова>",
+    "Source: International Monetary Fund": "<її слова>"
+   },
+   "card": {
+    "layout": "dim"
+   }
   },
   {
    "name": "worley-noise",
@@ -5696,8 +6344,12 @@
    "use": "background",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "textured board backdrop"
+   "status": "manual",
+   "note": "textured board backdrop",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   }
   },
   {
    "name": "yt-logo-intro",
@@ -5710,10 +6362,14 @@
    "quality": 3,
    "text_vars": [],
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "manual",
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "replace": {
+    "YT": "<її слова>",
+    "LET'S DIVE IN": "<її слова>"
+   }
   },
   {
    "name": "yt-vertical-fill",
@@ -5724,8 +6380,12 @@
    "use": "skip",
    "quality": 1,
    "text_vars": [],
-   "status": "skip",
-   "note": "widescreen fill, not for vertical reels"
+   "status": "manual",
+   "note": "widescreen fill, not for vertical reels",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   }
   },
   {
    "name": "arc-motion-path",
@@ -5737,11 +6397,15 @@
    "quality": 3,
    "text_vars": [],
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
-   "status": "manual",
-   "note": "порожня пляма"
+   "status": "skip",
+   "note": "у режимі затемнення: порожньо, дрібно або англійський текст",
+   "replace": {
+    "Arc Motion Path": "<її слова>",
+    "Plan": "<її слова>",
+    "Render": "<її слова>"
+   }
   },
   {
    "name": "ascii-render-pass",
@@ -5753,7 +6417,11 @@
    "quality": 2,
    "text_vars": [],
    "status": "skip",
-   "note": "experimental texture effect"
+   "note": "чорний або порожній кадр поверх відео",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   }
   },
   {
    "name": "ascii-trail-reveal",
@@ -5844,7 +6512,14 @@
    "quality": 2,
    "text_vars": [],
    "status": "skip",
-   "note": "Pulsing backdrop, would cover the speaker"
+   "note": "чорний або порожній кадр поверх відео",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Beat Pulse Background": "<її слова>"
+   }
   },
   {
    "name": "beat-timeline",
@@ -5874,8 +6549,7 @@
    "image_vars": true,
    "keep_ui": true,
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
    "status": "manual",
    "note": "дрібно"
@@ -5922,8 +6596,11 @@
     "place": "low",
     "layout": "front"
    },
-   "status": "skip",
-   "note": "англійський текст зашитий"
+   "status": "manual",
+   "note": "стиль субтитрів: англійське речення в окремому списку слів, треба підключати до субтитрів",
+   "replace": {
+    "Editorial Emphasis": "<її слова>"
+   }
   },
   {
    "name": "caption-glitch-rgb",
@@ -5938,8 +6615,11 @@
     "place": "low",
     "layout": "front"
    },
-   "status": "skip",
-   "note": "англійський текст зашитий"
+   "status": "manual",
+   "note": "стиль субтитрів: англійське речення в окремому списку слів, треба підключати до субтитрів",
+   "replace": {
+    "Glitch RGB": "<її слова>"
+   }
   },
   {
    "name": "caption-neon-accent",
@@ -5954,8 +6634,11 @@
     "place": "low",
     "layout": "front"
    },
-   "status": "skip",
-   "note": "англійський текст зашитий"
+   "status": "manual",
+   "note": "стиль субтитрів: англійське речення в окремому списку слів, треба підключати до субтитрів",
+   "replace": {
+    "Neon Accent": "<її слова>"
+   }
   },
   {
    "name": "caption-neon-glow",
@@ -5970,8 +6653,11 @@
     "place": "low",
     "layout": "front"
    },
-   "status": "skip",
-   "note": "англійський текст зашитий"
+   "status": "manual",
+   "note": "стиль субтитрів: англійське речення в окремому списку слів, треба підключати до субтитрів",
+   "replace": {
+    "Neon Glow": "<її слова>"
+   }
   },
   {
    "name": "caption-parallax-layers",
@@ -5983,10 +6669,13 @@
    "quality": 4,
    "text_vars": [],
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "skip",
+   "note": "у режимі затемнення: порожньо, дрібно або англійський текст",
+   "replace": {
+    "Parallax Layers": "<її слова>"
+   }
   },
   {
    "name": "caption-particle-burst",
@@ -6002,8 +6691,11 @@
     "place": "low",
     "layout": "front"
    },
-   "status": "skip",
-   "note": "англійський текст зашитий"
+   "status": "manual",
+   "note": "стиль субтитрів: англійське речення в окремому списку слів, треба підключати до субтитрів",
+   "replace": {
+    "Particle Burst": "<її слова>"
+   }
   },
   {
    "name": "caption-texture",
@@ -6018,8 +6710,11 @@
     "place": "low",
     "layout": "front"
    },
-   "status": "skip",
-   "note": "англійський текст зашитий"
+   "status": "manual",
+   "note": "стиль субтитрів: англійське речення в окремому списку слів, треба підключати до субтитрів",
+   "replace": {
+    "Texture": "<її слова>"
+   }
   },
   {
    "name": "caption-weight-shift",
@@ -6034,8 +6729,11 @@
     "place": "low",
     "layout": "front"
    },
-   "status": "skip",
-   "note": "англійський текст зашитий"
+   "status": "manual",
+   "note": "стиль субтитрів: англійське речення в окремому списку слів, треба підключати до субтитрів",
+   "replace": {
+    "Weight Shift": "<її слова>"
+   }
   },
   {
    "name": "card-resize",
@@ -6050,8 +6748,12 @@
     "place": "low",
     "layout": "front"
    },
-   "status": "skip",
-   "note": "англійський текст зашитий"
+   "status": "replace",
+   "replace": {
+    "Project status": "<її слова>",
+    "Ready to render": "<її слова>",
+    "All scenes validated and queued for export.": "<її слова>"
+   }
   },
   {
    "name": "chromatic-aberration-wipe",
@@ -6072,8 +6774,12 @@
     "scale": 1.78,
     "layout": "transition"
    },
-   "status": "skip",
-   "note": "англійський текст зашитий"
+   "status": "manual",
+   "note": "англійський текст зашитий",
+   "replace": {
+    "Before": "<її слова>",
+    "Chromatic Aberration Wipe": "<її слова>"
+   }
   },
   {
    "name": "colorama-wipe",
@@ -6107,8 +6813,12 @@
     "place": "low",
     "layout": "front"
    },
-   "status": "skip",
-   "note": "англійський текст зашитий"
+   "status": "manual",
+   "note": "англійський текст зашитий",
+   "replace": {
+    "Context Menu Cursor": "<її слова>",
+    "Launch assets": "<її слова>"
+   }
   },
   {
    "name": "cursor-glyph-trail",
@@ -6121,8 +6831,26 @@
    "text_vars": [
     "glyphs"
    ],
-   "status": "skip",
-   "note": "Baked settings-screen tutorial scene"
+   "status": "manual",
+   "note": "Baked settings-screen tutorial scene",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Cursor Glyph Trail": "<її слова>",
+    "Settings": "<її слова>",
+    "Account": "<її слова>",
+    "Profile": "<її слова>",
+    "Notifications": "<її слова>",
+    "Appearance": "<її слова>",
+    "Workspace": "<її слова>",
+    "Members": "<її слова>",
+    "Billing": "<її слова>",
+    "Integrations": "<її слова>",
+    "Choose what we email you, and how often.": "<її слова>",
+    "Email digest": "<її слова>"
+   }
   },
   {
    "name": "cursor-zoom-follow",
@@ -6135,10 +6863,24 @@
    "text_vars": [],
    "image_vars": true,
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "manual",
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "replace": {
+    "Zoom Follow Cursor": "<її слова>",
+    "Overview": "<її слова>",
+    "Revenue": "<її слова>",
+    "Customers": "<її слова>",
+    "Invoices": "<її слова>",
+    "Settings": "<її слова>",
+    "Updated 2 minutes ago": "<її слова>",
+    "Last 30 days": "<її слова>",
+    "Export": "<її слова>",
+    "Exporting…": "<її слова>",
+    "Aug 25": "<її слова>",
+    "Top plans": "<її слова>"
+   }
   },
   {
    "name": "cut-the-curve",
@@ -6172,11 +6914,13 @@
    "quality": 3,
    "text_vars": [],
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
-   "status": "manual",
-   "note": "дрібно"
+   "status": "skip",
+   "note": "у режимі затемнення: порожньо, дрібно або англійський текст",
+   "replace": {
+    "Dart Cursor": "<її слова>"
+   }
   },
   {
    "name": "directional-wipe",
@@ -6197,8 +6941,12 @@
     "scale": 1.78,
     "layout": "transition"
    },
-   "status": "skip",
-   "note": "англійський текст зашитий"
+   "status": "manual",
+   "note": "англійський текст зашитий",
+   "replace": {
+    "Before": "<її слова>",
+    "Directional Wipe": "<її слова>"
+   }
   },
   {
    "name": "drift-hold",
@@ -6248,8 +6996,15 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "Abstract demo primitive"
+   "status": "manual",
+   "note": "Abstract demo primitive",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Echo Trail": "<її слова>"
+   }
   },
   {
    "name": "extended-keyframe",
@@ -6258,8 +7013,15 @@
    "use": "skip",
    "quality": 1,
    "text_vars": [],
-   "status": "skip",
-   "note": "Easing helper, not a visual"
+   "status": "manual",
+   "note": "Easing helper, not a visual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "s recorded start value and erase the active tween": "<її слова>"
+   }
   },
   {
    "name": "facet-morph",
@@ -6306,8 +7068,15 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "Heavy full-scene filter"
+   "status": "manual",
+   "note": "Heavy full-scene filter",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "s camera at": "<її слова>"
+   }
   },
   {
    "name": "focus-rack",
@@ -6338,10 +7107,14 @@
    "quality": 2,
    "text_vars": [],
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "full_only",
+   "replace": {
+    "Grade Split Reveal": "<її слова>",
+    "Ungraded": "<її слова>",
+    "Warm Cinematic": "<її слова>"
+   }
   },
   {
    "name": "grain-field",
@@ -6418,8 +7191,18 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "Helper library, not a standalone visual"
+   "status": "manual",
+   "note": "Helper library, not a standalone visual",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "the boil": "<її слова>",
+    "BOIL \"CALM\" · STROKE \"PLAIN\"": "<її слова>",
+    "FRAME DROP 1": "<її слова>",
+    "TEXT, AMP 1.2": "<її слова>"
+   }
   },
   {
    "name": "icon-swap",
@@ -6447,11 +7230,13 @@
    "quality": 3,
    "text_vars": [],
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
-   "status": "manual",
-   "note": "пляма"
+   "status": "skip",
+   "note": "у режимі затемнення: порожньо, дрібно або англійський текст",
+   "replace": {
+    "Ink Bleed Reveal": "<її слова>"
+   }
   },
   {
    "name": "input-feedback",
@@ -6470,8 +7255,14 @@
     "place": "low",
     "layout": "front"
    },
-   "status": "skip",
-   "note": "англійський текст зашитий"
+   "status": "manual",
+   "note": "англійський текст зашитий",
+   "replace": {
+    "Email": "<її слова>",
+    "mia@example.com": "<її слова>",
+    "OK": "<її слова>",
+    "Looks good.": "<її слова>"
+   }
   },
   {
    "name": "keyframe-scrub-stack",
@@ -6482,8 +7273,12 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "No content vars, demo stack"
+   "status": "manual",
+   "note": "No content vars, demo stack",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   }
   },
   {
    "name": "light-sweep-pass",
@@ -6514,11 +7309,12 @@
     "label"
    ],
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
-   "status": "manual",
-   "note": "дрібно"
+   "status": "full_only",
+   "replace": {
+    "Locked Nucleus Orbit": "<її слова>"
+   }
   },
   {
    "name": "logo-brand-close",
@@ -6566,8 +7362,14 @@
    "text_vars": [
     "visits"
    ],
-   "status": "skip",
-   "note": "Editor toolbar demo"
+   "status": "replace",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Magnetic Cursor": "<її слова>"
+   }
   },
   {
    "name": "match-cut",
@@ -6591,8 +7393,12 @@
     "scale": 1.78,
     "layout": "transition"
    },
-   "status": "skip",
-   "note": "англійський текст зашитий"
+   "status": "manual",
+   "note": "англійський текст зашитий",
+   "replace": {
+    "Match Cut": "<її слова>",
+    "Match complete": "<її слова>"
+   }
   },
   {
    "name": "menu-morph",
@@ -6606,7 +7412,16 @@
     "actions"
    ],
    "status": "skip",
-   "note": "UI micro-primitive for apps"
+   "note": "чорний або порожній кадр поверх відео",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Text": "<її слова>",
+    "Image": "<її слова>",
+    "Audio": "<її слова>"
+   }
   },
   {
    "name": "mesh-gradient-bg",
@@ -6642,8 +7457,17 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "Slot-based structural primitive"
+   "status": "manual",
+   "note": "Slot-based structural primitive",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Modal Morph": "<її слова>",
+    "OPEN": "<її слова>",
+    "DETAILS": "<її слова>"
+   }
   },
   {
    "name": "morph-swap",
@@ -6666,7 +7490,10 @@
     "layout": "transition"
    },
    "status": "skip",
-   "note": "англійський текст зашитий"
+   "note": "чорний або порожній кадр поверх відео",
+   "replace": {
+    "Morph Swap": "<її слова>"
+   }
   },
   {
    "name": "motion-blur",
@@ -6675,8 +7502,17 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "Render helper"
+   "status": "manual",
+   "note": "Render helper",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "s own marker is": "<її слова>",
+    "s own containing block, so the element": "<її слова>",
+    "needs a number for": "<її слова>"
+   }
   },
   {
    "name": "multi-device-splay",
@@ -6688,10 +7524,12 @@
    "quality": 2,
    "text_vars": [],
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "full_only",
+   "replace": {
+    "Multi Device Splay": "<її слова>"
+   }
   },
   {
    "name": "multiplayer-cursors",
@@ -6721,8 +7559,15 @@
    "text_vars": [
     "traveler_label"
    ],
-   "status": "skip",
-   "note": "Abstract product-demo path motion, little use over a talking head"
+   "status": "manual",
+   "note": "Abstract product-demo path motion, little use over a talking head",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Offset Path Traveler": "<її слова>"
+   }
   },
   {
    "name": "onboarding-stepper-flow",
@@ -6733,8 +7578,17 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "Generic UI flow scene with baked copy and no text vars"
+   "status": "manual",
+   "note": "Generic UI flow scene with baked copy and no text vars",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Step 2 of 3": "<її слова>",
+    "Choose your visual style": "<її слова>",
+    "Continue": "<її слова>"
+   }
   },
   {
    "name": "ordered-dither-pass",
@@ -6758,7 +7612,7 @@
     "layout": "transition"
    },
    "status": "skip",
-   "note": "англійський текст зашитий"
+   "note": "чорний або порожній кадр поверх відео"
   },
   {
    "name": "page-slide",
@@ -6782,8 +7636,12 @@
     "scale": 1.78,
     "layout": "transition"
    },
-   "status": "skip",
-   "note": "англійський текст зашитий"
+   "status": "manual",
+   "note": "англійський текст зашитий",
+   "replace": {
+    "Dashboard": "<її слова>",
+    "Analytics": "<її слова>"
+   }
   },
   {
    "name": "pan-stations",
@@ -6797,10 +7655,13 @@
     "labels"
    ],
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "manual",
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "replace": {
+    "Pan Stations": "<її слова>"
+   }
   },
   {
    "name": "panel-reveal",
@@ -6818,8 +7679,12 @@
     "place": "low",
     "layout": "front"
    },
-   "status": "skip",
-   "note": "англійський текст зашитий"
+   "status": "replace",
+   "replace": {
+    "Motion tokens": "<її слова>",
+    "Duration 420ms": "<її слова>",
+    "Easing power3.out": "<її слова>"
+   }
   },
   {
    "name": "parallax-device-dive",
@@ -6834,10 +7699,17 @@
     "app_title"
    ],
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "full_only",
+   "replace": {
+    "Parallax Device Dive": "<її слова>",
+    "Overview": "<її слова>",
+    "HF": "<її слова>",
+    "Weekly activity": "<її слова>",
+    "Conversion": "<її слова>",
+    "Active users": "<її слова>"
+   }
   },
   {
    "name": "parallax-unzoom",
@@ -6849,8 +7721,12 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "Full-frame grid transition with no text or image vars"
+   "status": "manual",
+   "note": "Full-frame grid transition with no text or image vars",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   }
   },
   {
    "name": "parallax-zoom",
@@ -6862,8 +7738,12 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "Full-frame grid transition with no text or image vars"
+   "status": "manual",
+   "note": "Full-frame grid transition with no text or image vars",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   }
   },
   {
    "name": "particle-image-reveal",
@@ -6876,11 +7756,13 @@
    "text_vars": [],
    "image_vars": true,
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
    "status": "manual",
-   "note": "потрібна картинка"
+   "note": "потрібна картинка",
+   "replace": {
+    "Particle Image Reveal": "<її слова>"
+   }
   },
   {
    "name": "pendulum-swing",
@@ -6907,8 +7789,26 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "Mobile gesture demo with no text vars, low fit for a talking head"
+   "status": "manual",
+   "note": "Mobile gesture demo with no text vars, low fit for a talking head",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Pull to Refresh": "<її слова>",
+    "Pull to refresh": "<її слова>",
+    "Release to refresh": "<її слова>",
+    "Refreshing": "<її слова>",
+    "Activity": "<її слова>",
+    "Updated now": "<її слова>",
+    "Search activity": "<її слова>",
+    "AL": "<її слова>",
+    "Alex shared a draft": "<її слова>",
+    "Launch sequence, ready for review": "<її слова>",
+    "Now": "<її слова>",
+    "MK": "<її слова>"
+   }
   },
   {
    "name": "rubber-band-bumper",
@@ -6930,7 +7830,16 @@
     "layout": "transition"
    },
    "status": "skip",
-   "note": "англійський текст зашитий"
+   "note": "чорний або порожній кадр поверх відео",
+   "replace": {
+    "Rubber Band Bumper": "<її слова>",
+    "NEXT": "<її слова>",
+    "Clean release": "<її слова>",
+    "The incoming scene settles behind the snap.": "<її слова>",
+    "CURRENT": "<її слова>",
+    "Hold the tension": "<її слова>",
+    "Each pull travels less as resistance builds.": "<її слова>"
+   }
   },
   {
    "name": "scan-band",
@@ -6965,10 +7874,12 @@
    ],
    "image_vars": true,
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "full_only",
+   "replace": {
+    "Screen Flow Carousel": "<її слова>"
+   }
   },
   {
    "name": "scroll-camera-story",
@@ -6981,10 +7892,13 @@
    "text_vars": [],
    "image_vars": true,
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "manual",
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "replace": {
+    "Scroll Camera Story": "<її слова>"
+   }
   },
   {
    "name": "segmentation-flood",
@@ -7011,8 +7925,12 @@
    "use": "skip",
    "quality": 1,
    "text_vars": [],
-   "status": "skip",
-   "note": "Structural layout primitive, not a visible moment"
+   "status": "manual",
+   "note": "Structural layout primitive, not a visible moment",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   }
   },
   {
    "name": "settings-toggle-flow",
@@ -7023,8 +7941,20 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "Generic UI flow scene with baked copy and no text vars"
+   "status": "manual",
+   "note": "Generic UI flow scene with baked copy and no text vars",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Auto captions": "<її слова>",
+    "Generate timed captions": "<її слова>",
+    "Brand kit": "<її слова>",
+    "Apply saved colors": "<її слова>",
+    "Sound effects": "<її слова>",
+    "Layer subtle UI sounds": "<її слова>"
+   }
   },
   {
    "name": "shared-axis-y",
@@ -7046,8 +7976,13 @@
     "scale": 1.78,
     "layout": "transition"
    },
-   "status": "skip",
-   "note": "англійський текст зашитий"
+   "status": "manual",
+   "note": "англійський текст зашитий",
+   "replace": {
+    "Plan": "<її слова>",
+    "Debug": "<її слова>",
+    "Ask": "<її слова>"
+   }
   },
   {
    "name": "shared-axis-z",
@@ -7115,8 +8050,20 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "Generic UI flow scene with baked copy and no text vars"
+   "status": "manual",
+   "note": "Generic UI flow scene with baked copy and no text vars",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Create account": "<її слова>",
+    "Continue with Google": "<її слова>",
+    "or": "<її слова>",
+    "email@company.com": "<її слова>",
+    "Password": "<її слова>",
+    "Start building": "<її слова>"
+   }
   },
   {
    "name": "skeleton-reveal",
@@ -7147,8 +8094,15 @@
    "quality": 2,
    "text_vars": [],
    "image_vars": true,
-   "status": "skip",
-   "note": "Experimental canvas effect, heavy and abstract"
+   "status": "manual",
+   "note": "Experimental canvas effect, heavy and abstract",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Slit Scan Reveal": "<її слова>"
+   }
   },
   {
    "name": "soft-blob-touch",
@@ -7171,8 +8125,16 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "No text vars, decorative card demo"
+   "status": "manual",
+   "note": "No text vars, decorative card demo",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Spotlight Card": "<її слова>",
+    "A card with a scripted cursor spotlight and lit border.": "<її слова>"
+   }
   },
   {
    "name": "spring-stack-shuffle",
@@ -7186,11 +8148,13 @@
    "text_vars": [],
    "image_vars": true,
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
    "status": "manual",
-   "note": "потрібні картинки"
+   "note": "потрібні картинки",
+   "replace": {
+    "Spring Stack Shuffle": "<її слова>"
+   }
   },
   {
    "name": "stagger-cascade",
@@ -7203,10 +8167,12 @@
    "quality": 2,
    "text_vars": [],
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "full_only",
+   "replace": {
+    "Stagger Cascade": "<її слова>"
+   }
   },
   {
    "name": "stagger-lattice",
@@ -7217,8 +8183,12 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "Decorative grid demo with no vars"
+   "status": "manual",
+   "note": "Decorative grid demo with no vars",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   }
   },
   {
    "name": "state-chip-rail",
@@ -7252,10 +8222,12 @@
     "captions"
    ],
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "full_only",
+   "replace": {
+    "Sticky Mock Swap": "<її слова>"
+   }
   },
   {
    "name": "stitched-text-draw",
@@ -7333,8 +8305,11 @@
    "use": "skip",
    "quality": 1,
    "text_vars": [],
-   "status": "skip",
-   "note": "Decorative loader with no vars"
+   "status": "ready",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   }
   },
   {
    "name": "svg-mask-reveal",
@@ -7384,8 +8359,15 @@
    "text_vars": [
     "card_label_prefix"
    ],
-   "status": "skip",
-   "note": "Gesture demo with placeholder cards"
+   "status": "manual",
+   "note": "Gesture demo with placeholder cards",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Swipe Rail": "<її слова>"
+   }
   },
   {
    "name": "tabs-slide-indicator",
@@ -7429,8 +8411,19 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "Developer terminal demo with baked copy, no vars"
+   "status": "manual",
+   "note": "Developer terminal demo with baked copy, no vars",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Terminal Simulator": "<її слова>",
+    "index.html": "<її слова>",
+    "style.css": "<її слова>",
+    "timeline.js": "<її слова>",
+    "$ hyperframes render --skill=terminal-simulator": "<її слова>"
+   }
   },
   {
    "name": "text-stagger",
@@ -7477,8 +8470,12 @@
    "use": "skip",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "No text vars, texture library demo"
+   "status": "manual",
+   "note": "No text vars, texture library demo",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   }
   },
   {
    "name": "three-orbiting-cards",
@@ -7524,11 +8521,13 @@
     "headline"
    ],
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
-   "status": "manual",
-   "note": "порожня картка"
+   "status": "full_only",
+   "replace": {
+    "Primitive": "<її слова>",
+    "Agent-ready motion": "<її слова>"
+   }
   },
   {
    "name": "titlecard-lockup",
@@ -7600,11 +8599,16 @@
     "labels"
    ],
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
    "status": "manual",
-   "note": "дрібно"
+   "note": "дрібно",
+   "replace": {
+    "Tracing Beam": "<її слова>",
+    "Step one": "<її слова>",
+    "Step two": "<її слова>",
+    "Step three": "<її слова>"
+   }
   },
   {
    "name": "trust-strip",
@@ -7618,11 +8622,13 @@
     "marks"
    ],
    "card": {
-    "place": "low",
-    "layout": "front"
+    "layout": "dim"
    },
    "status": "manual",
-   "note": "дрібно"
+   "note": "дрібно",
+   "replace": {
+    "Trust Strip": "<її слова>"
+   }
   },
   {
    "name": "type-match-cut",
@@ -7647,7 +8653,12 @@
     "layout": "transition"
    },
    "status": "skip",
-   "note": "англійський текст зашитий"
+   "note": "чорний або порожній кадр поверх відео",
+   "replace": {
+    "Type Match Cut": "<її слова>",
+    "New editor": "<її слова>",
+    "Ready": "<її слова>"
+   }
   },
   {
    "name": "ui-focus-zoom",
@@ -7661,10 +8672,13 @@
    "text_vars": [],
    "image_vars": true,
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "manual",
+   "note": "на весь кадр, ще не перевірено в кадрі",
+   "replace": {
+    "UI Focus Zoom": "<її слова>"
+   }
   },
   {
    "name": "variable-axis-type",
@@ -7695,8 +8709,25 @@
    "text_vars": [
     "pathLabel"
    ],
-   "status": "skip",
-   "note": "Design-tool app chrome, niche demo"
+   "status": "manual",
+   "note": "Design-tool app chrome, niche demo",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "Vector Editor Rig": "<її слова>",
+    "Vector": "<її слова>",
+    "Layers": "<її слова>",
+    "Path": "<її слова>",
+    "Frame": "<її слова>",
+    "Group": "<її слова>",
+    "Properties": "<її слова>",
+    "Fill": "<її слова>",
+    "Stroke": "<її слова>",
+    "Width": "<її слова>",
+    "Nodes": "<її слова>"
+   }
   },
   {
    "name": "velocity-throw-snap",
@@ -7710,10 +8741,12 @@
     "card_label_prefix"
    ],
    "card": {
-    "layout": "full"
+    "layout": "dim"
    },
-   "status": "candidate",
-   "note": "на весь кадр, ще не перевірено в кадрі"
+   "status": "full_only",
+   "replace": {
+    "Velocity Throw Snap": "<її слова>"
+   }
   },
   {
    "name": "vignette",
@@ -7788,7 +8821,10 @@
     "layout": "transition"
    },
    "status": "skip",
-   "note": "англійський текст зашитий"
+   "note": "чорний або порожній кадр поверх відео",
+   "replace": {
+    "FOOTAGE": "<її слова>"
+   }
   },
   {
    "name": "yt-screen-warp",
@@ -7799,8 +8835,14 @@
    "use": "background",
    "quality": 2,
    "text_vars": [],
-   "status": "skip",
-   "note": "Texture overlay making footage look like a display"
+   "status": "replace",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "replace": {
+    "on screen": "<її слова>"
+   }
   },
   {
    "name": "zoom-through-transition",

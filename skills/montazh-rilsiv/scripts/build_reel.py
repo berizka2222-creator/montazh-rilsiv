@@ -658,9 +658,9 @@ for i, c in enumerate(edit.get("cards", [])):
             mt = mt.replace("<style>", "<style>\n" + "\n".join(font_css + BRAND_SANS) + "\n" + brand_font + "\n", 1)
         if not c.get("keep_ui"):                         # into her palette: the motion's own greens/blues/oranges become her accents,
             _lay = c.get("layout") or ("front" if c.get("tone") == "clear" else None)
-            mt = brand_recolor.recolor(mt, C, over=_lay in ("front", "behind", "over") or c.get("place") == "low")   # its darks/lights her dark/light (real product UIs keep theirs: "keep_ui")
+            mt = brand_recolor.recolor(mt, C, over=_lay in ("front", "behind", "over", "dim") or c.get("place") == "low")   # its darks/lights her dark/light (real product UIs keep theirs: "keep_ui")
         _lay = c.get("layout") or ("front" if c.get("tone") == "clear" else None)
-        if _lay in ("front", "behind", "over") or c.get("place") == "low":   # over the video: its own full-frame background goes
+        if _lay in ("front", "behind", "over", "dim") or c.get("place") == "low":   # over the video: its own full-frame background goes
             mt = brand_recolor.transparent_bg(mt, comp_id)
         if c.get("ink"):                                 # text-only motions with a hard-coded dark ink: "light" / "pop" / "#hex"
             ink = {"light": LIGHT, "pop": POP, "soft": _SOFT, "dark": MAIN}.get(c["ink"], c["ink"])
@@ -731,6 +731,16 @@ for i, c in enumerate(edit.get("cards", [])):
                       f'tl.to("#{cid}s .spw",{{top:0,height:{H},duration:0.45,ease:"power3.inOut"}},{q(b - 0.45)});'
                       f'tl.to("#{cid}s .spp",{{clipPath:"inset(0% 0% 100% 0%)",duration:0.45,ease:"power3.inOut"}},{q(b - 0.45)});tl.set("#{cid}s",{{autoAlpha:0}},{q(b)});')
             sfx("whoosh_soft", b - 0.45, -16); quiet.append((a, b)); zone(cid, "split", a, b, (0, 0, W, H), full=True)
+        elif layout == "dim":   # an effect too big to keep off the face: the video stays as a dimmed background, the effect on top
+            if not own_box:
+                c["box"] = fit_into(40, 240, 1000, 1400) if fixed else [40, 240, 1000, 1400]
+                if fixed:
+                    z = c.get("zoom", 1.2); bx, by, bw_, bh_ = c["box"]
+                    c["box"] = [round(bx - bw_ * (z - 1) / 2), round(by - bh_ * (z - 1) / 2), round(bw_ * z), round(bh_ * z)]
+            mid.append(f'<div id="{cid}d" style="position:absolute;inset:0;background:{_rgba(_DEEP, c.get("dim", 0.82))};opacity:0;visibility:hidden"></div>')
+            js.append(f'tl.fromTo("#{cid}d",{{autoAlpha:0}},{{autoAlpha:1,duration:0.3,ease:"power2.out"}},{q(a)});'
+                      f'tl.to("#{cid}d",{{autoAlpha:0,duration:0.3,ease:"power2.in"}},{q(b - 0.3)});')
+            quiet.append((a, b)); c.setdefault("tone", "clear")
         elif layout == "full":
             if not own_box and not c.get("box"): c["box"] = fit_into(60, 260, 960, 1240) if fixed else [60, 260, 960, 1240]
             elif not fixed and not own_box and c.get("box") == [0, 0, 1080, 1920]: pass

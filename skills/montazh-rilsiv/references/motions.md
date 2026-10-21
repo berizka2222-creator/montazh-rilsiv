@@ -46,6 +46,14 @@ with what each one is for, its moment and its tested placement, is `references/m
   - `bubble`: a rounded brand window in that band, `"shape": "circle"` for a circle;
   - `split`: the screen divides, the motion on a brand panel at the top, the person slides into the lower part (`"panel": 820` = its height);
   - `full`: the whole frame is the motion on the brand colour for its seconds (phones, CTA end screens).
+  - `low`: transparent, over the video from the chin down, text inks made light (most text effects);
+  - `dim`: the video stays as a darkened background (`"dim": 0.82` = how dark), the effect on top over the whole frame;
+    captions step aside. For effects that can't keep off the face: charts, carousels and galleries with their photos,
+    phone chats and notes, maps, before/after, device mocks. Status `full_only`, marked «на весь кадр».
+- Image slots (carousels, galleries, device and placeholder grids): fill `"images"` with their photos or screenshots; an
+  empty slot never goes in.
+- Brand-name examples (IG/TikTok follow cards, Spotify, X post, YouTube lower third, avatar promo): `replace` swaps the
+  company name for theirs; the logo is an image and must be their own. Status `manual`.
 - The tested placement comes from the catalog automatically (layout, place, tone, ink, css); set them on the card only to move it.
   `box: [x, y, w, h]` on the 1080x1920 frame; `scale` shows a 1920-wide overlay bigger than the frame (lower thirds, light
   leaks: x may go negative).
