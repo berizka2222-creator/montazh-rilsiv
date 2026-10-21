@@ -70,7 +70,10 @@ After Effects, Jitter...). Remotion: `npx remotion render <Element> out.webm --c
 - Render it with the element above the head or on the chest (`face.json` says where the face is), full screen only as a takeover.
   Never half over the face.
 - Their words in every text, numbers exactly as said. Counts toward the reel's motion number and the «never twice» rule;
-  `motions.py log` doesn't see it.
+  `motions.py log` sees it only with `"brand"` set (below).
+- Own Remotion library: with `~/motion/library.json` (or `$MOTION_HOME/library.json`: `{"elements": [{"element", "ua",
+  "moments", "text_vars"}]}`), `motions.py menu` / `ideas` offer its elements next to the catalog as `brand:<Element>`.
+  Name the file `overlays/brand-<Element>-<slug>.webm` and set `"brand": "<Element>"` on the card so `ideas` and `log` count it.
 
 ## Adding more from the catalog (447 items)
 

@@ -17,6 +17,24 @@ HERE = Path(__file__).resolve().parent
 CAT = json.load(open(HERE.parent / "references" / "motion_catalog.json"))
 READY = [m for m in CAT["motions"] if m.get("status") in ("ready", "replace")]
 HOME = Path(os.environ.get("REELS_HOME", "~/reels")).expanduser()
+# Own motion library (Remotion project, ~/motion/library.json), only when it exists: suggested on equal terms with the catalog,
+# as "brand:<Element>". They go in as transparent overlay cards with "brand": "<Element>" (how the log and "used here" see them).
+BRAND_LIB = Path(os.environ.get("MOTION_HOME", "~/motion")).expanduser() / "library.json"
+if BRAND_LIB.exists():
+    for e in json.load(open(BRAND_LIB))["elements"]:
+        READY.append({"name": f"brand:{e['element']}", "ua": f"[бренд] {e['ua']}", "moments": e["moments"], "status": "brand",
+                      "text_vars": e.get("text_vars", []), "example": e.get("example", {}), "rank": 2})
+
+
+def card_names(edit):
+    """Motion names a reel's edit.json uses: catalog motions and brand elements (overlay cards with "brand")."""
+    out = set()
+    for c in edit.get("cards", []):
+        if c.get("type") == "motion" and c.get("name"): out.add(c["name"])
+        elif c.get("type") == "overlay":
+            b = c.get("brand") or (re.match(r"brand-([A-Za-z]+)", Path(c.get("src", "")).name) or [None, None])[1]
+            if b: out.add(f"brand:{b}")
+    return out
 LOG = HOME / ".motion_log.json"
 RECENT_REELS = 3
 
@@ -43,6 +61,9 @@ def menu(moment=None):
         for m in ms:
             flag = "  [був у останніх рілсах]" if m["name"] in rec else ""
             print(f"  {m['name']:26s} {m['ua']}{' · текст через replace' if m['status'] == 'replace' else ''}{flag}")
+    if any(m["status"] == "brand" for m in READY) and not moment:
+        print("\n[бренд] = Remotion-елемент: ~/motion/scripts/render-overlay.sh <Element> '<props>' <reel>/overlays/brand-<Element>-<slug>.webm,"
+              "\n          картка {\"type\": \"overlay\", \"brand\": \"<Element>\", \"src\": ..., \"start\": .., \"end\": ..}")
     manual = [m for m in CAT["motions"] if m.get("status") == "manual"]
     if manual and not moment:
         print(f"\n## тільки вручну ({len(manual)}): дрібні у вертикальному кадрі, лише коли людина сама попросить")
@@ -72,7 +93,7 @@ def ideas(reel):
     words = [w for w in json.load(open(reel / "master_transcript.json")) if w["text"].strip()]
     used_here = set()
     if (reel / "edit.json").exists():
-        used_here = {c.get("name") for c in json.load(open(reel / "edit.json")).get("cards", []) if c.get("type") == "motion"}
+        used_here = card_names(json.load(open(reel / "edit.json")))
     rec = recent_names()
     phrases, cur = [], []
     for i, w in enumerate(words):
@@ -94,12 +115,12 @@ def ideas(reel):
         picks = pool[:3]
         for m in picks: offered[m["name"]] = offered.get(m["name"], 0) + 1
         print(f"{ph[0]['start']:6.1f}s  [{', '.join(moments)}]  {text[:90]}")
-        for m in picks: print(f"         -> {m['name']}: {m['ua']}")
+        for m in picks: print(f"         -> {m['name']}: {m['ua']}" + ("  [render-overlay.sh, картка overlay + \"brand\"]" if m["status"] == "brand" else ""))
 
 
 def log(reel):
     reel = Path(reel).expanduser()
-    names = sorted({c["name"] for c in json.load(open(reel / "edit.json")).get("cards", []) if c.get("type") == "motion"})
+    names = sorted(card_names(json.load(open(reel / "edit.json"))))
     d = [e for e in log_data() if e["reel"] != reel.name] + [{"reel": reel.name, "at": int(time.time()), "motions": names}]
     LOG.parent.mkdir(parents=True, exist_ok=True)
     json.dump(d[-30:], open(LOG, "w"), ensure_ascii=False, indent=1)
