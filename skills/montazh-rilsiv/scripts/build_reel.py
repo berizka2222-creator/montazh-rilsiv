@@ -414,7 +414,7 @@ for i, c in enumerate(edit.get("cards", [])):
     if kind == "bigtext":
         # big words in the brand's head font, usually behind the head ("behind": true); "/" breaks lines
         # a text she added on «Накладення» carries its own "look" (font head|body|accent, px, colour, outline, shadow, box), over the reel's "txt" look
-        lines = [case(x.strip()) for x in c.get("text", "").split("/") if x.strip()]
+        lines = [x.strip() for x in c.get("text", "").split("/") if x.strip()]   # as written: her typed caps stay caps
         TL = {**LOOK.get("txt", {}), **(c.get("look") or {})}
         px = TL.get("px") or c.get("size") or min(fit(max(lines, key=len), 320), 320)
         role = TL.get("font") if TL.get("font") in FAM else "head"

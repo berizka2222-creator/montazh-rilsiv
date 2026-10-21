@@ -2,6 +2,12 @@
 // (scripts/review_sync.py, which runs this same file with node) both use it, so what you approve is what renders.
 // Times: "src" = seconds in the raw clip; "cut" = seconds in the finished reel (after cuts and speed-up).
 (function (root) {
+  function autoPx(text, place) {   // an added text's size from its frame: as tall as the frame allows, but never wider than it
+    const lines = String(text || "").split("/").map(x => x.trim()).filter(Boolean), n = Math.max(1, lines.length);
+    const longest = Math.max(1, ...lines.map(x => x.length));
+    return Math.max(24, Math.round(Math.min(place[3] / n / 0.9, place[2] / (longest * 0.62))));
+  }
+
   // defaults (tight pacing) when a reel has no pacing: pause = gap between kept words over 0.25 s, 0.06 s air at every edit
 
   // decisions: {cut: [wordIdx...], restoredFillers: [wordIdx...], restoredPauses: [wordIdx...]}
@@ -95,7 +101,7 @@
       const state = ((d.board || {})[o.id] || {}).state || "k", a = firstKeptFrom(o.w0);
       const place = o.place || OVERLAY_PLACE[o.mode] || OVERLAY_PLACE.big, lines = (o.text || "").split("/").filter(x => x.trim()).length || 1;
       const g = o.kind === "text"
-        ? { id: o.id, type: "bigtext", kind: o.behind ? "Текст за тобою" : "Текст", what: o.text, text: o.text, y: place[1], size: (o.look || {}).px || Math.round(place[3] / lines / 0.9),
+        ? { id: o.id, type: "bigtext", kind: o.behind ? "Текст за тобою" : "Текст", what: o.text, text: o.text, y: place[1], size: (o.look || {}).px || autoPx(o.text, place),
             look: o.look && Object.keys(o.look).length ? o.look : undefined,
             behind: !!o.behind, place, w0: o.w0, user: true }
         : { id: o.id, type: "overlay", kind: o.behind ? "Накладення за тобою" : "Накладення", what: o.name, mode: o.mode, effect: o.effect || "soft", media: o.kind, assetId: o.assetId,
@@ -237,6 +243,6 @@
     safe: [60, 220, 960, 1280],
   };
 
-  const api = { SAFE, plan, captions, graphics, hash, capY, capsAround, gradeNorm, gradeParams, gradeLut, gradeCube, gradeFilter, isNeutral, GKEYS };
+  const api = { SAFE, autoPx, plan, captions, graphics, hash, capY, capsAround, gradeNorm, gradeParams, gradeLut, gradeCube, gradeFilter, isNeutral, GKEYS };
   if (typeof module !== "undefined") module.exports = api; else root.ReelCore = api;
 })(this);

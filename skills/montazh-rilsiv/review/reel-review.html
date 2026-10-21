@@ -1107,8 +1107,8 @@ function renderLook(k, root) {
     L.c2 || (k === "hook" && L.l2.c2) ? lSeg("Напрямок градієнта", [["→", 90], ["↓", 180], ["↘", 135]], L.gd, set("gd")) : null));
   if (k === "txt" || k.startsWith("ov:")) grid.insertBefore(lGroup("Шрифт і розмір",
     lSeg("Шрифт", [["Заголовків", "head"], ["Основний", "body"], ["Акцентний (курсив)", "accent"]], L.font, set("font")),
-    lChk("Свій розмір (інакше за висотою рамки)", L.px != null, on => setLook(k, "px", on ? 200 : null)),
-    L.px != null ? lSlider("Розмір", 40, 400, 2, L.px, v => v + " px", set("px"), live("px")) : null), grid.firstChild);
+    lSlider("Розмір", 24, 400, 2, L.px != null ? L.px : lookAutoPx(k), v => v + " px" + (L.px == null ? " (авто)" : ""), set("px"), live("px")),
+    L.px != null ? lChk("Авто: за розміром рамки", false, on => { if (on) setLook(k, "px", null); }) : null), grid.firstChild);
   if (k === "hook") grid.appendChild(lGroup("Другий рядок", ...fillRows(L.l2.c1, L.l2.c2, "l2", "Колір"),
     lChk("Акцентним шрифтом (з засічками, курсив)", L.l2acc, set("l2acc"))));
   grid.appendChild(lGroup("Контур",
@@ -1141,10 +1141,14 @@ function txtFace(f) {   // same faces as the render: head = brand bold, body = b
   return f === "accent" ? { fontFamily: "ra, Georgia, serif", fontStyle: "italic", fontWeight: 400 } : f === "body" ? { fontFamily: "rb, var(--f-body)", fontWeight: 400, fontStyle: "normal" }
     : { fontFamily: bold ? "bf_" + bold.replace(/\W/g, "_") + ", rb, var(--f-body)" : "rb, var(--f-body)", fontWeight: bold ? 400 : 700, fontStyle: "normal" };
 }
+function lookAutoPx(k) {   // the size an added text gets from its frame when she hasn't set one
+  if (k.startsWith("ov:")) { const o = ovById(k.slice(3)); return o ? ReelCore.autoPx(o.text, o.place || [90, 300, 900, 300]) : 120; }
+  return ReelCore.autoPx($("#ovtext").value || "Текст", (placing && placing.place) || [90, 300, 900, 300]);
+}
 function txtEl(text, place, L) {   // a text they added, in its look (build_reel.py bigtext draws the same)
   const k = $("#player").clientWidth / 1080, el = document.createElement("div");
-  const lines = text.split("/").map(x => x.trim()).filter(Boolean).map(x => R.style.case === "lower" ? x.toLowerCase() : x);
-  const px = L.px || Math.round(place[3] / Math.max(1, lines.length) / 0.9);
+  const lines = text.split("/").map(x => x.trim()).filter(Boolean);   // her text exactly as she typed it (caps stay caps)
+  const px = L.px || ReelCore.autoPx(text, place);
   Object.assign(el.style, { position: "absolute", left: 0, width: "100%", top: place[1] / 19.2 + "%", textAlign: "center", lineHeight: ".9", letterSpacing: "-.03em", pointerEvents: "none", ...txtFace(L.font) });
   for (const x of lines) {
     const d = document.createElement("div"); d.style.fontSize = px * k + "px"; d.style.whiteSpace = "nowrap";
@@ -1338,7 +1342,7 @@ function stopPlacing() { placing = null; overlay(pos); renderGraphics(); }
 function placeBox() {
   const p = placing.place, full = p[2] >= 1080 && p[3] >= 1920;
   const tx = !placing.id && ovKind() === "text" && $("#ovtext").value.trim();
-  const el = box({ place: p, imgUrl: placing.img, kind: full ? "На весь екран" : tx ? tx.replace(/\s*\/\s*/g, " ") : "Перетягни мене" }, true); el.classList.add("place");
+  const el = box({ place: p, imgUrl: placing.img, kind: full ? "На весь екран" : tx ? "" : "Перетягни мене" }, true); el.classList.add("place");
   if (full) return el;
   el.addEventListener("pointerdown", e => {
     e.preventDefault(); el.setPointerCapture(e.pointerId);
