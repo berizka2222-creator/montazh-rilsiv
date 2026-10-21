@@ -210,7 +210,7 @@ def do_import(reel, review):
     cy = d.get("capY") if d.get("capY") is not None else (reel_json.get("style") or {}).get("capY")
     if cy is not None and cy != json.load(open(HOME / "brand.json")).get("captions", {}).get("y", 1250): extra["caption_y"] = cy   # this reel's own caption height
     if d.get("capSize") is not None: extra["caption_size"] = d["capSize"]   # the caption size she picked for this reel
-    page_look = {k: v for k, v in (d.get("look") or {}).items() if k in ("cap", "hook") and v}   # text look from «Субтитри» / the hook block (only what she changed)
+    page_look = {k: v for k, v in (d.get("look") or {}).items() if k in ("cap", "hook", "txt") and v}   # text look from «Субтитри» / the hook block / «Накладення» text (only what she changed)
     base_look = json.load(open(HOME / "brand.json")).get("text_look") or {}                      # her saved default («Робити так у всіх наступних рілсах»)
     look = {k: {**base_look.get(k, {}), **page_look.get(k, {}), **({"acc": {**base_look.get(k, {}).get("acc", {}), **page_look.get(k, {}).get("acc", {})}} if k == "cap" else {}),
                 **({"l2": {**base_look.get(k, {}).get("l2", {}), **page_look.get(k, {}).get("l2", {})}} if k == "hook" else {})} for k in set(base_look) | set(page_look)}

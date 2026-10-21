@@ -95,7 +95,8 @@
       const state = ((d.board || {})[o.id] || {}).state || "k", a = firstKeptFrom(o.w0);
       const place = o.place || OVERLAY_PLACE[o.mode] || OVERLAY_PLACE.big, lines = (o.text || "").split("/").filter(x => x.trim()).length || 1;
       const g = o.kind === "text"
-        ? { id: o.id, type: "bigtext", kind: o.behind ? "Текст за тобою" : "Текст", what: o.text, text: o.text, y: place[1], size: Math.round(place[3] / lines / 0.9),
+        ? { id: o.id, type: "bigtext", kind: o.behind ? "Текст за тобою" : "Текст", what: o.text, text: o.text, y: place[1], size: (o.look || {}).px || Math.round(place[3] / lines / 0.9),
+            look: o.look && Object.keys(o.look).length ? o.look : undefined,
             behind: !!o.behind, place, w0: o.w0, user: true }
         : { id: o.id, type: "overlay", kind: o.behind ? "Накладення за тобою" : "Накладення", what: o.name, mode: o.mode, effect: o.effect || "soft", media: o.kind, assetId: o.assetId,
             place, box: o.place || undefined, imgUrl: o.kind === "image" ? o.url : null, behind: !!o.behind, w0: o.w0, user: true };

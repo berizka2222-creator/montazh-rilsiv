@@ -411,10 +411,18 @@ for i, c in enumerate(edit.get("cards", [])):
     if kind == "_skip": continue                 # a type the style rejects (see the style block at the top)
     if kind == "bigtext":
         # big words in the brand's head font, usually behind the head ("behind": true); "/" breaks lines
+        # a text she added on «Накладення» carries its own "look" (font head|body|accent, px, colour, outline, shadow, box), over the reel's "txt" look
         lines = [case(x.strip()) for x in c.get("text", "").split("/") if x.strip()]
-        px = c.get("size") or min(fit(max(lines, key=len), 320), 320)
-        front.append(f'<div id="{cid}" class="bigtext" style="top:{c.get("y", 430)}px;{font("head", px)};color:{c.get("color", LIGHT)}">'
-                     + "".join(f'<div class="btl">{esc(x)}</div>' for x in lines) + "</div>")
+        TL = {**LOOK.get("txt", {}), **(c.get("look") or {})}
+        px = TL.get("px") or c.get("size") or min(fit(max(lines, key=len), 320), 320)
+        role = TL.get("font") if TL.get("font") in FAM else "head"
+        if TL:
+            L = {"c1": c.get("color", LIGHT), **_LD, "sh": 0, **TL}
+            piece = lambda t: f'<span style="{look_bg(L)}">{look_run(L, esc(t))}</span>'
+            body = "".join(f'<div class="btl">' + (" ".join(piece(w) for w in x.split()) if L.get("bg") == "word" else piece(x)) + "</div>" for x in lines)
+        else:
+            body = "".join(f'<div class="btl">{esc(x)}</div>' for x in lines)
+        front.append(f'<div id="{cid}" class="bigtext" style="top:{c.get("y", 430)}px;{font(role, px)};color:{c.get("color", LIGHT)}">' + body + "</div>")
         show(f"#{cid}", a, b, 0.2)
         js.append(f'tl.fromTo("#{cid} .btl",{{y:140,opacity:0}},{{y:0,opacity:1,duration:0.6,ease:"power3.out",stagger:0.12}},{q(a)});')
         sfx("whoosh", a - 0.05, -13)

@@ -2,7 +2,38 @@
 
 Runs once, before the first edit. Output: `~/reels/brand.md` (for people and for you) and `~/reels/brand.json` (for the scripts).
 
-## How to run it
+## Step 0: take it from the earlier stages first (TARGET AI)
+
+Students come here after stage 1 of the course. They already have files about themselves and their design. Re-asking what those files say is the worst start: read them, build the brand from them, ask only the gaps.
+
+1. **Find the files** (quietly, no questions yet):
+   - `find ~ -maxdepth 4 \( -iname "dyzain*.md" -o -iname "profil*.md" -o -iname "bryf*.md" -o -iname "ca.md" -o -iname "keisy*.md" -o -iname "*design*system*.md" -o -iname "*дизайн*" -o -iname "DESIGN.md" \) -not -path "*/Library/*" -not -path "*/node_modules/*" -not -path "*/.Trash/*" 2>/dev/null` (Downloads, Desktop, Documents, the course folder).
+   - Claude Design (the main source: students build their design system there in stage 1): `Artifact` `action: "list"` with `type: "Design System"`, take the newest, then `action: "list"`, `scope: "files"` on it. Read `project/tokens.json` (or `tokens.css` / `design-system.json`) for colours and font roles, `project/README.md` for character and bans.
+   - **Fonts come from there too, never ask for them again.** Their font files sit in `project/fonts/` of that artifact. Download the ones the tokens name (head bold, body regular, accent italic) with `Artifact` `action: "read"`, `paths: [...]`, `out_dir` = `<workspace>/fonts` (`~/reels/fonts`, or `$REELS_HOME/fonts`), and point brand.json `fonts.*.file` at them. Only a font with no file anywhere falls back to Google Fonts, said in one line.
+   - Logo / decor PNGs in `project/assets` or `project/uploads`: copy the logo and a few decor elements into `<workspace>/assets/elements` for stickers.
+   - Found several versions → take the newest; files named OLD / старий are skipped.
+2. **Map them to the brand** (what goes where):
+   | Source | → brand.md / brand.json |
+   |---|---|
+   | `dyzain.md` / design system: фон, текст, акцент, другий акцент | `colors.main` (фон/темний), `light` (текст), `pop` = акцент, `soft` = другий акцент, `caption_accent` = акцент |
+   | Схема темна / світла | page theme; captions white on dark brands |
+   | Шрифти заголовків / тексту / акцент | `fonts.head` / `body` / `accent` (Google Fonts: download into `~/reels/fonts/`) |
+   | Характер | Graphics energy (стримано → minimal/clean; яскраво → balanced/bold) |
+   | Чого не використовуємо | Colours `Never` + Rules |
+   | Логотип / підпис, нік | `handle`, assets |
+   | `profil.md` / `bryf.md`: ніша, ім'я, кому продає | Account line, `name`, language |
+   | `ca.md` | who watches |
+   | `keisy.md` | real numbers for cards later (never invented) |
+3. **Show one short summary** «Взяла з твоїх файлів етапу 1: …» (colours as swatches/hex, fonts, account, what's banned) and ask the gaps **in one message**, each with a default so «ок» is enough:
+   - субтитри: по слову по центру (за замовчуванням) / фрази внизу
+   - графіки: мало / середньо (за замовчуванням) / багато
+   - звуки: без / тихі (за замовчуванням) / яскраві
+   - темп: природний (за замовчуванням) / щільний
+   Nothing else: CTA and hook are asked per reel; CapCut defaults to `"ask"`, quality to 1080p, platform to Instagram.
+4. Write `brand.md` + `brand.json` (shapes below), with a line in brand.md `## Sources` naming the files used. If a file is missing a field (no fonts, say), pick a sensible default, say it in one line, and move on.
+5. **Nothing found at all** → ask once: «Маєш файли з етапу 1 (dyzain.md, profil.md) або дизайн-систему в Claude Design? Кинь їх у чат або скажи, де лежать». Only if they have none, run the questions below.
+
+## How to run it (only without stage-1 files)
 
 - **One question at a time.** Plain language, no jargon. Most people installing this are not technical.
 - Offer 2-4 concrete options where you can, plus "something else".

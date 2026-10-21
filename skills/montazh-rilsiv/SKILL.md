@@ -13,7 +13,7 @@ Turns a raw talking-head clip into a finished, on-brand vertical reel. Every bra
 
 The workspace is `~/reels/` unless `REELS_HOME` is set.
 
-- **No `~/reels/brand.md`** → run the setup interview: read `references/setup-uk.md` first (design system + reference reels are required before the first edit), then `references/setup-interview.md`. Do not edit a clip without a brand file, even if they say "just use whatever". The interview takes 5 minutes and it is the whole point of this skill.
+- **No `~/reels/brand.md`** → first take what earlier course stages (TARGET AI) already made: the design system in Claude Design (colours, fonts with their files, logo) and `dyzain.md`, `profil.md`, `bryf.md`, `ca.md`, `keisy.md`. Read `references/setup-uk.md`, then Step 0 of `references/setup-interview.md`. Build the brand file from them and ask only what they don't say (one message, at most 4 short reel questions with a default each). Never ask what those files already answer, never ask for font files that are in the design system. The full interview is only for someone with none of these. Do not edit a clip without a brand file.
 - **Brand file exists** → read `brand.md` and `brand.json` in full, then continue.
 
 ## Which style (before every edit)

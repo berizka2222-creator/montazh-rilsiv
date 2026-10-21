@@ -517,6 +517,7 @@ section[data-p="effects"].with{margin-top:34px;padding-top:24px;border-top:1px s
       <div class="step">1 · Що додаємо</div>
       <div class="row" role="radiogroup" aria-label="Що додаємо"><label><input type="radio" name="ovkind" value="file" checked> Фото / відео</label><label><input type="radio" name="ovkind" value="text"> Текст</label></div>
       <div class="row" id="ovtextrow" hidden><input type="text" id="ovtext" placeholder="Напр.: ТАРГЕТ або без / клієнтів (/ = новий рядок)" aria-label="Текст накладення"></div>
+      <details class="lookdet" id="txtlookdet" hidden><summary>Вигляд тексту: шрифт, розмір, колір, контур, тінь, фон</summary><div id="txtlook"></div></details>
       <div class="row" id="ovfilerow"><input type="file" id="ovfile" accept="image/png,image/jpeg,image/webp,video/mp4,video/quicktime" aria-label="Файл накладення"></div>
       <div class="row" id="ovsaverow"><label><input type="checkbox" id="ovsave"> Зберегти в «Мої файли» для наступних рілсів</label></div>
       <div id="libbox" hidden><p class="mode" style="margin-top:8px"><b>Або з «Моїх файлів»:</b> тапни, щоб обрати.</p><div class="lib" id="lib"></div></div>
@@ -852,8 +853,14 @@ function overlay(c) {
   ov.textContent = "";
   if (!R || tab === "preview" || c == null || (mode !== "rough" && mode !== "roughPaused" && mode !== "cutvid" && !placing)) { highlight(null); return; }
   for (const g of GFX) if (!g.gone && g.state !== "d" && c >= g.start && c < g.end && !(placing && g.id === placing.id)) {
-    if (g.type === "title" && (g.text || "").trim()) { const h = hookEl(g); ov.appendChild(h); fitHook(h); } else ov.appendChild(box(g, true)); }
-  if (placing) ov.appendChild(placeBox());
+    if (g.type === "title" && (g.text || "").trim()) { const h = hookEl(g); ov.appendChild(h); fitHook(h); }
+    else if (g.user && g.type === "bigtext") { const t = txtEl(g.text, g.place, lookOf("ov:" + g.id)); ov.appendChild(t); fitHook(t); }
+    else ov.appendChild(box(g, true)); }
+  if (placing) {
+    const pt = placing.id ? (GFX.find(x => x.id === placing.id && x.type === "bigtext") || {}).text : ovKind() === "text" && $("#ovtext").value.trim();
+    if (pt) { const t = txtEl(pt, placing.place, lookOf(placing.id ? "ov:" + placing.id : "txt")); ov.appendChild(t); fitHook(t); }
+    ov.appendChild(placeBox());
+  }
   let cap = GFX.some(g => g.capsAside && !g.gone && g.state !== "d" && c >= g.start && c < g.end) ? null : CAPS.find(x => !x.gone && c >= x.start && c < x.end);
   const place = tab === "captions" && mode !== "rough";
   if (!cap && place) cap = CAPS.find(x => !x.gone && x.start >= c) || CAPS.filter(x => !x.gone).pop();   // something to drag
@@ -992,8 +999,13 @@ const LDEF = {
   cap: () => ({ c1: R.style.cap || "#FFFFFF", c2: null, gd: 90, sw: 0, sc: "#000000", sh: 30, ss: 28, bg: "none", bc: R.style.main, bo: 70, br: 16,
     acc: { look: R.style.editorial ? "big" : "color", a1: R.style.acc, a2: R.style.acc2 || null } }),
   hook: () => ({ c1: R.titleColor || "#FFFFFF", c2: null, gd: 90, sw: 0, sc: "#000000", sh: 40, ss: 68, bg: "none", bc: R.style.main, bo: 70, br: 16,
-    l2: { c1: null, c2: null }, l2acc: false }) };
+    l2: { c1: null, c2: null }, l2acc: false }),
+  // text they add on «Накладення»: "txt" = the look of the next text (and the brand default), "ov:<id>" = one added text (overlay.look)
+  txt: () => ({ c1: "#FFFFFF", c2: null, gd: 90, sw: 0, sc: "#000000", sh: 0, ss: 28, bg: "none", bc: R.style.main, bo: 70, br: 16, font: "head", px: null }) };
+const ovById = id => (S.overlays || []).find(o => o.id === id);
+function lookPart(k) { return k.startsWith("ov:") ? (ovById(k.slice(3)) || {}).look : (S.look || {})[k]; }
 function lookOf(k) {
+  if (k.startsWith("ov:")) { const t = lookOf("txt"); return { ...t, ...(lookPart(k) || {}) }; }
   const d = LDEF[k](), b = (R.look || {})[k] || {}, s = (S.look || {})[k] || {};
   const L = { ...d, ...b, ...s, acc: { ...d.acc, ...(b.acc || {}), ...(s.acc || {}) }, l2: { ...d.l2, ...(b.l2 || {}), ...(s.l2 || {}) } };
   if (!L.l2.c1) L.l2.c1 = L.c1;
@@ -1035,11 +1047,14 @@ function hookEl(g) {   // the hook on the rough cut, in the picked look (the dra
 }
 function fitHook(el) { for (const d of el.children) { let fs = parseFloat(d.style.fontSize); for (let i = 0; i < 25 && d.scrollWidth > d.clientWidth + 1; i++) { fs *= 0.92; d.style.fontSize = fs + "px"; } } }
 function setLook(k, key, val, sub, live) {   // live = while dragging (no undo step, no save yet)
-  const apply = () => { S.look = { ...(S.look || {}) }; const o = { ...(S.look[k] || {}) }; if (sub) o[sub] = { ...(o[sub] || {}), [key]: val }; else o[key] = val; S.look[k] = o; };
+  const apply = () => {
+    if (k.startsWith("ov:")) { const ov = ovById(k.slice(3)); if (ov) ov.look = { ...(ov.look || {}), [key]: val }; return; }
+    S.look = { ...(S.look || {}) }; const o = { ...(S.look[k] || {}) }; if (sub) o[sub] = { ...(o[sub] || {}), [key]: val }; else o[key] = val; S.look[k] = o; };
   if (live) { apply(); lookPreview(k); } else { mutate(apply); lookPreview(k); }
 }
 function lookPreview(k) {   // show the change on the player: the hook's seconds for the hook, captions where they are
   if (k === "hook") { const g = GFX.find(x => x.type === "title" && !x.gone && x.state !== "d"); if (g && (pos < g.start || pos >= g.end)) seekCut(g.start + 0.5); }
+  if (k.startsWith("ov:")) { const g = GFX.find(x => x.id === k.slice(3)); if (g && !g.gone && (pos < g.start || pos >= g.end)) seekCut(g.start + 0.3); }
   if (!["rough", "roughPaused", "cutvid"].includes(mode)) mode = "roughPaused";
   overlay(pos);
 }
@@ -1079,6 +1094,10 @@ function renderLook(k, root) {
     c2 ? lColor("Другий колір градієнта", c2, set("c2", sub), live("c2", sub)) : null];
   grid.appendChild(lGroup(k === "hook" ? "Колір першого рядка" : "Колір тексту", ...fillRows(L.c1, L.c2, null, "Колір"),
     L.c2 || (k === "hook" && L.l2.c2) ? lSeg("Напрямок градієнта", [["→", 90], ["↓", 180], ["↘", 135]], L.gd, set("gd")) : null));
+  if (k === "txt" || k.startsWith("ov:")) grid.insertBefore(lGroup("Шрифт і розмір",
+    lSeg("Шрифт", [["Заголовків", "head"], ["Основний", "body"], ["Акцентний (курсив)", "accent"]], L.font, set("font")),
+    lChk("Свій розмір (інакше за висотою рамки)", L.px != null, on => setLook(k, "px", on ? 200 : null)),
+    L.px != null ? lSlider("Розмір", 40, 400, 2, L.px, v => v + " px", set("px"), live("px")) : null), grid.firstChild);
   if (k === "hook") grid.appendChild(lGroup("Другий рядок", ...fillRows(L.l2.c1, L.l2.c2, "l2", "Колір"),
     lChk("Акцентним шрифтом (з засічками, курсив)", L.l2acc, set("l2acc"))));
   grid.appendChild(lGroup("Контур",
@@ -1098,13 +1117,32 @@ function renderLook(k, root) {
     lChk("Чергувати з другим кольором", !!L.acc.a2, on => setLook(k, "a2", on ? (R.style.acc2 || R.style.acc) : null, "acc")),
     L.acc.a2 ? lColor("Другий колір акценту", L.acc.a2, set("a2", "acc"), live("a2", "acc")) : null));
   const foot = document.createElement("div"); foot.className = "lookfoot";
-  const reset = document.createElement("button"); reset.type = "button"; reset.className = "b"; reset.textContent = "Повернути як у бренді"; reset.disabled = !(S.look || {})[k];
-  reset.addEventListener("click", () => { mutate(() => { const o = { ...(S.look || {}) }; delete o[k]; S.look = o; }); lookPreview(k); });
+  const reset = document.createElement("button"); reset.type = "button"; reset.className = "b"; reset.textContent = "Повернути як у бренді"; reset.disabled = !lookPart(k);
+  reset.addEventListener("click", () => { mutate(() => { if (k.startsWith("ov:")) { const ov = ovById(k.slice(3)); if (ov) delete ov.look; return; } const o = { ...(S.look || {}) }; delete o[k]; S.look = o; }); lookPreview(k); });
+  if (k.startsWith("ov:")) reset.textContent = "Як решта тексту";
   foot.appendChild(reset);
-  foot.appendChild(lChk("Робити так у всіх наступних рілсах", (S.look || {}).keep, on => mutate(() => { S.look = { ...(S.look || {}), keep: on }; })));
+  if (!k.startsWith("ov:")) foot.appendChild(lChk("Робити так у всіх наступних рілсах", (S.look || {}).keep, on => mutate(() => { S.look = { ...(S.look || {}), keep: on }; })));
   root.appendChild(foot);
 }
-function renderLooks() { if (!R) return; renderLook("cap", $("#caplook")); renderLook("hook", $("#hooklook")); }
+function renderLooks() { if (!R) return; renderLook("cap", $("#caplook")); renderLook("hook", $("#hooklook")); if (!$("#txtlookdet").hidden) renderLook("txt", $("#txtlook")); }
+function txtFace(f) {   // same faces as the render: head = brand bold, body = brand regular, accent = italic serif
+  const bold = Object.keys((R.fonts || {}).extra || {}).find(x => /bold/i.test(x));
+  return f === "accent" ? { fontFamily: "ra, Georgia, serif", fontStyle: "italic", fontWeight: 400 } : f === "body" ? { fontFamily: "rb, var(--f-body)", fontWeight: 400, fontStyle: "normal" }
+    : { fontFamily: bold ? "bf_" + bold.replace(/\W/g, "_") + ", rb, var(--f-body)" : "rb, var(--f-body)", fontWeight: bold ? 400 : 700, fontStyle: "normal" };
+}
+function txtEl(text, place, L) {   // a text they added, in its look (build_reel.py bigtext draws the same)
+  const k = $("#player").clientWidth / 1080, el = document.createElement("div");
+  const lines = text.split("/").map(x => x.trim()).filter(Boolean).map(x => R.style.case === "lower" ? x.toLowerCase() : x);
+  const px = L.px || Math.round(place[3] / Math.max(1, lines.length) / 0.9);
+  Object.assign(el.style, { position: "absolute", left: 0, width: "100%", top: place[1] / 19.2 + "%", textAlign: "center", lineHeight: ".9", letterSpacing: "-.03em", pointerEvents: "none", ...txtFace(L.font) });
+  for (const x of lines) {
+    const d = document.createElement("div"); d.style.fontSize = px * k + "px"; d.style.whiteSpace = "nowrap";
+    const piece = t => { const s = document.createElement("span"); s.style.cssText = lookBg(L, k); s.appendChild(lookRun(L, k, document.createTextNode(t))); return s; };
+    if (L.bg === "word") x.split(/\s+/).forEach((w, i) => { if (i) d.appendChild(document.createTextNode(" ")); d.appendChild(piece(w)); }); else d.appendChild(piece(x));
+    el.appendChild(d);
+  }
+  return el;
+}
 function accBefore(cap) { let n = 0; for (const c of CAPS) { if (c === cap) break; if (!c.gone) n += c.words.filter(w => w.accent).length; } return n; }
 function fitCap(el) {   // shrink until the widest word fits the frame, measured in the real fonts (the render does the same)
   let fs = parseFloat(el.style.fontSize);
@@ -1195,6 +1233,7 @@ function renderGraphics() {
   $("#otally").innerHTML = mine.length ? `<span>твоїх накладень: <b>${mine.length}</b></span>` : "";
   if (!mine.length) $("#ovcards").innerHTML = `<div class="empty">Накладень ще немає.</div>`;
 }
+const openLook = new Set();
 function cardList(box, list) {
   box.textContent = ""; const n = { k: 0, c: 0, d: 0 };
   for (const g of list) {
@@ -1239,6 +1278,13 @@ function cardList(box, list) {
       bb.addEventListener("click", () => mutate(() => { S.board[g.id] = { ...(S.board[g.id] || {}), behind: !g.behind }; })); acts.append(bb);
     }
     body.append(kind, what, meta, acts);
+    if (g.user && g.type === "bigtext" && !g.gone) {   // change one added text's look later
+      const det = document.createElement("details"); det.className = "lookdet"; det.open = openLook.has(g.id);
+      det.innerHTML = `<summary>Вигляд цього тексту: шрифт, розмір, колір, контур, тінь, фон</summary><div></div>`;
+      det.addEventListener("toggle", () => { if (det.open) { openLook.add(g.id); renderLook("ov:" + g.id, det.lastChild); lookPreview("ov:" + g.id); } else openLook.delete(g.id); });
+      if (det.open) renderLook("ov:" + g.id, det.lastChild);
+      body.appendChild(det);
+    }
     if (st === "c") {
       const inp = document.createElement("input"); inp.type = "text"; inp.id = "note-" + g.id; inp.placeholder = "Що змінити?"; inp.value = (S.board[g.id] || {}).note || "";
       inp.addEventListener("input", () => { S.board[g.id] = { ...(S.board[g.id] || { state: "c" }), note: inp.value }; queueSave(); });
@@ -1257,7 +1303,7 @@ const ovMode = () => $("#ovfull").checked ? "full" : "box";
 const OV_PLACE = { box: [600, 170, 400, 500], tiny: [760, 260, 200, 200], "small-r": [600, 170, 400, 500], "small-l": [80, 170, 400, 500], big: [90, 150, 900, 640], full: [0, 0, 1080, 1920], text: [40, 360, 1000, 280] };
 const ovKind = () => document.querySelector('input[name="ovkind"]:checked').value;
 document.querySelectorAll('input[name="ovkind"]').forEach(r => r.addEventListener("change", () => {
-  const txt = ovKind() === "text"; $("#ovtextrow").hidden = !txt; $("#ovfilerow").hidden = txt; $("#ovsaverow").hidden = txt; $("#libbox").hidden = txt || !LIB.length;
+  const txt = ovKind() === "text"; $("#ovtextrow").hidden = !txt; $("#ovfilerow").hidden = txt; $("#ovsaverow").hidden = txt; $("#libbox").hidden = txt || !LIB.length; $("#txtlookdet").hidden = !txt; if (txt) renderLook("txt", $("#txtlook"));
   if (txt) { $("#ovbehind").checked = true; if (placing && !placing.id) { placing.place = [...OV_PLACE.text]; placing.img = null; overlay(pos); } }
 }));
 let placing = null;   // {place: [x, y, w, h], id?: overlay being moved, img?: preview of the chosen file}
@@ -1324,7 +1370,7 @@ $("#ovadd").addEventListener("click", async () => {
     const text = $("#ovtext").value.trim(); if (!text) { msg.textContent = "Впиши текст."; $("#ovtext").focus(); return; }
     const w0 = wordAtCut(pos); if (w0 === null) { msg.textContent = "Тут немає жодного слова в нарізці."; return; }
     const at = pos, dur = Math.min(30, Math.max(0.5, +$("#ovdur").value || 3));
-    mutate(() => { S.overlays = [...(S.overlays || []), { id: "ov" + Date.now().toString(36), kind: "text", text, name: text, behind: behindOn, dur, w0,
+    mutate(() => { S.overlays = [...(S.overlays || []), { id: "ov" + Date.now().toString(36), kind: "text", text, name: text, behind: behindOn, dur, w0, look: { ...((S.look || {}).txt || {}) },
       place: placing && !placing.id ? [...placing.place] : [...OV_PLACE.text] }]; });
     msg.textContent = `Текст додано з ${fmt(at)}.`; $("#ovtext").value = ""; return;
   }
