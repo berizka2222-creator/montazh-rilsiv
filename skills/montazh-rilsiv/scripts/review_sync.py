@@ -66,7 +66,10 @@ def manual_effects():
         return ("Мапи" if "мапа" in note else "Переходи між склейками" if "перехід" in note or m.get("card", {}).get("layout") == "transition"
                 else "Стилі субтитрів" if n.startswith("caption-") else "Потрібен свій логотип" if "лого" in note or "бренд" in note
                 else "Переходи між склейками" if "перехід" in (m.get("moments") or [""])[0] else (lambda x: x[:1].upper() + x[1:])((m.get("moments") or ["інше"])[0]))
-    out = [{"n": m["name"], "ua": m.get("ua") or m["name"], "g": group(m)} for m in cat if m.get("status") == "manual"]
+    pv = HOME / ".motion_previews.json"            # {name: url}: 3 s looping previews uploaded to the page's assets
+    pv = json.load(open(pv)) if pv.exists() else {}
+    out = [{"n": m["name"], "ua": m.get("ua") or m["name"], "g": group(m), **({"p": pv[m["name"]]} if m["name"] in pv else {})}
+           for m in cat if m.get("status") == "manual"]
     return sorted(out, key=lambda x: (x["g"], x["ua"]))
 
 def export(reel, proposal, out):

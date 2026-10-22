@@ -1608,10 +1608,6 @@
    },
    "avatar": true,
    "replace_default": {
-    "Follow": "Стежити",
-    "Following": "Ви стежите",
-    "Subscribe": "Підписатися",
-    "Subscribed": "Ви підписані",
     "47.5K followers": ""
    }
   },
@@ -3467,10 +3463,6 @@
    },
    "avatar": true,
    "replace_default": {
-    "Follow": "Стежити",
-    "Following": "Ви стежите",
-    "Subscribe": "Підписатися",
-    "Subscribed": "Ви підписані",
     "1,999 followers": ""
    }
   },
@@ -3518,13 +3510,7 @@
     "Hyperframes": "name",
     "@hyperframes": "handle"
    },
-   "avatar": true,
-   "replace_default": {
-    "Follow": "Стежити",
-    "Following": "Ви стежите",
-    "Subscribe": "Підписатися",
-    "Subscribed": "Ви підписані"
-   }
+   "avatar": true
   },
   {
    "name": "yt-lower-third",
@@ -3555,10 +3541,6 @@
    },
    "avatar": true,
    "replace_default": {
-    "Follow": "Стежити",
-    "Following": "Ви стежите",
-    "Subscribe": "Підписатися",
-    "Subscribed": "Ви підписані",
     "82.2K subscribers": ""
    }
   },
@@ -3895,13 +3877,7 @@
     "X Follow Card": "<її слова>"
    },
    "brand_text": {},
-   "avatar": true,
-   "replace_default": {
-    "Follow": "Стежити",
-    "Following": "Ви стежите",
-    "Subscribe": "Підписатися",
-    "Subscribed": "Ви підписані"
-   }
+   "avatar": true
   },
   {
    "name": "decision-tree",

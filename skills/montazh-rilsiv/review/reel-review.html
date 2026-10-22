@@ -52,6 +52,7 @@ h1{font-family:var(--f-display);font-size:44px;line-height:1;margin:0;color:var(
 .manlib summary{cursor:pointer;display:flex;gap:8px;align-items:baseline}
 .manlib h4{margin:14px 0 6px;font-size:13px;color:var(--muted);font-weight:600}
 .manrow{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:7px 0;border-top:1px solid var(--line)}
+.manprev{width:72px;height:128px;border-radius:10px;object-fit:cover;flex:none;background:var(--surface);border:1px solid var(--line)}
 .manrow .nm{font:500 11px var(--f-mono);color:var(--muted)}
 .lede{margin:0 0 8px;color:var(--muted);font-size:14px;max-width:62ch}
 .tally{font:500 13px var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums;margin-bottom:10px;display:flex;gap:6px 14px;flex-wrap:wrap}
@@ -555,7 +556,7 @@ section[data-p="effects"].with{margin-top:34px;padding-top:24px;border-top:1px s
       <div class="cards" id="eflist"></div>
       <details class="panel manlib" id="manlib" hidden>
         <summary><b>Тільки вручну</b> <span class="mode" id="mancount"></span></summary>
-        <p class="lede">Claude сам їх не пропонує: вони для особливих моментів. Постав чорновий монтаж на потрібну секунду і натисни «На цю секунду».</p>
+        <p class="lede">Claude сам їх не пропонує: вони для особливих моментів. Біля кожного коротке прев’ю поверх відео. Постав чорновий монтаж на потрібну секунду і натисни «На цю секунду».</p>
         <input type="text" id="mansearch" placeholder="Пошук: мапа, перехід, субтитри, 3D…" aria-label="Пошук ефекту">
         <div id="manlist"></div>
       </details>
@@ -1419,6 +1420,8 @@ $("#ovadd").addEventListener("click", async () => {
 });
 
 // ---------- «Тільки вручну»: catalog effects Claude never suggests on its own (reel.json "manual"), one tap puts one on this second ----------
+const manObs = new IntersectionObserver(es => { for (const e of es) { const v = e.target;   // previews load and play only while on screen
+  if (e.isIntersecting) { if (!v.src) v.src = v.dataset.src; v.play().catch(() => {}); } else v.pause(); } }, { rootMargin: "200px" });
 function renderManual() {
   const box = $("#manlist"), all = (R && R.manual) || []; $("#manlib").hidden = !all.length; if (!all.length) return;
   const q = ($("#mansearch").value || "").trim().toLowerCase();
@@ -1428,7 +1431,9 @@ function renderManual() {
   for (const m of list) {
     if (m.g !== g) { g = m.g; const h = document.createElement("h4"); h.textContent = g; box.appendChild(h); }
     const row = document.createElement("div"); row.className = "manrow";
-    const t = document.createElement("div"); const a = document.createElement("div"); a.textContent = m.ua;
+    if (m.p) { const v = document.createElement("video"); v.className = "manprev"; v.muted = true; v.loop = true; v.playsInline = true;
+      v.preload = "none"; v.title = "Так виглядає поверх відео"; v.dataset.src = m.p; manObs.observe(v); row.appendChild(v); }
+    const t = document.createElement("div"); t.style.flex = "1"; const a = document.createElement("div"); a.textContent = m.ua;
     const n = document.createElement("div"); n.className = "nm"; n.textContent = m.n + (m.why ? " · " + m.why : ""); t.append(a, n);
     const b = document.createElement("button"); b.type = "button"; b.className = "b quiet"; b.textContent = "На цю секунду";
     b.addEventListener("click", () => { $("#eftext").value = `${m.n}: ${m.ua}. `; $("#efbox").scrollIntoView({ behavior: "smooth", block: "center" });

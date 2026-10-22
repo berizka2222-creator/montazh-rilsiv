@@ -52,9 +52,13 @@ with what each one is for, its moment and its tested placement, is `references/m
     phone chats and notes, maps, before/after, device mocks. Status `full_only`, marked «на весь кадр».
 - Image slots (carousels, galleries, device and placeholder grids): fill `"images"` with their photos or screenshots; an
   empty slot never goes in.
-- Follow cards (`instagram-follow`, `tiktok-follow`, `yt-lower-third`, `x-post`) are suggested: name and handle come from
-  brand.json `name` / `handle`, the buttons are in Ukrainian («Стежити», «Ви стежите»), the avatar is brand.json `"avatar"`
-  (a path) or a square crop of the face from the reel. A follower count shows only if `replace` gives a real one.
+- Follow cards (`instagram-follow`, `tiktok-follow`, `yt-lower-third`, `x-post`) are suggested. Name and handle come from
+  brand.json `name` / `handle` (stage 1 files already give them); the person can change them for one reel (card `replace`,
+  e.g. `{"HeyGen": "Інна"}`) or for good (brand.json). The buttons stay in English, as in the real apps. The photo is
+  brand.json `"avatar"`: the first time a follow card is planned and there is none, ask «Дай фото для картки підписки
+  (як на аватарці)», save it to `<REELS_HOME>/assets/avatar.jpg` and set `"avatar": "avatar.jpg"`. Never crop it from the
+  reel or leave the example logo: until the photo comes, the slot shows their initial on the brand colour. A follower count
+  shows only if `replace` gives a real one.
 - Effects that work but are never suggested on their own (`manual`: maps, shader transitions, caption styles, 3D scenes) are
   listed on the review page under «Ефекти» → «Тільки вручну»; the person picks one for a second there.
 - The tested placement comes from the catalog automatically (layout, place, tone, ink, css); set them on the card only to move it.

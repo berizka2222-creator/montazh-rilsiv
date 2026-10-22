@@ -260,18 +260,16 @@ def img(src):
             return f"img/{dst.name}"
     print(f"warning: image not found: {src}"); return ""
 def avatar_img(own=None):
-    """Their profile photo for follow cards: the card's "avatar", brand.json "avatar", else a square crop of their face from the reel."""
+    """Their profile photo for follow cards: the card's "avatar", else brand.json "avatar" (ask them for it once and save it there).
+    Without one the slot shows the first letter of their name on the brand colour, never someone else's logo."""
     src = own or brand.get("avatar")
     if src: return img(src)
-    out = reel / "elements" / "_avatar.png"
-    if not out.exists():
-        fj = reel / "face.json"
-        x, y, w, h = json.load(open(fj))["box"] if fj.exists() else (290, 400, 500, 500)
-        s = min(1080, int(min(w, h) * 1.15)); x0 = max(0, min(1080 - s, x + w // 2 - s // 2)); y0 = max(0, min(1920 - s, y + h // 2 - s // 2))
-        out.parent.mkdir(parents=True, exist_ok=True)
-        subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", "1", "-i", str(reel / "master.mp4"), "-frames:v", "1",
-                        "-vf", f"scale=1080:1920,crop={s}:{s}:{x0}:{y0},scale=400:400", str(out)])
-    return img(str(out)) if out.exists() else ""
+    print("warning: follow card without a profile photo: ask them for one, save it as brand.json \"avatar\" (meanwhile: their initial)")
+    letter = html.escape((brand.get("name") or "?").strip()[:1].upper())
+    svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="{POP}"/>'
+           f'<text x="50" y="67" font-family="Helvetica,Arial" font-weight="700" font-size="48" text-anchor="middle" fill="{_DEEP}">{letter}</text></svg>')
+    out = proj / "img" / "_avatar.svg"; out.write_text(svg)
+    return f"img/{out.name}"
 
 # fonts: brand.json "fonts": {"head": {...}, "body": {...}, "accent": {...}}, each {family, file?, weight?, style?}
 FALLBACK = "'Helvetica Neue', Helvetica, Arial, sans-serif"   # single quotes: these go inside style="..." attributes
