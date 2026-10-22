@@ -312,11 +312,12 @@ n_sfx = 0
 CAPCUT_NAME = {"swish": "whoosh-short", "whoosh": "whoosh-short", "pop": "pop", "snap": "snap", "typing": "typing",
                "chime": "chime", "sparkle": "sparkle", "coin": "coin"}   # local file -> CapCut library sound (capcut_draft.py)
 def sfx(name, t, db=-12, level="subtle", dur=None):
-    """Subtle, ASMR-clean accents: every effect sits 10-15 dB under the voice (db = level relative to full scale).
+    """Quiet background accents, at most 15% of full volume (brand.json "sfx_max"), one per "sfx_gap" seconds (db = relative level).
     level = lowest brand sfx setting that still plays it. CapCut route: recorded for CapCut's real library sounds."""
     global n_sfx
     global CARD_SFX
     if CARD_MUTE: return                                  # this graphic's sound was switched off in the review
+    approved = bool(CARD_SFX and level == "subtle")
     if CARD_SFX and level == "subtle":                    # the sound approved in the review replaces the entrance sound
         name, db = {"sparkle": "chime"}.get(CARD_SFX["name"], CARD_SFX["name"]) if not CAPCUT else CARD_SFX["name"], CARD_SFX.get("db", db)
         CARD_SFX = None
@@ -324,7 +325,12 @@ def sfx(name, t, db=-12, level="subtle", dur=None):
         name = S_SND["events"][SFX_EVENT[name]]
         if not name: return
     if brand.get("sfx", "subtle") == "none" or (level == "lots" and brand.get("sfx") != "lots") or t >= DUR: return
-    vol = round(min(1.0, 10 ** ((db + brand.get("sfx_gain_db", 8)) / 20)), 3)   # +8 dB: clearly audible under a voice with no music bed
+    # Inna, 2026-10-22: sounds sit in the background, at most 15% of full volume, and not on every graphic:
+    # one accent sound per "sfx_gap" seconds (default 10); a sound picked in the review always plays.
+    if not approved and any(abs(t - x) < brand.get("sfx_gap", 10) for x in SFX_TIMES): return
+    SFX_TIMES.append(t)
+    vmax = brand.get("sfx_max", 0.15)
+    vol = round(min(vmax, vmax * 10 ** ((db + 12) / 20)), 3)   # the loudest accent (-12) = vmax, quieter ones scale down from it
     if CAPCUT:
         SFX_OUT.append({"name": CAPCUT_NAME.get(name, name), "t": round(max(t, 0), 2), "vol": vol, **({"dur": dur} if dur else {})}); return
     p = proj / "sfx" / f"{name}.wav"
@@ -334,6 +340,7 @@ def sfx(name, t, db=-12, level="subtle", dur=None):
     audio.append(f'<audio id="sx{n_sfx}" src="sfx/{name}.wav" data-start="{q(t)}" data-duration="{q(d)}" '
                  f'data-track-index="{20 + n_sfx}" data-volume="{vol}"></audio>')
 SFX_OUT = []
+SFX_TIMES = []
 CARD_MUTE = False
 CARD_SFX = None
 ZONES = []   # where each graphic and caption sits, for the Instagram safe-zone check (scripts/safezones.py)
