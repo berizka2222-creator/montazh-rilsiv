@@ -83,7 +83,7 @@ def _merge(a, b):
     return out
 _st = reel / "style.txt"
 STYLE, STYLE_NAME = {}, edit.get("style") or (_st.read_text().strip() if _st.exists() else "") or os.environ.get("REEL_STYLE") or brand.get("style")
-if STYLE_NAME in ("brand", "mix"):   # «Тільки бренд» / «Без стилю: мікс ефектів» on the page: brand colours and fonts, no style file
+if STYLE_NAME in ("brand", "mix", "minimal"):   # «Тільки бренд» / «Без стилю: мікс ефектів» on the page: brand colours and fonts, no style file
     print(f"style: none ({STYLE_NAME})")
 elif STYLE_NAME:
     _sp = Path(STYLE_NAME).expanduser()
@@ -141,7 +141,8 @@ CASE = CAPS.get("case", "lower")
 # text look set on the review page (edit.json "text_look": {"cap": {...}, "hook": {...}}); a missing block = the brand look as before.
 # c1, c2 (gradient end, none = solid), gd (gradient angle), sw (outline px as seen, 1080 frame), sc (outline colour),
 # sh (shadow strength 0-100), ss (shadow softness 0-100), bg ("none"|"line"|"word"), bc, bo (box colour, opacity 0-100), br (corner px).
-# cap also: acc {look: "color"|"box"|"underline"|"big"|"echo", a1, a2}; hook also: l2 {c1, c2} second-line colours, l2acc (accent font).
+# cta: same as hook (lines[], align, scale), drawn as the hook is when set; without it the brand pill.
+# cap also: acc {look: "color"|"box"|"underline"|"big"|"echo", a1, a2}; hook also: lines [{font head|body|accent, c1, c2, gd, sw, sc, bg, bc, bo, br}] per line (shadow shared); old l2 {c1, c2} / l2acc still read.
 LOOK = edit.get("text_look") or {}
 def look_shadow(L, filt=False):
     """The picked shadow: text-shadow, or a drop-shadow filter for gradient text (text-shadow would sit on top of it)."""
@@ -261,6 +262,7 @@ proj = reel / "proj"
 if proj.exists(): shutil.rmtree(proj)
 (proj / "fonts").mkdir(parents=True); (proj / "sfx").mkdir(); (proj / "vendor").mkdir()
 shutil.copy(ENGINE / "gsap.min.js", proj / "vendor/gsap.min.js")
+FIT_MEASURE, FIT_LOG = bool(os.environ.get("REEL_FIT_MEASURE")), {}
 DRAFT = bool(os.environ.get("REEL_DRAFT"))   # fast review draft: rendered at 540x960 from a 540p copy of the master (a quarter of the pixels)
 _mh = int(subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=height", "-of", "csv=p=0", str(reel / "master.mp4")], capture_output=True, text=True).stdout or 1920)
 def link_or_copy(src, dst):   # a hard link, not a second copy of the video on disk (copy only across volumes)
@@ -365,7 +367,7 @@ def sfx(name, t, db=-12, level="subtle", dur=None):
         name = S_SND["events"][SFX_EVENT[name]]
         if not name: return
     if brand.get("sfx", "subtle") == "none" or (level == "lots" and brand.get("sfx") != "lots") or t >= DUR: return
-    # Inna, 2026-10-22: sounds sit in the background, at most 15% of full volume, and not on every graphic:
+    # 2026-10-22: sounds sit in the background, at most 15% of full volume, and not on every graphic:
     # one accent sound per "sfx_gap" seconds (default 10); a sound picked in the review always plays.
     if not approved and any(abs(t - x) < brand.get("sfx_gap", 10) for x in SFX_TIMES): return
     SFX_TIMES.append(t)
@@ -592,15 +594,22 @@ for i, c in enumerate(edit.get("cards", [])):
         olw = brand.get("title_outline_px")                            # fixed outline width (e.g. 2 for a faint hairline); default scales with size
         st = lambda px: f";-webkit-text-stroke:{olw or max(6, px // 16)}px {ol};paint-order:stroke fill" if ol else ""
         if LH and not brand.get("title_glass"):   # the hook look picked on the page: line colours / gradient, outline, shadow, box, 2nd line font
-            roles = ["accent" if LH.get("l2acc") and j % 2 else "head" for j in range(len(lines))]
-            sizes = [c.get("size") or min(fit(x, 230, 230 // 16 + float(LH.get("sw") or 0), role=r), brand.get("title_max_px", 999)) for x, r in zip(lines, roles)]
-            lk = lambda j: {**LH, "c1": LH["l2"].get("c1") or LH.get("c1"), "c2": LH["l2"].get("c2")} if j % 2 and LH.get("l2") else LH
+            def lk(j):   # each line its own look: "lines"[j] (font, colour/gradient, outline, box) over the old 2nd-line fields
+                leg = {"c1": LH["l2"].get("c1") or LH.get("c1"), "c2": LH["l2"].get("c2")} if j % 2 and LH.get("l2") else {}
+                own = (LH.get("lines") or [])[j] if j < len(LH.get("lines") or []) else None
+                return {**LH, **leg, "font": "accent" if LH.get("l2acc") and j % 2 else "head", **(own or {})}
+            LJ = [lk(j) for j in range(len(lines))]
+            roles = [L["font"] if L["font"] in FAM else "head" for L in LJ]
+            sizes = [c.get("size") or min(fit(x, 230, 230 // 16 + float(L.get("sw") or 0), role=r), brand.get("title_max_px", 999)) for x, r, L in zip(lines, roles, LJ)]
+            sizes = [int(px * float(LH.get("scale") or 100) / 100) for px in sizes]   # «Розмір» on the page
+            AL = LH.get("align") or brand.get("title_align") or "center"            # «Рядки»: center (default) | zigzag | left | right
+            lk = lambda j: LJ[j]
             back.append(f'<div id="{cid}" class="title" style="{font("head", sizes[0])};top:{c.get("y", brand.get("title_y", 360))}px;left:{c.get("x", 90) - 90}px;letter-spacing:{brand.get("title_tracking", -0.045)}em;text-shadow:none">'
-                        + "".join(f'<div class="tl" style="{font(r, px) if r != "head" else f"font-size:{px}px"};text-align:{("left", "right")[j % 2] if len(lines) > 1 else "center"}">'
-                                  f'<span style="{look_bg(LH)}">{look_run(lk(j), esc(x), "hk")}</span></div>' for j, (x, px, r) in enumerate(zip(lines, sizes, roles))) + "</div>")
+                        + "".join(f'<div class="tl" style="{font(r, px) if r != "head" else f"font-size:{px}px"};text-align:{(("left", "right")[j % 2] if len(lines) > 1 else "center") if AL == "zigzag" else AL}">'
+                                  f'<span style="{look_bg(lk(j))}">{look_run(lk(j), esc(x), "hk")}</span></div>' for j, (x, px, r) in enumerate(zip(lines, sizes, roles))) + "</div>")
         else: back.append(f'<div id="{cid}" class="title" style="{font("head", sizes[0])};top:{c.get("y", brand.get("title_y", 360))}px;left:{c.get("x", 90) - 90}px;color:{c.get("color", TITLE_COLOR)};letter-spacing:{brand.get("title_tracking", -0.045)}em">'
                     + ('<div class="tg glass">' if brand.get("title_glass") else "")
-                    + "".join(f'<div class="tl" style="font-size:{px}px;text-align:{brand.get("title_align") or (("left", "right")[j % 2] if len(lines) > 1 and not brand.get("title_glass") else "center")}{st(px)}">{esc(x)}</div>' for j, (x, px) in enumerate(zip(lines, sizes)))
+                    + "".join(f'<div class="tl" style="font-size:{px}px;text-align:{(("left", "right")[j % 2] if len(lines) > 1 and not brand.get("title_glass") else "center") if brand.get("title_align") == "zigzag" else (brand.get("title_align") or "center")}{st(px)}">{esc(x)}</div>' for j, (x, px) in enumerate(zip(lines, sizes)))
                     + ("</div>" if brand.get("title_glass") else "") + "</div>")
         show(f"#{cid}", a, b)
         if brand.get("title_glass"): js.append(f'tl.fromTo("#{cid} .tg",{{scale:0.9,opacity:0,filter:"blur(10px)"}},{{scale:1,opacity:1,filter:"blur(0px)",duration:0.4,ease:"power3.out"}},{q(a - 0.05)});')
@@ -712,9 +721,25 @@ for i, c in enumerate(edit.get("cards", [])):
         js.append(f'tl.fromTo("#{cid} .tag",{{scale:0.4,y:30,opacity:0}},{{scale:1,y:0,opacity:1,duration:0.42,ease:"back.out(3)"}},{q(a)});')
         sfx("pop", a, -14)
         zone(cid, "tag", a, b, (tw(c["text"], 58)[0] - 42, c.get("y", 300), tw(c["text"], 58)[1] + 84, 100))
+    elif kind == "cta" and LOOK.get("cta"):   # the CTA look picked on the page: same controls as the hook (lines, per-line font/colour/outline/box, size, align)
+        quiet.append((a, b))
+        LC = {"c1": MAIN, "bg": "line", "bc": brand.get("cta_bg", LIGHT), "bo": 100, "br": 40, "sh": 0, **LOOK["cta"]}
+        lines = [x.strip() for x in c["text"].split("/") if x.strip()]
+        LJ = [{**LC, "font": "head", **(((LC.get("lines") or [])[j] if j < len(LC.get("lines") or []) else None) or {})} for j in range(len(lines))]
+        roles = [L["font"] if L["font"] in FAM else "head" for L in LJ]
+        sizes = [int(min(fit(x, 200, 200 // 16 + float(L.get("sw") or 0), role=r), brand.get("cta_px", 78) * 1.5) * float(LC.get("scale") or 100) / 100) for x, r, L in zip(lines, roles, LJ)]
+        AL = LC.get("align") or "center"
+        y = c.get("y", 1360)
+        front.append(f'<div id="{cid}" class="title" style="{font("head", sizes[0])};top:{y}px;left:{c.get("x", 90) - 90}px;letter-spacing:-0.02em;text-shadow:none">'
+                     + "".join(f'<div class="tl" style="{font(r, px) if r != "head" else f"font-size:{px}px"};text-align:{(("left", "right")[j % 2] if len(lines) > 1 else "center") if AL == "zigzag" else AL}">'
+                               f'<span style="{look_bg(LJ[j])}">{look_run(LJ[j], esc(x), "hk")}</span></div>' for j, (x, px, r) in enumerate(zip(lines, sizes, roles))) + "</div>")
+        show(f"#{cid}", a, b)
+        js.append(f'tl.fromTo("#{cid} .tl",{{scale:0.6,y:50,opacity:0}},{{scale:1,y:0,opacity:1,duration:0.45,ease:"back.out(2.2)",stagger:0.12}},{q(a)});')
+        sfx("coin", a + 0.1, -12)
+        _x, _w = tw(max(lines, key=len), max(sizes)); zone(cid, "cta", a, b, (_x, y, _w, sum(sizes) * 1.1))
     elif kind == "cta":
         quiet.append((a, b))
-        words = c["text"].split()
+        words = c["text"].replace("/", " ").split()
         inner = " ".join(f'<span style="color:{MAIN if brand.get("cta_bg", LIGHT).lower() == POP.lower() else POP}">{esc(w)}</span>' if w.isupper() and len(w) > 1 else esc(case(w)) for w in words)
         front.append(f'<div id="{cid}" class="ctaw" style="top:{c.get("y", 1360)}px"><span class="cta{" glass" if c.get("glass", brand.get("cta_glass", GLASS_ALL)) else ""}" style="{font("head", brand.get("cta_px", 78))};color:{MAIN};background:{brand.get("cta_bg", LIGHT)}">{inner}</span></div>')
         show(f"#{cid}", a, b)
@@ -864,6 +889,9 @@ for i, c in enumerate(edit.get("cards", [])):
                                      "bubble" if c.get("place") in ("top", "chest") else None)
         if layout in ("front", "behind"): c.setdefault("tone", "clear")
         panel_bg = {"light": LIGHT}.get(c.get("tone"), _DEEP)
+        def zget(c_, d_):                                # blow-up of a motion; REEL_FIT_MEASURE=1 (test_motions.py --fit) draws it at 1.0 and logs the box centre
+            if FIT_MEASURE: FIT_LOG[c_.get("id") or c_["name"]] = {"default": d_}; return 1.0
+            return float(c_.get("zoom", d_))
         def fit_into(ax, ay, aw, ah):                    # a fixed-size motion scaled to fit an area, centred
             s_ = min(aw / nw, ah / nh); return [round(ax + (aw - nw * s_) / 2), round(ay + (ah - nh * s_) / 2), round(nw * s_), round(nh * s_)]
         if layout == "over": layout = "front"
@@ -872,7 +900,7 @@ for i, c in enumerate(edit.get("cards", [])):
             top = min(int(fy + 0.86 * fh) + 10, 1260)    # face.json pads the face box below the chin
             c["box"] = [40, top, 1000, 1660 - top]
             if fixed:
-                z = c.get("zoom", 1.5); bx, by, bw_, bh_ = fit_into(*c["box"])   # 16:9 motions have wide empty margins: blown up, the overspill is transparent
+                z = zget(c, 1.5); bx, by, bw_, bh_ = fit_into(*c["box"])   # 16:9 motions have wide empty margins: blown up, the overspill is transparent
                 c["box"] = [round(bx - bw_ * (z - 1) / 2), round(by - bh_ * (z - 1) / 2), round(bw_ * z), round(bh_ * z)]
             if layout not in ("front", "behind", "bubble"): layout = "front"
             if layout != "bubble": c.setdefault("tone", "clear")
@@ -892,7 +920,7 @@ for i, c in enumerate(edit.get("cards", [])):
             if not own_box:
                 c["box"] = fit_into(*area) if fixed else list(area)
                 if fixed:   # catalog motions are drawn for 16:9 with wide margins: blow them up to fill the panel (the overspill is panel colour)
-                    z = c.get("zoom", 1.25); bx, by, bw_, bh_ = c["box"]
+                    z = zget(c, 1.25); bx, by, bw_, bh_ = c["box"]
                     c["box"] = [round(bx - bw_ * (z - 1) / 2), round(by - bh_ * (z - 1) / 2), round(bw_ * z), round(bh_ * z)]
             mid.append(f'<div id="{cid}s" class="sp" style="opacity:0;visibility:hidden">'
                        f'<div class="spw" style="left:0;top:0;width:1080px;height:1920px"><video src="master.mp4" muted playsinline data-start="{q(a)}" '
@@ -908,7 +936,7 @@ for i, c in enumerate(edit.get("cards", [])):
             if not own_box:
                 c["box"] = fit_into(40, 240, 1000, 1400) if fixed else [40, 240, 1000, 1400]
                 if fixed:
-                    z = c.get("zoom", 1.2); bx, by, bw_, bh_ = c["box"]
+                    z = zget(c, 1.2); bx, by, bw_, bh_ = c["box"]
                     c["box"] = [round(bx - bw_ * (z - 1) / 2), round(by - bh_ * (z - 1) / 2), round(bw_ * z), round(bh_ * z)]
             mid.append(f'<div id="{cid}d" style="position:absolute;inset:0;background:{_rgba(_DEEP, c.get("dim", 0.82))};opacity:0;visibility:hidden"></div>')
             js.append(f'tl.fromTo("#{cid}d",{{autoAlpha:0}},{{autoAlpha:1,duration:0.3,ease:"power2.out"}},{q(a)});'
@@ -926,10 +954,13 @@ for i, c in enumerate(edit.get("cards", [])):
         if not re.search(r'data-width="(\d+)"', txt) and c.get("box"):   # size-free components fill whatever box they get:
             nw, nh, sc = bw, bh, 1.0                     # a wide band above the head or across the chest, not a square on the face
             if c.get("place") == "low" and not own_box:   # their text is a share of the box (cq units): scale the whole band up from
-                sc = float(c.get("zoom", 1.9)); x, y = round(x - bw * (sc - 1) / 2), round(y - bh * (sc - 1) / 2)   # its centre (transparent, short text)
+                sc = zget(c, 1.9); x, y = round(x - bw * (sc - 1) / 2), round(y - bh * (sc - 1) / 2)   # its centre (transparent, short text)
                 bw, bh = round(bw * sc), round(bh * sc)
         if c.get("scale"):                               # "scale": wide 16:9 overlays (lower thirds, handwriting) shown bigger than
             sc = float(c["scale"]); bw, bh = round(nw * sc), round(nh * sc)   # the 1080 frame; box x/y may go negative to crop
+        if FIT_MEASURE and (c.get("id") or c["name"]) in FIT_LOG:   # measuring: only the motion itself differs from the plain video
+            FIT_LOG[c.get("id") or c["name"]]["box"] = [x, y, bw, bh]
+            mid.append(f'<style>#{cid}s,#{cid}d,#{cid}f,#bg{{opacity:0!important}}#cam,#scaler{{background:#f0f!important}}</style>')   # magenta stage: whatever is not magenta is the motion
         if y + bh * 0.7 > CAP_Y or c.get("place") == "low": quiet.append((a, b))   # motion sits over the caption zone: captions step aside
         vals = html.escape(json.dumps(vars_), quote=True)
         tone = TONES.get(c.get("tone", "dark"), TONES["dark"]) + "".join(f"{k}:{v};" for k, v in (c.get("css") or {}).items())
@@ -1365,6 +1396,7 @@ html, body {{ margin: 0; background: #000; overflow: hidden; }}
 (proj / "index.html").write_text(doc)
 sys.path.insert(0, str(Path(__file__).resolve().parent)); import safezones
 safezones.save(reel, ZONES)
+if FIT_MEASURE: json.dump(FIT_LOG, open(reel / "fit.json", "w"))
 (proj / "package.json").write_text('{"name":"reel","private":true,"type":"module"}')
 if CAPCUT:
     json.dump(cap_json, open(reel / "captions.json", "w"), indent=1)

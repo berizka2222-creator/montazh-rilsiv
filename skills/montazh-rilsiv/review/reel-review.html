@@ -471,6 +471,214 @@ section[data-p="effects"].with{margin-top:34px;padding-top:24px;border-top:1px s
 .stlink{display:inline-flex;align-items:center;gap:6px;max-width:100%;font-size:13px;border:1px solid var(--line);border-radius:999px;padding:4px 6px 4px 12px}
 .stlink a{color:var(--accent);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px}
 .stlink button{border:0;background:none;color:var(--muted);cursor:pointer;font-size:15px;line-height:1;padding:2px 6px}
+.ovgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:4px 28px}
+@media (max-width:700px){.ovgrid{grid-template-columns:minmax(0,1fr)}}
+.ovgrid .step{border-top:0;padding-top:0;margin-top:12px}
+.ovform .ovsub{font-weight:400;margin-left:6px}
+.ovkinds{gap:6px!important}
+.ovkinds label{position:relative;border:1px solid var(--line);border-radius:999px;padding:5px 14px;cursor:pointer;font-size:13.5px;color:var(--muted)}
+.ovkinds label:has(input:checked){border-color:var(--accent);color:var(--ink);background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.ovkinds label:has(input:focus-visible){outline:3px solid var(--pink);outline-offset:2px}
+.ovkinds input{position:absolute;opacity:0;pointer-events:none}
+.ovform .ovdur{display:inline-flex;align-items:center;gap:6px}
+.ovform .ovdur input{width:70px}
+#libbox .lib button{width:58px;height:72px}
+.menuno{display:inline-block;min-width:1.9em;margin-right:6px;padding:0 5px;border-radius:6px;background:var(--accent);color:var(--on-accent);font:600 11px var(--f-mono);text-align:center}
+.efrow{display:flex;gap:8px;align-items:center;margin-top:8px}
+.efrow #eftext{flex:1;min-width:0}
+.efrow .ovdur{display:inline-flex;align-items:center;gap:6px;font-size:14px}.efrow .ovdur input{width:64px}
+.effiles{margin-top:8px;border:0;padding:0;background:none}
+.effiles summary{font-size:13px}
+#efhint:empty{display:none}
+#eflist:not(:empty){margin-top:10px}
+#refbox summary{font-weight:600}
+@media (max-width:560px){.efrow{flex-wrap:wrap}.efrow #eftext{flex-basis:100%}}
+input[type=file]::file-selector-button{font:600 12.5px var(--f-body);border:0;background:var(--ink);color:var(--bg);border-radius:8px;padding:5px 11px;margin-right:8px;cursor:pointer}
+input[type=file]::file-selector-button:hover{opacity:.85}
+input[type=file]{font-size:12.5px}
+.manlib>summary,.capstyles>summary{list-style:none;cursor:pointer}
+.manlib>summary::-webkit-details-marker,.capstyles>summary::-webkit-details-marker{display:none}
+.manlib>summary::before,.capstyles>summary::before{content:"▾";display:inline-block;color:var(--accent);transition:transform .2s;margin-right:2px}
+.manlib:not([open])>summary::before,.capstyles:not([open])>summary::before{transform:rotate(-90deg)}
+.manlib>summary::after,.capstyles>summary::after{content:"згорнути";margin-left:auto;font:500 12px var(--f-body);color:var(--muted)}
+.manlib:not([open])>summary::after,.capstyles:not([open])>summary::after{content:"розгорнути"}
+.capstyles>summary{display:flex;gap:8px;align-items:baseline}
+/* text look: each setting its own numbered card, in the order you'd decide them */
+.lookcards{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))!important;gap:10px!important;counter-reset:lk;margin-top:10px}
+.lookcards>.ggroup{margin:0!important;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.035)}
+.lookcards>.ggroup>.gtitle{counter-increment:lk;display:flex;align-items:center;gap:8px;font:600 14px var(--f-body);letter-spacing:0;text-transform:none;color:var(--ink);opacity:1;margin:0 0 8px}
+.lookcards>.ggroup>.gtitle::before{content:counter(lk);display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--accent);color:var(--on-accent);font:600 11px var(--f-mono)}
+.lookcards .lrow .gl,.lookcards .gs .gl,.lookcards .lchk{font-size:13px;color:var(--muted)}
+.lookcards .sws button{width:22px;height:22px}
+.lookdet .lookfoot{margin-top:12px}
+.pair audio{height:32px;max-width:300px}
+.pair figcaption{font-size:13px}
+.sws button.mine{box-shadow:0 0 0 1px var(--line)}
+.sws button.mine:first-of-type,.sws button:not(.mine)+button.mine{margin-left:8px}
+section[data-p="captions"]{counter-reset:lk}
+section[data-p="captions"] .lookcards{counter-reset:none}
+.capcards{margin:0 0 12px}
+.capcards .fontrow{margin-top:0;display:grid;grid-template-columns:auto 1fr;gap:8px 10px;align-items:center}
+.capcards .fontbtn{margin:0;justify-self:start}
+.capcards #capyval{color:var(--ink);font-weight:600}
+/* cards pack like a masonry: each as tall as its content, no stretched empty boxes on a wide screen */
+.lookcards{display:block!important;column-width:290px;column-gap:10px}
+.lookcards>*{break-inside:avoid;margin:0 0 10px!important;display:block}
+.lookcards>.ggroup{width:100%;box-sizing:border-box}
+/* the look footer: secondary actions, quieter than the settings */
+.lookfoot{gap:8px 14px!important;padding-top:8px!important;margin-top:8px!important}
+.lookfoot .b{font-size:12px!important;font-weight:500!important;padding:4px 10px!important;border:1px solid var(--line)!important;background:none!important;color:var(--muted)!important;box-shadow:none!important}
+.lookfoot .b:hover:not(:disabled){color:var(--ink)!important;transform:none!important}
+.lookfoot .lchk{font-size:12px!important;color:var(--muted)!important;gap:5px!important}
+.lookfoot .lchk input{width:13px;height:13px;margin:0}
+/* find & replace in captions: one slim row, a tool and not a main control */
+.sr{gap:6px!important;align-items:center;padding:6px 6px 6px 12px;border:1px solid var(--line);border-radius:999px;width:fit-content;max-width:100%;box-sizing:border-box}
+.sr .srl{font-size:12px;color:var(--muted);margin-right:4px;white-space:nowrap}
+.sr input{font-size:13.5px!important;padding:5px 10px!important;border-radius:999px!important;width:130px!important;max-width:none!important;background:transparent!important}
+.sr .srar{color:var(--muted);font-size:13px}
+.sr .b{font-size:12.5px!important;padding:5px 12px!important}
+@media (max-width:560px){.sr{border-radius:16px;flex-wrap:wrap}.sr input{flex:1;width:auto!important;min-width:90px}}
+/* timeline */
+.tl{margin:4px 0 16px;border:1px solid var(--line);border-radius:14px;padding:10px 12px 8px;background:rgba(255,255,255,.025);user-select:none;-webkit-user-select:none}
+.tlhead{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:6px}.tlhead b{font-size:14px}.tlhead .mode{font-size:12px}
+.tlbody{position:relative}
+.tlrow{display:grid;grid-template-columns:84px minmax(0,1fr);gap:8px;align-items:center;margin:3px 0}
+.tllab{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tllane{position:relative;height:26px;border-radius:7px;background:rgba(255,255,255,.04)}
+.tllane.thin{height:10px}
+.tlruler .tllane{height:16px;background:none;cursor:pointer}
+.tltick{position:absolute;top:0;transform:translateX(-50%);font:500 10px var(--f-mono);color:var(--muted)}
+.tlb{position:absolute;top:2px;bottom:2px;border-radius:6px;padding:0 8px;font:600 11px/22px var(--f-body);color:#141a0e;white-space:nowrap;overflow:hidden;cursor:grab;touch-action:none;box-sizing:border-box;min-width:6px}
+.tlb span{pointer-events:none;display:block;overflow:hidden;text-overflow:ellipsis}
+.tlb:active{cursor:grabbing}
+.tlb.t0{background:#F3F4EC}.tlb.t3{background:rgba(243,244,236,.18);color:var(--ink)}.tlb.t1{background:var(--accent)}.tlb.t2{background:var(--pink)}
+.tlb.off{opacity:.3;text-decoration:line-through;cursor:pointer}
+.tlb.sel{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--ink)}
+.tlb i{position:absolute;top:0;bottom:0;width:9px;cursor:ew-resize;background:rgba(0,0,0,.18)}
+.tlb i.rh{right:0;border-radius:0 6px 6px 0}.tlb i.lh{left:0;border-radius:6px 0 0 6px}
+.tlcap{position:absolute;top:2px;bottom:2px;background:rgba(255,255,255,.28);border-radius:2px}
+.tlplay{position:absolute;top:0;bottom:0;width:2px;background:#fff;pointer-events:none;left:calc(92px + (100% - 92px) * var(--p, 0));box-shadow:0 0 6px rgba(255,255,255,.6)}
+.tlsel{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+.tlsel span{flex:1;min-width:160px}.tlsel .b{font-size:12px!important;padding:4px 10px!important}
+@media (max-width:560px){.tlrow{grid-template-columns:58px minmax(0,1fr)}.tlplay{left:calc(66px + (100% - 66px) * var(--p, 0))}.tlhead .mode{display:none}}
+.tlplay{pointer-events:auto!important;cursor:ew-resize;touch-action:none;z-index:2}
+.tlplay::before{content:"";position:absolute;left:-9px;right:-9px;top:0;bottom:0}
+.tlplay::after{content:"";position:absolute;top:-6px;left:50%;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px var(--bg)}
+.tlruler .tllane,.tllane{cursor:ew-resize}.tllane .tlb{cursor:grab}
+body.scrubbing,body.scrubbing *{cursor:ew-resize!important;user-select:none}
+/* step 2: one place: timeline -> the picked element's panel (preview, decision, timing, its own settings) -> everything as a list */
+.insp{margin:0 0 16px}
+.insp .card{border-color:var(--accent);grid-template-columns:auto minmax(0,1fr)}
+.insp .thumb.story{width:170px}
+.insp .ibox{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.insp .ibox label{display:block;font-weight:600;font-size:13px;margin:6px 0 4px}
+.insptime{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;margin-top:10px;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.04)}
+.insptime .ig{display:inline-flex;align-items:center;gap:6px}
+.insptime .il{font-size:12px;color:var(--muted);margin-right:2px}
+.insptime b{font:500 12.5px var(--f-mono);min-width:44px;text-align:center}
+.insptime .b{font-size:12px!important;padding:4px 10px!important}
+.tlb.ghost{background:transparent!important;border:1px dashed var(--muted);color:var(--muted);cursor:pointer}
+.alllist>summary{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.alllist .tally{margin:0;font-size:11px}
+.alllist .cards{margin-top:10px}
+#cards .card{cursor:pointer}
+@media (max-width:560px){.insp .card{grid-template-columns:minmax(0,1fr)}.insp .thumb.story{width:100%;max-width:220px}}
+/* small screens: steps on top, then the video, then the timeline and the picked element; style below them */
+@media (max-width:820px){
+  .wrap{display:flex!important;flex-direction:column;gap:14px}
+  .wrap>main{display:contents}
+  .wrap>main>.topnav{order:-2;margin:0}
+  .wrap>.side{order:-1}
+  .wrap>main>*:not(.topnav){order:0}
+  section[data-p="graphics"]:not([hidden]){display:flex;flex-direction:column}
+  section[data-p="graphics"]>.sechead,section[data-p="graphics"]>.lede{order:0}
+  section[data-p="graphics"]>#tl{order:1}
+  section[data-p="graphics"]>#insp{order:2}
+  section[data-p="graphics"]>.stylepanel{order:3}
+  section[data-p="graphics"]>#cutbox{order:4}
+  section[data-p="graphics"]>.alllist{order:5}
+  section[data-p="graphics"]>.lede{display:none}
+  .side .by{display:none}
+  .player{max-width:min(240px,26vh)!important}   /* video and timeline on one phone screen */
+  .side{gap:8px}.side .mode{display:none}.reel-name{font-size:12.5px}
+  .side .savebar .pill:not(.err){display:none}.side .savebar #undo:disabled{display:none}
+  section[data-p="graphics"]>.sechead{display:none}
+}
+/* small screens: right of the video, play with its scrubber right under it, then a small row −5 · +5 · Зони, then save state */
+@media (max-width:820px){
+  .side{display:grid!important;grid-template-columns:auto repeat(3,minmax(0,1fr));column-gap:6px;row-gap:8px;align-items:start;align-content:start}
+  .side>*{grid-column:1/-1}
+  .side>.reel-name{grid-row:1}
+  .side>.player{grid-column:1;grid-row:2/span 5;margin:0 8px 0 0;width:min(58vw,27vh)!important;max-width:none!important}
+  .side>.ctl{display:contents}
+  .side #rough{grid-column:2/-1;grid-row:2;width:100%;padding:10px 8px!important;font-size:14px!important}
+  .side>.scrub{grid-column:2/-1;grid-row:3;flex-direction:column;align-items:stretch;gap:2px}
+  .side>.scrub .tc{font-size:10px;text-align:center;white-space:normal}.side>.scrub .tc::before{content:""}
+  .side #back5{grid-column:2;grid-row:4}.side #fwd5{grid-column:3;grid-row:4}.side #szbtn{grid-column:4;grid-row:4}
+  .side #back5,.side #fwd5,.side #szbtn{padding:5px 2px!important;font-size:11px!important;min-width:0;width:100%;overflow:visible;white-space:nowrap;letter-spacing:-.01em}
+  .side>.savebar{grid-column:2/-1;grid-row:5}
+}
+.side .ctl:not(:has(button:not([hidden]))){display:none}
+.steps .st.locked{opacity:.4;cursor:not-allowed}
+/* «Звук і колір» as numbered cards, like the caption and hook settings */
+.scards{counter-reset:sk;display:flex;flex-direction:column;gap:12px}
+.scard>.gtitle{counter-increment:sk;display:flex;align-items:center;gap:8px;font:600 15px var(--f-body);letter-spacing:0;text-transform:none;color:var(--ink);opacity:1;margin:0 0 6px}
+.scard>.gtitle::before{content:counter(sk);display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--accent);color:var(--on-accent);font:600 11px var(--f-mono)}
+.scard .pair{margin-bottom:0}
+/* wide screens with a short window: the player never runs under the bottom bar */
+@media (min-width:821px){.player{max-width:min(330px,calc((100vh - 300px) * 9 / 16))}}
+/* mid widths: short step names so the step bar stays on one line */
+@media (max-width:1180px){.steps .lg{display:none}.steps .sh{display:inline}}
+/* small screens: the reel's name goes to the right column too, so the video starts higher */
+@media (max-width:820px){
+  .side>.reel-name{grid-column:2/-1;grid-row:2;font-size:11.5px;line-height:1.3}
+  .side #rough{grid-row:3}.side>.scrub{grid-row:4}
+  .side #back5,.side #fwd5,.side #szbtn{grid-row:5}
+  .side>.savebar{grid-row:6}
+  .side>.player{grid-row:2/span 6}
+  .side{grid-template-columns:auto repeat(3,minmax(0,1fr));overflow:hidden}
+  .side #szbtn{font-size:10px!important;padding:5px 0!important;letter-spacing:-.02em}
+  .side{column-gap:4px!important;padding-right:2px}
+  .side>.player{margin-right:8px!important}
+}
+/* draft notes as pins on the timeline */
+.tlb.pin{width:12px!important;min-width:12px;padding:0;border-radius:50%;top:6px;bottom:6px;background:var(--pink);cursor:pointer;margin-left:-6px}
+/* «Знайти»: her request, then the options as a grid she picks from */
+.findbox .gtitle{font:600 14px var(--f-body);letter-spacing:0;text-transform:none;color:var(--ink);opacity:1;margin:0 0 4px}
+.findbox .gpre{margin:8px 0}
+.freq{margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+.freq .fhead{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;font-size:13px}
+.freq .fhead b{color:var(--ink)}.freq .fhead .mode{flex:1}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;margin-top:8px}
+.fopt{position:relative;border:2px solid transparent;border-radius:10px;overflow:hidden;cursor:pointer;background:#000;aspect-ratio:3/4;padding:0}
+.fopt img,.fopt video{width:100%;height:100%;object-fit:cover;display:block}
+.fopt[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--now)}
+.fopt[aria-pressed="true"]::after{content:"✓";position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:var(--accent);color:var(--on-accent);font:700 12px/20px var(--f-body);text-align:center}
+.fopt .fsrc{position:absolute;left:0;right:0;bottom:0;font:500 9px var(--f-body);color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.7));padding:8px 4px 3px}
+/* colour card: compact sliders (value on the right of its name), small before / after */
+.scard label.gs{display:grid!important;grid-template-columns:minmax(0,1fr) auto;column-gap:8px;margin:0!important;font-weight:400!important;font-size:inherit!important;padding:2px 0}
+.scard .gs .gl{font-size:12.5px;font-weight:500}
+.scard .gs .gv{padding-left:8px}
+.scard .ggrid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))!important;gap:0 18px!important}
+.scard .ggroup{margin-top:6px}
+.scard .gtitle+.ggrid,.scard .ggroup .gtitle{margin-bottom:0}
+.scard .gs input{height:12px;margin-top:0}
+.scard .pair{display:grid;grid-template-columns:repeat(2,minmax(0,150px));gap:12px;margin-top:10px}
+.scard .pair img,.scard .pair canvas{max-width:150px;border-radius:10px}
+.scard .pair figcaption{font-size:12px;font-weight:600}
+.scard #audio.pair{grid-template-columns:repeat(2,minmax(0,300px))}
+.menubig{position:absolute;top:10px;left:10px;font:inherit;font-size:15px;line-height:1;border:0;border-radius:999px;padding:6px 8px;background:rgba(0,0,0,.55);color:#fff;cursor:pointer}
+.menubig:hover,.menuat:hover{background:rgba(0,0,0,.8)}
+#bigpv{border:0;padding:0;background:transparent;max-width:100vw;max-height:100vh}
+#bigpv::backdrop{background:rgba(0,0,0,.82)}
+#bigpv .bigin{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px}
+#bigpv video{height:min(78vh,820px);aspect-ratio:9/16;max-width:92vw;border-radius:14px;background:#000;object-fit:contain}
+#bigpv .bigcap{display:flex;flex-direction:column;align-items:center;gap:8px;color:#fff;text-align:center;max-width:min(92vw,520px)}
+#bigpv .bigact{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+#bigpv .bigx{position:absolute;top:4px;right:4px;z-index:2;border:0;border-radius:999px;width:36px;height:36px;font-size:16px;background:rgba(255,255,255,.15);color:#fff;cursor:pointer}
+#bigpv .bignav{position:absolute;top:calc(39vh - 22px);z-index:2;border:0;border-radius:999px;width:44px;height:44px;font-size:26px;line-height:1;background:rgba(255,255,255,.15);color:#fff;cursor:pointer}
+#bigpv .bignav.prev{left:4px}#bigpv .bignav.next{right:4px}
+@media (max-width:640px){#bigpv video{height:auto;width:88vw}#bigpv .bignav{top:40%}}
 </style>
 
 <div class="wrap">
@@ -514,8 +722,8 @@ section[data-p="effects"].with{margin-top:34px;padding-top:24px;border-top:1px s
     <div class="banner" id="banner" hidden></div>
     <div class="tabs" role="tablist">
       <button class="tab" role="tab" data-tab="cuts">Нарізка <span class="dot" hidden></span></button>
-      <button class="tab" role="tab" data-tab="overlays">Накладення й ефекти <span class="dot" hidden></span></button>
-      <button class="tab gone" role="tab" data-tab="effects">Ефекти <span class="dot" hidden></span></button>
+      <button class="tab" role="tab" data-tab="overlays">Накладення <span class="dot" hidden></span></button>
+      <button class="tab" role="tab" data-tab="effects">Ефекти <span class="dot" hidden></span></button>
       <button class="tab gone" role="tab" data-tab="graphics">Графіка <span class="dot" hidden></span></button>
       <button class="tab" role="tab" data-tab="captions">Субтитри <span class="dot" hidden></span></button>
       <button class="tab" role="tab" data-tab="sound">Звук і колір <span class="dot" hidden></span></button>
@@ -534,125 +742,151 @@ section[data-p="effects"].with{margin-top:34px;padding-top:24px;border-top:1px s
 
     <section data-p="overlays" hidden>
       <div class="sechead"><h2>Твої <em>фото й відео</em></h2><div class="sectools"><button class="icon notebtn" type="button">+ Нотатка</button></div></div>
-      <p class="lede">Розстав свої фото й відео, графіку Claude додасть навколо. Коли закінчиш, напиши Claude «графіка».</p>
+      <p class="lede">Розстав свої фото, відео й текст. Графіку Claude додасть навколо.</p>
       <p class="lede" id="ovnone" hidden>Завантаження недоступне: кинь файли в папку рілса й напиши секунди.</p>
       <details class="ovform" id="ovbox" open>
-      <summary>+ Накладення тут <span class="tc" id="ovat">0:00.0</span></summary>
-      <p class="mode">Фото, скрін або відео до 20 МБ з цієї секунди.</p>
-      <div class="step">1 · Що додаємо</div>
-      <div class="row" role="radiogroup" aria-label="Що додаємо"><label><input type="radio" name="ovkind" value="file" checked> Фото / відео</label><label><input type="radio" name="ovkind" value="text"> Текст</label></div>
-      <div class="row" id="ovtextrow" hidden><input type="text" id="ovtext" placeholder="Напр.: ТАРГЕТ або без / клієнтів (/ = новий рядок)" aria-label="Текст накладення"></div>
-      <details class="lookdet" id="txtlookdet" hidden><summary>Вигляд тексту: шрифт, розмір, колір, контур, тінь, фон</summary><div id="txtlook"></div></details>
-      <div class="row" id="ovfilerow"><input type="file" id="ovfile" accept="image/png,image/jpeg,image/webp,video/mp4,video/quicktime" aria-label="Файл накладення"></div>
-      <div class="row" id="ovsaverow"><label><input type="checkbox" id="ovsave"> Зберегти в «Мої файли» для наступних рілсів</label></div>
-      <div id="libbox" hidden><p class="mode" style="margin-top:8px"><b>Або з «Моїх файлів»:</b> тапни, щоб обрати.</p><div class="lib" id="lib"></div></div>
-      <div class="step">2 · Де</div>
-      <p class="mode">Перетягни рамку на відео, а кружечком у кутку зміни розмір.</p>
-      <div class="row"><label><input type="checkbox" id="ovfull"> На весь екран</label></div>
-      <div class="row"><label><input type="checkbox" id="ovbehind"> <b>За мною</b>: поставити за тобою (Claude виріже тебе тільки на ці секунди й покладе поверх; рендер на ~1 хв довший)</label></div>
-      <div class="step">3 · Як</div>
-      <div class="row"><label for="oveffect">Ефект</label>
-        <select id="oveffect"><option value="soft">Плавна поява</option><option value="slide">Виліт збоку</option><option value="polaroid">Полароїд (рамка з нахилом)</option><option value="glass">Скло (як твої картки)</option><option value="zoom">Повільне наближення</option></select></div>
-      <div class="row"><label for="ovdur">Скільки секунд</label><input type="number" id="ovdur" value="3" min="0.5" max="30" step="0.5"></div>
-      <div class="row"><button class="b primary" id="ovadd" type="button">Додати накладення</button><span class="mode" id="ovmsg" aria-live="polite"></span></div>
+      <summary>+ Накладення тут <span class="tc" id="ovat">0:00.0</span> <span class="mode ovsub">фото, скрін або відео до 20 МБ</span></summary>
+      <div class="ovgrid">
+        <div class="ovcol">
+          <div class="step">1 · Що додаємо</div>
+          <div class="row ovkinds" role="radiogroup" aria-label="Що додаємо"><label><input type="radio" name="ovkind" value="file" checked> Фото / відео</label><label><input type="radio" name="ovkind" value="text"> Текст</label></div>
+          <div class="row" id="ovtextrow" hidden><input type="text" id="ovtext" placeholder="Напр.: ТАРГЕТ або без / клієнтів (/ = новий рядок)" aria-label="Текст накладення"></div>
+          <details class="lookdet" id="txtlookdet" hidden><summary>Вигляд тексту: шрифт, розмір, колір, контур, тінь, фон</summary><div id="txtlook"></div></details>
+          <div class="row" id="ovfilerow"><input type="file" id="ovfile" accept="image/png,image/jpeg,image/webp,video/mp4,video/quicktime" aria-label="Файл накладення"></div>
+          <div class="row" id="ovsaverow"><label><input type="checkbox" id="ovsave"> Зберегти в «Мої файли»</label></div>
+        </div>
+        <div class="ovcol">
+          <div class="step">2 · Де і як</div>
+          <p class="mode">Перетягни рамку на відео, кружечком у кутку зміни розмір.</p>
+          <div class="row"><label><input type="checkbox" id="ovfull"> На весь екран</label><label title="Claude виріже тебе тільки на ці секунди й покладе поверх, рендер на ~1 хв довший"><input type="checkbox" id="ovbehind"> <b>За мною</b></label></div>
+          <div class="row"><select id="oveffect" aria-label="Ефект"><option value="soft">Плавна поява</option><option value="slide">Виліт збоку</option><option value="polaroid">Полароїд (рамка з нахилом)</option><option value="glass">Скло (як твої картки)</option><option value="zoom">Повільне наближення</option></select>
+            <label class="ovdur"><input type="number" id="ovdur" value="3" min="0.5" max="30" step="0.5" aria-label="Скільки секунд"> с</label></div>
+          <div class="row"><button class="b primary" id="ovadd" type="button">Додати накладення</button><span class="mode" id="ovmsg" aria-live="polite"></span></div>
+        </div>
+      </div>
+      <div id="libbox" hidden><div class="step">Мої файли</div><p class="mode">Тапни, щоб обрати замість нового файлу.</p><div class="lib" id="lib"></div></div>
     </details>
       <div class="tally" id="otally"></div>
+      <div class="panel findbox" id="findbox">
+        <div class="gtitle">Знайти фото, гіфку, відео чи мем</div>
+        <p class="mode">Постав відео на потрібну секунду, обери, що шукаємо, і напиши, що воно має передати: емоцію, стан, вайб. Claude знайде 10–15 варіантів, а ти обереш.</p>
+        <div class="gpre" id="findkind" role="group" aria-label="Що шукаємо"></div>
+        <div class="efrow"><input type="text" id="findq" placeholder="Напр.: паніка, коли клієнт пише «дорого»"><button class="b primary" id="findgo" type="button">Знайти варіанти</button></div>
+        <p class="mode" id="findmsg" aria-live="polite"></p>
+        <div id="findlist"></div>
+      </div>
       <div class="cards" id="ovcards"></div>
     </section>
 
     <section data-p="effects" hidden>
-      <div class="sechead"><h2>Ефекти, які <em>хочеш</em></h2><div class="sectools"><button class="icon notebtn" type="button">+ Нотатка</button></div></div>
-      <p class="lede">Постав чорновий монтаж на потрібну секунду, опиши ефект або встав назву з бібліотеки. Якщо для ефекту потрібні фото, додай їх тут.</p>
-      <p><a class="libbtn" id="eflib" href="https://hyperframes.heygen.com/catalog" target="_blank" rel="noopener">Відкрити бібліотеку ефектів ↗</a></p>
-      <div class="panel"><label for="refurl">Рілс-референс: «зроби як тут»</label>
-        <div class="ctl"><input type="text" id="refurl" placeholder="Посилання на рілс в Instagram або TikTok, монтаж якого подобається"><button class="b" id="refadd" type="button">Додати</button></div>
-        <p class="mode" style="margin:6px 0 0">Claude розбере прийоми (хук, субтитри, темп, графіку) і перенесе їх у твій рілс твоїми словами й кольорами.</p>
-        <div id="reflist"></div></div>
-      <div class="panel" id="efbox">
-        <label for="eftext">Ефект на <span class="tc" id="efat">0:00.0</span></label>
-        <textarea id="eftext" placeholder="Напр.: count-up від 0 до 20 клієнтів, або: фото вилітають віялом з-за мене"></textarea>
-        <div class="row ctl" style="margin-top:8px"><label for="efdur" style="margin:0">Скільки секунд</label><input type="number" id="efdur" value="3" min="0.5" max="30" step="0.5" style="width:80px"></div>
-        <label for="effiles">Фото чи відео для ефекту (необов'язково)</label>
-        <input type="file" id="effiles" multiple accept="image/png,image/jpeg,image/webp,video/mp4,video/quicktime">
-        <div class="ctl" style="margin-top:10px"><button class="b primary" id="efadd" type="button">Додати ефект</button><span class="mode" id="efmsg" aria-live="polite"></span></div>
-      </div>
-      <div class="cards" id="eflist"></div>
+      <div class="sechead"><h2>Ефекти</h2><div class="sectools"><button class="icon notebtn" type="button">+ Нотатка</button></div></div>
+      <p class="lede">Обирати не обов'язково: якщо нічого не тиснеш, Claude сам підбере ефекти під фрази.</p>
       <details class="panel manlib" id="stamplib" hidden open>
         <summary><b>Мої марки</b> <span class="mode" id="stampcount"></span></summary>
-        <p class="lede">Ефекти з твоїх готових рілсів. Claude пропонує їх першими. Постав чорновий монтаж на потрібну секунду і натисни «На цю секунду».</p>
+        <p class="lede">Ефекти з твоїх готових рілсів. Claude пропонує їх першими. Постав відео на потрібну секунду і тапни марку.</p>
         <div class="capgrid" id="stamplist"></div>
       </details>
       <details class="panel manlib" id="manlib" hidden open>
         <summary><b>Меню ефектів</b> <span class="mode" id="mancount"></span></summary>
-        <p class="lede">Кожен ефект на тобі, у твоїх кольорах. Тицяй ті, що подобаються: вони збираються в «Мій вибір», і Claude поставить їх у рілс на фрази, яким вони пасують. Щоб поставити на конкретну секунду, натисни «⏱».</p>
+        <p class="lede">Кожен ефект на тобі, у твоїх кольорах, з постійним номером. Тицяй ті, що подобаються: вони підуть у «Мій вибір», і Claude поставить їх на фрази, яким вони пасують. «Тільки вручну» Claude сам не бере, тільки якщо ти обереш. «⏱» ставить ефект на секунду, де зараз відео.</p>
         <div class="gpre" id="menufilter" role="group" aria-label="Які ефекти показати"></div>
-        <input type="text" id="mansearch" placeholder="Пошук: цифра, список, чат, мапа, перехід…" aria-label="Пошук ефекту" style="margin-top:8px">
+        <input type="text" id="mansearch" placeholder="Пошук: номер, цифра, список, чат, перехід…" aria-label="Пошук ефекту" style="margin-top:8px">
         <div class="basket" id="basket" hidden></div>
         <div id="manlist"></div>
       </details>
+      <div class="panel efsec" id="efbox">
+        <label for="eftext">Ефект на конкретну секунду: <span class="tc" id="efat">0:00.0</span></label>
+        <p class="mode">Постав відео зліва на потрібну секунду. Впиши номер з меню (напр. <b>12</b>) або опиши своїми словами.</p>
+        <div class="efrow"><input type="text" id="eftext" placeholder="12, або: фото вилітають віялом, або: знайди мем «клієнт зник»">
+          <label class="ovdur"><input type="number" id="efdur" value="3" min="0.5" max="30" step="0.5" aria-label="Скільки секунд"> с</label>
+          <button class="b primary" id="efadd" type="button">Додати</button></div>
+        <p class="mode" id="efhint" aria-live="polite"></p>
+        <details class="effiles"><summary>+ Свої фото чи відео для цього ефекту</summary><input type="file" id="effiles" multiple accept="image/png,image/jpeg,image/webp,video/mp4,video/quicktime" aria-label="Файли для ефекту"></details>
+        <span class="mode" id="efmsg" aria-live="polite"></span>
+        <div class="cards" id="eflist"></div>
+      </div>
+      <details class="panel" id="refbox"><summary>Рілс-референс: «зроби як тут»</summary>
+        <div class="ctl" style="margin-top:8px"><input type="text" id="refurl" placeholder="Посилання на рілс в Instagram або TikTok"><button class="b" id="refadd" type="button">Додати</button></div>
+        <p class="mode" style="margin:6px 0 0">Claude розбере прийоми (хук, субтитри, темп, графіку) і перенесе їх у твій рілс твоїми словами й кольорами.</p>
+        <div id="reflist"></div>
+        <p style="margin:10px 0 0"><a class="libbtn" id="eflib" href="https://hyperframes.heygen.com/catalog" target="_blank" rel="noopener">Ще більше ефектів у бібліотеці ↗</a></p></details>
     </section>
 
     <section data-p="graphics" hidden>
       <div class="sechead"><h2>Нарізка й <em>графіка</em></h2><div class="sectools"><button class="icon notebtn" type="button">+ Нотатка</button></div></div>
-      <p class="lede">У плеєрі справжня нарізка зі склейками: перевір її. Нижче графіка від Claude: залиш, попроси змінити або прибери.</p>
+      <p class="lede">Тапни елемент на таймлайні: під ним усе про нього (як виглядає, коли, скільки, що з ним робити). Тягни блок, щоб посунути.</p>
+      <div class="panel stylepanel">
+        <details class="capstyles styledet" id="styledet"><summary><b>Стиль монтажу</b> <span class="mode" id="stylecur"></span></summary>
+        <div class="gpre" id="stylepick" role="group" aria-label="Стиль монтажу" style="margin-top:8px"></div>
+        <p class="mode" id="stylehint" style="margin-top:4px"></p>
+        <label id="speedlabel">Швидкість руху графіки</label>
+        <div class="gpre" id="speedpick" role="group" aria-labelledby="speedlabel"></div></details>
+      </div>
+      <div class="tl" id="tl" hidden></div>
+      <div class="insp" id="insp"></div>
+      <div id="holder" hidden>
+        <div id="hookbox" class="ibox">
+          <div id="hookoptbox" hidden><label>Обери варіант або напиши свій</label><div class="hookopts" id="hookopts"></div></div>
+          <label for="hooktext">Текст хука</label>
+          <input type="text" id="hooktext" placeholder="Напр.: Чому не / виходить / заробляти? (/ = новий рядок)">
+          <div class="ctl" hidden><button class="b quiet" id="hookmove" type="button">Перемістити хук на відео</button><span class="mode" id="hookmovemsg"></span></div>
+          <details class="lookdet" id="hooklookdet"><summary>Вигляд хука: розташування, розмір, кожен рядок окремо (шрифт, колір, контур, фон), тінь</summary><div id="hooklook"></div></details>
+        </div>
+        <div id="ctabox" class="ibox">
+          <label for="ctatext">Текст заклику</label>
+          <input type="text" id="ctatext" placeholder="Напр.: Пиши АНКЕТА в директ (слово КАПСОМ стане рожевим)">
+          <div class="row ctl" style="margin-top:8px"><label for="ctadur" style="margin:0">На екрані, секунд</label><input type="number" id="ctadur" value="4" min="2" max="10" step="0.5" style="width:80px"></div>
+          <details class="lookdet" id="ctalookdet"><summary>Вигляд заклику: розташування, розмір, кожен рядок окремо (шрифт, колір, контур, фон), тінь</summary><div id="ctalook"></div></details>
+        </div>
+      </div>
       <div class="panel" id="cutbox">
         <div class="gtop"><label style="margin:0">Нарізка</label><span class="mode" id="cutstate"></span></div>
         <div class="ctl" style="margin-top:6px"><input type="text" id="cutnote" placeholder="Що не так у нарізці в цей момент (склейка, зайве слово)"><button class="b" id="cutadd" type="button">Нотатка на цю секунду</button></div>
         <div id="cutnotes"></div>
       </div>
-      <div class="panel">
-        <label id="stylepicklabel">Стиль монтажу</label>
-        <div class="gpre" id="stylepick" role="group" aria-labelledby="stylepicklabel"></div>
-        <p class="mode" id="stylehint" style="margin-top:4px"></p>
-        <label id="speedlabel">Швидкість руху графіки</label>
-        <div class="gpre" id="speedpick" role="group" aria-labelledby="speedlabel"></div>
-        <div id="hookoptbox" hidden><label>Хук: обери варіант або напиши свій</label><div class="hookopts" id="hookopts"></div></div>
-        <label for="hooktext">Хук: заголовок на початку</label>
-        <input type="text" id="hooktext" placeholder="Напр.: Чому не / виходить / заробляти? (/ = новий рядок)">
-        <details class="lookdet" id="hooklookdet"><summary>Вигляд хука: кольори рядків, контур, тінь, фон</summary><div id="hooklook"></div></details>
-        <label for="ctatext">CTA: заклик у кінці (необов'язково)</label>
-        <input type="text" id="ctatext" placeholder="Напр.: Пиши АНКЕТА в директ (слово КАПСОМ стане рожевим)">
-        <div class="row ctl" style="margin-top:8px"><label for="ctadur" style="margin:0">CTA на екрані, секунд</label><input type="number" id="ctadur" value="4" min="2" max="10" step="0.5" style="width:80px"></div>
-      </div>
-      <div class="tally" id="gtally"></div>
-      <div class="cards" id="cards"><div class="empty">Графіка з'явиться тут, коли рілс завантажиться.</div></div>
+      <details class="panel alllist" id="alllist"><summary><b>Усі елементи списком</b> <span class="tally" id="gtally"></span></summary>
+        <div class="cards" id="cards"><div class="empty">Графіка з'явиться тут, коли рілс завантажиться.</div></div></details>
     </section>
 
     <section data-p="captions" hidden>
       <div class="sechead"><h2>Субтитри</h2><div class="sectools"><button class="icon notebtn" type="button">+ Нотатка</button></div></div>
       <p class="lede">Тапни слово, щоб зробити його акцентом. <b>правити</b> змінює текст, ±0,1 зсуває початок, <b>об'єднати</b> склеює з наступним, <b>роз'єднати</b> ставить кожне слово окремо.</p>
-      <div class="panel capplace"><div class="gtop"><span class="gtitle" style="margin:0">Де субтитри</span><span class="mode" id="capyval"></span></div>
-        <div class="gpre" id="capplace"></div>
-        <div class="fontrow"><span class="fl">Шрифт</span><button type="button" class="fontbtn" id="capfont" data-role="body"></button>
-          <span class="fl">Слово-акцент</span><button type="button" class="fontbtn" id="capacc" data-role="accent"></button></div>
-        <div class="fontpop" id="fontpop" hidden><input type="text" id="fontq" placeholder="Пошук шрифту" aria-label="Пошук шрифту"><div class="fontlist" id="fontlist"></div></div>
-        <label class="gs capsize" style="margin-top:8px"><span class="gl">Розмір тексту</span><span class="gv" id="capszv"></span><input type="range" id="capsz" min="56" max="140" step="2" aria-label="Розмір субтитрів"></label>
-        <p class="mode" style="margin:6px 0 0">Або перетягни субтитр на відео вгору чи вниз. Графіка сама відсунеться від обличчя й субтитрів.</p></div>
+      <div class="capplace"><div class="ggrid lookcards capcards">
+        <div class="ggroup"><div class="gtitle">Де субтитри</div><div class="gpre" id="capplace"></div>
+          <p class="mode" style="margin:8px 0 0">Зараз: <b id="capyval"></b>. Або перетягни субтитр на відео.</p></div>
+        <div class="ggroup"><div class="gtitle">Шрифт</div>
+          <div class="fontrow"><span class="fl">Основний</span><button type="button" class="fontbtn" id="capfont" data-role="body"></button>
+            <span class="fl">Слово-акцент</span><button type="button" class="fontbtn" id="capacc" data-role="accent"></button></div>
+          <div class="fontpop" id="fontpop" hidden><input type="text" id="fontq" placeholder="Пошук шрифту" aria-label="Пошук шрифту"><div class="fontlist" id="fontlist"></div></div></div>
+        <div class="ggroup"><div class="gtitle">Розмір</div>
+          <label class="gs capsize"><span class="gl">Розмір тексту</span><span class="gv" id="capszv"></span><input type="range" id="capsz" min="56" max="140" step="2" aria-label="Розмір субтитрів"></label>
+          <p class="mode" style="margin:6px 0 0">Графіка сама відсунеться від обличчя й субтитрів.</p></div>
+      </div></div>
       <details class="panel capstyles" id="capstylebox" hidden open><summary><b>Анімація субтитрів</b> <span class="mode" id="capstylecur"></span></summary>
         <p class="lede">Стиль з бібліотеки ефектів: твої слова, таймінг, шрифт і кольори, а рух від стилю. На відео вище видно звичайні субтитри, обраний стиль з'явиться на чернетці.</p>
         <div class="capgrid" id="capgrid"></div></details>
       <details class="panel lookdet" id="caplookdet" open><summary>Вигляд субтитрів: колір, контур, тінь, фон, акцент</summary><div id="caplook"></div></details>
-      <div class="sr"><input type="text" id="srfind" placeholder="Знайти слово" aria-label="Знайти слово"><input type="text" id="srrepl" placeholder="Замінити на" aria-label="Замінити на"><button class="b" id="srgo" type="button">Замінити всюди</button><span class="mode" id="srmsg" aria-live="polite"></span></div>
+      <div class="sr"><span class="srl">Виправити слово всюди</span><input type="text" id="srfind" placeholder="було" aria-label="Знайти слово"><span class="srar" aria-hidden="true">→</span><input type="text" id="srrepl" placeholder="стало" aria-label="Замінити на"><button class="b" id="srgo" type="button">Замінити</button><span class="mode" id="srmsg" aria-live="polite"></span></div>
       <div class="tally" id="captally"></div>
       <div class="caps" id="caps"><div class="empty">Субтитри з'являться тут, коли рілс завантажиться.</div></div>
     </section>
 
     <section data-p="sound" hidden>
       <div class="sechead"><h2>Звук і <em>колір</em></h2><div class="sectools"><button class="icon notebtn" type="button">+ Нотатка</button></div></div>
-      <h2>Чистка голосу</h2>
-      <p class="lede">Ті самі 10 секунд до і після чистки.</p>
-      <div class="ctl" id="voiceclean" style="margin-bottom:12px"></div>
-      <div class="pair" id="audio"></div>
-      <h2>Колір</h2>
-      <p class="lede">Відео зліва одразу показує результат, у рендері буде так само. Подвійний клік по назві повертає 0.</p>
-      <div class="gpanel">
-        <div class="gtop"><div class="gpre" id="gradepre"></div></div>
-        <div id="gradebox"></div>
+      <div class="scards">
+        <div class="panel scard"><div class="gtitle">Голос</div>
+          <p class="lede">Ті самі 10 секунд до і після.</p>
+          <div class="ctl" id="voiceclean" style="margin-bottom:10px"></div>
+          <div class="pair" id="audio"></div></div>
+        <div class="panel scard"><div class="gtitle">Колір</div>
+          <p class="lede">Відео зліва одразу показує результат, у рендері буде так само. Подвійний клік по назві повертає 0.</p>
+          <div class="gtop"><div class="gpre" id="gradepre"></div></div>
+          <div id="gradebox"></div>
+          <div class="pair" id="colour"></div></div>
+        <div class="panel scard"><div class="gtitle">Звуки на графіці</div>
+          <p class="lede">Звуки на появі графіки. Вимкни зайві або заміни.</p>
+          <div id="cues"></div></div>
       </div>
-      <div class="pair" id="colour"></div>
-      <h2>Звукові ефекти</h2>
-      <p class="lede">Звуки на появі графіки. Вимкни зайві.</p>
-      <div id="cues"></div>
     </section>
 
     <section data-p="style" hidden>
@@ -685,7 +919,9 @@ section[data-p="effects"].with{margin-top:34px;padding-top:24px;border-top:1px s
       <div class="sechead"><h2>Чернетка</h2><div class="sectools"><button class="icon notebtn" type="button">+ Нотатка</button></div></div>
       <p class="lede">Claude збирає відео з твоїми рішеннями (<span id="preveta">~7 хв</span>). Потім залиш нотатки на потрібних секундах.</p>
       <div class="state" id="bstate">Чернетку ще не зібрано.</div>
-      <div class="ctl"><button class="b primary" id="build" type="button">Зібрати чернетку</button></div>
+      <div class="ctl" hidden><button class="b primary" id="build" type="button">Зібрати чернетку</button></div>
+      <div class="panel" id="igbox" hidden><label for="igcap"><b>Instagram: підпис до рілса</b></label>
+        <textarea id="igcap" placeholder="Текст під рілсом, хештеги. Публікуєш кнопкою внизу"></textarea><p class="mode" id="igstate"></p></div>
       <h2>Нотатки до чернетки</h2>
       <div class="ctl"><input type="text" id="revtext" placeholder="Що змінити в цей момент"><button class="b" id="revadd" type="button">Додати нотатку на цю секунду</button></div>
       <div id="revs"></div>
@@ -722,1707 +958,4 @@ try { const f = JSON.parse(localStorage.getItem("reelFonts") || "null");
     if (f.body) document.documentElement.style.setProperty("--f-body", '"rb", system-ui, sans-serif'); } } catch (e) {}
 </script>
 <script src="core.js"></script>
-<script>
-const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
-const v = $("#v"), ov = $("#ov");
-// ---------- safe zones: the Instagram Reels screen over the video (ReelCore.SAFE) ----------
-function drawZones() { $("#sz").innerHTML = zonesSvg((R && R.handle) || ""); }
-function zonesSvg(nick) {
-  const Z = ReelCore.SAFE, r = (b, cls) => `<rect class="${cls}" x="${b[0]}" y="${b[1]}" width="${b[2]}" height="${b[3]}" rx="${cls === "line" ? 24 : 0}"/>`;
-  const [bx, by] = Z.covered.find(z => z.id === "buttons").box;
-  const icons = [0, 1, 2, 3].map(k => `<circle class="ic" cx="${bx + 75}" cy="${by + 70 + k * 120}" r="30"/>`).join("");
-  const handle = (nick || "твій_нік").replace(/^@/, "");
-  return `<svg viewBox="0 0 1080 1920" preserveAspectRatio="none">${Z.crop.map(b => r(b, "crop")).join("")}${Z.covered.map(z => r(z.box, "cov")).join("")}
-    ${r(Z.safe, "line")}${icons}<text x="70" y="130">Reels</text>
-    <circle class="ic" cx="105" cy="1590" r="34"/><text x="160" y="1601">${handle.replace(/[<&]/g, "")} · Стежити</text>
-    <text x="70" y="1690" opacity=".7">Підпис до рілса…</text><text x="70" y="1790" opacity=".7">♫ Оригінальний звук</text></svg>`;
-}
-function zonesOn(on) {
-  $("#sz").hidden = !on; $("#szbtn").setAttribute("aria-pressed", on); $("#szbtn").classList.toggle("on", on);
-  if (on) drawZones();
-  try { localStorage.setItem("reelZones", on ? "1" : ""); } catch (e) {}
-}
-const fmt = t => `${Math.floor(t / 60)}:${(Math.max(0, t) % 60).toFixed(1).padStart(4, "0")}`;
-let R = null, B = null, CB = null, S = blank(), P = null, CAPS = [], GFX = [];
-// the cut on its own (db builds/cut): rendered right after step 1 so the cuts are checked before the graphics
-const cutHash = d => { const x = JSON.stringify([d.cut, d.restoredFillers, d.restoredPauses, d.trimmedPauses]); let h = 5381; for (let i = 0; i < x.length; i++) h = ((h << 5) + h + x.charCodeAt(i)) | 0; return (h >>> 0).toString(36); };
-const cutVid = () => tab === "graphics" && !!CB?.url;
-let tab = "cuts", ref = null, saving = Promise.resolve(), timer = null, undo = [], mode = "idle", loop = null;
-function blank() { return { cut: null, restoredFillers: [], restoredPauses: [], trimmedPauses: [], captions: null, board: {}, sfxOff: {}, overlays: [], effects: [], notes: {}, brandRequest: "", revisions: [], buildRequest: null }; }
-
-// ---------- saving, undo ----------
-const pill = (t, err) => { $("#save").textContent = t; $("#save").classList.toggle("err", !!err); $("#retry").hidden = !err; };
-let dirty = false, mine = null;   // dirty: local edits not yet sent; mine: updatedAt of our last write (to spot other writers)
-function queueSave() {
-  clearTimeout(timer); dirty = true; pill("Є незбережені зміни…");
-  timer = setTimeout(saveNow, 600);
-}
-function saveNow() {
-  if (!ref) { pill("Немає з'єднання: зміни не збережуться", true); return; }
-  dirty = false;
-  const body = JSON.parse(JSON.stringify({ ...S, updatedAt: new Date().toISOString() }));
-  mine = body.updatedAt;
-  pill("Зберігаю…");
-  saving = saving.then(() => ref.set(body)).then(() => pill("Збережено " + new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })),
-    e => pill("Не вдалося зберегти (" + (e?.code || "error") + ")", true));
-}
-$("#retry").addEventListener("click", saveNow);
-function mutate(fn) {
-  undo.push(JSON.stringify(S)); if (undo.length > 60) undo.shift();
-  fn(); $("#undo").disabled = false; recompute(); renderAll(); setPos(pos); queueSave();
-}
-function doUndo() { if (!undo.length) return; S = JSON.parse(undo.pop()); $("#undo").disabled = !undo.length; recompute(); renderAll(); queueSave(); }
-$("#undo").addEventListener("click", doUndo);
-$("#szbtn").addEventListener("click", () => zonesOn($("#sz").hidden));
-try { if (localStorage.getItem("reelZones")) zonesOn(true); } catch (e) {}
-document.addEventListener("keydown", e => { if ((e.metaKey || e.ctrlKey) && e.key === "z" && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) { e.preventDefault(); doUndo(); } });
-
-// ---------- derived timeline ----------
-function decisions() { return { ...S, cut: S.cut || R.proposedCut, captions: S.captions || R.captions }; }
-function recompute() { const d = decisions(); P = ReelCore.plan(R, d); CAPS = ReelCore.captions(R, d, P); GFX = ReelCore.graphics(R, d, P); ReelCore.capsAround(R, d, CAPS, GFX); }
-
-// ---------- tabs ----------
-const STEP_OF = { cuts: 1, overlays: 1, effects: 1, captions: 1, sound: 1, mystyle: 1, graphics: 2, preview: 3 };
-let lastSub = "cuts";
-function showTab(t) {
-  if (t === "effects") t = "overlays";   // «Накладення й ефекти» is one screen
-  tab = t;
-  if (STEP_OF[t] === 1) lastSub = t;
-  $$("#steps .st").forEach(b => b.classList.toggle("here", +b.dataset.s === STEP_OF[t]));
-  $("#stylelink").classList.toggle("here", t === "style");
-  $(".tabs").classList.toggle("off", STEP_OF[t] !== 1);
-  $$(".tab").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t));
-  $$("section[data-p]").forEach(s => s.hidden = s.dataset.p !== t && !(t === "overlays" && s.dataset.p === "effects"));
-  $('section[data-p="effects"]').classList.toggle("with", t === "overlays");
-  $("#notesbox").hidden = t === "style"; document.querySelector(".wrap").classList.toggle("stylemode", t === "style");
-  if (t === "style") { $("#nextbox").hidden = true; stopPlay(); renderStyle(); renderStage(); return; }
-  if (!R) return;
-  $("#notetab").textContent = { cuts: "нарізка", overlays: "накладення", effects: "ефекти", graphics: "графіка", captions: "субтитри", sound: "звук і колір", mystyle: "стиль монтажу", preview: "чернетка" }[t];
-  $("#notes").value = S.notes[t] || ""; $("#notesdet").open = !!(S.notes[t] || "").trim() || !!((S.refs || {})[t] || []).length; $("#resetbox").hidden = t === "preview";
-  renderRefs();
-  $("#nextbox").hidden = true;   // the steps on top and the bar at the bottom lead the way now
-  $("#notesbox").hidden = !(S.notes[t] || "").trim() && !((S.refs || {})[t] || []).length;
-  stopPlay();
-  if (t !== "overlays" && placing && !placing.id) stopPlacing();
-  if (t === "overlays" && assets && $("#ovbox").open && !placing) setTimeout(() => startPlacing(OV_PLACE[ovMode()]), 0);
-  $("#noprev").hidden = !(t === "preview" && !B?.url);
-  $("#mode").hidden = t === "preview" || (t === "graphics" && !!CB?.url); $("#szbtn").hidden = t === "preview";
-  $("#sz").hidden = t === "preview" || $("#szbtn").getAttribute("aria-pressed") !== "true";
-  if (cutVid()) { $("#clock").hidden = true; if (v.getAttribute("src") !== CB.url) { v.setAttribute("src", CB.url); v.load(); } $("#rough").hidden = $("#back5").hidden = $("#fwd5").hidden = true; $(".scrub").hidden = true; v.controls = true; mode = "cutvid"; }
-  else if (t === "preview") { $("#clock").hidden = true; if (B?.url && v.getAttribute("src") !== B.url) { v.setAttribute("src", B.url); v.load(); } $("#rough").hidden = $("#back5").hidden = $("#fwd5").hidden = true; $(".scrub").hidden = true; v.controls = true; }
-  else { if (v.getAttribute("src") !== R.srcUrl) { v.setAttribute("src", R.srcUrl); v.load(); } $("#rough").hidden = $("#back5").hidden = $("#fwd5").hidden = false; $(".scrub").hidden = false; v.controls = false; }
-  if (t === "captions" && R) { mode = "roughPaused"; v.currentTime = P.toSrc(pos); $("#clock").hidden = false; }
-  gradeView(); overlay(pos); renderStage();
-}
-$$(".tab").forEach(b => b.addEventListener("click", () => showTab(b.dataset.tab)));
-// the steps in order: a number on each tab and a «Далі» button under each section
-const ORDER = $$(".tab:not(.tabx)").map(b => b.dataset.tab);   // «Стиль» is not a step of the reel
-$$("#steps .st, #stylelink").forEach(b => b.addEventListener("click", () => { const go = b.dataset.go; showTab(go === "cuts" ? lastSub : go); scrollTo({ top: 0, behavior: "smooth" }); }));
-$$(".notebtn").forEach(b => b.addEventListener("click", () => { $("#notesbox").hidden = false; $("#notesdet").open = true; $("#notesdet").scrollIntoView({ block: "center", behavior: "smooth" }); setTimeout(() => $("#notes").focus(), 300); }));
-$$(".helpbtn").forEach(b => b.addEventListener("click", () => { const on = $("#legend").hidden; $("#legend").hidden = !on; b.setAttribute("aria-expanded", String(on)); }));
-$("#nextbtn").addEventListener("click", () => { const k = ORDER.indexOf(tab); if (k < ORDER.length - 1) { showTab(ORDER[k + 1]); scrollTo({ top: 0, behavior: "smooth" }); } });
-$("#notes").addEventListener("input", e => { S.notes[tab] = e.target.value; queueSave(); });
-$("#brand").addEventListener("input", e => { S.brandRequest = e.target.value; queueSave(); });
-$("#reset").addEventListener("click", () => {
-  const box = $("#resetbox"); box.textContent = "";
-  const msg = document.createElement("span"); msg.className = "confirm"; msg.textContent = "Повернути цей розділ до моєї пропозиції? ";
-  const yes = document.createElement("button"); yes.className = "b"; yes.type = "button"; yes.textContent = "Скинути";
-  const no = document.createElement("button"); no.className = "b quiet"; no.type = "button"; no.textContent = "Скасувати";
-  const back = () => { box.textContent = ""; box.append(resetBtn); };
-  yes.addEventListener("click", () => { mutate(() => {
-    if (tab === "cuts") Object.assign(S, { cut: null, restoredFillers: [], restoredPauses: [], trimmedPauses: [] });
-    if (tab === "graphics") S.board = {};
-    if (tab === "captions") S.captions = null;
-    if (tab === "sound") { S.sfxOff = {}; S.grade = null; }
-    if (tab === "overlays") S.overlays = [];
-    if (tab === "effects") S.effects = [];
-  }); back(); });
-  no.addEventListener("click", back); msg.append(yes, no); box.append(msg);
-});
-const resetBtn = $("#reset");
-
-// ---------- playback: line (raw) and continuous rough cut ----------
-let pos = 0;   // where the rough cut is, in cut time: pause, scrub and ±5 s all keep it
-v.addEventListener("timeupdate", () => { if (mode === "cutvid") { pos = v.currentTime; overlay(v.currentTime); } });
-v.addEventListener("seeked", () => { if (mode === "cutvid") { pos = v.currentTime; overlay(v.currentTime); } });
-function renderCutBox() {   // notes on the cut video (S.cutNotes, cut seconds) and whether the video still matches her cuts
-  const box = $("#cutnotes"); if (!box) return; box.textContent = "";
-  const st = $("#cutstate");
-  if (CB?.url) st.textContent = CB.cutHash && S.graphicsRequest && cutHash(decisions()) !== CB.cutHash ? "Ти змінила нарізку після цього відео: Claude врахує це в чернетці." : "Відео нарізки: склейки справжні, графіка рамками.";
-  else st.textContent = S.graphicsRequest ? "Claude збирає відео нарізки (~2–3 хв)…" : "Відео нарізки з'явиться після «Готово → Claude» на кроці 1.";
-  $("#cutadd").disabled = !CB?.url;
-  for (const [k, n] of (S.cutNotes || []).entries()) {
-    const row = document.createElement("div"); row.className = "rev";
-    const t = document.createElement("button"); t.className = "ts"; t.type = "button"; t.innerHTML = `<span class="tc">${fmt(n.t)}</span>`;
-    t.addEventListener("click", () => { if (cutVid()) { v.currentTime = n.t; v.play().catch(() => {}); } });
-    const x = document.createElement("span"); x.textContent = n.text;
-    const del = document.createElement("button"); del.type = "button"; del.className = "b quiet"; del.textContent = "Видалити";
-    del.addEventListener("click", () => mutate(() => S.cutNotes.splice(k, 1)));
-    row.append(t, x, del); box.appendChild(row);
-  }
-}
-$("#cutadd").addEventListener("click", () => {
-  const text = $("#cutnote").value.trim(); if (!text) { $("#cutnote").focus(); return; }
-  if (!cutVid()) { pill("Нотатки до нарізки ставляться на відео нарізки.", true); return; }
-  mutate(() => { S.cutNotes = [...(S.cutNotes || []), { t: +v.currentTime.toFixed(2), text }].sort((a, b) => a.t - b.t); }); $("#cutnote").value = "";
-});
-function stopPlay() { mode = "idle"; cancelAnimationFrame(loop); v.pause(); v.playbackRate = 1; $("#rough").textContent = "▶ Нарізка"; }
-function setPos(c) {
-  pos = Math.max(0, Math.min(c, P.cutDur - 0.05));
-  $("#scrub").max = P.cutDur.toFixed(1); $("#scrub").value = pos.toFixed(1);
-  $("#pos").textContent = `${fmt(pos)} / ${fmt(P.cutDur)}`; $("#clock").textContent = `монтаж ${fmt(pos)} / ${fmt(P.cutDur)}`;
-  $("#ovat").textContent = fmt(pos); $("#efat").textContent = fmt(pos);
-}
-function seekCut(c) {   // jump within the rough cut; keeps playing if it was playing, else shows that frame
-  setPos(c); v.currentTime = P.toSrc(pos); $("#clock").hidden = false;
-  if (mode !== "rough") { mode = "roughPaused"; overlay(pos); }
-}
-$("#scrub").addEventListener("input", e => seekCut(+e.target.value));
-$("#back5").addEventListener("click", () => seekCut(pos - 5));
-$("#fwd5").addEventListener("click", () => seekCut(pos + 5));
-function playLine(s, e) {
-  stopPlay(); mode = "line"; v.currentTime = s; v.play().catch(() => { stopPlay(); pill("Відтворення заблоковано. Тапни час ще раз.", true); });
-  const tick = () => { if (mode !== "line") return; if (v.currentTime >= e) { stopPlay(); return; } overlay(); loop = requestAnimationFrame(tick); };
-  loop = requestAnimationFrame(tick);
-}
-function playRough(fromCut = pos) {
-  if (fromCut >= P.cutDur - 0.1) fromCut = 0;
-  stopPlay(); mode = "rough"; v.playbackRate = P.speed; setPos(fromCut); v.currentTime = P.toSrc(pos); $("#clock").hidden = false;
-  $("#rough").textContent = "❚❚ Пауза";
-  v.play().catch(() => { stopPlay(); pill("Відтворення заблоковано. Натисни «Дивитись» ще раз.", true); });
-  const tick = () => {
-    if (mode !== "rough") return;
-    const t = v.currentTime, sp = P.spans;
-    const k = sp.findIndex(([a, b]) => t < b);
-    if (k === -1) { stopPlay(); mode = "roughPaused"; setPos(P.cutDur); return; }
-    if (t < sp[k][0] - 0.02) v.currentTime = sp[k][0];          // inside a cut: jump to the next kept span
-    const c = P.toCut(Math.max(t, sp[k][0]));
-    setPos(c); overlay(c); loop = requestAnimationFrame(tick);
-  };
-  loop = requestAnimationFrame(tick);
-}
-$("#rough").addEventListener("click", () => { if (mode === "rough") { stopPlay(); mode = "roughPaused"; overlay(pos); } else playRough(pos); });
-v.addEventListener("loadedmetadata", () => { if (mode === "idle" && tab !== "preview" && v.currentTime === 0) v.currentTime = 0.05; });   // show a frame, not black
-v.addEventListener("error", () => pill("Відео не завантажилось. Онови сторінку; якщо не допоможе, попроси Claude завантажити його знову.", true));
-
-// overlay at a cut time: approximate graphic boxes + caption style preview
-function overlay(c) {
-  ov.textContent = "";
-  if (!R || tab === "preview" || c == null || (mode !== "rough" && mode !== "roughPaused" && mode !== "cutvid" && !placing)) { highlight(null); return; }
-  for (const g of GFX) if (!g.gone && g.state !== "d" && c >= g.start && c < g.end && !(placing && g.id === placing.id)) {
-    if (g.type === "title" && (g.text || "").trim()) { const h = hookEl(g); ov.appendChild(h); fitHook(h); }
-    else if (g.user && g.type === "bigtext") { const t = txtEl(g.text, g.place, lookOf("ov:" + g.id)); ov.appendChild(t); fitHook(t); }
-    else ov.appendChild(box(g, true)); }
-  if (placing) {
-    const pt = placing.id ? (GFX.find(x => x.id === placing.id && x.type === "bigtext") || {}).text : ovKind() === "text" && $("#ovtext").value.trim();
-    if (pt) { const t = txtEl(pt, placing.place, lookOf(placing.id ? "ov:" + placing.id : "txt")); ov.appendChild(t); fitHook(t); }
-    ov.appendChild(placeBox());
-  }
-  let cap = GFX.some(g => g.capsAside && !g.gone && g.state !== "d" && c >= g.start && c < g.end) ? null : CAPS.find(x => !x.gone && c >= x.start && c < x.end);
-  const place = tab === "captions" && mode !== "rough";
-  if (!cap && place) cap = CAPS.find(x => !x.gone && x.start >= c) || CAPS.filter(x => !x.gone).pop();   // something to drag
-  if (cap) { const el = capEl(cap); ov.appendChild(el); fitCap(el); if (place) dragCap(el); }
-  highlight(c, cap);
-}
-function box(g, label) {
-  const [x, y, w, h] = g.place || [90, 200, 900, 500];
-  const el = document.createElement("div"); el.className = "gbox";
-  Object.assign(el.style, { left: x / 10.8 + "%", top: y / 19.2 + "%", width: w / 10.8 + "%", height: h / 19.2 + "%" });
-  if (g.imgUrl) el.style.backgroundImage = `linear-gradient(rgba(237,132,176,.15),rgba(237,132,176,.15)),url(${JSON.stringify(g.imgUrl)})`;
-  if (g.imgUrl && g.user) Object.assign(el.style, { backgroundSize: "contain", backgroundRepeat: "no-repeat", backgroundPosition: "center" });   // their own pictures: shown whole
-  if (label) {   // the card's own words, so the rough cut says what will be there (the real look is in the draft)
-    const words = (g.text || g.title || g.top || "").replace(/\s*\/\s*/g, " ").trim() || (g.what || "");
-    el.textContent = g.kind + (words ? ": " + (words.length > 70 ? words.slice(0, 68) + "…" : words) : "");
-    el.style.whiteSpace = "normal"; el.style.textAlign = "center"; el.style.lineHeight = "1.2";
-  }
-  return el;
-}
-function capEl(cap) {
-  const st = R.style, W = $("#player").clientWidth, one = cap.words.length === 1, L = lookOf("cap"), k = W / 1080, big = L.acc.look === "big";
-  const el = document.createElement("div"); el.className = "capov" + (big && !one ? " ed" : "");
-  const base = (S.capSize ?? st.capSize) / 1080 * W * (one ? 1.35 : 1);
-  const cf = S.capFont || {};
-  Object.assign(el.style, { top: (cap.y ?? ReelCore.capY(R, decisions())) / 19.2 + "%", fontFamily: cf.body ? (cf.body.brandFile ? cf.body.base : `"${cf.body.family}", sans-serif`) : "rb, var(--f-body)",
-    fontWeight: cf.body ? cf.body.weight : "", fontSize: base + "px", textShadow: "none" });
-  const run = document.createDocumentFragment();
-  const wbg = L.bg === "word" ? lookBg(L, k) : "";
-  let n = L.acc.a2 ? accBefore(cap) : 0;   // two accent colours alternate across the reel, as in the render
-  for (const w of cap.words) {
-    const s = document.createElement("span"), t = w.text.replace(/[.,!?;:]+$/, ""), tx = st.case === "lower" ? t.toLowerCase() : t;   // captions carry no punctuation
-    if (w.accent) {
-      const col = L.acc.a2 && n++ % 2 ? L.acc.a2 : L.acc.a1; s.className = "a";
-      s.style.cssText = `font-family:${cf.accent ? (cf.accent.brandFile ? cf.accent.base : `"${cf.accent.family}", serif`) : "ra, Georgia, serif"};font-style:${cf.accent ? cf.accent.style : "italic"};font-weight:${cf.accent ? cf.accent.weight : ""};font-size:${big ? 1.7 : 1.12}em;` + accCss(L, col) + (L.acc.look === "box" ? "" : wbg);   // a «Плашка» accent keeps its own box
-      if (L.acc.look === "echo") { s.style.position = "relative"; s.style.display = "inline-block"; s.style.zIndex = 0;
-        for (const e of [1, 2]) { const i = document.createElement("i"); i.textContent = tx; i.setAttribute("aria-hidden", "true");
-          i.style.cssText = `position:absolute;left:0;top:${-0.42 * e}em;z-index:-1;font-style:inherit;opacity:${0.42 / e};color:${col};-webkit-text-fill-color:${col};-webkit-text-stroke:0;text-shadow:none`; s.appendChild(i); } }
-      s.appendChild(document.createTextNode(tx));
-    } else { s.textContent = tx; if (wbg) s.style.cssText = wbg; }
-    run.appendChild(s); run.appendChild(document.createTextNode(" "));
-  }
-  const look = lookRun(L, k, (() => { const w = document.createElement("span"); w.appendChild(run); return w; })());
-  if (L.bg === "line") { const bx = document.createElement("span"); bx.style.cssText = lookBg(L, k); bx.appendChild(look); el.appendChild(bx); } else el.appendChild(look);
-  return el;
-}
-function dragCap(el) {   // move the captions up or down on the player; saved as this reel's caption height
-  el.classList.add("capdrag"); el.title = "Перетягни вгору або вниз";
-  el.addEventListener("pointerdown", e => {
-    e.preventDefault(); el.setPointerCapture(e.pointerId);
-    const k = 1920 / $("#player").clientHeight, sy = e.clientY, y0 = ReelCore.capY(R, decisions()); let y = y0;
-    const mv = ev => { y = Math.round(Math.max(150, Math.min(1560, y0 + (ev.clientY - sy) * k))); el.style.top = y / 19.2 + "%"; $("#capyval").textContent = capWhere(y); };
-    const up = () => { el.removeEventListener("pointermove", mv); el.removeEventListener("pointerup", up); if (y !== y0) mutate(() => { S.capY = y; }); };
-    el.addEventListener("pointermove", mv); el.addEventListener("pointerup", up);
-  });
-}
-// caption fonts: the design system first, then free Google Fonts checked to have Ukrainian letters (Ї Є Ґ І); the brand's banned fonts are left out
-// the design system's own list comes from brand.json "caption_fonts" (reel.json fontChoices): {body|accent: [{label, file|gf, weight, style}]}
-const brandName = role => ((R && R.fontChoices && R.fontChoices.names) || {})[role] || (role === "body" ? "Бренд: основний" : "Бренд: акцент");
-const brandFonts = role => [["brand", brandName(role) + (role === "accent" ? " italic" : ""), null, 400, role === "body" ? "normal" : "italic"]]
-  .concat(((R && R.fontChoices) || {})[role]?.map(f => [f.label, f.label, f.gf || null, f.weight || 400, f.style || "normal", f.file]) || []);
-const GF = {
-  "Без засічок": "Golos Text|Golos+Text:wght@600;Rubik|Rubik:wght@600;Nunito|Nunito:wght@700;Nunito Sans|Nunito+Sans:wght@700;Raleway|Raleway:wght@600;Commissioner|Commissioner:wght@600;Geologica|Geologica:wght@600;Exo 2|Exo+2:wght@600;Comfortaa|Comfortaa:wght@700;Fira Sans|Fira+Sans:wght@600;Fira Sans Condensed|Fira+Sans+Condensed:wght@600;IBM Plex Sans|IBM+Plex+Sans:wght@600;PT Sans|PT+Sans:wght@700;PT Sans Narrow|PT+Sans+Narrow:wght@700;Noto Sans|Noto+Sans:wght@600;Ubuntu|Ubuntu:wght@500;Ubuntu Condensed|Ubuntu+Condensed;Source Sans 3|Source+Sans+3:wght@600;Mulish|Mulish:wght@700;Wix Madefor Display|Wix+Madefor+Display:wght@600;Wix Madefor Text|Wix+Madefor+Text:wght@600;Sofia Sans|Sofia+Sans:wght@600;Sofia Sans Condensed|Sofia+Sans+Condensed:wght@700;Oswald|Oswald:wght@500;Play|Play:wght@700;Philosopher|Philosopher:wght@700;Tektur|Tektur:wght@600;Jura|Jura:wght@600;Scada|Scada:wght@700;Cuprum|Cuprum:wght@600;Didact Gothic|Didact+Gothic;Arimo|Arimo:wght@600;Geist|Geist:wght@600;Podkova|Podkova:wght@600;Yanone Kaffeesatz|Yanone+Kaffeesatz:wght@600",
-  "З засічками": "Lora|Lora:ital,wght@1,400|i;Playfair Display|Playfair+Display:ital,wght@1,400|i;Cormorant Garamond|Cormorant+Garamond:ital,wght@1,500|i;Cormorant|Cormorant:ital,wght@1,500|i;PT Serif|PT+Serif:ital,wght@1,400|i;EB Garamond|EB+Garamond:ital,wght@1,400|i;Merriweather|Merriweather:ital,wght@1,400|i;Noto Serif|Noto+Serif:ital,wght@1,400|i;Literata|Literata:ital,wght@1,400|i;Spectral|Spectral:ital,wght@1,400|i;Alice|Alice;Old Standard TT|Old+Standard+TT:ital@1|i;Prata|Prata;Ledger|Ledger;Vollkorn|Vollkorn:ital,wght@1,400|i;Tinos|Tinos:ital@1|i;Gabriela|Gabriela;El Messiri|El+Messiri:wght@600",
-  "Виразні": "Russo One|Russo+One;Days One|Days+One;Prosto One|Prosto+One;Dela Gothic One|Dela+Gothic+One;Rubik Mono One|Rubik+Mono+One;Seymour One|Seymour+One;Ruslan Display|Ruslan+Display;Kelly Slab|Kelly+Slab;Yeseva One|Yeseva+One;Forum|Forum;Oranienbaum|Oranienbaum;Underdog|Underdog;Climate Crisis|Climate+Crisis;Rubik Doodle Shadow|Rubik+Doodle+Shadow;Rubik Wet Paint|Rubik+Wet+Paint",
-  "Рукописні": "Caveat|Caveat:wght@600;Marck Script|Marck+Script;Bad Script|Bad+Script;Neucha|Neucha;Amatic SC|Amatic+SC:wght@700;Kurale|Kurale;Pangolin|Pangolin;Comforter|Comforter;Great Vibes|Great+Vibes;Pacifico|Pacifico;Lobster|Lobster;Pattaya|Pattaya" };
-const GF_LIST = Object.entries(GF).map(([cat, str]) => [cat, str.split(";").map(x => { const [fam, gf, it] = x.split("|"); const w = +(gf.match(/@(?:1,)?(\d{3})$/) || [])[1] || 400; return { family: fam, gf, weight: w, style: it ? "italic" : "normal" }; })]);
-const brandSpec = r => r[0] === "brand" ? null : r[2] ? { family: r[0], gf: r[2], weight: r[3], style: r[4] || "normal" } : { family: r[1], brandFile: r[5], weight: r[3], style: r[4] || "normal", base: "bf_" + r[5].replace(/\W/g, "_") + ", " + (r[5].startsWith("Nyght") ? "ra" : "rb") };
-const gfLoaded = new Set();
-function loadGf(spec) { if (!spec || !spec.gf || gfLoaded.has(spec.gf)) return; gfLoaded.add(spec.gf);
-  document.head.appendChild(Object.assign(document.createElement("link"), { rel: "stylesheet", href: `https://fonts.googleapis.com/css2?family=${spec.gf}&display=swap` })); }
-let previewsLoaded = false;
-function loadPreviews() {   // every family's name in its own face: one small request (only the letters of the names)
-  if (previewsLoaded) return; previewsLoaded = true;
-  const fams = GF_LIST.flatMap(([, l]) => l).concat(["body", "accent"].flatMap(r => brandFonts(r).filter(x => x[2]).map(x => ({ gf: x[2] }))));
-  const text = encodeURIComponent([...new Set(GF_LIST.flatMap(([, l]) => l.map(f => f.family)).join("") + "ManropeOnest" + "Їжак ґаву з'їв")].join(""));
-  for (let i = 0; i < fams.length; i += 25)
-    document.head.appendChild(Object.assign(document.createElement("link"), { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?" + fams.slice(i, i + 25).map(f => "family=" + f.gf).join("&") + "&text=" + text + "&display=swap" }));
-}
-const faceCss = (spec, role) => spec ? (spec.brandFile ? `font-family:${spec.base};font-weight:${spec.weight};font-style:${spec.style}` : `font-family:"${spec.family}";font-weight:${spec.weight};font-style:${spec.style}`)
-  : (role === "body" ? "font-family:rb, var(--f-body)" : "font-family:ra, Georgia, serif;font-style:italic");
-function fillFontSelects() {
-  for (const [role, id] of [["body", "#capfont"], ["accent", "#capacc"]]) {
-    const sp = (S.capFont || {})[role]; loadGf(sp);
-    const b = $(id); b.textContent = sp ? sp.family : brandName(role); b.style.cssText = faceCss(sp, role);
-  }
-}
-let popRole = null;
-function openFonts(role) {
-  popRole = role; loadPreviews(); const pop = $("#fontpop"); pop.hidden = false; $("#fontq").value = ""; renderFontList(); $("#fontq").focus();
-  const btn = role === "body" ? $("#capfont") : $("#capacc"); btn.after(pop);
-}
-function renderFontList() {
-  const q = $("#fontq").value.trim().toLowerCase(), box = $("#fontlist"); box.textContent = "";
-  const cur = ((S.capFont || {})[popRole] || {}).family || "brand";
-  const groups = [["Дизайн-система", brandFonts(popRole).map(r => ({ id: r[0], label: r[1], spec: brandSpec(r) }))]]
-    .concat((popRole === "accent" ? [GF_LIST[1], GF_LIST[3], GF_LIST[2], GF_LIST[0]] : GF_LIST).map(([cat, l]) => [cat, l.map(f => ({ id: f.family, label: f.family, spec: f }))]));
-  for (const [cat, items] of groups) {
-    const list = items.filter(it => !q || it.label.toLowerCase().includes(q)); if (!list.length) continue;
-    const h = document.createElement("div"); h.className = "gtitle"; h.textContent = cat; box.appendChild(h);
-    for (const it of list) {
-      const b = document.createElement("button"); b.type = "button"; b.className = "fontopt"; b.setAttribute("aria-pressed", it.id === cur || (it.spec && it.spec.family === cur));
-      b.innerHTML = `<span></span><small>Їжак ґаву з'їв</small>`; b.firstChild.textContent = it.label; b.firstChild.style.cssText = faceCss(it.spec, popRole); b.lastChild.style.cssText = faceCss(it.spec, popRole);
-      if (it.spec && it.spec.gf) b.addEventListener("mouseenter", () => loadGf(it.spec), { once: true });
-      b.addEventListener("click", () => { loadGf(it.spec); const role = popRole;
-        mutate(() => { const f = { ...(S.capFont || {}) }; if (it.spec) f[role] = it.spec; else delete f[role]; S.capFont = Object.keys(f).length ? f : null; });
-        $("#fontpop").hidden = true; setTimeout(() => overlay(pos), 400); });
-      box.appendChild(b);
-    }
-  }
-  if (!box.children.length) box.innerHTML = `<div class="mode" style="padding:8px">Нічого не знайшлось.</div>`;
-}
-$("#capfont").addEventListener("click", () => $("#fontpop").hidden || popRole !== "body" ? openFonts("body") : ($("#fontpop").hidden = true));
-$("#capacc").addEventListener("click", () => $("#fontpop").hidden || popRole !== "accent" ? openFonts("accent") : ($("#fontpop").hidden = true));
-$("#fontq").addEventListener("input", renderFontList);
-document.addEventListener("keydown", e => { if (e.key === "Escape") $("#fontpop").hidden = true; });
-document.addEventListener("click", e => { if (!$("#fontpop").hidden && !e.target.closest("#fontpop,.fontbtn")) $("#fontpop").hidden = true; });
-function capWhere(y) { const F = R.face; if (!F) return Math.round(y / 19.2) + "% висоти";
-  return y + 150 < F[1] ? "над головою" : y > F[1] + F[3] ? (y > 1350 ? "внизу" : "під підборіддям") : "на обличчі"; }
-function renderCapPlace() {
-  const F = R.face || [300, 540, 480, 620], y = ReelCore.capY(R, decisions()), box = $("#capplace"); box.textContent = "";
-  const opts = [["Над головою", Math.max(150, F[1] - 280)], ["Під підборіддям", F[1] + F[3] + 20], ["Внизу", 1400]];
-  for (const [name, val] of opts) { const b = document.createElement("button"); b.type = "button"; b.textContent = name; b.setAttribute("aria-pressed", Math.abs(val - y) < 30);
-    b.addEventListener("click", () => { mutate(() => { S.capY = val; }); if (tab === "captions") { mode = "roughPaused"; overlay(pos); } }); box.appendChild(b); }
-  $("#capyval").textContent = capWhere(y);
-  fillFontSelects();
-  const sz = S.capSize ?? R.style.capSize; $("#capsz").value = sz; $("#capszv").textContent = sz + " px" + (S.capSize == null ? " (бренд)" : "");
-  renderLooks();
-}
-$("#capsz").addEventListener("input", e => { S.capSize = +e.target.value; $("#capszv").textContent = S.capSize + " px"; overlay(pos); });
-$("#capsz").addEventListener("change", () => mutate(() => { if (S.capSize === R.style.capSize) delete S.capSize; }));
-
-// ---------- text look: captions + hook (colour or gradient, outline, shadow, box, accent word, 2nd hook line) ----------
-// stored partial in S.look {cap, hook, keep}: only what was changed; brand.json "text_look" (R.look) and LDEF fill the rest.
-// The render (build_reel.py look_fill / look_bg) uses the same numbers on the 1080 frame.
-const LDEF = {
-  cap: () => ({ c1: R.style.cap || "#FFFFFF", c2: null, gd: 90, sw: 0, sc: "#000000", sh: 30, ss: 28, bg: "none", bc: R.style.main, bo: 70, br: 16,
-    acc: { look: R.style.editorial ? "big" : "color", a1: R.style.acc, a2: R.style.acc2 || null } }),
-  hook: () => ({ c1: R.titleColor || "#FFFFFF", c2: null, gd: 90, sw: 0, sc: "#000000", sh: 40, ss: 68, bg: "none", bc: R.style.main, bo: 70, br: 16,
-    l2: { c1: null, c2: null }, l2acc: false }),
-  // text they add on «Накладення»: "txt" = the look of the next text (and the brand default), "ov:<id>" = one added text (overlay.look)
-  txt: () => ({ c1: "#FFFFFF", c2: null, gd: 90, sw: 0, sc: "#000000", sh: 0, ss: 28, bg: "none", bc: R.style.main, bo: 70, br: 16, font: "head", px: null }) };
-const ovById = id => (S.overlays || []).find(o => o.id === id);
-function lookPart(k) { return k.startsWith("ov:") ? (ovById(k.slice(3)) || {}).look : (S.look || {})[k]; }
-function lookOf(k) {
-  if (k.startsWith("ov:")) { const t = lookOf("txt"); return { ...t, ...(lookPart(k) || {}) }; }
-  const d = LDEF[k](), b = (R.look || {})[k] || {}, s = (S.look || {})[k] || {};
-  const L = { ...d, ...b, ...s, acc: { ...d.acc, ...(b.acc || {}), ...(s.acc || {}) }, l2: { ...d.l2, ...(b.l2 || {}), ...(s.l2 || {}) } };
-  if (!L.l2.c1) L.l2.c1 = L.c1;
-  return L;
-}
-const hexA = (h, a) => { h = (h || "#000000").replace("#", ""); return `rgba(${parseInt(h.slice(0, 2), 16)},${parseInt(h.slice(2, 4), 16)},${parseInt(h.slice(4, 6), 16)},${a})`; };
-function lookShadow(L, k, filt) {
-  const a = L.sh / 100, blur = L.ss * 0.5 * k, sh = `0 ${blur * 0.18 + (a ? 2 * k : 0)}px ${blur}px rgba(0,0,0,${a})`;
-  return filt ? (a ? `filter:drop-shadow(${sh});` : "") : `text-shadow:${a ? sh : "none"};`;
-}
-const lookFill = (L, k) => `color:${L.c1};-webkit-text-fill-color:${L.c1};` + (L.sw > 0 ? `-webkit-text-stroke:${L.sw * 2 * k}px ${L.sc};paint-order:stroke fill;` : "-webkit-text-stroke:0;") + lookShadow(L, k);
-function lookRun(L, k, node, cls) {   // same layers as build_reel.py look_run: gradient clipped to the letters, its outline a copy underneath
-  const run = document.createElement("span"); run.className = cls || "cf"; run.appendChild(node);
-  if (!L.c2) { run.style.cssText = lookFill(L, k); return run; }
-  run.style.cssText = `background:linear-gradient(${L.gd}deg,${L.c1},${L.c2});-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;-webkit-text-stroke:0;text-shadow:none;`;
-  const gw = document.createElement("span"); gw.className = "gw"; gw.style.cssText = lookShadow(L, k, true);
-  if (L.sw > 0) { const go = document.createElement("span"); go.className = "go"; go.setAttribute("aria-hidden", "true"); go.style.setProperty("--oc", L.sc); go.style.setProperty("--ow", L.sw * 2 * k + "px");
-    go.appendChild(node.cloneNode(true)); gw.appendChild(go); }
-  gw.appendChild(run); return gw;
-}
-const lookBg = (L, k) => L.bg === "none" ? "" : `background:${hexA(L.bc, L.bo / 100)};padding:.06em .26em .1em;border-radius:${L.br * k}px;box-decoration-break:clone;-webkit-box-decoration-break:clone;`;
-function accCss(L, col) {
-  if (L.acc.look === "box") return `color:${R.style.main};-webkit-text-fill-color:${R.style.main};background:${col};padding:0 .16em;border-radius:.14em;text-shadow:none;filter:none;-webkit-text-stroke:0;box-decoration-break:clone;-webkit-box-decoration-break:clone;`;
-  if (L.acc.look === "underline") return `color:${L.c1};-webkit-text-fill-color:${L.c1};box-shadow:inset 0 -.2em 0 ${col};`;
-  return `color:${col};-webkit-text-fill-color:${col};`;
-}
-function hookEl(g) {   // the hook on the rough cut, in the picked look (the draft shows the real animation)
-  const L = lookOf("hook"), k = $("#player").clientWidth / 1080, el = document.createElement("div"); el.className = "hookov";
-  const lines = g.text.split("/").map(x => x.trim()).filter(Boolean).map(x => R.style.case === "lower" ? x.toLowerCase() : x);
-  const bold = Object.keys((R.fonts || {}).extra || {}).find(f => /bold/i.test(f));   // the brand's head face (Gilroy Bold) when it was uploaded
-  Object.assign(el.style, { top: ((g.place || [])[1] ?? R.titleY ?? 360) / 19.2 + "%", fontFamily: bold ? "bf_" + bold.replace(/\W/g, "_") + ", rb, var(--f-body)" : "rb, var(--f-body)", fontWeight: bold ? 400 : 700 });
-  lines.forEach((x, j) => {
-    const d = document.createElement("div"), s = document.createElement("span"), alt = j % 2 === 1;
-    d.className = "hl"; d.style.textAlign = lines.length > 1 ? (alt ? "right" : "left") : "center"; d.style.fontSize = 130 * k + "px";
-    if (alt && L.l2acc) Object.assign(d.style, { fontFamily: "ra, Georgia, serif", fontStyle: "italic", fontWeight: 400 });
-    s.style.cssText = lookBg(L, k); s.appendChild(lookRun(alt ? { ...L, c1: L.l2.c1, c2: L.l2.c2 } : L, k, document.createTextNode(x), "hk")); d.appendChild(s); el.appendChild(d);
-  });
-  return el;
-}
-function fitHook(el) { for (const d of el.children) { let fs = parseFloat(d.style.fontSize); for (let i = 0; i < 25 && d.scrollWidth > d.clientWidth + 1; i++) { fs *= 0.92; d.style.fontSize = fs + "px"; } } }
-function setLook(k, key, val, sub, live) {   // live = while dragging (no undo step, no save yet)
-  const apply = () => {
-    if (k.startsWith("ov:")) { const ov = ovById(k.slice(3)); if (ov) ov.look = { ...(ov.look || {}), [key]: val }; return; }
-    S.look = { ...(S.look || {}) }; const o = { ...(S.look[k] || {}) }; if (sub) o[sub] = { ...(o[sub] || {}), [key]: val }; else o[key] = val; S.look[k] = o; };
-  if (live) { apply(); lookPreview(k); } else { mutate(apply); lookPreview(k); }
-}
-function lookPreview(k) {   // show the change on the player: the hook's seconds for the hook, captions where they are
-  if (k === "hook") { const g = GFX.find(x => x.type === "title" && !x.gone && x.state !== "d"); if (g && (pos < g.start || pos >= g.end)) seekCut(g.start + 0.5); }
-  if (k.startsWith("ov:")) { const g = GFX.find(x => x.id === k.slice(3)); if (g && !g.gone && (pos < g.start || pos >= g.end)) seekCut(g.start + 0.3); }
-  if (!["rough", "roughPaused", "cutvid"].includes(mode)) mode = "roughPaused";
-  overlay(pos);
-}
-const LSW = () => [...new Set(["#FFFFFF", "#000000", R.style.main, R.style.acc, R.style.acc2, (R.theme || {}).soft].filter(Boolean).map(x => x.toUpperCase()))];
-function lColor(label, val, set, live) {
-  const r = document.createElement("div"); r.className = "lrow"; r.innerHTML = `<span class="gl"></span><div class="sws"></div>`; r.firstChild.textContent = label;
-  const box = r.lastChild;
-  for (const c of LSW()) { const b = document.createElement("button"); b.type = "button"; b.style.background = c; b.title = c; b.setAttribute("aria-label", label + " " + c);
-    b.setAttribute("aria-pressed", (val || "").toUpperCase() === c); b.addEventListener("click", () => set(c)); box.appendChild(b); }
-  const i = document.createElement("input"); i.type = "color"; i.value = /^#[0-9a-f]{6}$/i.test(val || "") ? val : "#ffffff"; i.setAttribute("aria-label", label + ": свій колір");
-  i.addEventListener("input", () => live(i.value)); i.addEventListener("change", () => set(i.value)); box.appendChild(i);
-  return r;
-}
-function lSlider(label, min, max, step, val, show, set, live) {
-  const r = document.createElement("label"); r.className = "gs"; r.innerHTML = `<span class="gl"></span><span class="gv"></span><input type="range" min="${min}" max="${max}" step="${step}">`;
-  r.firstChild.textContent = label; const v = r.children[1], i = r.lastChild; i.value = val; v.textContent = show(+val); i.setAttribute("aria-label", label);
-  i.addEventListener("input", () => { v.textContent = show(+i.value); live(+i.value); }); i.addEventListener("change", () => set(+i.value));
-  return r;
-}
-function lSeg(label, opts, val, set) {
-  const r = document.createElement("div"); r.className = "lrow"; r.innerHTML = `<span class="gl"></span><div class="gpre" role="group"></div>`; r.firstChild.textContent = label;
-  for (const [t, v] of opts) { const b = document.createElement("button"); b.type = "button"; b.textContent = t; b.setAttribute("aria-pressed", v === val); b.addEventListener("click", () => set(v)); r.lastChild.appendChild(b); }
-  return r;
-}
-function lChk(label, on, set) {
-  const r = document.createElement("label"); r.className = "lchk"; r.innerHTML = `<input type="checkbox"><span></span>`; r.lastChild.textContent = label;
-  r.firstChild.checked = !!on; r.firstChild.addEventListener("change", e => set(e.target.checked)); return r;
-}
-function lGroup(title, ...rows) { const g = document.createElement("div"); g.className = "ggroup"; g.innerHTML = `<div class="gtitle"></div>`; g.firstChild.textContent = title; rows.filter(Boolean).forEach(x => g.appendChild(x)); return g; }
-function renderLook(k, root) {
-  const L = lookOf(k), set = (key, sub) => v => setLook(k, key, v, sub), live = (key, sub) => v => setLook(k, key, v, sub, true);
-  root.textContent = "";
-  const grid = document.createElement("div"); grid.className = "ggrid"; root.appendChild(grid);
-  const fillRows = (c1, c2, sub, name) => [
-    lColor(name, c1, set("c1", sub), live("c1", sub)),
-    lChk("Градієнт", !!c2, on => setLook(k, "c2", on ? (k === "cap" ? R.style.acc : R.style.acc2 || R.style.acc) : null, sub)),
-    c2 ? lColor("Другий колір градієнта", c2, set("c2", sub), live("c2", sub)) : null];
-  grid.appendChild(lGroup(k === "hook" ? "Колір першого рядка" : "Колір тексту", ...fillRows(L.c1, L.c2, null, "Колір"),
-    L.c2 || (k === "hook" && L.l2.c2) ? lSeg("Напрямок градієнта", [["→", 90], ["↓", 180], ["↘", 135]], L.gd, set("gd")) : null));
-  if (k === "txt" || k.startsWith("ov:")) grid.insertBefore(lGroup("Шрифт і розмір",
-    lSeg("Шрифт", [["Заголовків", "head"], ["Основний", "body"], ["Акцентний (курсив)", "accent"]], L.font, set("font")),
-    lSlider("Розмір", 24, 400, 2, L.px != null ? L.px : lookAutoPx(k), v => v + " px" + (L.px == null ? " (авто)" : ""), set("px"), live("px")),
-    L.px != null ? lChk("Авто: за розміром рамки", false, on => { if (on) setLook(k, "px", null); }) : null), grid.firstChild);
-  if (k === "hook") grid.appendChild(lGroup("Другий рядок", ...fillRows(L.l2.c1, L.l2.c2, "l2", "Колір"),
-    lChk("Акцентним шрифтом (з засічками, курсив)", L.l2acc, set("l2acc"))));
-  grid.appendChild(lGroup("Контур",
-    lSlider("Товщина", 0, 16, 0.5, L.sw, v => v ? v + " px" : "без контуру", set("sw"), live("sw")),
-    L.sw > 0 ? lColor("Колір контуру", L.sc, set("sc"), live("sc")) : null));
-  grid.appendChild(lGroup("Тінь під текстом",
-    lSlider("Сила", 0, 100, 1, L.sh, v => v ? v + "%" : "без тіні", set("sh"), live("sh")),
-    L.sh > 0 ? lSlider("М'якість", 0, 100, 1, L.ss, v => v < 15 ? "чітка" : v > 70 ? "дуже м'яка" : "м'яка", set("ss"), live("ss")) : null));
-  grid.appendChild(lGroup("Фон під текстом",
-    lSeg("Фон", [["Немає", "none"], ["Під рядком", "line"], ["Під кожним словом", "word"]], L.bg, set("bg")),
-    L.bg !== "none" ? lColor("Колір фону", L.bc, set("bc"), live("bc")) : null,
-    L.bg !== "none" ? lSlider("Прозорість", 0, 95, 1, 100 - L.bo, v => v + "%", v => setLook(k, "bo", 100 - v), v => setLook(k, "bo", 100 - v, null, true)) : null,
-    L.bg !== "none" ? lSlider("Кути", 0, 60, 1, L.br, v => v ? "заокруглені, " + v + " px" : "чіткі", set("br"), live("br")) : null));
-  if (k === "cap") grid.appendChild(lGroup("Слово-акцент",
-    lSeg("Як виділяти", [["Колір", "color"], ["Плашка", "box"], ["Підкреслення", "underline"], ["Велике", "big"], ["Ехо", "echo"]], L.acc.look, set("look", "acc")),
-    lColor("Колір акценту", L.acc.a1, set("a1", "acc"), live("a1", "acc")),
-    lChk("Чергувати з другим кольором", !!L.acc.a2, on => setLook(k, "a2", on ? (R.style.acc2 || R.style.acc) : null, "acc")),
-    L.acc.a2 ? lColor("Другий колір акценту", L.acc.a2, set("a2", "acc"), live("a2", "acc")) : null));
-  const foot = document.createElement("div"); foot.className = "lookfoot";
-  const reset = document.createElement("button"); reset.type = "button"; reset.className = "b"; reset.textContent = "Повернути як у бренді"; reset.disabled = !lookPart(k);
-  reset.addEventListener("click", () => { mutate(() => { if (k.startsWith("ov:")) { const ov = ovById(k.slice(3)); if (ov) delete ov.look; return; } const o = { ...(S.look || {}) }; delete o[k]; S.look = o; }); lookPreview(k); });
-  if (k.startsWith("ov:")) reset.textContent = "Як решта тексту";
-  foot.appendChild(reset);
-  if (!k.startsWith("ov:")) foot.appendChild(lChk("Робити так у всіх наступних рілсах", (S.look || {}).keep, on => mutate(() => { S.look = { ...(S.look || {}), keep: on }; })));
-  root.appendChild(foot);
-}
-function renderLooks() { if (!R) return; renderLook("cap", $("#caplook")); renderLook("hook", $("#hooklook")); if (!$("#txtlookdet").hidden) renderLook("txt", $("#txtlook")); }
-function txtFace(f) {   // same faces as the render: head = brand bold, body = brand regular, accent = italic serif
-  const bold = Object.keys((R.fonts || {}).extra || {}).find(x => /bold/i.test(x));
-  return f === "accent" ? { fontFamily: "ra, Georgia, serif", fontStyle: "italic", fontWeight: 400 } : f === "body" ? { fontFamily: "rb, var(--f-body)", fontWeight: 400, fontStyle: "normal" }
-    : { fontFamily: bold ? "bf_" + bold.replace(/\W/g, "_") + ", rb, var(--f-body)" : "rb, var(--f-body)", fontWeight: bold ? 400 : 700, fontStyle: "normal" };
-}
-function lookAutoPx(k) {   // the size an added text gets from its frame when she hasn't set one
-  if (k.startsWith("ov:")) { const o = ovById(k.slice(3)); return o ? ReelCore.autoPx(o.text, o.place || [90, 300, 900, 300]) : 120; }
-  return ReelCore.autoPx($("#ovtext").value || "Текст", (placing && placing.place) || [90, 300, 900, 300]);
-}
-function txtEl(text, place, L) {   // a text they added, in its look (build_reel.py bigtext draws the same)
-  const k = $("#player").clientWidth / 1080, el = document.createElement("div");
-  const lines = text.split("/").map(x => x.trim()).filter(Boolean);   // her text exactly as she typed it (caps stay caps)
-  const px = L.px || ReelCore.autoPx(text, place);
-  Object.assign(el.style, { position: "absolute", left: 0, width: "100%", top: place[1] / 19.2 + "%", textAlign: "center", lineHeight: ".9", letterSpacing: "-.03em", pointerEvents: "none", ...txtFace(L.font) });
-  for (const x of lines) {
-    const d = document.createElement("div"); d.style.fontSize = px * k + "px"; d.style.whiteSpace = "nowrap";
-    const piece = t => { const s = document.createElement("span"); s.style.cssText = lookBg(L, k); s.appendChild(lookRun(L, k, document.createTextNode(t))); return s; };
-    if (L.bg === "word") x.split(/\s+/).forEach((w, i) => { if (i) d.appendChild(document.createTextNode(" ")); d.appendChild(piece(w)); }); else d.appendChild(piece(x));
-    el.appendChild(d);
-  }
-  return el;
-}
-function accBefore(cap) { let n = 0; for (const c of CAPS) { if (c === cap) break; if (!c.gone) n += c.words.filter(w => w.accent).length; } return n; }
-function fitCap(el) {   // shrink until the widest word fits the frame, measured in the real fonts (the render does the same)
-  let fs = parseFloat(el.style.fontSize);
-  for (let i = 0; i < 25 && el.scrollWidth > el.clientWidth + 1; i++) { fs *= 0.92; el.style.fontSize = fs + "px"; }
-}
-function highlight(c, cap) {
-  $$(".card").forEach(el => { const g = GFX.find(x => x.id === el.dataset.id); el.classList.toggle("now", c != null && g && !g.gone && c >= g.start && c < g.end); });
-  $$(".caprow").forEach(el => el.classList.toggle("now", !!cap && +el.dataset.ci === cap.ci));
-  if (mode === "line" || mode === "rough") { const t = v.currentTime; $$(".w[data-i]").forEach(e => { const w = R.words[+e.dataset.i]; e.classList.toggle("now", t >= w.s && t < w.e); }); }
-}
-
-// ---------- 1. cuts ----------
-function renderCuts() {
-  const tx = $("#tx"); tx.textContent = "";
-  const cut = new Set(S.cut || R.proposedCut), fb = new Set(S.restoredFillers);
-  const pz = new Map(P.pauses.map(p => [p.after, p]));
-  const sents = []; let cur = [];
-  R.words.forEach((w, i) => { cur.push(i); if (/[.?!]$/.test(w.text) || i === R.words.length - 1) { sents.push(cur); cur = []; } });
-  for (const idx of sents) {
-    const row = document.createElement("div"); row.className = "sent";
-    const ts = document.createElement("button"); ts.className = "ts"; ts.type = "button";
-    ts.innerHTML = `<span class="src">${fmt(R.words[idx[0]].s)}</span>`; ts.title = "Слухати цей рядок з оригіналу";
-    ts.addEventListener("click", () => playLine(R.words[idx[0]].s, R.words[idx[idx.length - 1]].e + 0.2));
-    const ws = document.createElement("div"); ws.className = "words";
-    for (const i of idx) {
-      const w = R.words[i], s = document.createElement("span");
-      s.className = "w" + (w.filler ? " filler" + (fb.has(i) ? " back" : "") : cut.has(i) ? " cut" : "");
-      s.tabIndex = 0; s.setAttribute("role", "button"); s.dataset.i = i; s.textContent = w.text;
-      s.title = w.filler ? (fb.has(i) ? "Слово-паразит залишено (тапни, щоб прибрати)" : "Слово-паразит прибрано автоматично (тапни, щоб залишити)") : "";
-      ws.appendChild(s);
-      const p = pz.get(i);
-      if (p) {
-        const b = document.createElement("button"); b.type = "button"; b.className = "pz" + (p.kept ? " kept" : "");
-        b.textContent = `⏸ ${p.len.toFixed(2)}s ${p.kept ? "залишено" : "скорочено"}`;
-        b.title = p.kept ? "Паузу залишено. Тапни, щоб скоротити" : "Паузу скорочено до ~0,1 с. Тапни, щоб залишити";
-        b.addEventListener("click", () => mutate(() => {
-          const keepDefault = (R.keepPauses || []).includes(i);
-          S.restoredPauses = S.restoredPauses.filter(x => x !== i); S.trimmedPauses = S.trimmedPauses.filter(x => x !== i);
-          if (p.kept) { if (keepDefault) S.trimmedPauses.push(i); } else if (!keepDefault) S.restoredPauses.push(i);
-        }));
-        ws.appendChild(b);
-      }
-    }
-    row.append(ts, ws); tx.appendChild(row);
-  }
-  const words = [...cut].length, fills = R.words.filter((w, i) => w.filler && !fb.has(i)).length, pt = P.pauses.filter(p => !p.kept).length;
-  $("#ctally").innerHTML = `<span>рілс <b>${fmt(P.cutDur)}</b></span><span>вирізано слів: <b>${words}</b></span><span>прибрано паразитів: <b>${fills}</b></span><span>скорочено пауз: <b>${pt}</b> з ${P.pauses.length}</span>`;
-}
-(function wireCuts() {
-  const tx = $("#tx"); let drag = null;
-  const toggle = (i, val) => { const set = new Set(S.cut || R.proposedCut); val ? set.add(i) : set.delete(i); S.cut = [...set].sort((a, b) => a - b); };
-  tx.addEventListener("pointerdown", e => {
-    const w = e.target.closest(".w"); if (!w) return; e.preventDefault();
-    const i = +w.dataset.i;
-    if (R.words[i].filler) { mutate(() => { const fb = new Set(S.restoredFillers); fb.has(i) ? fb.delete(i) : fb.add(i); S.restoredFillers = [...fb]; }); return; }
-    undo.push(JSON.stringify(S)); $("#undo").disabled = false;
-    drag = { start: i, val: !(S.cut || R.proposedCut).includes(i), base: JSON.stringify(S.cut || R.proposedCut) };
-    toggle(i, drag.val); recompute(); renderCuts();
-  });
-  tx.addEventListener("pointermove", e => {
-    if (!drag) return;
-    const w = document.elementFromPoint(e.clientX, e.clientY)?.closest?.(".w"); if (!w) return;
-    S.cut = JSON.parse(drag.base); const j = +w.dataset.i, [lo, hi] = drag.start < j ? [drag.start, j] : [j, drag.start];
-    for (let i = lo; i <= hi; i++) if (!R.words[i].filler) toggle(i, drag.val);
-    recompute(); renderCuts();
-  });
-  window.addEventListener("pointerup", () => { if (drag) { drag = null; renderAll(); queueSave(); } });
-  tx.addEventListener("keydown", e => {
-    const w = e.target.closest(".w"); if (!w || (e.key !== "Enter" && e.key !== " ")) return; e.preventDefault();
-    const i = +w.dataset.i;
-    mutate(() => { if (R.words[i].filler) { const fb = new Set(S.restoredFillers); fb.has(i) ? fb.delete(i) : fb.add(i); S.restoredFillers = [...fb]; } else toggle(i, !(S.cut || R.proposedCut).includes(i)); });
-  });
-})();
-
-// ---------- 2. graphics ----------
-const LABEL = { k: "Залишити", c: "Змінити", d: "Прибрати" };
-function placeText(g) {
-  const [x, y, w, h] = g.place || [0, 0, 1080, 1920];
-  if (w >= 1000 && h >= 1800) return "На весь екран";
-  const mid = y + h / 2; return (mid < 700 ? "Вгорі, над головою" : mid < 1250 ? "Посередині" : "Внизу") + (w < 600 ? (x + w / 2 < 540 ? ", ліворуч" : ", праворуч") : "");
-}
-function renderGraphics() {
-  const byTime = (a, b) => (!!a.gone - !!b.gone) || (a.start || 0) - (b.start || 0);   // cut-out ones last
-  const all = [...GFX].sort(byTime), mine = all.filter(g => g.user);
-  const own = all.filter(g => g.user || g.own).length;
-  const n = cardList($("#cards"), all), m = cardList($("#ovcards"), mine);
-  $("#gtally").innerHTML = `<span>усього: <b>${all.length}</b></span><span>твоїх: <b>${own}</b></span><span>від Claude: <b>${all.length - own}</b></span><span>змінити: <b>${n.c}</b></span><span>прибрати: <b>${n.d}</b></span>`;
-  $("#otally").innerHTML = mine.length ? `<span>твоїх накладень: <b>${mine.length}</b></span>` : "";
-  if (!mine.length) $("#ovcards").innerHTML = `<div class="empty">Накладень ще немає.</div>`;
-}
-const openLook = new Set();
-function cardList(box, list) {
-  box.textContent = ""; const n = { k: 0, c: 0, d: 0 };
-  for (const g of list) {
-    const st = (S.board[g.id] || {}).state || "k"; n[st]++;
-    const el = document.createElement("div"); el.className = "card" + (st === "d" ? " dropped" : ""); el.dataset.id = g.id;
-    const th = document.createElement("div");
-    const tb = document.createElement("div"); tb.className = "thumb";
-    if (g.storyUrl && !g.placed) {   // storyboard: their frame with this very graphic on it (scripts/storyboard.py), tap to see it big
-      tb.classList.add("story"); tb.style.backgroundImage = `url(${JSON.stringify(g.storyUrl)})`; tb.title = "Так буде виглядати. Натисни, щоб збільшити";
-      tb.addEventListener("click", () => showBig(g.storyUrl, g.kind)); th.append(tb);
-    } else {
-      if (g.thumbUrl) tb.style.backgroundImage = `url(${JSON.stringify(g.thumbUrl)})`;
-      tb.appendChild(box_(g)); const ap = document.createElement("div"); ap.className = "approx"; ap.textContent = "Приблизно";
-      th.append(tb, ap);
-    }
-    const body = document.createElement("div");
-    const kind = document.createElement("div"); kind.className = "kind";
-    const who = document.createElement("span"); who.className = "who" + (g.user || g.own ? " mine" : ""); who.textContent = g.user || g.own ? "твоє" : "від Claude";
-    kind.append(who, document.createTextNode(g.kind));
-    const what = document.createElement("div"); what.className = "what"; what.textContent = g.what;
-    const meta = document.createElement("div"); meta.className = "meta";
-    if (g.gone) meta.innerHTML = `<span class="warnline">Її рядок вирізано, тому ця графіка не з'явиться.</span>`;
-    else {
-      const t = document.createElement("button"); t.className = "ts"; t.type = "button"; t.innerHTML = `<span class="tc">${fmt(g.start)}</span>`;
-      t.title = "Дивитись чорновий монтаж з цього місця"; t.addEventListener("click", () => playRough(g.start));
-      meta.append(t);
-      const d = document.createElement("span"); d.textContent = `${(g.end - g.start).toFixed(1)} с на екрані`; meta.append(d);
-      const p = document.createElement("span"); p.textContent = placeText(g); meta.append(p);
-      if (g.shifted) p.title = g.behind ? "Над головою, щоб було видно за тобою" : "Відсунуто, щоб не перекривати обличчя й субтитри";
-      if (g.user && g.type !== "bigtext") { const fx = document.createElement("span"); fx.textContent = "ефект: " + ({ soft: "плавна поява", slide: "виліт збоку", polaroid: "полароїд", glass: "скло", zoom: "наближення" }[g.effect] || g.effect); meta.append(fx); }
-      if (g.user || ["title", "bigtext", "card", "tag", "cta"].includes(g.type)) {   // their overlays, and Claude's text cards (the hook first of all), can be dragged
-        const mvb = document.createElement("button"); mvb.type = "button"; mvb.className = "b quiet"; const on = placing?.id === g.id;
-        mvb.textContent = on ? "Готово" : "Перемістити"; mvb.title = "Перетягни рамку на відео, щоб змінити місце";
-        mvb.addEventListener("click", () => { if (on) stopPlacing(); else { setPos(g.start + 0.3); startPlacing(g.place, g.id); } }); meta.append(mvb); }
-      if (g.moved) { const m = document.createElement("span"); m.className = "warnline"; m.textContent = "Її перше слово вирізано, тому вона зсунулась на наступне слово."; meta.append(m); }
-    }
-    const seg = document.createElement("div"); seg.className = "seg"; seg.setAttribute("role", "group"); seg.setAttribute("aria-label", "Рішення для " + g.kind);
-    for (const k of ["k", "c", "d"]) {
-      const b = document.createElement("button"); b.type = "button"; b.className = k; b.textContent = LABEL[k]; b.setAttribute("aria-pressed", st === k);
-      b.addEventListener("click", () => { mutate(() => { S.board[g.id] = { ...(S.board[g.id] || {}), state: k }; }); if (k === "c") setTimeout(() => document.getElementById("note-" + g.id)?.focus(), 0); });
-      seg.appendChild(b);
-    }
-    const acts = document.createElement("div"); acts.className = "acts"; acts.append(seg);
-    const full = (g.place || [0, 0, 1080, 1920])[2] >= 1000 && (g.place || [0, 0, 1080, 1920])[3] >= 1800;
-    if (!g.gone && (!full || g.behind)) {
-      const bb = document.createElement("button"); bb.type = "button"; bb.className = "behindbtn"; bb.setAttribute("aria-pressed", !!g.behind);
-      bb.innerHTML = `<span class="sw"></span>За мною`; bb.title = "Поставити за тебе: стане над головою, де його видно, субтитри на цей час опустяться";
-      bb.addEventListener("click", () => mutate(() => { S.board[g.id] = { ...(S.board[g.id] || {}), behind: !g.behind }; })); acts.append(bb);
-    }
-    body.append(kind, what, meta, acts);
-    if (g.user && g.type === "bigtext" && !g.gone) {   // change one added text's look later
-      const det = document.createElement("details"); det.className = "lookdet"; det.open = openLook.has(g.id);
-      det.innerHTML = `<summary>Вигляд цього тексту: шрифт, розмір, колір, контур, тінь, фон</summary><div></div>`;
-      det.addEventListener("toggle", () => { if (det.open) { openLook.add(g.id); renderLook("ov:" + g.id, det.lastChild); lookPreview("ov:" + g.id); } else openLook.delete(g.id); });
-      if (det.open) renderLook("ov:" + g.id, det.lastChild);
-      body.appendChild(det);
-    }
-    if (st === "c") {
-      const inp = document.createElement("input"); inp.type = "text"; inp.id = "note-" + g.id; inp.placeholder = "Що змінити?"; inp.value = (S.board[g.id] || {}).note || "";
-      inp.addEventListener("input", () => { S.board[g.id] = { ...(S.board[g.id] || { state: "c" }), note: inp.value }; queueSave(); });
-      body.appendChild(inp);
-    }
-    el.append(th, body); box.appendChild(el);
-  }
-  return n;
-}
-const box_ = g => box(g, false);
-
-// ---------- overlays they upload: an image or video from the current rough-cut moment ----------
-let assets = null;
-// where an overlay goes: a box they drag on the player (1080x1920 frame units); size presets set its width and height
-const ovMode = () => $("#ovfull").checked ? "full" : "box";
-const OV_PLACE = { box: [600, 170, 400, 500], tiny: [760, 260, 200, 200], "small-r": [600, 170, 400, 500], "small-l": [80, 170, 400, 500], big: [90, 150, 900, 640], full: [0, 0, 1080, 1920], text: [40, 360, 1000, 280] };
-const ovKind = () => document.querySelector('input[name="ovkind"]:checked').value;
-document.querySelectorAll('input[name="ovkind"]').forEach(r => r.addEventListener("change", () => {
-  const txt = ovKind() === "text"; $("#ovtextrow").hidden = !txt; $("#ovfilerow").hidden = txt; $("#ovsaverow").hidden = txt; $("#libbox").hidden = txt || !LIB.length; $("#txtlookdet").hidden = !txt; if (txt) renderLook("txt", $("#txtlook"));
-  if (txt) { $("#ovbehind").checked = true; if (placing && !placing.id) { placing.place = [...OV_PLACE.text]; placing.img = null; overlay(pos); } }
-}));
-let placing = null;   // {place: [x, y, w, h], id?: overlay being moved, img?: preview of the chosen file}
-const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-function startPlacing(place, id) {
-  stopPlay(); placing = { place: [...place], id, img: placing?.img }; mode = "roughPaused"; $("#clock").hidden = false;
-  v.currentTime = P.toSrc(pos); overlay(pos); renderGraphics();
-  if (id) setTimeout(() => $("#player").scrollIntoView({ block: "center" }), 0);   // narrow screens: the player is not sticky, bring it to the box
-}
-function fitToImage(url) {   // the box takes the picture's proportions, so nothing gets cropped
-  if (!url || !placing) return;
-  const im = new Image(); im.onload = () => {
-    if (!placing || !im.naturalWidth) return;
-    const p = placing.place; if (p[2] >= 1080 && p[3] >= 1920) return;
-    const cx = p[0] + p[2] / 2, cy = p[1] + p[3] / 2, r = im.naturalHeight / im.naturalWidth;
-    let w = p[2], h = Math.round(w * r); if (h > 1800) { h = 1800; w = Math.round(h / r); }
-    placing.place = [Math.round(clamp(cx - w / 2, 0, 1080 - w)), Math.round(clamp(cy - h / 2, 0, 1920 - h)), w, h]; overlay(pos);
-  }; im.src = url;
-}
-function stopPlacing() { placing = null; overlay(pos); renderGraphics(); }
-function placeBox() {
-  const p = placing.place, full = p[2] >= 1080 && p[3] >= 1920;
-  const tx = !placing.id && ovKind() === "text" && $("#ovtext").value.trim();
-  const el = box({ place: p, imgUrl: placing.img, kind: full ? "На весь екран" : tx ? "" : "Перетягни мене" }, true); el.classList.add("place");
-  if (full) return el;
-  el.addEventListener("pointerdown", e => {
-    e.preventDefault(); el.setPointerCapture(e.pointerId);
-    const k = 1080 / $("#player").clientWidth, sx = e.clientX, sy = e.clientY, x0 = p[0], y0 = p[1];
-    const mv = ev => { p[0] = Math.round(clamp(x0 + (ev.clientX - sx) * k, 0, 1080 - p[2])); p[1] = Math.round(clamp(y0 + (ev.clientY - sy) * k, 0, 1920 - p[3]));
-                       el.style.left = p[0] / 10.8 + "%"; el.style.top = p[1] / 19.2 + "%"; };
-    const up = () => { el.removeEventListener("pointermove", mv); el.removeEventListener("pointerup", up);
-      if (placing?.id) { const id = placing.id, np = [...p]; mutate(() => { const o = (S.overlays || []).find(x => x.id === id);
-        if (o) o.place = np; else S.board = { ...S.board, [id]: { ...(S.board[id] || {}), place: np } }; }); } };
-    el.addEventListener("pointermove", mv); el.addEventListener("pointerup", up);
-  });
-  if (p[2] < 300 || p[3] < 160) el.style.fontSize = "0";   // a sticker-sized box: no label, just the picture and the corner
-  const rz = document.createElement("div"); rz.className = "rz"; rz.title = "Тягни, щоб змінити розмір"; el.appendChild(rz);
-  rz.addEventListener("pointerdown", e => {   // the corner: any size from a sticker (~80 px) up to the whole frame
-    e.preventDefault(); e.stopPropagation(); rz.setPointerCapture(e.pointerId);
-    const k = 1080 / $("#player").clientWidth, sx = e.clientX, sy = e.clientY, w0 = p[2], h0 = p[3];
-    const mv = ev => { p[2] = Math.round(clamp(w0 + (ev.clientX - sx) * k, 80, 1080 - p[0])); p[3] = Math.round(clamp(h0 + (ev.clientY - sy) * k, 80, 1920 - p[1]));
-                       el.style.width = p[2] / 10.8 + "%"; el.style.height = p[3] / 19.2 + "%"; };
-    const up = () => { rz.removeEventListener("pointermove", mv); rz.removeEventListener("pointerup", up);
-      if (placing?.id) { const id = placing.id, np = [...p]; mutate(() => { const o = (S.overlays || []).find(x => x.id === id); if (o) o.place = np; }); } };
-    rz.addEventListener("pointermove", mv); rz.addEventListener("pointerup", up);
-  });
-  return el;
-}
-$("#ovbox").addEventListener("toggle", () => { if (!R || tab !== "overlays") return; if ($("#ovbox").open) startPlacing(OV_PLACE[ovMode()]); else if (placing && !placing.id) stopPlacing(); });
-$("#ovfull").addEventListener("change", () => {   // full screen on/off; any other size is the box they drag and resize
-  const np = [...OV_PLACE[ovMode()]];
-  if (placing) { placing.place = np; overlay(pos); } else startPlacing(np);
-});
-$("#ovtext").addEventListener("input", () => { if (placing && !placing.id) overlay(pos); });
-$("#ovfile").addEventListener("change", () => { const f = $("#ovfile").files[0];
-  if (placing) { placing.img = f && f.type.startsWith("image") ? URL.createObjectURL(f) : null; overlay(pos); fitToImage(placing.img); } });
-function wordAtCut(c) {   // the kept word nearest this rough-cut moment: overlays hang on words so they move with the cut
-  const src = P.toSrc(c); let best = null;
-  for (const i of P.kept) if (!R.words[i].filler && (best === null || Math.abs(R.words[i].s - src) < Math.abs(R.words[best].s - src))) best = i;
-  return best;
-}
-$("#ovadd").addEventListener("click", async () => {
-  const msg = $("#ovmsg"), btn = $("#ovadd"), behindOn = $("#ovbehind").checked;
-  if (ovKind() === "text") {   // big text, usually behind them: no file, nothing to upload
-    const text = $("#ovtext").value.trim(); if (!text) { msg.textContent = "Впиши текст."; $("#ovtext").focus(); return; }
-    const w0 = wordAtCut(pos); if (w0 === null) { msg.textContent = "Тут немає жодного слова в нарізці."; return; }
-    const at = pos, dur = Math.min(30, Math.max(0.5, +$("#ovdur").value || 3));
-    mutate(() => { S.overlays = [...(S.overlays || []), { id: "ov" + Date.now().toString(36), kind: "text", text, name: text, behind: behindOn, dur, w0, look: { ...((S.look || {}).txt || {}) },
-      place: placing && !placing.id ? [...placing.place] : [...OV_PLACE.text] }]; });
-    msg.textContent = `Текст додано з ${fmt(at)}.`; $("#ovtext").value = ""; return;
-  }
-  const f = $("#ovfile").files[0], pick = !f && libPick;
-  if (!f && !pick) { msg.textContent = "Спершу вибери файл або щось із «Моїх файлів»."; $("#ovfile").focus(); return; }
-  if (!assets) { msg.textContent = "Завантаження тут недоступне. Кинь файл у папку рілса й напиши Claude."; return; }
-  if (f && f.size > 20 * 1024 * 1024) { msg.textContent = "Файл більший за 20 МБ. Кинь його в папку рілса й напиши Claude, на якій секунді."; return; }
-  const w0 = wordAtCut(pos); if (w0 === null) { msg.textContent = "Тут немає жодного слова в нарізці."; return; }
-  const at = pos, mode = ovMode(), effect = $("#oveffect").value, dur = Math.min(30, Math.max(0.5, +$("#ovdur").value || 3));
-  btn.disabled = true; msg.textContent = "Завантажую…";
-  try {
-    const up = pick ? { id: pick.id, url: pick.url } : await assets.upload(f);
-    const name = pick ? pick.name : f.name, kind = pick ? pick.kind : f.type.startsWith("video") ? "video" : "image";
-    if (!pick && $("#ovsave").checked && libRef) await saveToLib({ id: up.id, url: up.url, name, kind });
-    mutate(() => { S.overlays = [...(S.overlays || []), { id: "ov" + Date.now().toString(36), assetId: up.id, url: up.url, name,
-      kind, mode, effect, dur, w0, behind: behindOn, place: placing && !placing.id ? [...placing.place] : OV_PLACE[mode] }]; });
-    libPick = null; renderLib();
-    msg.textContent = `Додано з ${fmt(at)}. Воно в списку нижче.`; $("#ovfile").value = "";
-  } catch (e) { msg.textContent = "Не вдалося завантажити (" + (e?.code || "помилка") + "). Спробуй ще раз або кинь файл у папку рілса."; }
-  finally { btn.disabled = false; }
-});
-
-// ---------- storyboard: a big view of one frame, and the hook options as pictures (reel.json "hookOptions": [{text, img}]) ----------
-function showBig(url, label) {
-  const d = document.createElement("div"); d.className = "bigview"; d.setAttribute("role", "dialog"); d.setAttribute("aria-label", label || "Кадр");
-  const im = document.createElement("img"); im.src = url; im.alt = label || ""; d.appendChild(im);
-  const close = () => { d.remove(); document.removeEventListener("keydown", esc); }; const esc = e => { if (e.key === "Escape") close(); };
-  d.addEventListener("click", close); document.addEventListener("keydown", esc); document.body.appendChild(d);
-}
-function renderHookOpts() {
-  const all = ((R && R.hookOptions) || []).filter(o => o.text); $("#hookoptbox").hidden = !all.length; if (!all.length) return;
-  const box = $("#hookopts"), cur = ($("#hooktext").value || "").trim(); box.textContent = "";
-  all.forEach((o, i) => {
-    const b = document.createElement("button"); b.type = "button"; b.className = "hookopt"; b.setAttribute("aria-pressed", o.text.trim() === cur);
-    if (o.img) { const im = document.createElement("img"); im.src = o.img; im.alt = ""; im.loading = "lazy"; b.appendChild(im); }
-    const t = document.createElement("span"); t.textContent = String.fromCharCode(65 + i) + ": " + o.text.replace(/\s*\/\s*/g, " "); b.appendChild(t);
-    b.addEventListener("click", () => { $("#hooktext").value = o.text; mutate(() => { S.hook = o.text; }); });
-    box.appendChild(b);
-  });
-}
-
-// ---------- «Стиль монтажу» on step 1: every style as a looping example to pick by look (style/list + reel.json "stylePreviews") ----------
-function renderStyleGrid() {
-  const box = $("#stylegrid1"); if (!box || !R) return; box.textContent = "";
-  const SP = R.stylePreviews || {}, cur = S.style || "";
-  const opts = [...STYLE_LIST.map(x => ({ n: x.name, t: x.title || x.name, w: x.what || "", u: x.url, p: x.posterUrl })),
-    { n: "brand", t: "Тільки бренд", w: "Твої кольори й шрифти, фірмові картки й списки, спокійно й впізнавано.", u: SP.brand },
-    { n: "mix", t: "Без стилю: мікс ефектів", w: "Ефекти з усієї бібліотеки, щоразу інші: два рілси не схожі.", u: SP.mix }];
-  for (const o of opts) {
-    const b = document.createElement("button"); b.type = "button"; b.className = "stpick"; b.setAttribute("aria-pressed", o.n === cur);
-    if (o.u) { const v = document.createElement("video"); v.muted = true; v.loop = true; v.playsInline = true; v.preload = "none"; if (o.p) v.poster = o.p;
-      v.dataset.src = o.u; manObs.observe(v); b.appendChild(v); }
-    const t = document.createElement("b"); t.textContent = o.t; const w = document.createElement("span"); w.textContent = o.w; b.append(t, w);
-    b.addEventListener("click", () => mutate(() => { S.style = o.n; }));
-    box.appendChild(b);
-  }
-}
-
-// ---------- reference reels by link (S.refs), import prints REFERENCE: <url> ----------
-function renderRefs() {
-  const box = $("#reflist"); if (!box) return; box.textContent = "";
-  for (const u of S.refs || []) {
-    const r = document.createElement("div"); r.className = "manrow"; const a = document.createElement("span"); a.textContent = u; a.style.wordBreak = "break-all";
-    const x = document.createElement("button"); x.type = "button"; x.className = "b quiet"; x.textContent = "Прибрати";
-    x.addEventListener("click", () => mutate(() => { S.refs = (S.refs || []).filter(v => v !== u); })); r.append(a, x); box.appendChild(r);
-  }
-}
-$("#refadd").addEventListener("click", () => { const u = $("#refurl").value.trim();
-  if (!/^https?:\/\/\S+$/.test(u)) { $("#refurl").focus(); return; }
-  mutate(() => { S.refs = [...new Set([...(S.refs || []), u])]; }); $("#refurl").value = ""; });
-
-// ---------- «Мої марки»: graphics their finished reels kept (reel.json "stamps": [{key, ua, uses, img}]) ----------
-function renderStamps() {
-  const all = (R && R.stamps) || []; $("#stamplib").hidden = !all.length; if (!all.length) return;
-  $("#stampcount").textContent = all.length; const box = $("#stamplist"); box.textContent = "";
-  for (const m of all) {
-    const b = document.createElement("button"); b.type = "button"; b.className = "capopt"; b.title = "На цю секунду";
-    if (m.img) { const im = document.createElement("img"); im.src = m.img; im.alt = ""; im.loading = "lazy"; im.style.cssText = "width:100%;aspect-ratio:9/16;object-fit:cover;border-radius:8px"; b.appendChild(im); }
-    const t = document.createElement("span"); t.textContent = m.ua + (m.uses > 1 ? ` · ×${m.uses}` : ""); b.appendChild(t);
-    b.addEventListener("click", () => { $("#eftext").value = `моя марка ${m.key}: ${m.ua}. `; $("#efbox").scrollIntoView({ behavior: "smooth", block: "center" });
-      $("#eftext").focus(); $("#efmsg").textContent = "Допиши свої слова для ефекту, перевір секунду і натисни «Додати ефект»."; });
-    box.appendChild(b);
-  }
-}
-
-// ---------- «Анімація субтитрів»: a caption style from the catalog (reel.json "capStyles"), saved as S.capStyle -> edit.json "caption_style" ----------
-function renderCapStyles() {
-  const box = $("#capgrid"), all = (R && R.capStyles) || []; $("#capstylebox").hidden = !all.length; if (!all.length) return;
-  const cur = S.capStyle || ""; box.textContent = "";
-  const pick = all.find(x => x.n === cur); $("#capstylecur").textContent = pick ? "· " + pick.ua : "· мої субтитри";
-  for (const m of [{ n: "", ua: "Мої субтитри (бренд)" }, ...all]) {
-    const b = document.createElement("button"); b.type = "button"; b.className = "capopt"; b.setAttribute("aria-pressed", m.n === cur);
-    if (m.p) { const v = document.createElement("video"); v.muted = true; v.loop = true; v.playsInline = true; v.preload = "none"; v.dataset.src = m.p; manObs.observe(v); b.appendChild(v); }
-    else { const d = document.createElement("div"); d.className = "capnone"; d.textContent = m.n ? "без прев'ю" : "як у бренді"; b.appendChild(d); }
-    const t = document.createElement("span"); t.textContent = m.ua; b.appendChild(t);
-    b.addEventListener("click", () => mutate(() => { if (m.n) S.capStyle = m.n; else delete S.capStyle; }));
-    box.appendChild(b);
-  }
-}
-
-// ---------- «Тільки вручну»: catalog effects Claude never suggests on its own (reel.json "manual"), one tap puts one on this second ----------
-const manObs = new IntersectionObserver(es => { for (const e of es) { const v = e.target;   // previews load and play only while on screen
-  if (e.isIntersecting) { if (!v.src) v.src = v.dataset.src; v.play().catch(() => {}); } else v.pause(); } }, { rootMargin: "200px" });
-let MENU_F = "all";
-function renderManual() {
-  const box = $("#manlist"), all = (R && R.manual) || []; $("#manlib").hidden = !all.length; if (!all.length) return;
-  const fb = $("#menufilter"); fb.textContent = "";
-  for (const [k, t] of [["all", "Усі"], ["a", "Claude пропонує"], ["m", "Тільки вручну"], ["mine", "Мій вибір"]]) {
-    const b = document.createElement("button"); b.type = "button"; b.textContent = t; b.setAttribute("aria-pressed", MENU_F === k);
-    b.addEventListener("click", () => { MENU_F = k; renderManual(); }); fb.appendChild(b); }
-  const picks = new Set(S.picks || []), q = ($("#mansearch").value || "").trim().toLowerCase();
-  const list = all.filter(m => (MENU_F === "all" || (MENU_F === "mine" ? picks.has(m.n) : (m.k || "m") === MENU_F))
-                              && (!q || (m.ua + " " + m.n + " " + m.g).toLowerCase().includes(q)));
-  $("#mancount").textContent = list.length === all.length ? `${all.length}` : `${list.length} з ${all.length}`;
-  const bk = $("#basket"); bk.hidden = !picks.size; bk.textContent = "";
-  if (picks.size) { const t = document.createElement("span"); t.innerHTML = `<b>Мій вибір: ${picks.size}</b> · Claude поставить їх у рілс, коли натиснеш велику кнопку внизу`;
-    const c = document.createElement("button"); c.type = "button"; c.className = "b quiet"; c.textContent = "Очистити";
-    c.addEventListener("click", () => mutate(() => { delete S.picks; })); bk.append(t, c); }
-  box.textContent = ""; let g = null, grid = null;
-  for (const m of list) {
-    if (m.g !== g) { g = m.g; const h = document.createElement("h4"); h.textContent = g; grid = document.createElement("div"); grid.className = "capgrid"; box.append(h, grid); }
-    const card = document.createElement("div"); card.className = "capopt menuopt"; card.setAttribute("role", "button"); card.tabIndex = 0;
-    card.setAttribute("aria-pressed", picks.has(m.n)); card.title = picks.has(m.n) ? "Прибрати з мого вибору" : "Додати в мій вибір";
-    if (m.p) { const v = document.createElement("video"); v.muted = true; v.loop = true; v.playsInline = true; v.preload = "none"; v.dataset.src = m.p; manObs.observe(v); card.appendChild(v); }
-    else { const d = document.createElement("div"); d.className = "capnone"; d.textContent = "прев'ю ще готується"; card.appendChild(d); }
-    const t = document.createElement("span"); t.textContent = (picks.has(m.n) ? "✓ " : "") + m.ua; card.appendChild(t);
-    const at = document.createElement("button"); at.type = "button"; at.className = "menuat"; at.textContent = "⏱"; at.title = "На цю секунду";
-    at.addEventListener("click", e => { e.stopPropagation(); $("#eftext").value = `${m.n}: ${m.ua}. `; $("#efbox").scrollIntoView({ behavior: "smooth", block: "center" });
-      $("#eftext").focus(); $("#efmsg").textContent = "Допиши свої слова для ефекту, перевір секунду і натисни «Додати ефект»."; });
-    card.appendChild(at);
-    const tog = () => mutate(() => { const p = new Set(S.picks || []); p.has(m.n) ? p.delete(m.n) : p.add(m.n); S.picks = [...p]; if (!S.picks.length) delete S.picks; });
-    card.addEventListener("click", tog); card.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tog(); } });
-    grid.appendChild(card);
-  }
-}
-$("#mansearch").addEventListener("input", renderManual);
-
-// ---------- effects they ask for: a moment, what to do (a library name or their words) and files for it ----------
-function renderEffects() {
-  const box = $("#eflist"); box.textContent = "";
-  const list = [...(S.effects || [])].sort((a, b) => a.at - b.at);
-  if (!list.length) { box.innerHTML = `<div class="empty">Ефектів ще немає.</div>`; return; }
-  for (const e of list) {
-    const el = document.createElement("div"); el.className = "card"; el.style.gridTemplateColumns = "1fr";
-    const body = document.createElement("div");
-    const kind = document.createElement("div"); kind.className = "kind"; kind.textContent = "Ефект";
-    const what = document.createElement("div"); what.className = "what"; what.textContent = e.text;
-    const meta = document.createElement("div"); meta.className = "meta";
-    const t = document.createElement("button"); t.className = "ts"; t.type = "button"; t.innerHTML = `<span class="tc">${fmt(e.at)}</span>`;
-    t.title = "Дивитись чорновий монтаж з цього місця"; t.addEventListener("click", () => playRough(e.at)); meta.append(t);
-    const d = document.createElement("span"); d.textContent = `${e.dur} с`; meta.append(d);
-    const del = document.createElement("button"); del.type = "button"; del.className = "b quiet"; del.textContent = "Прибрати";
-    del.addEventListener("click", () => mutate(() => { S.effects = S.effects.filter(x => x.id !== e.id); })); meta.append(del);
-    body.append(kind, what, meta);
-    if ((e.files || []).length) {
-      const fl = document.createElement("div"); fl.className = "lib";
-      for (const f of e.files) { const b = document.createElement("span"); b.className = "efthumb"; b.title = f.name;
-        if (f.kind === "image") b.style.backgroundImage = `url(${JSON.stringify(f.url)})`; else b.textContent = "▶"; fl.appendChild(b); }
-      body.appendChild(fl);
-    }
-    el.appendChild(body); box.appendChild(el);
-  }
-}
-$("#efadd").addEventListener("click", async () => {
-  const msg = $("#efmsg"), btn = $("#efadd"), text = $("#eftext").value.trim();
-  if (!text) { msg.textContent = "Опиши ефект або встав його назву."; $("#eftext").focus(); return; }
-  const w0 = wordAtCut(pos); if (w0 === null) { msg.textContent = "Тут немає жодного слова в нарізці."; return; }
-  const files = [...$("#effiles").files], at = pos, dur = Math.min(30, Math.max(0.5, +$("#efdur").value || 3));
-  if (files.length && !assets) { msg.textContent = "Файли тут не завантажуються: кинь їх у папку рілса й напиши Claude."; return; }
-  if (files.some(f => f.size > 20 * 1024 * 1024)) { msg.textContent = "Один з файлів більший за 20 МБ. Кинь його в папку рілса."; return; }
-  btn.disabled = true; msg.textContent = files.length ? "Завантажую файли…" : "";
-  try {
-    const up = [];
-    for (const f of files) { const u = await assets.upload(f); up.push({ id: u.id, url: u.url, name: f.name, kind: f.type.startsWith("video") ? "video" : "image" }); }
-    mutate(() => { S.effects = [...(S.effects || []), { id: "ef" + Date.now().toString(36), w0, at: +at.toFixed(2), dur, text, files: up }]; });
-    $("#eftext").value = ""; $("#effiles").value = ""; msg.textContent = `Додано на ${fmt(at)}.`;
-  } catch (e) { msg.textContent = "Не вдалося завантажити (" + (e?.code || "помилка") + "). Спробуй ще раз."; }
-  finally { btn.disabled = false; }
-});
-
-// ---------- the editing style for this reel (db style/list, built on «Стиль»); saved as S.style, import writes <reel>/style.txt ----------
-let STYLE_LIST = [], STYLE_DEFAULT = null;
-function useDefaultStyle() {   // a reel with no style picked yet takes the one marked «Завжди цей»
-  if (R && !S.style && STYLE_DEFAULT && STYLE_LIST.some(x => x.name === STYLE_DEFAULT) && !B?.url) { S.style = STYLE_DEFAULT; recompute(); renderAll(); queueSave(); }
-}
-function placeStyleTab() {   // no styles yet: «Мої стилі» stands out, it is the first thing to do
-  const l = $("#stylelink"); l.classList.toggle("first", !STYLE_LIST.length); l.firstChild.textContent = STYLE_LIST.length ? "Мої стилі " : "Зібрати стиль ";
-}
-const SPEEDS = [[0.75, "Повільніше"], [1, "Як у стилі"], [1.3, "Швидше"]];
-function renderSpeedPick() {
-  const box = $("#speedpick"); if (!box) return; box.textContent = "";
-  for (const [v, t] of SPEEDS) { const b = document.createElement("button"); b.type = "button"; b.textContent = t; b.setAttribute("aria-pressed", (S.speedMul || 1) === v);
-    b.addEventListener("click", () => mutate(() => { if (v === 1) delete S.speedMul; else S.speedMul = v; })); box.appendChild(b); }
-}
-function renderStylePick() {
-  renderSpeedPick();
-  const box = $("#stylepick"); if (!box) return; box.textContent = "";
-  const cur = S.style || null, opts = [...STYLE_LIST.map(x => [x.name, x.title || x.name, x.what || ""]), ["brand", "Тільки бренд", "Кольори й шрифти бренду, без стилю"], ["mix", "Без стилю: мікс ефектів", "Без стилю: графіка з усієї бібліотеки ефектів, щоразу інші анімації"]];
-  for (const [name, title, what] of opts) {
-    const b = document.createElement("button"); b.type = "button"; b.textContent = title; b.title = what; b.setAttribute("aria-pressed", cur === name);
-    b.addEventListener("click", () => mutate(() => { S.style = cur === name ? null : name; })); box.appendChild(b);
-  }
-  const pick = STYLE_LIST.find(x => x.name === cur);
-  const go = document.createElement("button"); go.type = "button"; go.className = "b quiet"; go.textContent = "Зібрати стилі"; go.addEventListener("click", () => showTab("style"));
-  $("#stylehint").textContent = (!STYLE_LIST.length ? "Стилів ще немає. Збери їх на вкладці «Стиль» або монтуй тільки з брендом." : cur === "brand" ? "Монтаж у кольорах і шрифтах бренду, без стилю: картки й списки бренду плюс кілька ефектів з бібліотеки." : cur === "mix" ? `Без стилю: Claude бере ефекти з бібліотеки (${R && R.libCount ? R.libCount : "понад 100"} анімацій, перевірених у вертикальному відео), щоразу інші, ніколи не повторює в одному рілсі. Кольори й шрифти бренду.` : pick ? pick.what : "Обери стиль до «Готово → Claude»: пропозиції графіки й звуки будуть у ньому.") + " ";
-  if (STYLE_LIST.length) go.textContent = "Подивитись приклади стилів";
-  $("#stylehint").appendChild(go);
-  const box1 = $("#stylepick1"); if (!box1) return; box1.textContent = "";   // the same picker on step 1 («Стиль монтажу» tab)
-  for (const [name, title, what] of opts) {
-    const b = document.createElement("button"); b.type = "button"; b.textContent = title; b.title = what; b.setAttribute("aria-pressed", cur === name);
-    b.addEventListener("click", () => mutate(() => { S.style = cur === name ? null : name; })); box1.appendChild(b);
-  }
-  $("#stylehint1").textContent = $("#stylehint").firstChild ? $("#stylehint").firstChild.textContent : "";
-  const go1 = go.cloneNode(true); go1.addEventListener("click", () => showTab("style")); $("#stylehint1").appendChild(go1);
-}
-
-// ---------- hook + CTA typed on the page ----------
-function syncHookCta() {
-  const hook = GFX.find(g => g.type === "title");
-  $("#hooktext").value = S.hook != null ? S.hook : (hook?.text || "");
-  $("#ctatext").value = (S.cta || {}).text || ""; $("#ctadur").value = (S.cta || {}).dur || 4;
-}
-$("#hooktext").addEventListener("change", e => mutate(() => { S.hook = e.target.value.trim(); }));
-const setCta = () => mutate(() => { const tx = $("#ctatext").value.trim(); S.cta = tx ? { text: tx, dur: Math.min(10, Math.max(2, +$("#ctadur").value || 4)) } : null; });
-$("#ctatext").addEventListener("change", setCta); $("#ctadur").addEventListener("change", setCta);
-
-// ---------- «Мої файли»: photos/videos kept on the page for every reel (db library/files) ----------
-let libRef = null, LIB = [], libPick = null;
-function renderLib() {
-  const box = $("#lib"); box.textContent = ""; $("#libbox").hidden = !LIB.length;
-  for (const it of LIB) {
-    const b = document.createElement("button"); b.type = "button"; b.title = it.name; b.setAttribute("aria-pressed", libPick?.id === it.id);
-    if (it.kind === "image") b.style.backgroundImage = `url(${JSON.stringify(it.url)})`; else b.textContent = "▶ " + it.name;
-    b.addEventListener("click", () => { libPick = libPick?.id === it.id ? null : it; $("#ovfile").value = "";
-      if (placing) { placing.img = libPick && libPick.kind === "image" ? libPick.url : null; overlay(pos); fitToImage(placing.img); } renderLib(); });
-    box.appendChild(b);
-  }
-}
-async function saveToLib(item) { LIB = [...LIB, item]; renderLib(); try { await libRef.set({ items: LIB, updatedAt: new Date().toISOString() }); } catch (e) { pill("Не вдалося зберегти в «Мої файли»", true); } }
-
-// ---------- search & replace across captions ----------
-$("#srgo").addEventListener("click", () => {
-  const f = $("#srfind").value.trim(), r = $("#srrepl").value.trim(), msg = $("#srmsg");
-  if (!f) { msg.textContent = "Впиши слово, яке шукаємо."; $("#srfind").focus(); return; }
-  const esc = f.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), re = new RegExp(`(^|\\s)${esc}(?=$|\\s|[.,!?;:])`, "giu");
-  let n = 0;
-  mutate(() => { const arr = capsEditable();
-    for (const c of CAPS) { if (c.gone) continue;
-      const before = c.words.map(w => w.text).join(" "), after = before.replace(re, (m, sp) => { n++; return sp + r; });
-      if (after !== before) { const cc = arr[c.ci], keep = after.split(/\s+/).length === c.words.length;
-        cc.text = after; cc.accText = keep ? c.words.map((w, k) => w.accent ? k : -1).filter(k => k >= 0) : []; } } });
-  msg.textContent = n ? `Замінено: ${n}` : "Такого слова в субтитрах немає.";
-});
-
-// ---------- 3. captions ----------
-function capsEditable() { if (!S.captions) S.captions = JSON.parse(JSON.stringify(R.captions)); return S.captions; }
-function renderCaptions() {
-  const box = $("#caps"); box.textContent = "";
-  const live = CAPS.filter(c => !c.gone);
-  for (const c of CAPS) {
-    const src = (S.captions || R.captions)[c.ci];
-    const row = document.createElement("div"); row.className = "caprow" + (c.gone ? " gone" : ""); row.dataset.ci = c.ci;
-    const ts = document.createElement("button"); ts.className = "ts"; ts.type = "button";
-    const cw = document.createElement("div"); cw.className = "cw";
-    if (c.gone) {
-      ts.textContent = "вирізано"; ts.disabled = true;
-      cw.textContent = src.text || src.w.map(i => R.words[i].text).join(" ");
-      row.append(ts, cw, document.createElement("span")); box.appendChild(row); continue;
-    }
-    ts.innerHTML = `<span class="tc">${fmt(c.start)}</span>`; ts.addEventListener("click", () => playRough(c.start));
-    c.words.forEach((w, k) => {
-      const b = document.createElement("button"); b.type = "button"; b.className = "x" + (w.accent ? " acc" : ""); b.textContent = w.text;
-      b.title = w.accent ? "Акцент (тапни, щоб зробити звичайним)" : "Тапни, щоб зробити акцентом";
-      b.addEventListener("click", () => mutate(() => {
-        const cc = capsEditable()[c.ci];
-        if (cc.text) { const a = new Set(cc.accText || []); a.has(k) ? a.delete(k) : a.add(k); cc.accText = [...a]; }
-        else { const a = new Set(cc.acc || []); a.has(w.i) ? a.delete(w.i) : a.add(w.i); cc.acc = [...a]; }
-      }));
-      cw.appendChild(b);
-    });
-    if (c.overlapFixed) { const f = document.createElement("span"); f.className = "flag"; f.textContent = "скорочено"; f.title = "Скорочено, щоб не накладався на наступний субтитр"; cw.appendChild(f); }
-    const tools = document.createElement("div"); tools.className = "tools";
-    const tool = (label, title, fn) => { const b = document.createElement("button"); b.type = "button"; b.textContent = label; b.title = title; b.addEventListener("click", fn); tools.appendChild(b); };
-    tool("правити", "Виправити текст", () => {
-      const inp = document.createElement("input"); inp.type = "text"; inp.id = "cap-" + c.ci; inp.value = c.words.map(w => w.text).join(" ");
-      let done = false;
-      const finish = keep => { if (done) return; done = true; if (!keep) { renderCaptions(); return; }
-        const val = inp.value.trim(), orig = src.w.filter(i => !P.removed(i)).map(i => R.words[i].text).join(" ");
-        mutate(() => { const cc = capsEditable()[c.ci]; if (!val || val === orig) { delete cc.text; delete cc.accText; } else { cc.text = val; cc.accText = []; } }); };
-      inp.addEventListener("keydown", e => { if (e.key === "Enter") finish(true); if (e.key === "Escape") finish(false); });
-      inp.addEventListener("blur", () => finish(true));
-      cw.replaceWith(inp); inp.focus();
-    });
-    tool("−0.1", "Почати на 0,1 с раніше", () => mutate(() => { const cc = capsEditable()[c.ci]; cc.nudge = +Math.max(-1, (cc.nudge || 0) - 0.1).toFixed(2); }));
-    tool("+0.1", "Почати на 0,1 с пізніше", () => mutate(() => { const cc = capsEditable()[c.ci]; cc.nudge = +Math.min(1, (cc.nudge || 0) + 0.1).toFixed(2); }));
-    const nextLive = live[live.indexOf(c) + 1];
-    if (nextLive) tool("об'єднати", "Склеїти з наступним субтитром", () => mutate(() => {
-      const arr = capsEditable(), a = arr[c.ci], b = arr[nextLive.ci];
-      if (a.text || b.text) { a.text = [a.text || a.w.map(i => R.words[i].text).join(" "), b.text || b.w.map(i => R.words[i].text).join(" ")].join(" "); a.accText = []; }
-      a.w = a.w.concat(b.w); a.acc = (a.acc || []).concat(b.acc || []); arr.splice(nextLive.ci, 1);
-    }));
-    if (src.w.length > 1) tool("роз'єднати", "Кожне слово окремим субтитром", () => mutate(() => {
-      const arr = capsEditable(), a = arr[c.ci], parts = a.text ? a.text.split(/\s+/) : null, same = parts && parts.length === a.w.length;
-      arr.splice(c.ci, 1, ...a.w.map((i, k) => ({ w: [i], acc: (a.acc || []).filter(x => x === i),
-        ...(same ? { text: parts[k], accText: (a.accText || []).includes(k) ? [0] : [] } : {}), ...(k === 0 && a.nudge ? { nudge: a.nudge } : {}) })));
-    }));
-    row.append(ts, cw, tools); box.appendChild(row);
-  }
-  const acc = live.reduce((n, c) => n + c.words.filter(w => w.accent).length, 0);
-  $("#captally").innerHTML = `<span>субтитрів: <b>${live.length}</b></span><span>вирізано разом зі словами: <b>${CAPS.length - live.length}</b></span><span>слів-акцентів: <b>${acc}</b></span>`;
-}
-
-// ---------- 4. sound & colour ----------
-function renderSound() {
-  const A = R.assets || {};
-  { // one button: clean the voice or keep the original sound
-    const vc = $("#voiceclean"), on = S.voiceClean !== false; vc.textContent = "";
-    const seg = document.createElement("div"); seg.className = "seg"; seg.setAttribute("role", "group"); seg.setAttribute("aria-label", "Чистка голосу");
-    for (const [cls, val, label] of [["k", true, "Чистити голос"], ["d", false, "Залишити звук як є"]]) {
-      const b = document.createElement("button"); b.type = "button"; b.className = cls; b.textContent = label; b.setAttribute("aria-pressed", on === val);
-      b.addEventListener("click", () => mutate(() => { S.voiceClean = val; })); seg.appendChild(b);
-    }
-    vc.appendChild(seg);
-  }
-  const fig = (label, el) => { const f = document.createElement("figure"); const c = document.createElement("figcaption"); c.textContent = label; f.append(c, el); return f; };
-  const au = u => { const a = document.createElement("audio"); a.controls = true; a.preload = "none"; a.src = u; return a; };
-  const im = (u, alt) => { const i = document.createElement("img"); i.src = u; i.alt = alt; return i; };
-  $("#audio").replaceChildren(...(A.audioOriginal ? [fig("Оригінал", au(A.audioOriginal)), fig("Після чистки", au(A.audioCleaned))] : [Object.assign(document.createElement("div"), { className: "empty", textContent: "Для цього рілса ще немає порівняння звуку." })]));
-  if (A.colourBefore) {
-    const cv = document.createElement("canvas"); cv.setAttribute("aria-label", "Той самий кадр після кольорокорекції");
-    $("#colour").replaceChildren(fig("Оригінал", im(A.colourBefore, "Кадр до кольорокорекції")), fig("Після корекції", cv));
-    gAfterGL = glFor(cv); gAfter = new Image(); gAfter.onload = () => gAfterGL && gAfterGL.draw(gAfter, ReelCore.gradeParams(curGrade())); gAfter.src = A.colourBefore;
-  } else $("#colour").textContent = "";
-  renderGrade();
-  const cues = $("#cues"); cues.textContent = "";
-  const lib = sfxLib(), names = Object.keys(lib);
-  for (const g of GFX.filter(g => g.sfx && !g.gone && g.state !== "d")) {
-    const off = !!S.sfxOff[g.id], cur = (S.sfxSwap || {})[g.id] || g.sfx.name;
-    const row = document.createElement("div"); row.className = "cue" + (off ? " off" : "");
-    const t = document.createElement("span"); t.className = "tc"; t.textContent = fmt(g.start);
-    const w = document.createElement("span"); w.className = "what"; w.textContent = g.kind;
-    const ctl = document.createElement("span"); ctl.className = "ctl";
-    const sel = document.createElement("select"); sel.className = "sfxsel"; sel.setAttribute("aria-label", "Звук для " + g.kind);
-    const groups = {}; for (const n of new Set([cur, ...names])) (groups[(lib[n] || {}).cat || "Інше"] ||= []).push(n);
-    for (const [cat, ns] of Object.entries(groups)) { const og = document.createElement("optgroup"); og.label = cat;
-      for (const n of ns) { const o = document.createElement("option"); o.value = n; o.textContent = (lib[n] || {}).label || n; o.selected = n === cur; og.appendChild(o); } sel.appendChild(og); }
-    sel.addEventListener("change", () => { playSfx(sel.value, g.sfx.db); mutate(() => { S.sfxSwap = { ...(S.sfxSwap || {}) }; if (sel.value === g.sfx.name) delete S.sfxSwap[g.id]; else S.sfxSwap[g.id] = sel.value; }); });
-    const play = document.createElement("button"); play.type = "button"; play.className = "b quiet"; play.textContent = "▶"; play.title = "Слухати";
-    play.addEventListener("click", () => playSfx(sel.value, g.sfx.db));
-    const tg = document.createElement("button"); tg.type = "button"; tg.className = "b quiet"; tg.textContent = off ? "Увімкнути" : "Вимкнути";
-    tg.addEventListener("click", () => mutate(() => { if (off) delete S.sfxOff[g.id]; else S.sfxOff[g.id] = true; }));
-    ctl.append(sel, play, tg); row.append(t, w, ctl); cues.appendChild(row);
-  }
-  if (!cues.children.length) cues.innerHTML = `<div class="empty">Звуків на графіці ще немає.</div>`;
-  // the whole library to listen through, by category
-  const det = document.createElement("details"); det.className = "sfxlib"; det.innerHTML = `<summary>Бібліотека звуків (${names.length})</summary>`;
-  const byCat = {}; for (const n of names) (byCat[lib[n].cat || "Інше"] ||= []).push(n);
-  for (const [cat, ns] of Object.entries(byCat)) {
-    const g = document.createElement("div"); g.className = "ggroup"; g.innerHTML = `<div class="gtitle"></div>`; g.firstChild.textContent = cat;
-    const row = document.createElement("div"); row.className = "gpre";
-    for (const n of ns) { const b = document.createElement("button"); b.type = "button"; b.textContent = "▶ " + lib[n].label; b.addEventListener("click", () => playSfx(n)); row.appendChild(b); }
-    g.appendChild(row); det.appendChild(g);
-  }
-  cues.appendChild(det);
-}
-
-// ---------- colour grade: iPhone-style sliders, previewed with WebGL using the render's exact maths (core.js gradeParams) ----------
-const GRADE_UI = [["Світло", [["ex", "Експозиція"], ["hi", "Світлі ділянки"], ["sh", "Тіні"], ["co", "Контраст"], ["br", "Яскравість"]]],
-  ["Колір", [["sa", "Насиченість"], ["vi", "Кольоровість"], ["wa", "Теплота"]]], ["Деталі", [["cl", "Чіткість"], ["sp", "Різкість"]]]];
-const GRADE_PRESETS = [["Без корекції", {}], ["Природний", { ex: 5, sh: 15, co: 8, vi: 15, wa: 10 }], ["Теплий", { ex: 3, co: 10, sa: 5, vi: 20, wa: 35 }],
-  ["Холодний", { sh: 10, co: 10, sa: -5, wa: -25 }], ["Яскравий", { ex: 8, hi: -15, sh: 20, co: 15, vi: 35, cl: 20 }]];
-const curGrade = () => ReelCore.gradeNorm(S.grade && !("c" in S.grade) ? S.grade : {});   // {b,c,s,w} = the old 4-slider format: start fresh
-function glFor(canvas) {   // one WebGL program: tone LUT -> saturation matrix -> vibrance -> clarity/sharpen (luma unsharp), like ffmpeg
-  const gl = canvas.getContext("webgl", { premultipliedAlpha: false, preserveDrawingBuffer: true }); if (!gl) return null;
-  const vs = "attribute vec2 p;varying vec2 v;void main(){v=vec2(p.x*.5+.5,.5-p.y*.5);gl_Position=vec4(p,0.,1.);}";
-  const fs = `precision highp float;uniform sampler2D I,L;uniform mat3 M;uniform float V,C,S;uniform vec2 X;varying vec2 v;
-    vec3 col(vec2 u){vec3 c=texture2D(I,u).rgb;c=vec3(texture2D(L,vec2(c.r*255./256.+.5/256.,.5)).r,texture2D(L,vec2(c.g*255./256.+.5/256.,.5)).g,texture2D(L,vec2(c.b*255./256.+.5/256.,.5)).b);
-      c=clamp(M*c,0.,1.);float mx=max(c.r,max(c.g,c.b)),mn=min(c.r,min(c.g,c.b)),l=dot(c,vec3(.2126,.7152,.0722));float k=1.+V*(1.-sign(V)*(mx-mn));return clamp(l+(c-l)*k,0.,1.);}
-    float Y(vec3 c){return dot(c,vec3(.2126,.7152,.0722));}
-    void main(){vec3 c=col(v);float y=Y(c),d=0.;
-      if(C>0.){float s=0.;for(int i=-3;i<=3;i++)for(int j=-3;j<=3;j++)s+=Y(col(v+vec2(float(i),float(j))*X*2.));d+=(y-s/49.)*C;}
-      if(S>0.){float s=0.;for(int i=-2;i<=2;i++)for(int j=-2;j<=2;j++)s+=Y(col(v+vec2(float(i),float(j))*X));d+=(y-s/25.)*S;}
-      gl_FragColor=vec4(clamp(c+d,0.,1.),1.);}`;
-  const sh = (t, src) => { const o = gl.createShader(t); gl.shaderSource(o, src); gl.compileShader(o); return o; };
-  const pr = gl.createProgram(); gl.attachShader(pr, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(pr);
-  if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) return null;
-  gl.useProgram(pr);
-  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer()); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
-  const ap = gl.getAttribLocation(pr, "p"); gl.enableVertexAttribArray(ap); gl.vertexAttribPointer(ap, 2, gl.FLOAT, false, 0, 0);
-  const tex = u => { const t = gl.createTexture(); gl.activeTexture(gl.TEXTURE0 + u); gl.bindTexture(gl.TEXTURE_2D, t);
-    for (const [k, val] of [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D, k, val); return t; };
-  const ti = tex(0), tl = tex(1); gl.uniform1i(gl.getUniformLocation(pr, "I"), 0); gl.uniform1i(gl.getUniformLocation(pr, "L"), 1);
-  const U = n => gl.getUniformLocation(pr, n); let lastKey = "";
-  return { draw(src, P) {
-    const dpr = Math.min(2, devicePixelRatio || 1), w = Math.round(canvas.clientWidth * dpr), h = Math.round(canvas.clientHeight * dpr);
-    if (!w || !h) return; if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
-    gl.viewport(0, 0, w, h);
-    const key = JSON.stringify(P.n); if (key !== lastKey) { lastKey = key;
-      const b = new Uint8Array(256 * 4); P.lut.forEach((c, i) => { b[i * 4] = Math.round(c[0] * 255); b[i * 4 + 1] = Math.round(c[1] * 255); b[i * 4 + 2] = Math.round(c[2] * 255); b[i * 4 + 3] = 255; });
-      gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, tl); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 256, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, b);
-      const m = P.sat; gl.uniformMatrix3fv(U("M"), false, [m[0], m[3], m[6], m[1], m[4], m[7], m[2], m[5], m[8]]);
-      gl.uniform1f(U("V"), P.vib); gl.uniform1f(U("C"), P.clar); gl.uniform1f(U("S"), P.sharp); gl.uniform2f(U("X"), 1 / 1080, 1 / 1920); }
-    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, ti);
-    try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, src); } catch (e) { return; }
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-  } };
-}
-let GV = null, gLoop = null, gAfter = null, gAfterGL = null;
-function gradeView() {   // live graded video over the player while a grade is set (the built draft already has it baked in)
-  const cv = $("#gcv"), on = tab !== "preview" && !cutVid() && !ReelCore.isNeutral(curGrade());   // the built videos have the grade baked in
-  cv.hidden = !on; cancelAnimationFrame(gLoop);
-  if (!on) return;
-  if (!GV) GV = glFor(cv); if (!GV) { cv.hidden = true; return; }
-  const P = ReelCore.gradeParams(curGrade());
-  const tick = () => { if (v.readyState >= 2) GV.draw(v, P); gLoop = requestAnimationFrame(tick); }; tick();
-  if (gAfter && gAfter.complete && gAfterGL) gAfterGL.draw(gAfter, P);
-}
-function renderGrade() {
-  const g = curGrade(), box = $("#gradebox"); box.textContent = "";
-  for (const [title, rows] of GRADE_UI) {
-    const grp = document.createElement("div"); grp.className = "ggroup";
-    const t = document.createElement("div"); t.className = "gtitle"; t.textContent = title;
-    const grid = document.createElement("div"); grid.className = "ggrid";
-    for (const [k, name] of rows) {
-      const row = document.createElement("label"); row.className = "gs" + (g[k] ? " on" : "");
-      const min = k === "cl" || k === "sp" ? 0 : -100;
-      row.innerHTML = `<span class="gl"></span><span class="gv"></span><input type="range" min="${min}" max="100" step="1">`;
-      row.querySelector(".gl").textContent = name; const val = row.querySelector(".gv"), inp = row.querySelector("input");
-      const show = x => { val.textContent = x > 0 ? "+" + x : String(x); row.classList.toggle("on", !!+x); };
-      inp.value = g[k]; inp.setAttribute("aria-label", name); show(g[k]);
-      inp.addEventListener("input", () => { S.grade = { ...curGrade(), [k]: +inp.value }; show(+inp.value); gradeView(); markPresets(); });
-      inp.addEventListener("change", () => mutate(() => { if (ReelCore.isNeutral(S.grade)) S.grade = null; }));
-      row.querySelector(".gl").addEventListener("dblclick", e => { e.preventDefault(); mutate(() => { S.grade = { ...curGrade(), [k]: 0 }; if (ReelCore.isNeutral(S.grade)) S.grade = null; }); });
-      grid.appendChild(row);
-    }
-    grp.append(t, grid); box.appendChild(grp);
-  }
-  const pre = $("#gradepre"); pre.textContent = "";
-  for (const [name, p] of GRADE_PRESETS) {
-    const b = document.createElement("button"); b.type = "button"; b.textContent = name; b.dataset.p = JSON.stringify(ReelCore.gradeNorm(p));
-    b.addEventListener("click", () => mutate(() => { S.grade = ReelCore.isNeutral(p) ? null : ReelCore.gradeNorm(p); })); pre.appendChild(b);
-  }
-  markPresets(); gradeView();
-}
-function markPresets() { const now = JSON.stringify(curGrade()); $$("#gradepre button").forEach(b => b.setAttribute("aria-pressed", b.dataset.p === now)); }
-
-// ---------- sound library: the reel's own sounds plus «library/sfx» (kept on the page for every reel) ----------
-let SFXLIB = [];
-const SFX_LABEL = { whoosh: "Свіш", swish: "Шурх", pop: "Поп", snap: "Клац", chime: "Дзвіночок", typing: "Друк" };
-function sfxLib() {
-  const o = {}; if (!SFXLIB.length) for (const [n, u] of Object.entries((R && R.assets && R.assets.sfx) || {})) o[n] = { url: u, label: SFX_LABEL[n] || n };
-  for (const it of SFXLIB) o[it.name] = { url: it.url, label: it.label || SFX_LABEL[it.name] || it.name, cat: it.cat };
-  return o;
-}
-function playSfx(name, db = -12) { const u = (sfxLib()[name] || {}).url; if (!u) return; const a = new Audio(u); a.volume = Math.min(1, Math.pow(10, (db + 8) / 20)); a.play().catch(() => {}); }
-
-// ---------- references for a section: pictures or videos of what she likes («як тут»), up to 5 per section ----------
-function renderRefs() {
-  const box = $("#reflist"); if (!box) return; box.textContent = "";
-  const list = (S.refs || {})[tab] || [];
-  $("#reffile").hidden = !assets || list.length >= 5; $(".reflabel").hidden = !assets && !list.length;
-  list.forEach((f, k) => {
-    const b = document.createElement("button"); b.type = "button"; b.title = f.name + " (тапни, щоб прибрати)";
-    if (f.kind === "image") b.style.backgroundImage = `url(${JSON.stringify(f.url)})`; else b.textContent = "▶ " + f.name;
-    b.addEventListener("click", () => mutate(() => { S.refs = { ...(S.refs || {}) }; S.refs[tab] = list.filter((_, j) => j !== k); }));
-    box.appendChild(b);
-  });
-}
-$("#reffile").addEventListener("change", async e => {
-  const files = [...e.target.files], msg = $("#refmsg"), have = ((S.refs || {})[tab] || []).length;
-  if (!files.length || !assets) return;
-  if (have + files.length > 5) { msg.textContent = "Можна до 5 файлів у розділі."; e.target.value = ""; return; }
-  if (files.some(f => f.size > 20 * 1024 * 1024)) { msg.textContent = "Файл більший за 20 МБ: кинь його Claude в чат."; e.target.value = ""; return; }
-  msg.textContent = "Завантажую…"; const t = tab;
-  try {
-    const up = [];
-    for (const f of files) { const u = await assets.upload(f); up.push({ id: u.id, url: u.url, name: f.name, kind: f.type.startsWith("video") ? "video" : "image" }); }
-    mutate(() => { S.refs = { ...(S.refs || {}) }; S.refs[t] = [...(S.refs[t] || []), ...up]; });
-    msg.textContent = "Додано."; renderRefs();
-  } catch (er) { msg.textContent = "Не вдалося завантажити (" + (er?.code || "помилка") + "). Спробуй ще раз."; }
-  e.target.value = "";
-});
-
-// ---------- 5. preview ----------
-function renderPreview() {
-  if (P) $("#preveta").textContent = "~" + Math.max(4, Math.round((240 + P.cutDur * 2.2) / 60)) + " хв";
-  const h = ReelCore.hash(decisions()), st = $("#bstate");
-  st.className = "state";
-  if (B?.url && B.hash === h) { st.textContent = `Чернетка актуальна (зібрано ${new Date(B.at).toLocaleString("uk-UA")}). Натисни play на відео.`; st.classList.add("ok"); }
-  else if (B?.url) { st.textContent = "Чернетка застаріла: рішення змінились. Збери ще раз."; st.classList.add("out"); }
-  else if (S.buildRequest?.hash === h) st.textContent = S.buildRequest.sent ? "Claude збирає чернетку (~6–15 хв). Прийде сповіщення, а тут відкриється відео." : "Запит збережено. Напиши Claude «збери чернетку».";
-  else st.textContent = "Чернетку ще не зібрано.";
-  const busy = stage().wait, fresh = B?.url && B.hash === h;
-  $("#build").disabled = busy || fresh; $("#build").textContent = busy ? "Чернетка збирається…" : fresh ? "Чернетка актуальна" : "Зібрати чернетку";
-  const revs = $("#revs"); revs.textContent = "";
-  S.revisions.forEach((r, k) => {
-    const row = document.createElement("div"); row.className = "rev";
-    const t = document.createElement("button"); t.className = "ts"; t.type = "button"; t.innerHTML = `<span class="tc">${fmt(r.t)}</span>`;
-    t.addEventListener("click", () => { if (B?.url) { v.currentTime = r.t; v.play().catch(() => {}); } });
-    const x = document.createElement("span"); x.textContent = r.text;
-    const del = document.createElement("button"); del.type = "button"; del.className = "b quiet"; del.textContent = "Видалити";
-    del.addEventListener("click", () => mutate(() => S.revisions.splice(k, 1)));
-    row.append(t, x, del); revs.appendChild(row);
-  });
-  if (!S.revisions.length) revs.innerHTML = `<div class="empty">Нотаток ще немає.</div>`;
-}
-$("#build").addEventListener("click", () => askStep("build"));
-
-// ---------- steps: 1 her edit -> 2 Claude's proposals -> 3 draft -> 4 final; one big button moves to the next ----------
-// She presses it; the page saves, marks the request in her review doc and sends Claude a «Send to Claude» comment, which
-// reaches the Claude session watching this page. Without that (no session / not an editor) it tells her the chat word.
-let comments = null;
-function stage() {
-  if (B?.final) return { n: 4, wait: false };
-  if (B?.url && S.finalRequest?.hash === B.hash) return { n: 4, wait: true };
-  if (B?.url && S.fixRequest?.hash === B.hash && B.fixedFor !== S.fixRequest.at) return { n: 3, wait: true };   // notes sent: waiting for the draft that answers them (builds doc carries fixedFor)
-  if (B?.url && S.buildRequest && S.buildRequest.hash !== B.hash && S.buildRequest.hash === ReelCore.hash(decisions())) return { n: 3, wait: true };   // asked to rebuild after a change
-  if (B?.url) return { n: 3, wait: false };
-  if (S.buildRequest) return { n: 3, wait: true };
-  if ((R?.claudeRound || 0) > 0) return { n: 2, wait: false };
-  if (S.graphicsRequest) return { n: 2, wait: true };
-  return { n: 1, wait: false };
-}
-const STEP = {
-  graphics: { title: "Віддати Claude на пропозиції?", yes: "Так, готово → Claude",
-    body: () => `<p class="lede">Усе твоє збережено: нарізка, накладення, ефекти, хук, субтитри, колір.</p><ol>
-      <li><b>Збере відео нарізки</b> (~2–3 хв): справжні склейки, щоб ти перевірила їх до графіки.</li>
-      <li><b>Додасть графіку</b> у вибраному стилі: картки, motion на ключові фрази, лічильники. Твоє не чіпає й не перекриває.</li>
-      <li><b>Сторінка оновиться сама</b> (~5–10 хв) і відкриє крок 2 «Нарізка і графіка». Потім одна кнопка: <b>Зібрати чернетку</b>.</li></ol>
-      ${STYLE_LIST.length ? `<p class="lede" style="margin-top:4px"><b>Яким стилем монтуємо?</b></p><div class="gpre" id="mstylepick"></div>` : ""}`,
-    say: "графіка", text: "▶ Кнопка «Готово → Claude»: мій монтаж готовий, зроби пропозиції графіки (раунд 2)." },
-  build: { title: "Зібрати чернетку?", yes: "Так, збирай",
-    body: `<p class="lede">Claude збере відео з усіма рішеннями: твоїми і погодженими пропозиціями.</p><ol>
-      <li><b>Перевірить склейки й субтитри</b> до рендеру, щоб чернетка вже була чистою.</li>
-      <li><b>Рендер ~6 хв.</b> Коли готово, прийде сповіщення, а тут відкриється «Чернетка».</li>
-      <li>Ти дивишся й лишаєш нотатки на потрібних секундах. Погоджена чернетка = фінал.</li></ol>`,
-    say: "збери чернетку", text: "▶ Кнопка «Зібрати чернетку»: збери чернетку." },
-  fixes: { title: "Віддати нотатки Claude?", yes: "Так, виправляй",
-    body: `<p class="lede">Claude виправить усе з твоїх нотаток і збере нову чернетку.</p>`,
-    say: "виправ нотатки", text: "▶ Кнопка «Виправити за нотатками»: виправ нотатки до чернетки і збери нову." },
-  final: { title: "Це фінал?", yes: "Так, це фінал",
-    body: `<p class="lede">Claude перевірить звук і довжину й покладе готовий MP4 у папку Reels.</p>`,
-    say: "фінал", text: "▶ Кнопка «Це фінал»: чернетка погоджена, видай фінал." },
-};
-function renderEta() {   // a rough clock for the draft: import + cut + precheck ~4 min, render ~2.2 s per second of reel at 540p (1 worker)
-  const at = (S.fixRequest && S.fixRequest.hash === B?.hash && B?.fixedFor !== S.fixRequest.at) ? S.fixRequest.at : S.buildRequest?.at;
-  if (!at || !P) return null;
-  const total = Math.max(4, Math.round((240 + P.cutDur * 2.2) / 60)), done = Math.max(0, Math.round((Date.now() - Date.parse(at)) / 60000));
-  return { done: Math.min(done, total + 5), total, pct: Math.min(95, Math.round(done / total * 100)) };
-}
-setInterval(() => { if (R && tab !== "style" && stage().wait) renderStage(); }, 30000);
-function renderStage() {
-  if (tab === "style") { styleBar(); return; }
-  if (!R) return;
-  const st = stage();
-  $$("#steps .st").forEach(b => { const n = +b.dataset.s, sn = Math.min(st.n, 3); b.classList.toggle("done", n < sn || (st.n === 4 && !st.wait)); b.classList.toggle("next", n === sn); });
-  const bar = $("#gobar"), txt = $("#gotext"), btn = $("#gobtn"); bar.hidden = false; btn.disabled = false;
-  const set = (t, sub, label, kind) => { txt.innerHTML = `<b>${t}</b><span class="sub">${sub}</span>`; btn.innerHTML = label; btn.dataset.kind = kind || ""; btn.disabled = !kind; };
-  const newRevs = S.revisions.filter(r => B && r.hash === B.hash && !r.sent).length;
-  if (st.n === 1) set("Крок 1 · твій монтаж", "Коли все своє зроблено, передай Claude.", "Готово → пропозиції Claude", "graphics");
-  else if (st.n === 2 && st.wait) set("Claude готує пропозиції", "Сторінка оновиться сама. Можеш далі правити своє.", `<span class="spin"></span>Claude працює`);
-  else if (st.n === 2) set("Крок 2 · пропозиції Claude", "На «Графіці» все з позначкою «від Claude»: залиш, зміни або прибери.", "Зібрати чернетку", "build");
-  else if (st.n === 3 && st.wait) { const r = renderEta(); set("Claude збирає чернетку", r ? `Минуло ${r.done} хв з ~${r.total}. Сторінка відкриє «Чернетку» сама.` : "~6–10 хв. Сторінка відкриє «Чернетку» сама.", `<span class="spin"></span>${r ? r.pct + "%" : "Рендериться"}`); }
-  else if (st.n === 3 && B?.url && B.hash !== ReelCore.hash(decisions())) set("Крок 3 · рішення змінились", "Чернетка зібрана до твоїх змін (стиль, нарізка, графіка). Збери її заново.", "Зібрати чернетку заново", "build");
-  else if (st.n === 3 && newRevs) set("Крок 3 · чернетка", `Нотаток: ${newRevs}. Віддай їх Claude одним натиском.`, "Виправити за нотатками", "fixes");
-  else if (st.n === 3) set("Крок 3 · чернетка", "Подивись чернетку. Є що змінити? Лиши нотатку на секунді.", "Це фінал", "final");
-  else if (st.wait) set("Claude видає фінал", "Перевірка звуку, MP4 у папку Reels.", `<span class="spin"></span>Готується`);
-  else set("Крок 4 · фінал", "Рілс готовий: MP4 у папці Reels.", "Готово ✓");
-}
-$("#gobtn").addEventListener("click", () => { const k = $("#gobtn").dataset.kind; if (k === "style") askStyle(); else if (k === "tographics") { showTab("graphics"); scrollTo({ top: 0, behavior: "smooth" }); } else if (k) askStep(k); });
-function missingNotes() {   // «Змінити» with no note: Claude would have to guess what to change
-  return Object.entries(S.board || {}).filter(([id, b]) => b.state === "c" && !(b.note || "").trim()).map(([id]) => ({ id, kind: (GFX.find(g => g.id === id) || {}).kind || id }));
-}
-function askStep(kind) {
-  const miss = (kind === "graphics" || kind === "build") ? missingNotes() : [];
-  if (miss.length) {
-    $("#mtitle").textContent = "Що саме змінити?";
-    $("#mbody").innerHTML = `<p class="lede">Ти позначила «Змінити», але не написала що: ${miss.map(m => "<b>" + m.kind.replace(/[<&]/g, "") + "</b>").join(", ")}. Допиши коротко, і Claude зробить саме це.</p>`;
-    $("#myes").textContent = "Дописати"; $("#mno").textContent = "Надіслати так";
-    $("#myes").hidden = false; $("#modal").hidden = false; $("#myes").focus();
-    $("#myes").onclick = () => { $("#modal").hidden = true; showTab("graphics"); setTimeout(() => { const i = document.getElementById("note-" + miss[0].id); if (i) { i.scrollIntoView({ block: "center" }); i.focus(); } }, 50); };
-    $("#mno").onclick = () => { $("#mno").onclick = null; askStepGo(kind); };
-    return;
-  }
-  askStepGo(kind);
-}
-function fillModalStyles() {   // the style is picked as she hands step 1 over (Claude makes the graphics in it)
-  const box = document.getElementById("mstylepick"); if (!box) return; box.textContent = "";
-  for (const [name, title] of [...STYLE_LIST.map(x => [x.name, x.title || x.name]), ["brand", "Тільки бренд"], ["mix", "Без стилю: мікс ефектів"]]) {
-    const b = document.createElement("button"); b.type = "button"; b.textContent = title; b.setAttribute("aria-pressed", S.style === name);
-    b.addEventListener("click", () => { mutate(() => { S.style = name; }); fillModalStyles(); }); box.appendChild(b);
-  }
-}
-function askStepGo(kind) {
-  const c = STEP[kind]; $("#mtitle").textContent = c.title; $("#mbody").innerHTML = typeof c.body === "function" ? c.body() : c.body; $("#myes").textContent = c.yes; $("#mno").textContent = "Ще ні";
-  $("#myes").hidden = false; $("#modal").hidden = false; $("#myes").focus();
-  if (kind === "graphics") fillModalStyles();
-  $("#myes").onclick = () => sendStep(kind);
-}
-$("#mno").addEventListener("click", () => { $("#modal").hidden = true; });
-$("#modal").addEventListener("click", e => { if (e.target.id === "modal") $("#modal").hidden = true; });
-document.addEventListener("keydown", e => { if (e.key === "Escape") $("#modal").hidden = true; });
-async function sendStep(kind) {
-  const c = STEP[kind], at = new Date().toISOString();
-  $("#myes").disabled = true;
-  // the send must come from her click, so it goes first; the decision is saved either way
-  let sent = false, why = "";
-  try {
-    const can = comments ? await comments.canSendToClaude() : "off";
-    if (can === "available") { await comments.sendToClaude({ anchor: await comments.anchorFor($("#gobtn")), text: c.text }); sent = true; }
-    else why = can;
-  } catch (e) { why = e?.code || "error"; }
-  mutate(() => {
-    if (kind === "graphics") S.graphicsRequest = { at, sent, cutHash: cutHash(decisions()) };
-    if (kind === "build") S.buildRequest = { hash: ReelCore.hash(decisions()), at, sent };
-    if (kind === "fixes") { S.revisions.forEach(r => { if (B && r.hash === B.hash) r.sent = true; }); S.fixRequest = { at, hash: B?.hash, sent }; S.buildRequest = null; }
-    if (kind === "final") S.finalRequest = { at, hash: B?.hash, sent };
-  });
-  $("#myes").disabled = false;
-  if (sent) { $("#modal").hidden = true; pill("Передано Claude"); }
-  else {   // no Claude session listening right now: the request is saved, one chat word wakes Claude up
-    $("#mtitle").textContent = "Збережено. Ще один крок";
-    $("#mbody").innerHTML = `<p class="lede">Claude зараз не на зв'язку зі сторінкою${why === "writers_only" ? " (кнопка працює тільки для власниці сторінки)" : ""}. Напиши йому в чаті одне слово:</p><p style="font-size:22px;font-weight:700;margin:6px 0 14px">«${c.say}»</p>`;
-    $("#myes").hidden = true; $("#mno").textContent = "Зрозуміло";
-  }
-  renderStage();
-}
-$("#revadd").addEventListener("click", () => {
-  const text = $("#revtext").value.trim(); if (!text) { $("#revtext").focus(); return; }
-  if (!B?.url) { pill("Спочатку збери чернетку, потім додавай нотатки до моментів у ній.", true); return; }
-  mutate(() => { S.revisions.push({ t: +v.currentTime.toFixed(2), text, hash: B.hash }); S.revisions.sort((a, b) => a.t - b.t); }); $("#revtext").value = "";
-});
-
-function renderAll() {
-  renderCuts(); renderGraphics(); renderEffects(); renderManual(); renderCapStyles(); renderCaptions(); renderSound(); renderPreview(); syncHookCta(); renderHookOpts(); renderStyleGrid(); renderRefs(); renderStamps(); renderStage(); renderCapPlace(); renderStylePick(); renderCutBox();
-  const sent = { mystyle: !!S.style, cuts: S.cut != null, overlays: (S.overlays || []).length, effects: (S.effects || []).length, graphics: Object.keys(S.board).length || (S.hook != null) || !!S.cta || !!S.style || !!S.speedMul, captions: S.captions != null, sound: Object.keys(S.sfxOff).length || S.voiceClean === false || !ReelCore.isNeutral(S.grade) };
-  $$(".tab:not(.tabx)").forEach(b => { const d = b.querySelector(".dot"); if (d) d.hidden = !sent[b.dataset.tab]; });
-  styleDot();
-}
-
-
-// ---------- «Стиль»: rounds of rendered variants (db style/round, written by Claude) and her verdicts (db style/votes) ----------
-// Each variant: a muted looping preview, «Зі звуком» plays it from the start with sound; Залишити / Можливо / Прибрати + a note.
-// «Готово → Claude» sends the round with the same «Send to Claude» comment as the reel steps; scripts/style_lab.py apply reads it.
-let STR = null, STV = null, stRef = null, stTimer = null, stZones = false;
-const ST_V = { keep: "Залишити", maybe: "Можливо", drop: "Прибрати" };
-const stBlank = () => ({ round: STR?.id || null, verdicts: {}, note: "", refs: [], sent: null });
-function stVariants() { return (STR?.sections || []).flatMap(s => s.variants || []); }
-function stCount() { const c = { keep: 0, maybe: 0, drop: 0 }; for (const v of stVariants()) { const x = STV?.verdicts?.[v.id]?.v; if (x) c[x]++; } return c; }
-function stWaiting() { return !!(STR && STV?.sent && STV.round === STR.id); }
-function styleDot() { const d = document.querySelector('#stylelink .dot'); if (d) d.hidden = !(STR && !STR.closed && !stWaiting()); }
-function stSave() {
-  clearTimeout(stTimer);
-  stTimer = setTimeout(async () => {
-    if (!stRef) return;
-    try { await stRef.set(JSON.parse(JSON.stringify({ ...STV, updatedAt: new Date().toISOString() }))); pill("Оцінки збережено"); }
-    catch (e) { pill("Оцінки не збереглись (" + (e?.code || "error") + ")", true); }
-  }, 500);
-}
-function stVote(id, v) {
-  const cur = STV.verdicts[id] || {}; STV.verdicts[id] = { ...cur, v: cur.v === v ? null : v };
-  renderStyle(); styleBar(); stSave();
-}
-function stPlayer(url, poster, label) {   // a muted looping example with a «Зі звуком» button (one plays with sound at a time)
-  const w = document.createElement("div"); w.className = "stpl";
-  w.innerHTML = `<video muted loop playsinline autoplay preload="metadata"></video><div class="sz" hidden aria-hidden="true"></div><button class="stsound" type="button" aria-pressed="false">Зі звуком</button>`;
-  const vid = w.querySelector("video"), sb = w.querySelector(".stsound"); vid.src = url; if (poster) vid.poster = poster; vid.setAttribute("aria-label", label || "Приклад");
-  sb.addEventListener("click", () => {
-    const on = vid.muted;
-    $$("section[data-p=style] video").forEach(x => { x.muted = true; const b = x.parentElement.querySelector(".stsound"); if (b) { b.setAttribute("aria-pressed", "false"); b.textContent = "Зі звуком"; } });
-    if (on) { vid.muted = false; vid.currentTime = 0; vid.play().catch(() => {}); sb.setAttribute("aria-pressed", "true"); sb.textContent = "Без звуку"; }
-  });
-  return w;
-}
-// «Доточити»: a round for one element of a saved style (scripts/style_lab.py element <style> <element>)
-const TUNE = [["captions", "Субтитри"], ["hook", "Хук"], ["lists", "Списки"], ["numbers", "Цифри"], ["split", "Розбивки екрану"], ["transitions", "Переходи"], ["cta", "CTA"], ["sounds", "Звуки"], ["motion", "Швидкість руху"]];
-function askTune(x, el, label) {
-  $("#mtitle").textContent = `Доточити «${x.title || x.name}»?`; $("#myes").textContent = "Так, роби раунд"; $("#mno").textContent = "Ще ні";
-  $("#mbody").innerHTML = `<p class="lede">Claude зробить раунд «${label}»: 3–5 варіантів цього стилю, у кожному змінено одну річ, слова ті самі. Він з'явиться тут, на «Стилі».</p>`;
-  $("#myes").hidden = false; $("#modal").hidden = false; $("#myes").focus();
-  $("#myes").onclick = async () => {
-    $("#myes").disabled = true; let sent = false;
-    try { if (comments && await comments.canSendToClaude() === "available") { await comments.sendToClaude({ anchor: await comments.anchorFor($("#mystyles")), text: `▶ «Стиль»: доточи стиль ${x.name} (${x.title || x.name}): ${el} (${label}).` }); sent = true; } } catch (e) {}
-    try { await DB.doc("style/request").set({ style: x.name, element: el, at: new Date().toISOString(), sent }); } catch (e) {}
-    $("#myes").disabled = false;
-    if (sent) { $("#modal").hidden = true; pill("Передано Claude"); }
-    else { $("#mtitle").textContent = "Збережено. Ще один крок"; $("#mbody").innerHTML = `<p class="lede">Claude зараз не на зв'язку зі сторінкою. Напиши йому в чаті:</p><p style="font-size:20px;font-weight:700;margin:6px 0 14px">«доточи ${(x.title || x.name).replace(/[<&]/g, "")}: ${label.toLowerCase()}»</p>`; $("#myes").hidden = true; $("#mno").textContent = "Зрозуміло"; }
-  };
-}
-function startPlan() {   // a new person: where they are on the way to the first reel
-  const done = [true, STYLE_LIST.length > 0, false], now = done.indexOf(false);
-  const steps = [["Бренд", "кольори, шрифти, елементи: Claude питає в чаті"], ["Стиль", "9 варіантів на 5 секундах твого відео, обираєш свої"], ["Перший рілс", "надішли Claude відео, тут з'явиться нарізка"]];
-  $("#banner").innerHTML = "<b>Як почати</b><ol style=\"margin:6px 0 0;padding-left:20px\">" + steps.map(([t, d], k) => `<li style="${k === now ? "font-weight:700" : "opacity:.75"}">${done[k] ? "✓ " : ""}${t}: ${d}</li>`).join("") + "</ol>";
-  $("#banner").hidden = false;
-}
-function renderMyStyles() {   // the styles already saved (db style/list, each with the example it was kept from)
-  const box = $("#mystyles"); if (!box) return; box.textContent = "";
-  if (!STYLE_LIST.length) return;
-  const h = document.createElement("h2"); h.style.marginTop = "0"; h.textContent = `Мої стилі (${STYLE_LIST.length})`;
-  const p = document.createElement("p"); p.className = "lede"; p.textContent = "Затверджені стилі з прикладами. Для рілса стиль обираєш на «Графіці».";
-  const grid = document.createElement("div"); grid.className = "stgrid";
-  for (const x of STYLE_LIST) {
-    const c = document.createElement("div"); c.className = "stv"; c.dataset.style = x.name;
-    if (x.url) c.appendChild(stPlayer(x.url, x.posterUrl, x.title));
-    const t = document.createElement("div"); t.className = "stt"; t.textContent = x.title || x.name;
-    if (R && S.style === x.name) { const b = document.createElement("span"); b.className = "stbadge"; b.textContent = "цей рілс"; t.appendChild(b); }
-    if (STYLE_DEFAULT === x.name) { const b = document.createElement("span"); b.className = "stbadge"; b.textContent = "завжди"; t.appendChild(b); }
-    const w = document.createElement("p"); w.className = "stw"; w.textContent = x.what || "";
-    const acts = document.createElement("div"); acts.className = "stacts";
-    const def = document.createElement("button"); def.type = "button"; def.className = "b quiet"; def.textContent = STYLE_DEFAULT === x.name ? "Не за замовчуванням" : "Завжди цей";
-    def.title = "Новий рілс одразу бере цей стиль (на «Графіці» можна змінити)";
-    def.addEventListener("click", async () => { const v = STYLE_DEFAULT === x.name ? null : x.name;
-      try { await DB.doc("style/list").update({ default: v }); STYLE_DEFAULT = v; renderMyStyles(); pill(v ? "Стиль за замовчуванням: " + (x.title || x.name) : "Стиль за замовчуванням прибрано"); }
-      catch (e) { pill("Не збереглось (" + (e?.code || "error") + ")", true); } });
-    const sel = document.createElement("select"); sel.className = "sfxsel"; sel.setAttribute("aria-label", "Що доточити в стилі " + (x.title || x.name));
-    sel.innerHTML = `<option value="">Доточити…</option>` + TUNE.map(([k, t]) => `<option value="${k}">${t}</option>`).join("");
-    sel.addEventListener("change", () => { if (sel.value) askTune(x, sel.value, sel.selectedOptions[0].textContent); sel.value = ""; });
-    acts.append(def, sel);
-    c.append(t, w, acts); grid.appendChild(c);
-  }
-  box.append(h, p, grid);
-  if (stZones) box.querySelectorAll(".sz").forEach(z => { z.hidden = false; z.innerHTML = zonesSvg(STR?.handle || (R && R.handle) || ""); });
-}
-function renderStyle() {
-  const box = $("#stbox"); styleDot(); renderMyStyles();
-  if (STR?.closed) { box.innerHTML = `<div class="empty">Оцінки записані у стилі вище. Новий раунд з'явиться тут, коли попросиш Claude.</div>`; $("#stnotebox").hidden = true; $("#sttally").textContent = ""; box.dataset.round = ""; return; }
-  if (!STR) { box.innerHTML = `<div class="empty">Раундів стилю ще немає. Попроси Claude почати «Стиль».</div>`; $("#stnotebox").hidden = true; $("#sttally").textContent = ""; return; }
-  if (STR.lede) $("#stlede").textContent = STR.lede;
-  const playing = [...box.querySelectorAll("video")].find(x => !x.muted)?.dataset.id;   // keep the one with sound playing across re-renders
-  if (box.dataset.round === STR.id && box.children.length) { stPaint(); return; }
-  box.dataset.round = STR.id; box.textContent = "";
-  const h = document.createElement("h2"); h.textContent = STR.title || "Раунд"; h.style.marginTop = "0"; box.appendChild(h);
-  for (const sec of STR.sections || []) {
-    const el = document.createElement("div"); el.className = "stsec";
-    el.innerHTML = `<h2></h2><p class="lede"></p><div class="stgrid"></div>`;
-    el.querySelector("h2").textContent = sec.title || ""; el.querySelector(".lede").textContent = sec.what || "";
-    const grid = el.querySelector(".stgrid");
-    for (const v of sec.variants || []) {
-      const c = document.createElement("div"); c.className = "stv"; c.dataset.id = v.id;
-      c.innerHTML = `<div class="stpl"><video muted loop playsinline autoplay preload="metadata"></video><div class="sz" hidden aria-hidden="true"></div>
-          <button class="stsound" type="button" aria-pressed="false">Зі звуком</button></div>
-        <div class="stt"></div><p class="stw"></p>
-        <div class="stvote" role="group"><button type="button" data-v="keep" aria-pressed="false">Залишити</button><button type="button" data-v="maybe" aria-pressed="false">Можливо</button><button type="button" data-v="drop" aria-pressed="false">Прибрати</button></div>
-        <textarea placeholder="Що подобається або що змінити"></textarea>`;
-      const vid = c.querySelector("video"); vid.dataset.id = v.id; vid.src = v.url; if (v.posterUrl) vid.poster = v.posterUrl;
-      vid.setAttribute("aria-label", v.title || "Варіант");
-      c.querySelector(".stt").textContent = v.title || ""; c.querySelector(".stw").textContent = v.what || "";
-      c.querySelector(".stvote").setAttribute("aria-label", "Оцінка: " + (v.title || ""));
-      c.querySelectorAll(".stvote button").forEach(b => b.addEventListener("click", () => stVote(v.id, b.dataset.v)));
-      const ta = c.querySelector("textarea"); ta.setAttribute("aria-label", "Нотатка: " + (v.title || ""));
-      ta.addEventListener("input", () => { STV.verdicts[v.id] = { ...(STV.verdicts[v.id] || {}), note: ta.value }; stSave(); });
-      const sb = c.querySelector(".stsound");
-      sb.addEventListener("click", () => {
-        const on = vid.muted;
-        box.querySelectorAll("video").forEach(x => { x.muted = true; x.closest(".stv").querySelector(".stsound").setAttribute("aria-pressed", "false"); x.closest(".stv").querySelector(".stsound").textContent = "Зі звуком"; });
-        if (on) { vid.muted = false; vid.currentTime = 0; vid.play().catch(() => {}); sb.setAttribute("aria-pressed", "true"); sb.textContent = "Без звуку"; }
-      });
-      grid.appendChild(c);
-    }
-    box.appendChild(el);
-  }
-  if (playing) box.querySelector(`video[data-id="${CSS.escape(playing)}"]`)?.closest(".stv").querySelector(".stsound").click();
-  $("#stnotebox").hidden = false;
-  stPaint();
-}
-function stPaint() {   // verdicts, notes, zones onto the cards already built (videos keep playing)
-  for (const c of $$("#stbox .stv")) {
-    const x = STV?.verdicts?.[c.dataset.id] || {};
-    c.dataset.v = x.v || "";
-    c.querySelectorAll(".stvote button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === x.v)));
-    const ta = c.querySelector("textarea"); if (document.activeElement !== ta) ta.value = x.note || "";
-    const z = c.querySelector(".sz"); z.hidden = !stZones; if (stZones && !z.innerHTML) z.innerHTML = zonesSvg(STR?.handle || (R && R.handle) || "");
-  }
-  $$("#mystyles .sz").forEach(z => { z.hidden = !stZones; if (stZones && !z.innerHTML) z.innerHTML = zonesSvg(STR?.handle || (R && R.handle) || ""); });
-  if (document.activeElement !== $("#stnote")) $("#stnote").value = STV?.note || "";
-  renderStRefs();
-  const n = stCount(), all = stVariants().length;
-  $("#sttally").textContent = all ? `Оцінено ${n.keep + n.maybe + n.drop} з ${all} · залишити ${n.keep} · можливо ${n.maybe} · прибрати ${n.drop}` : "";
-}
-$("#stnote").addEventListener("input", e => { if (!STV) return; STV.note = e.target.value; stSave(); });
-// references for the round: links to reels they like (Instagram, TikTok, YouTube) and their own files, up to 10 in all
-function renderStRefs() {
-  const refs = STV?.refs || [], links = $("#stlinks"), files = $("#streflist"); links.textContent = ""; files.textContent = "";
-  refs.forEach((r, k) => {
-    const del = () => { STV.refs = refs.filter((_, j) => j !== k); renderStRefs(); stSave(); };
-    if (r.kind === "link") {
-      const c = document.createElement("span"); c.className = "stlink";
-      const a = document.createElement("a"); a.href = r.url; a.target = "_blank"; a.rel = "noopener"; a.textContent = "↗ " + r.url.replace(/^https?:\/\/(www\.)?/, "");
-      const x = document.createElement("button"); x.type = "button"; x.textContent = "×"; x.title = "Прибрати"; x.setAttribute("aria-label", "Прибрати посилання"); x.addEventListener("click", del);
-      c.append(a, x); links.appendChild(c);
-    } else {
-      const b = document.createElement("button"); b.type = "button"; b.title = r.name + " (тапни, щоб прибрати)";
-      if (r.kind === "image") b.style.backgroundImage = `url(${JSON.stringify(r.url)})`; else b.textContent = "▶ " + r.name;
-      b.addEventListener("click", del); files.appendChild(b);
-    }
-  });
-  $("#streffile").hidden = !assets || refs.length >= 10;
-}
-$("#stlinkadd").addEventListener("click", () => {
-  const inp = $("#streflink"), u = inp.value.trim(), msg = $("#strefmsg");
-  if (!STV) return;
-  if (!/^https:\/\/\S+\.\S+/.test(u)) { msg.textContent = "Встав посилання, що починається з https://"; inp.focus(); return; }
-  if ((STV.refs || []).length >= 10) { msg.textContent = "Можна до 10 референсів."; return; }
-  STV.refs = [...(STV.refs || []), { kind: "link", url: u }]; inp.value = ""; msg.textContent = "Посилання додано."; renderStRefs(); stSave();
-});
-$("#streflink").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); $("#stlinkadd").click(); } });
-$("#streffile").addEventListener("change", async e => {
-  const fs = [...e.target.files], msg = $("#strefmsg"); if (!fs.length || !assets || !STV) return;
-  if ((STV.refs || []).length + fs.length > 10) { msg.textContent = "Можна до 10 референсів."; e.target.value = ""; return; }
-  if (fs.some(f => f.size > 20 * 1024 * 1024)) { msg.textContent = "Файл більший за 20 МБ: кинь посилання на рілс замість файлу."; e.target.value = ""; return; }
-  msg.textContent = "Завантажую…";
-  try {
-    for (const f of fs) { const u = await assets.upload(f); STV.refs = [...(STV.refs || []), { kind: f.type.startsWith("video") ? "video" : "image", id: u.id, url: u.url, name: f.name }]; }
-    msg.textContent = "Додано."; renderStRefs(); stSave();
-  } catch (er) { msg.textContent = "Не вдалося завантажити (" + (er?.code || "помилка") + "). Спробуй ще раз."; }
-  e.target.value = "";
-});
-$("#stzbtn").addEventListener("click", () => { stZones = !stZones; $("#stzbtn").classList.toggle("on", stZones); $("#stzbtn").setAttribute("aria-pressed", String(stZones)); stPaint(); });
-function styleBar() {
-  const bar = $("#gobar"), txt = $("#gotext"), btn = $("#gobtn"); bar.hidden = false;
-  const set = (t, sub, label, kind) => { txt.innerHTML = `<b>${t}</b><span class="sub">${sub}</span>`; btn.innerHTML = label; btn.dataset.kind = kind || ""; btn.disabled = !kind; };
-  if (!STR || STR.closed) return STYLE_LIST.length ? set("Мої стилі", "Стиль для рілса обираєш на «Графіці».", "До «Графіки»", R ? "tographics" : "") : set("Стиль", "Claude ще не підготував раунд.", "Готово → Claude");
-  const n = stCount(), done = n.keep + n.maybe + n.drop, all = stVariants().length;
-  if (stWaiting()) return set("Claude готує наступний раунд", "Сторінка оновиться сама. Оцінки можна ще правити.", `<span class="spin"></span>Claude працює`);
-  if (!done) return set(STR.title || "Стиль", "Оціни варіанти: залишити, можливо або прибрати.", "Готово → Claude");
-  set(STR.title || "Стиль", done < all ? `Оцінено ${done} з ${all}. Неоцінені Claude пропустить.` : "Усе оцінено. Передай Claude.", "Готово → Claude", "style");
-}
-function askStyle() {
-  const n = stCount();
-  $("#mtitle").textContent = "Віддати раунд Claude?"; $("#myes").textContent = "Так, готово → Claude"; $("#mno").textContent = "Ще ні";
-  $("#mbody").innerHTML = `<p class="lede">Залишити: ${n.keep} · Можливо: ${n.maybe} · Прибрати: ${n.drop}${(STV.refs || []).length ? ` · референсів: ${STV.refs.length}` : ""}</p><ol>
-    <li><b>«Залишити»</b> Claude запише у твій стиль${STR?.kind === "directions" ? " (кожен напрям окремим стилем)" : ""}.</li>
-    <li><b>«Можливо»</b> виправить за нотатками й покаже ще раз.</li>
-    <li><b>«Прибрати»</b> більше не з'явиться, причину запише.</li></ol>`;
-  $("#myes").hidden = false; $("#modal").hidden = false; $("#myes").focus();
-  $("#myes").onclick = sendStyle;
-}
-async function sendStyle() {
-  const n = stCount(), at = new Date().toISOString(); $("#myes").disabled = true;
-  let sent = false, why = "";
-  const text = `▶ Кнопка «Готово → Claude» у «Стилі»: раунд ${STR.id} оцінено (залишити ${n.keep}, можливо ${n.maybe}, прибрати ${n.drop}${(STV.refs || []).length ? `, референсів ${STV.refs.length}` : ""}).`;
-  try {
-    const can = comments ? await comments.canSendToClaude() : "off";
-    if (can === "available") { await comments.sendToClaude({ anchor: await comments.anchorFor($("#gobtn")), text }); sent = true; }
-    else why = can;
-  } catch (e) { why = e?.code || "error"; }
-  STV.sent = { at, sent }; clearTimeout(stTimer);
-  try { await stRef.set(JSON.parse(JSON.stringify({ ...STV, updatedAt: at }))); } catch (e) { pill("Оцінки не збереглись (" + (e?.code || "error") + ")", true); }
-  $("#myes").disabled = false;
-  if (sent) { $("#modal").hidden = true; pill("Передано Claude"); }
-  else {
-    $("#mtitle").textContent = "Збережено. Ще один крок";
-    $("#mbody").innerHTML = `<p class="lede">Claude зараз не на зв'язку зі сторінкою${why === "writers_only" ? " (кнопка працює тільки для власниці сторінки)" : ""}. Напиши йому в чаті одне слово:</p><p style="font-size:22px;font-weight:700;margin:6px 0 14px">«стиль»</p>`;
-    $("#myes").hidden = true; $("#mno").textContent = "Зрозуміло";
-  }
-  styleBar(); styleDot();
-}
-async function loadStyle() {
-  const rr = DB.doc("style/round"); stRef = DB.doc("style/votes");
-  try { const x = await rr.get(); STR = x.exists ? JSON.parse(JSON.stringify(x.data())) : null; } catch (e) { STR = null; }
-  try { const x = await stRef.get(); STV = x.exists ? JSON.parse(JSON.stringify(x.data())) : null; } catch (e) { STV = null; }   // a copy: db data can be read-only
-  if (!STV || STV.round !== STR?.id) STV = stBlank();
-  STV.verdicts = STV.verdicts || {};
-  if (STR?.theme && !R) { const rt = document.documentElement; for (const [k, val] of Object.entries(STR.theme)) if (k !== "scheme" && k !== "label") rt.style.setProperty("--" + k, val); rt.setAttribute("data-theme", STR.theme.scheme || "light"); }
-  styleDot(); if (tab === "style") { renderStyle(); styleBar(); }
-  else if (STR && !STR.closed && !stWaiting() && !Object.keys(STV.verdicts).length) { $("#banner").textContent = `${STR.title || "Новий раунд стилю"}: відкрий вкладку «Стиль».`; $("#banner").hidden = false; }
-  let first = true;
-  rr.onSnapshot(x => {   // Claude put up the next round: show it in place
-    if (first) { first = false; return; }
-    const prev = STR?.id; STR = x.exists ? JSON.parse(JSON.stringify(x.data())) : null;
-    if (STR && STR.id !== prev) { STV = stBlank(); $("#stbox").dataset.round = ""; showTab("style"); $("#banner").textContent = `${STR.title || "Новий раунд"}: оціни варіанти й натисни «Готово → Claude».`; $("#banner").hidden = false; pill("Новий раунд стилю"); }
-    else if (tab === "style") { $("#stbox").dataset.round = ""; renderStyle(); styleBar(); }
-    styleDot();
-  }, () => {});
-}
-
-// ---------- load ----------
-// One reel: docs reel/current, review/current, builds/latest. A batch: reel/index lists them, and each has reel/<id>, review/<id>, builds/<id>.
-let DB = null, subs = [], LIST = [], loadNo = 0;   // loadNo: listeners of a reel we switched away from ignore their events
-const docsFor = id => ({ reel: "reel/" + id, review: "review/" + id, build: id === "current" ? "builds/latest" : "builds/" + id, cut: id === "current" ? "builds/cut" : "builds/" + id + "-cut" });
-function pickReel() { let id = null; try { id = localStorage.getItem("reelPick"); } catch (e) {} return LIST.some(x => x.id === id) ? id : (LIST.find(x => !/фінал/i.test(x.status || "")) || LIST[0]).id; }
-function renderPick(cur) {
-  const sel = $("#reelsel"); sel.textContent = ""; $("#reelpick").hidden = LIST.length < 2;
-  LIST.forEach((x, k) => { const o = document.createElement("option"); o.value = x.id; o.textContent = `${k + 1}. ${x.title || x.id}${x.status ? " · " + x.status : ""}`; o.selected = x.id === cur; sel.appendChild(o); });
-}
-$("#reelsel").addEventListener("change", async e => {
-  try { localStorage.setItem("reelPick", e.target.value); } catch (er) {}
-  if (dirty) { clearTimeout(timer); saveNow(); }
-  await saving.catch(() => {});
-  load(e.target.value);
-});
-async function load(id) {
-  for (const u of subs) if (typeof u === "function") try { u(); } catch (e) {}
-  subs = []; stopPlay(); placing = null; R = null; B = null; CB = null; S = blank(); undo = []; $("#undo").disabled = true; dirty = false; mine = null; pos = 0;
-  renderPick(id); $("#reelname").textContent = "Завантажую рілс…"; pill("Завантажую…");
-  const d = docsFor(id), my = ++loadNo, live = () => my === loadNo;
-  try {
-    const rs = await DB.doc(d.reel).get(); if (!live()) return;
-    if (!rs.exists) { $("#reelname").textContent = "Рілс ще не завантажено. Попроси Claude його завантажити."; pill("Нічого переглядати", true); startPlan(); if (STR || !STYLE_LIST.length) showTab("style"); return; }
-    R = rs.data();
-    if (!$("#sz").hidden) drawZones();   // their own handle on the Instagram screen
-    if (R.theme) {   // brand colours from brand.json
-      const rt = document.documentElement;
-      for (const [k, val] of Object.entries(R.theme)) if (k !== "scheme" && k !== "label") rt.style.setProperty("--" + k, val);
-      if (R.theme.label) $("#eyebrow").textContent = R.theme.label;
-      if (R.theme.library) $("#eflib").href = R.theme.library;
-      rt.setAttribute("data-theme", R.theme.scheme || "light"); rt.style.colorScheme = R.theme.scheme || "light";
-    }
-    try { if (R.fonts) localStorage.setItem("reelFonts", JSON.stringify(R.fonts)); } catch (e) {}
-    if (R.fonts) {   // brand fonts, so the caption preview uses the real faces (replaces the copy remembered from the last visit)
-      document.getElementById("brandfonts")?.remove();
-      const css = [["rb", R.fonts.body], ["ra", R.fonts.accent], ...Object.entries(R.fonts.extra || {}).map(([f, u]) => ["bf_" + f.replace(/\W/g, "_"), u])]
-        .filter(f => f[1]).map(([n, u]) => `@font-face{font-family:${n};src:url(${u});font-display:swap}`).join("");   // extra: the brand's other weights
-      document.head.appendChild(Object.assign(document.createElement("style"), { id: "brandfonts", textContent: css }));
-      const rt = document.documentElement;   // the brand's fonts for the whole page
-      if (R.fonts.accent) rt.style.setProperty("--f-display", '"ra", Georgia, serif');
-      if (R.fonts.body) rt.style.setProperty("--f-body", '"rb", system-ui, sans-serif');
-    }
-    ref = DB.doc(d.review);
-    const rv = await ref.get(); if (!live()) return; if (rv.exists) S = { ...blank(), ...JSON.parse(JSON.stringify(rv.data())) };
-    // someone else (Claude, another tab) changed the decisions: take theirs instead of saving a stale copy over it
-    subs.push(ref.onSnapshot(s => {
-      if (!live() || !R) return;
-      if (!s.exists) {   // Claude cleared the decisions (a new reel in the same slot): drop the old ones held in this tab
-        if (!dirty && JSON.stringify(S) !== JSON.stringify(blank())) { S = blank(); undo = []; mine = null; $("#undo").disabled = true; recompute(); renderAll(); setPos(0); pill("Новий рілс: старі рішення скинуто"); }
-        return;
-      }
-      const d = s.data(); if (d.updatedAt === mine || dirty) return;
-      if (JSON.stringify({ ...blank(), ...JSON.parse(JSON.stringify(d)) }) === JSON.stringify({ ...S })) return;   // same decisions (fields blank() adds included): nothing changed
-      S = { ...blank(), ...JSON.parse(JSON.stringify(d)) }; undo = []; $("#undo").disabled = true;
-      recompute(); renderAll(); setPos(pos); pill("Оновлено Claude");
-    }, () => {}));
-    let firstReel = true;
-    subs.push(DB.doc(d.reel).onSnapshot(async s => {   // Claude changed the reel (e.g. added proposals): take it in place
-      if (!live()) return; if (firstReel) { firstReel = false; return; } if (!s.exists) return;
-      if (dirty) { clearTimeout(timer); saveNow(); } await saving.catch(() => {});
-      const before = R.claudeRound || 0; R = s.data(); recompute(); renderAll(); setPos(pos); overlay(pos);
-      if ((R.claudeRound || 0) > before) { showTab("graphics"); const n = GFX.filter(g => !g.user && !g.own && !g.gone).length;
-        $("#banner").textContent = `Claude додав пропозиції (${n}). Переглянь кожну: залиш, зміни або прибери. Потім «Зібрати чернетку» внизу.`; $("#banner").hidden = false; pill("Пропозиції Claude готові"); }
-      else pill("Claude оновив рілс");
-    }, () => {}));
-    let firstBuild = true;
-    let firstCut = true;
-    subs.push(DB.doc(d.cut).onSnapshot(s => { if (!live()) return; const had = CB?.url; CB = s.exists ? s.data() : null;
-      if (!firstCut && CB?.url && CB.url !== had && tab === "graphics") { showTab("graphics"); $("#banner").textContent = "Відео нарізки готове: перевір склейки в плеєрі."; $("#banner").hidden = false; }
-      else if (tab === "graphics") showTab("graphics"); renderCutBox(); firstCut = false; }, () => {}));
-    subs.push(DB.doc(d.build).onSnapshot(s => { if (!live()) return; const had = B?.url; B = s.exists ? s.data() : null; if (R) { renderPreview(); renderStage(); }
-      if (!firstBuild && B?.url && B.url !== had) { showTab("preview"); $("#banner").textContent = "Чернетка готова. Натисни play на відео, лиши нотатки на секундах або «Це фінал»."; $("#banner").hidden = false; }
-      else if (tab === "preview") showTab("preview"); firstBuild = false; }, () => {}));
-    recompute();
-    $("#reelname").textContent = `${R.title} · оригінал ${fmt(R.srcDur)} → рілс ${fmt(P.cutDur)}`; setPos(0);
-    $("#brand").value = S.brandRequest || "";
-    renderAll(); showTab(["cuts", "overlays", "effects", "graphics", "captions", "sound", "mystyle", "preview", "style"].includes(location.hash.slice(1)) ? location.hash.slice(1) : tab || "cuts");
-    pill(rv.exists ? "Збережені рішення завантажено" : "Готово");
-    useDefaultStyle();
-  } catch (e) { if (live()) pill("Не вдалося завантажити рілс (" + (e?.code || "error") + "). Онови сторінку.", true); }
-}
-(async () => {
-  DB = await window.claude?.use?.("db");
-  if (!DB) { pill("Тут рілс не завантажиться. Відкрий сторінку за посиланням з claude.ai.", true); $("#reelname").textContent = "Немає з'єднання."; return; }
-  assets = await window.claude?.use?.("assets");
-  comments = await window.claude?.use?.("comments");   // «Send to Claude» from the big button   // only editors get it; others don't see the overlay button
-  $("#ovbox").hidden = !assets; $("#ovnone").hidden = !!assets;
-  await loadStyle();
-  const takeList = x => { const d = x.exists ? JSON.parse(JSON.stringify(x.data())) : {}; STYLE_LIST = d.items || []; STYLE_DEFAULT = d.default || null; };
-  try { takeList(await DB.doc("style/list").get()); } catch (e) { STYLE_LIST = []; }
-  placeStyleTab();
-  DB.doc("style/list").onSnapshot(x => { takeList(x); useDefaultStyle(); if (R) renderStylePick(); if (tab === "style") { renderMyStyles(); styleBar(); } placeStyleTab(); }, () => {});
-  if (tab === "style") { renderMyStyles(); styleBar(); }
-  libRef = DB.doc("library/files");   // «Мої файли» live across reels
-  try { const l = await libRef.get(); LIB = l.exists ? (l.data().items || []) : [];
-    if (l.exists && /^https:\/\//.test(l.data().libraryUrl || "")) $("#eflib").href = l.data().libraryUrl;   // their own effects gallery, for every reel
-  } catch (e) { LIB = []; }
-  renderLib();
-  try { const x = await DB.doc("library/sfx").get(); SFXLIB = x.exists ? (x.data().items || []) : []; } catch (e) { SFXLIB = []; }
-  DB.doc("library/sfx").onSnapshot(x => { SFXLIB = x.exists ? (x.data().items || []) : []; if (R) renderSound(); }, () => {});   // new sounds show up without a refresh
-  const idx = DB.doc("reel/index");   // a batch of reels; without it the page shows reel/current as before
-  try { const x = await idx.get(); LIST = x.exists ? (x.data().items || []) : []; } catch (e) { LIST = []; }
-  if (!LIST.length) LIST = [{ id: "current" }];
-  const first = pickReel(); load(first);
-  idx.onSnapshot(s => {   // Claude adds the next reel or changes a status while they review: refresh the picker only
-    const items = s.exists ? (s.data().items || []) : []; if (!items.length) return;
-    const added = items.length > LIST.length; LIST = items; renderPick($("#reelsel").value || first);
-    if (added) pill("Наступний рілс готовий до перевірки: обери його зверху");
-  }, () => {});
-})();
-</script>
+<script src="app.js"></script>

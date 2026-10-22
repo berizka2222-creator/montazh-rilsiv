@@ -71,7 +71,7 @@ def style_previews():
     """Looping examples for «Тільки бренд» and «Мікс ефектів» on «Стиль монтажу» (<REELS_HOME>/.motion_previews.json "style:brand" / "style:mix")."""
     pv = HOME / ".motion_previews.json"
     pv = json.load(open(pv)) if pv.exists() else {}
-    return {k: pv[f"style:{k}"] for k in ("brand", "mix") if f"style:{k}" in pv}
+    return {k: pv[f"style:{k}"] for k in ("brand", "mix", "minimal") if f"style:{k}" in pv}
 
 def caption_styles():
     """Caption styles from the catalog (status "caption") for «Анімація субтитрів» on the «Субтитри» tab."""
@@ -91,10 +91,21 @@ def manual_effects():
                 else "Переходи між склейками" if "перехід" in (m.get("moments") or [""])[0] else (lambda x: x[:1].upper() + x[1:])((m.get("moments") or ["інше"])[0]))
     pv = HOME / ".motion_previews.json"            # {name: url}: 3 s looping previews uploaded to the page's assets
     pv = json.load(open(pv)) if pv.exists() else {}
-    out = [{"n": m["name"], "ua": m.get("ua") or m["name"], "g": group(m), "k": "m" if m.get("status") == "manual" else "a",
-            **({"p": pv[m["name"]]} if m["name"] in pv else {})}
-           for m in cat if m.get("status") in ("manual", "ready", "replace", "full_only")]
-    return sorted(out, key=lambda x: (x["g"], x["ua"]))
+    menu = [m for m in cat if m.get("status") in ("manual", "ready", "replace", "full_only")]
+    # «№» on the page: a number per effect that never changes, so people remember and type it ("12"). New effects get the
+    # next free number, written back into the catalog; an effect that leaves the menu keeps its number unused.
+    if any("no" not in m for m in menu):
+        nxt = max([m.get("no", 0) for m in cat] + [0]) + 1
+        for m in sorted((m for m in menu if "no" not in m), key=lambda m: (group(m), m.get("ua") or m["name"])):
+            m["no"] = nxt; nxt += 1
+        cp = Path(__file__).resolve().parent.parent / "references" / "motion_catalog.json"
+        full = json.load(open(cp)); byname = {m["name"]: m["no"] for m in menu}
+        for m in full["motions"]:
+            if m["name"] in byname: m["no"] = byname[m["name"]]
+        json.dump(full, open(cp, "w"), ensure_ascii=False, indent=1)
+    out = [{"n": m["name"], "no": m["no"], "ua": m.get("ua") or m["name"], "g": group(m), "k": "m" if m.get("status") == "manual" else "a",
+            **({"p": pv[m["name"]]} if m["name"] in pv else {})} for m in menu]
+    return sorted(out, key=lambda x: x["no"])
 
 def export(reel, proposal, out):
     out.mkdir(parents=True, exist_ok=True)
@@ -171,7 +182,7 @@ def export(reel, proposal, out):
                            "mode": mode, "editorial": brand["captions"].get("style") == "editorial",
                            "cap": brand["colors"].get("caption", "#FFFFFF"), "acc": brand["colors"].get("caption_accent", "#FF7DB8"), "acc2": brand["colors"].get("caption_accent_2"),
                            "main": brand["colors"]["main"], "case": brand["captions"].get("case", "lower")},
-                 "grade": brand.get("grade"), "look": brand.get("text_look"), "titleColor": brand.get("title_color", brand["colors"]["main"]), "titleY": brand.get("title_y", 360),
+                 "grade": brand.get("grade"), "look": brand.get("text_look"), "titleColor": brand.get("title_color", brand["colors"]["main"]), "titleY": brand.get("title_y", 360), "titleAlign": brand.get("title_align") or "center", "cleanVoice": brand.get("clean_voice", True) is not False,
                  **({"face": json.load(open(reel / "face.json"))["box"]} if (reel / "face.json").exists() else {}),
                  "fontChoices": {**(brand.get("caption_fonts") or {}), "names": {r: (brand.get("fonts", {}).get(r) or {}).get("family", "") for r in ("body", "accent")}}}   # face: scripts/face_box.py; fontChoices: the design system's other caption fonts
     P = node(reel_json, {"cut": proposed_cut})
@@ -216,8 +227,10 @@ def do_import(reel, review):
     P = node(reel_json, d)
     if P.get("grade"):   # her colour grade from the page: the tone curve goes to <reel>/grade.cube, the chain into edl.json
         (reel / "grade.cube").write_text(P["cube"]); P["grade"] = P["grade"].replace("__CUBE__", str((reel / "grade.cube").resolve()))
-    clean = d.get("voiceClean") is not False
+    brand_clean = json.load(open(HOME / "brand.json")).get("clean_voice", True) is not False
+    clean = d["voiceClean"] if isinstance(d.get("voiceClean"), bool) else brand_clean   # untouched on the page = the brand's setting
     if not clean: print("VOICE: keep the original sound, no clean-up (the final loudness is still levelled)")
+    elif not brand_clean: print("VOICE CLEAN REQUESTED: brand.json has clean_voice false, so voice.wav is only levelled. Run CLEAN_VOICE=1 scripts/clean_audio.sh <raw> voice.wav before cutting")
     if P.get("grade"): print("GRADE (set on the page, goes into edl.json, cut.py applies it):", d.get("grade"))
     json.dump({"source": raw_clip(reel).name, "audio": "voice.wav" if clean else raw_clip(reel).name, "keep": [[round(a, 3), round(b, 3)] for a, b in P["spans"]],
                **({"grade": P["grade"]} if P.get("grade") else {})},
@@ -230,7 +243,7 @@ def do_import(reel, review):
         if g.get("gone") or g["state"] == "d": continue
         note = ((d.get("board") or {}).get(g["id"]) or {}).get("note")
         if g["state"] == "c": changes.append(f"{g['id']} @ cut {g['start']:.1f}s: {note or '(no note)'}")
-        spec = {k: v for k, v in g.items() if k not in ("id", "kind", "what", "w0", "w1", "state", "place", "moved", "gone", "own", "shifted", "capsAside", "placed", "storyUrl")}
+        spec = {k: v for k, v in g.items() if k not in ("id", "kind", "what", "w0", "w1", "state", "place", "moved", "gone", "own", "shifted", "capsAside", "placed", "storyUrl", "durSet", "afterHook")}
         if g.get("capsAside"): spec["quiet"] = True   # captions step aside while this card shows (no room for both)
         if g.get("shifted") and g.get("type") in ("motion", "custom") and not g.get("user"):
             pass   # catalog motions keep their tested placement (band / split / full, see build_reel); the page only shifts their preview box
@@ -245,9 +258,13 @@ def do_import(reel, review):
         if (d.get("sfxSwap") or {}).get(g["id"]) and isinstance(spec.get("sfx"), dict): spec["sfx"] = {**spec["sfx"], "name": d["sfxSwap"][g["id"]]}
         if g["id"] in (d.get("sfxOff") or {}) and d["sfxOff"][g["id"]]: spec["sfx"] = False
         if g.get("type") == "overlay":   # uploaded on the page: Claude downloads the asset into <reel>/overlays/ before rendering
-            spec = {k: v for k, v in spec.items() if k not in ("imgUrl", "user", "media")}
+            spec = {k: v for k, v in spec.items() if k not in ("imgUrl", "user", "media", "file", "memeText", "findOpt")}
             spec["src"] = f"overlays/{g['assetId']}"
             have = list((reel / "overlays").glob(g["assetId"] + ".*")) if (reel / "overlays").exists() else []
+            if g.get("file") and (reel / g["file"]).exists():   # picked from «Знайти»: the full-quality original is already in finds/
+                spec["src"] = g["file"]; have = [reel / g["file"]]
+                if g.get("memeText") is not None:
+                    print(f"MEME {g['id']}: her text «{g['memeText'] or '(none yet: ask her)'}» -> find_media.py <reel> meme --id <template> --text \"...\" --into <request>, then point this overlay's src at the -caption.png")
             overlays.append(f"{g['id']} @ cut {g['start']:.1f}-{g['end']:.1f}s, {g['mode']}, {g.get('what', '')}: "
                             + ("file ready" if have else f"DOWNLOAD asset {g['assetId']} into {reel / 'overlays'}"))
         cards.append(spec)
@@ -258,10 +275,15 @@ def do_import(reel, review):
     cy = d.get("capY") if d.get("capY") is not None else (reel_json.get("style") or {}).get("capY")
     if cy is not None and cy != json.load(open(HOME / "brand.json")).get("captions", {}).get("y", 1250): extra["caption_y"] = cy   # this reel's own caption height
     if d.get("capSize") is not None: extra["caption_size"] = d["capSize"]   # the caption size she picked for this reel
-    page_look = {k: v for k, v in (d.get("look") or {}).items() if k in ("cap", "hook", "txt") and v}   # text look from «Субтитри» / the hook block / «Накладення» text (only what she changed)
+    page_look = {k: v for k, v in (d.get("look") or {}).items() if k in ("cap", "hook", "txt", "cta") and v}   # text look from «Субтитри» / the hook block / «Накладення» text (only what she changed)
+    def merge_lines(a, b):   # hook look per line: the page's changes over her saved default, line by line
+        a, b = a or [], b or []
+        return [{**((a[i] if i < len(a) else None) or {}), **((b[i] if i < len(b) else None) or {})} for i in range(max(len(a), len(b)))]
     base_look = json.load(open(HOME / "brand.json")).get("text_look") or {}                      # her saved default («Робити так у всіх наступних рілсах»)
     look = {k: {**base_look.get(k, {}), **page_look.get(k, {}), **({"acc": {**base_look.get(k, {}).get("acc", {}), **page_look.get(k, {}).get("acc", {})}} if k == "cap" else {}),
-                **({"l2": {**base_look.get(k, {}).get("l2", {}), **page_look.get(k, {}).get("l2", {})}} if k == "hook" else {})} for k in set(base_look) | set(page_look)}
+                **({"l2": {**base_look.get(k, {}).get("l2", {}), **page_look.get(k, {}).get("l2", {})},
+                    "lines": merge_lines(base_look.get(k, {}).get("lines"), page_look.get(k, {}).get("lines"))} if k in ("hook", "cta") else {})}
+            for k in set(base_look) | set(page_look)}
     if look:
         extra["text_look"] = look; print("TEXT LOOK:", json.dumps(look, ensure_ascii=False))
         if page_look and (d.get("look") or {}).get("keep"):   # becomes the brand default (reel.json "look" on the next reels)

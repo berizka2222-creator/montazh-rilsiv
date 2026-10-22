@@ -8,10 +8,11 @@ TMP="$(mktemp -d)"; trap 'rm -rf "$TMP"' EXIT
 ffmpeg -v error -y -i "$IN" -vn -ac 1 -ar 48000 "$TMP/raw.wav"
 SRC="$TMP/raw.wav"
 
+# CLEAN_VOICE=1 cleans this clip even when the brand says not to (she ticked «Чистити голос» on the page).
 # brand.json "clean_voice": false = leave the voice as recorded: volume only (no denoise, EQ, de-ess or compression),
 # raised toward -14 LUFS but never past -1.5 dB peak
 BRAND="${REELS_HOME:-$HOME/reels}/brand.json"
-if [ -f "$BRAND" ] && [ "$(python3 -c "import json;print(json.load(open('$BRAND')).get('clean_voice', True))")" = "False" ]; then
+if [ -z "${CLEAN_VOICE:-}" ] && [ -f "$BRAND" ] && [ "$(python3 -c "import json;print(json.load(open('$BRAND')).get('clean_voice', True))")" = "False" ]; then
   E="$(ffmpeg -hide_banner -i "$SRC" -af ebur128=peak=true -f null - 2>&1)"
   I="$(printf '%s' "$E" | grep -E '^\s+I:' | tail -1 | awk '{print $2}')"; P="$(printf '%s' "$E" | grep -E '^\s+Peak:' | tail -1 | awk '{print $2}')"
   G="$(python3 -c "print(round(min(-14-($I), -1.5-($P)), 2))")"

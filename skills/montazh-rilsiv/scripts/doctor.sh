@@ -62,6 +62,13 @@ MH="${MOTION_HOME:-$HOME/motion}"
 if [ -d "$MH/node_modules/@remotion/cli" ] && [ -f "$MH/scripts/sync-brand.py" ]; then ok "motion library (Remotion) in $MH"
 else warn "motion library (Remotion) not installed" "run: bash scripts/setup_motion.sh (brand elements and motion reels need it)"; fi
 
+# optional: picture / GIF / meme search on the review page («Накладення → Знайти»); free keys, saved with scripts/set_key.sh
+ENVF="$HOME/.config/reels/.env"
+for K in PIXABAY_API_KEY GIPHY_API_KEY; do
+  if grep -q "^$K=." "$ENVF" 2>/dev/null; then ok "$K connected"
+  else printf '  ℹ️  %s not connected (optional: %s)\n' "$K" "search for photos, videos, GIFs; connect with: bash scripts/set_key.sh $K"; fi
+done
+
 FREE_GB=$(df -Pk "$HOME" | awk 'NR==2{print int($4/1048576)}')
 [ "$FREE_GB" -ge 10 ] && ok "${FREE_GB} GB free disk" || no "only ${FREE_GB} GB free disk" "free up 10+ GB (35+ GB for 4K exports)"
 

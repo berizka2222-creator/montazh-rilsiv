@@ -88,16 +88,17 @@
   function graphics(reel, d, P) {
     const W = reel.words, firstKeptFrom = i => { for (let k = i; k < W.length; k++) if (!P.removed(k)) return k; return null; };
     const out = reel.board.map(g0 => { let g = g0;
-      const state = ((d.board || {})[g.id] || {}).state || "k", bp = ((d.board || {})[g.id] || {}).place;   // bp: dragged on the page
+      const bb = (d.board || {})[g.id] || {}, state = bb.state || "k", bp = bb.place;   // bp: dragged on the page
       if (bp) g = { ...g, place: bp, placed: true };
+      if (bb.w0 != null) g = { ...g, w0: bb.w0, w1: null };   // moved on the timeline: starts on this word
       const a = firstKeptFrom(g.w0);
       if (a === null) return { ...g, state, gone: true };
       let endSrc;
       if (g.w1 != null && !P.removed(g.w1)) endSrc = W[g.w1].e;
       else { let k = a; while (k < W.length - 1 && !/[.,!?;:]$/.test(W[k].text) && W[k + 1].s - W[k].e < 0.35 && P.toCut(W[k].e) - P.toCut(W[a].s) < 4) k++; endSrc = W[k].e; }
       const minDur = g.type === "block" ? 2.2 : ["card", "list", "split", "steps"].includes(g.type) ? 2.5 : g.type === "push" ? 2 : g.type === "follow" ? 2.5 : 1;   // long enough to read past the entrance animation
-      const start = P.toCut(W[a].s), end = Math.max(start + minDur, P.toCut(endSrc) + 0.15);
-      return { ...g, state, start, end: Math.min(end, P.cutDur), moved: a !== g.w0 };
+      const start = P.toCut(W[a].s), end = bb.dur != null ? start + Math.max(0.5, bb.dur) : Math.max(start + minDur, P.toCut(endSrc) + 0.15);   // dur: stretched on the timeline
+      return { ...g, state, start, end: Math.min(end, P.cutDur), moved: a !== g.w0, durSet: bb.dur != null };
     }).concat((d.overlays || []).map(o => {   // overlays they added on the page: an uploaded image/video (or big text) from a word, for o.dur seconds
       const state = ((d.board || {})[o.id] || {}).state || "k", a = firstKeptFrom(o.w0);
       const place = o.place || OVERLAY_PLACE[o.mode] || OVERLAY_PLACE.big, lines = (o.text || "").split("/").filter(x => x.trim()).length || 1;
@@ -105,7 +106,7 @@
         ? { id: o.id, type: "bigtext", kind: o.behind ? "Текст за тобою" : "Текст", what: o.text, text: o.text, y: place[1], size: (o.look || {}).px || autoPx(o.text, place),
             look: o.look && Object.keys(o.look).length ? o.look : undefined,
             behind: !!o.behind, place, w0: o.w0, user: true }
-        : { id: o.id, type: "overlay", kind: o.behind ? "Накладення за тобою" : "Накладення", what: o.name, mode: o.mode, effect: o.effect || "soft", media: o.kind, assetId: o.assetId,
+        : { id: o.id, type: "overlay", kind: o.behind ? "Накладення за тобою" : "Накладення", what: o.name, mode: o.mode, effect: o.effect || "soft", media: o.kind, assetId: o.assetId, ...(o.file ? { file: o.file } : {}), ...(o.memeText != null ? { memeText: o.memeText, findOpt: o.findOpt } : {}),
             place, box: o.place || undefined, imgUrl: o.kind === "image" ? o.url : null, behind: !!o.behind, w0: o.w0, user: true };
       if (a === null) return { ...g, state, gone: true };
       const start = P.toCut(W[a].s);
@@ -113,13 +114,16 @@
     }));
     // the hook text and the CTA they typed on the page (their words, so they count as theirs)
     if ((d.hook || "").trim()) for (const g of out) if (g.type === "title") Object.assign(g, { text: d.hook.trim(), what: d.hook.replace(/\s*\/\s*/g, " ").trim(), own: true });
-    for (const g of out) if (g.type === "title" && !g.gone) g.end = Math.min(Math.max(g.end, g.start + 3.5), P.cutDur);   // a hook needs ~3.5 s to be read
+    for (const g of out) if (g.type === "title" && !g.gone && !g.durSet) g.end = Math.min(Math.max(g.end, g.start + 3.5), P.cutDur);   // a hook needs ~3.5 s to be read
+    const H = out.find(g => g.type === "title" && !g.gone && g.state !== "d");   // nothing else on screen while the hook is: a graphic that falls on it starts right after
+    if (H) for (const g of out) if (g !== H && !g.gone && g.state !== "d" && g.type !== "camera" && g.start < H.end && g.end > H.start) {
+      const len = g.end - g.start; g.start = Math.min(H.end + 0.05, P.cutDur - 0.5); g.end = Math.min(P.cutDur, g.start + len); g.afterHook = true; }
     for (const g of out) { const b = (d.board || {})[g.id]; if (b && typeof b.behind === "boolean") g.behind = b.behind; }   // «За мною» toggled on the page
     layout(reel, d, out);
     if (((d.cta || {}).text || "").trim()) {
       const dur = Math.min(d.cta.dur || 4, P.cutDur);
       out.push({ id: "cta", type: "cta", kind: "Заклик (CTA)", what: d.cta.text.trim(), text: d.cta.text.trim(), own: true,
-                 state: ((d.board || {}).cta || {}).state || "k", place: [90, 1300, 900, 170], start: P.cutDur - dur, end: P.cutDur });
+                 state: ((d.board || {}).cta || {}).state || "k", place: ((d.board || {}).cta || {}).place || [90, 1300, 900, 170], placed: !!((d.board || {}).cta || {}).place, start: P.cutDur - dur, end: P.cutDur });
     }
     return out;
   }
