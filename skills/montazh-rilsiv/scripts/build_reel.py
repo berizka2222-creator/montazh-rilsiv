@@ -217,6 +217,44 @@ DUR = round(dur_of(reel / "master.mp4") - 0.02, 2)
 q = lambda t: round(round(max(t, 0) * FPS) / FPS, 4)
 esc = lambda s: html.escape(s, quote=False)
 case = lambda s: s.lower() if CASE == "lower" else s
+# Caption styles from the HyperFrames catalog (status "caption", references/motions.md): edit.json "caption_style" (or
+# brand.json captions "anim") names one, and it draws the captions instead of the brand's own: their words with their
+# timing, grouped as in edit.json captions, accent words as its key words, in the brand fonts and colours.
+CAP_STYLE = edit.get("caption_style") or CAPS.get("anim")
+if CAP_STYLE and edit.get("captions") and not CAPCUT:
+    edit["cards"] = edit.get("cards", []) + [{"type": "motion", "name": CAP_STYLE, "start": 0, "end": DUR, "id": "capstyle", "sfx": False, "layout": "front",
+        "tone": "clear", "box": [-420, int(CAP_Y) - MOTION_PRESETS.get(CAP_STYLE, {}).get("cap_at", 1020), 1920, 1080], "_capgroups": [c for c in edit["captions"] if not c.get("plain")]}]
+    edit["captions"] = []
+def caption_patch(mt, groups, dur):
+    """Their words into a catalog caption style: the WORDS / TRANSCRIPT list, its groups and key words, the duration, and a
+    text width that fits the vertical frame (the style is drawn 1920 wide and shown cropped to the middle 1080)."""
+    words, pairs, keys = [], [], []
+    for g in groups:
+        a = len(words)
+        for j, w in enumerate(g["words"]):
+            nxt = g["words"][j + 1]["t"] if j + 1 < len(g["words"]) else g["end"]
+            if w.get("accent"): keys.append(len(words))
+            words.append({"text": case(w["text"]), "start": round(w["t"], 3), "end": round(max(nxt, w["t"] + 0.08), 3)})
+        if len(words) > a: pairs.append([a, len(words) - 1])
+    if not words: return mt
+    J = json.dumps(words, ensure_ascii=False)
+    mt = re.sub(r"((?:var|const|let)\s+(?:WORDS|TRANSCRIPT|W)\s*=\s*)\[.*?\];", lambda m: m.group(1) + J + ";", mt, count=1, flags=re.S)
+    mt = re.sub(r"((?:var|const|let)\s+RAW_GROUPS\s*=\s*)\[.*?\];", lambda m: m.group(1) + json.dumps(pairs) + ";", mt, count=1, flags=re.S)
+    mt = re.sub(r"(KEYWORDS\s*=\s*new Set\()\[[^\]]*\]", lambda m: m.group(1) + json.dumps(keys), mt)
+    if "var BLOCKS" in mt:                           # editorial: two lines a block, accent words large
+        bl = [{"line1": [[k, "e" if k in keys else "n"] for k in range(a, a + (b - a + 2) // 2)],
+               "line2": [[k, "e" if k in keys else "n"] for k in range(a + (b - a + 2) // 2, b + 1)] or None} for a, b in pairs]
+        mt = re.sub(r"(var\s+BLOCKS\s*=\s*)\[.*?\n\s*\];", lambda m: m.group(1) + json.dumps(bl) + ";", mt, count=1, flags=re.S)
+    mt = re.sub(r'data-duration="[0-9.]+"', f'data-duration="{dur}"', mt, count=1)
+    mt = re.sub(r"(var\s+DURATION\s*=\s*)[0-9.]+", lambda m: m.group(1) + str(dur), mt)
+    mt = re.sub(r":\s*8\.0;", f": {dur};", mt)
+    mt = re.sub(r"(var\s+(?:SAFE_ZONE_WIDTH|SAFE_WIDTH|PILL_MAX_WIDTH)\s*=\s*)\d+", lambda m: m.group(1) + "940", mt)
+    mt = re.sub(r"(fitFontSize\([^;]*?,\s*)1[4-9]\d\d\)", lambda m: m.group(1) + "940)", mt)   # fit lines into 940 px, not 1720
+    k = CAP_PX / 80                                  # their caption size: the styles are drawn for ~72-88 px
+    mt = re.sub(r"(fitFontSize\([^,]+,\s*)(\d+)(,)", lambda m: m.group(1) + str(round(int(m.group(2)) * k)) + m.group(3), mt)
+    mt = re.sub(r"(var\s+(?:BASE_FONT_SIZE|CAPTION_FONT_SIZE|ACCENT_FONT_SIZE|MIN_FONT_SIZE|BASE_FONT)\s*=\s*)(\d+)",
+                lambda m: m.group(1) + str(round(int(m.group(2)) * k)), mt)
+    return mt
 
 # ---- project folder: template files are copied, never installed -------------------------------------------------
 proj = reel / "proj"
@@ -774,6 +812,8 @@ for i, c in enumerate(edit.get("cards", [])):
         rep = {**_cm.get("replace_default", {}), **{k: brand[f] for k, f in _cm.get("brand_text", {}).items() if brand.get(f)},
                **(c.get("replace") or {})}
         rep = {k: v for k, v in rep.items() if k and not str(v).startswith("<")}   # motions with their text baked in: swap it for their words
+        if c.get("_capgroups") is not None:            # a caption style: their words, minus the spans where a card carries the words
+            mt = caption_patch(mt, [g for g in c["_capgroups"] if not any(a - 0.05 <= g["start"] < b for a, b in quiet)], DUR)
         if _cm.get("avatar") or c.get("avatar"):         # someone else's logo in the avatar slot -> their photo
             av = avatar_img(c.get("avatar"))
             if av:

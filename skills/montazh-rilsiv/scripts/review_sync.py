@@ -58,6 +58,14 @@ def lib_count():
     lib = Path(os.environ.get("MOTION_HOME", "~/motion")).expanduser() / "library.json"
     return sum(1 for m in cat if m.get("status") in ("ready", "replace", "full_only")) + (len(json.load(open(lib))["elements"]) if lib.exists() else 0)
 
+def caption_styles():
+    """Caption styles from the catalog (status "caption") for «Анімація субтитрів» on the «Субтитри» tab."""
+    cat = json.load(open(Path(__file__).resolve().parent.parent / "references" / "motion_catalog.json"))["motions"]
+    pv = HOME / ".motion_previews.json"
+    pv = json.load(open(pv)) if pv.exists() else {}
+    return [{"n": m["name"], "ua": m.get("ua") or m["name"], **({"p": pv[m["name"]]} if m["name"] in pv else {})}
+            for m in cat if m.get("status") == "caption"]
+
 def manual_effects():
     """Catalog effects that work but are never suggested on their own («Тільки вручну» on the page's «Ефекти» tab)."""
     cat = json.load(open(Path(__file__).resolve().parent.parent / "references" / "motion_catalog.json"))["motions"]
@@ -142,7 +150,7 @@ def export(reel, proposal, out):
     reel_json = {"title": proposal["title"], "srcDur": float(subprocess.run(["ffprobe", "-v", "error", "-show_entries",
                  "format=duration", "-of", "csv=p=0", str(raw_clip(reel))], capture_output=True, text=True).stdout),
                  "theme": _theme(brand), "handle": brand.get("handle", ""), "speed": pacing(brand)["speed"], "pacing": pacing(brand), "words": words, "proposedCut": proposed_cut, "keepPauses": keep_pauses,
-                 "captions": caps, "board": board, "manual": manual_effects(), "libCount": lib_count(),
+                 "captions": caps, "board": board, "manual": manual_effects(), "capStyles": caption_styles(), "libCount": lib_count(),
                  "style": {"capSize": brand["captions"].get("size", 104), "capY": brand["captions"].get("y", 1250),
                            "mode": mode, "editorial": brand["captions"].get("style") == "editorial",
                            "cap": brand["colors"].get("caption", "#FFFFFF"), "acc": brand["colors"].get("caption_accent", "#FF7DB8"), "acc2": brand["colors"].get("caption_accent_2"),
@@ -241,6 +249,7 @@ def do_import(reel, review):
         if page_look and (d.get("look") or {}).get("keep"):   # becomes the brand default (reel.json "look" on the next reels)
             bp = HOME / "brand.json"; bj = json.load(open(bp)); bj["text_look"] = look
             json.dump(bj, open(bp, "w"), ensure_ascii=False, indent=2); print("TEXT LOOK saved to brand.json for the next reels")
+    if d.get("capStyle"): extra["caption_style"] = d["capStyle"]; print("CAPTION STYLE:", d["capStyle"])   # «Анімація субтитрів» on «Субтитри»
     if d.get("speedMul"): extra["motion_mul"] = d["speedMul"]; print("MOTION SPEED for this reel: x" + str(d["speedMul"]))   # «Повільніше / Швидше» on «Графіка»
     st = d.get("style")   # the editing style she picked on «Графіка» (~/reels/styles/<name>.json); "brand" = brand.json only
     if st:

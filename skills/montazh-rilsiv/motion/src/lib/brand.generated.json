@@ -1,0 +1,8 @@
+{
+ "source": "neutral defaults: scripts/sync-brand.py replaces them with the person's brand.json",
+ "C": {"c0": "#0A0A0A", "c1": "#111111", "c2": "#181818", "c3": "#202020", "main": "#111111", "deep": "#0A0A0A",
+  "lime": "#FFD24C", "limeHi": "#FFE08A", "pink": "#F2A7B8", "pinkDk": "#85505C", "cream": "#F5F5F0", "ink": "#111111",
+  "tx": "#F5F5F0", "tx2": "rgba(245,245,240,.66)", "tx3": "rgba(245,245,240,.42)", "bd": "rgba(255,255,255,.1)", "bd2": "rgba(255,255,255,.2)"},
+ "F": {"head": "Helvetica Neue", "accent": "Georgia", "body": "Helvetica Neue", "mono": "IBM Plex Mono"},
+ "fonts": [], "chrome": [], "name": "", "handle": ""
+}

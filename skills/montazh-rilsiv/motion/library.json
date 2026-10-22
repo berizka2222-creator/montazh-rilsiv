@@ -1,0 +1,14 @@
+{
+  "about": "Brand motion elements (Remotion) for reel-editor's motions.py: suggested next to the HyperFrames catalog. One entry per element in src/elements/index.ts; keep in sync when an element is added. Render: ~/motion/scripts/render-overlay.sh <Element> '<props>' <reel>/overlays/brand-<Element>-<slug>.webm, card: {type: overlay, brand: <Element>, src, start, end}.",
+  "elements": [
+    {"element": "HookTitle", "ua": "великий заголовок, слова виринають, акцентне слово italic", "moments": ["хук / ключова фраза"], "text_vars": ["text", "eyebrow", "sub"], "example": {"text": "слова / *акцент*", "place": "top"}},
+    {"element": "Marker", "ua": "фраза, де частину обводить / підсвічує / закреслює рука", "moments": ["хук / ключова фраза", "проблема / тиск"], "text_vars": ["text (*частина*)", "mode"], "example": {"text": "фраза з *ключовим*", "mode": "circle", "place": "top"}},
+    {"element": "Counter", "ua": "цифра в акцентному кольорі рахується до значення, з підписом", "moments": ["цифра", "успіх / готово"], "text_vars": ["value", "suffix", "label"], "example": {"value": 0, "suffix": "%", "label": "підпис", "place": "top"}},
+    {"element": "Bars", "ua": "смуги-порівняння ростуть, головна в акцентному кольорі", "moments": ["ріст / падіння", "цифра", "до / після"], "text_vars": ["title", "bars[label, value]", "unit"], "example": {"title": "*заголовок*", "bars": [{"label": "до", "value": 0}, {"label": "після", "value": 0, "hi": true}], "place": "top"}},
+    {"element": "ListReveal", "ua": "рядки 01/02/03 як у каруселі, з галочками", "moments": ["список / кроки"], "text_vars": ["title", "rows"], "example": {"title": "*список*", "rows": ["пункт", "пункт"], "check": true, "place": "chest"}},
+    {"element": "BeforeAfter", "ua": "було → стало, біль закреслюється", "moments": ["до / після", "проблема / тиск"], "text_vars": ["before", "after"], "example": {"before": "як було", "after": "як стало", "place": "top"}},
+    {"element": "Chat", "ua": "переписка бульбашками з «друкує…» (тільки реальні повідомлення)", "moments": ["повідомлення / чат", "відгук / доказ"], "text_vars": ["messages[from, text]"], "example": {"messages": [{"from": "them", "text": "реальне повідомлення"}], "place": "top"}},
+    {"element": "LowerThird", "ua": "скляна плашка з іменем, роллю й ніком на грудях", "moments": ["ім'я / хто я"], "text_vars": ["name", "role", "handle"], "example": {"y": 1180}},
+    {"element": "CtaEnd", "ua": "заклик із кнопкою-пілюлею в акцентному кольорі (текст кнопки від людини)", "moments": ["заклик (CTA)"], "text_vars": ["title", "button", "note"], "example": {"title": "*заклик*", "button": "кнопка", "place": "center"}}
+  ]
+}

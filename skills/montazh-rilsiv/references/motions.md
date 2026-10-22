@@ -102,6 +102,25 @@ After Effects, Jitter...). Remotion: `npx remotion render <Element> out.webm --c
   "moments", "text_vars"}]}`), `motions.py menu` / `ideas` offer its elements next to the catalog as `brand:<Element>`.
   Name the file `overlays/brand-<Element>-<slug>.webm` and set `"brand": "<Element>"` on the card so `ideas` and `log` count it.
 
+## Caption styles (status `caption`)
+
+11 catalog styles can draw all the captions instead of the brand's own: highlight, pill-karaoke, neon-accent, neon-glow,
+gradient-fill, glitch-rgb, matrix-decode, particle-burst, emoji-pop, clip-wipe, weight-shift. The person picks one on the
+review page («Субтитри» → «Анімація субтитрів», with a preview of each); `review_sync.py import` writes edit.json
+`"caption_style": "<name>"` (prints `CAPTION STYLE:`). build_reel feeds it their words and timing, the caption groups and
+accent words, the brand fonts and colours, at the brand caption height (`"cap_at"` in the catalog = where the style's line
+sits in its 1920x1080 frame). brand.json `captions.anim` makes one the default for every reel. The page shows the brand
+captions while reviewing; the style appears on the draft. editorial-emphasis, texture and blend-difference stay manual: they
+show no text with fed-in words on this HyperFrames version.
+
+## Re-testing the library (after a HyperFrames update or for new items)
+
+`python3 scripts/test_motions.py <any cut reel> <out dir> --status candidate` (or `--names a,b`, or `--status manual`)
+renders every motion alone on that reel with Ukrainian sample text and prints an index; look through
+`<out>/sheet_*.jpg` and the LEAK flags (something visible before the motion starts). Write the verdicts into
+`references/motion_catalog.json` (status, card placement, replace, note). `--previews` makes the 3 s clips for the
+review page's «Тільки вручну» list. Two workers at most on an 8 GB Mac; the run resumes where it stopped.
+
 ## Adding more from the catalog (447 items)
 
 `cd engine/hf && npx hyperframes add <name>`, then `python3 scripts/wrap_snippets.py` (paste-in snippets get their own

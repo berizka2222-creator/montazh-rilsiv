@@ -1,0 +1,15 @@
+{
+  "format": "9:16",
+  "transition": "slide",
+  "scenes": [
+    {"type": "hook", "seconds": 3, "props": {"eyebrow": "Meta Ads", "text": "Приклад / *заголовка*", "sub": "підзаголовок italic"}},
+    {"type": "marker", "seconds": 2.6, "props": {"text": "фраза з *ключовим* словом", "mode": "circle"}},
+    {"type": "counter", "seconds": 2.6, "props": {"eyebrow": "приклад", "value": 1250, "suffix": " грн", "label": "підпис до цифри"}},
+    {"type": "list", "seconds": 3.2, "props": {"eyebrow": "кроки", "title": "Три *кроки*", "rows": ["перший пункт", "другий пункт", "третій пункт"], "check": true}},
+    {"type": "beforeAfter", "seconds": 3, "props": {"before": "як було", "after": "як стало"}},
+    {"type": "chat", "seconds": 3, "props": {"title": "директ", "messages": [{"from": "them", "text": "питання від людини"}, {"from": "me", "text": "відповідь"}]}},
+    {"type": "bars", "seconds": 3, "props": {"title": "Порівняння *цифр*", "unit": " грн", "bars": [{"label": "до", "value": 80}, {"label": "після", "value": 35, "hi": true}]}},
+    {"type": "lowerThird", "seconds": 2.6, "props": {}},
+    {"type": "cta", "seconds": 3.4, "props": {"eyebrow": "далі", "title": "Заклик *до дії*", "button": "Текст кнопки"}}
+  ]
+}

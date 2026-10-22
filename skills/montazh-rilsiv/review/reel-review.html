@@ -54,6 +54,10 @@ h1{font-family:var(--f-display);font-size:44px;line-height:1;margin:0;color:var(
 .manrow{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:7px 0;border-top:1px solid var(--line)}
 .manprev{width:72px;height:128px;border-radius:10px;object-fit:cover;flex:none;background:var(--surface);border:1px solid var(--line)}
 .manrow .nm{font:500 11px var(--f-mono);color:var(--muted)}
+.capgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px;margin-top:8px}
+.capopt{font:inherit;font-size:12px;text-align:left;background:var(--surface);color:var(--ink);border:2px solid var(--line);border-radius:12px;padding:6px;cursor:pointer;display:flex;flex-direction:column;gap:6px}
+.capopt[aria-pressed=true]{border-color:var(--lime,#D2DB76)}
+.capopt video,.capopt .capnone{width:100%;aspect-ratio:9/16;border-radius:8px;object-fit:cover;background:#000;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:11px;text-align:center}
 .lede{margin:0 0 8px;color:var(--muted);font-size:14px;max-width:62ch}
 .tally{font:500 13px var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums;margin-bottom:10px;display:flex;gap:6px 14px;flex-wrap:wrap}
 .tally b{color:var(--ink)}
@@ -597,6 +601,9 @@ section[data-p="effects"].with{margin-top:34px;padding-top:24px;border-top:1px s
         <div class="fontpop" id="fontpop" hidden><input type="text" id="fontq" placeholder="Пошук шрифту" aria-label="Пошук шрифту"><div class="fontlist" id="fontlist"></div></div>
         <label class="gs capsize" style="margin-top:8px"><span class="gl">Розмір тексту</span><span class="gv" id="capszv"></span><input type="range" id="capsz" min="56" max="140" step="2" aria-label="Розмір субтитрів"></label>
         <p class="mode" style="margin:6px 0 0">Або перетягни субтитр на відео вгору чи вниз. Графіка сама відсунеться від обличчя й субтитрів.</p></div>
+      <details class="panel capstyles" id="capstylebox" hidden open><summary><b>Анімація субтитрів</b> <span class="mode" id="capstylecur"></span></summary>
+        <p class="lede">Стиль з бібліотеки ефектів: твої слова, таймінг, шрифт і кольори, а рух від стилю. На відео вище видно звичайні субтитри, обраний стиль з'явиться на чернетці.</p>
+        <div class="capgrid" id="capgrid"></div></details>
       <details class="panel lookdet" id="caplookdet" open><summary>Вигляд субтитрів: колір, контур, тінь, фон, акцент</summary><div id="caplook"></div></details>
       <div class="sr"><input type="text" id="srfind" placeholder="Знайти слово" aria-label="Знайти слово"><input type="text" id="srrepl" placeholder="Замінити на" aria-label="Замінити на"><button class="b" id="srgo" type="button">Замінити всюди</button><span class="mode" id="srmsg" aria-live="polite"></span></div>
       <div class="tally" id="captally"></div>
@@ -1419,6 +1426,21 @@ $("#ovadd").addEventListener("click", async () => {
   finally { btn.disabled = false; }
 });
 
+// ---------- «Анімація субтитрів»: a caption style from the catalog (reel.json "capStyles"), saved as S.capStyle -> edit.json "caption_style" ----------
+function renderCapStyles() {
+  const box = $("#capgrid"), all = (R && R.capStyles) || []; $("#capstylebox").hidden = !all.length; if (!all.length) return;
+  const cur = S.capStyle || ""; box.textContent = "";
+  const pick = all.find(x => x.n === cur); $("#capstylecur").textContent = pick ? "· " + pick.ua : "· мої субтитри";
+  for (const m of [{ n: "", ua: "Мої субтитри (бренд)" }, ...all]) {
+    const b = document.createElement("button"); b.type = "button"; b.className = "capopt"; b.setAttribute("aria-pressed", m.n === cur);
+    if (m.p) { const v = document.createElement("video"); v.muted = true; v.loop = true; v.playsInline = true; v.preload = "none"; v.dataset.src = m.p; manObs.observe(v); b.appendChild(v); }
+    else { const d = document.createElement("div"); d.className = "capnone"; d.textContent = m.n ? "без прев'ю" : "як у бренді"; b.appendChild(d); }
+    const t = document.createElement("span"); t.textContent = m.ua; b.appendChild(t);
+    b.addEventListener("click", () => mutate(() => { if (m.n) S.capStyle = m.n; else delete S.capStyle; }));
+    box.appendChild(b);
+  }
+}
+
 // ---------- «Тільки вручну»: catalog effects Claude never suggests on its own (reel.json "manual"), one tap puts one on this second ----------
 const manObs = new IntersectionObserver(es => { for (const e of es) { const v = e.target;   // previews load and play only while on screen
   if (e.isIntersecting) { if (!v.src) v.src = v.dataset.src; v.play().catch(() => {}); } else v.pause(); } }, { rootMargin: "200px" });
@@ -1940,7 +1962,7 @@ $("#revadd").addEventListener("click", () => {
 });
 
 function renderAll() {
-  renderCuts(); renderGraphics(); renderEffects(); renderManual(); renderCaptions(); renderSound(); renderPreview(); syncHookCta(); renderStage(); renderCapPlace(); renderStylePick(); renderCutBox();
+  renderCuts(); renderGraphics(); renderEffects(); renderManual(); renderCapStyles(); renderCaptions(); renderSound(); renderPreview(); syncHookCta(); renderStage(); renderCapPlace(); renderStylePick(); renderCutBox();
   const sent = { mystyle: !!S.style, cuts: S.cut != null, overlays: (S.overlays || []).length, effects: (S.effects || []).length, graphics: Object.keys(S.board).length || (S.hook != null) || !!S.cta || !!S.style || !!S.speedMul, captions: S.captions != null, sound: Object.keys(S.sfxOff).length || S.voiceClean === false || !ReelCore.isNeutral(S.grade) };
   $$(".tab:not(.tabx)").forEach(b => { const d = b.querySelector(".dot"); if (d) d.hidden = !sent[b.dataset.tab]; });
   styleDot();

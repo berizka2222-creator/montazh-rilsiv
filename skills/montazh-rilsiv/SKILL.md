@@ -33,6 +33,7 @@ The person works in the Claude desktop app, Code tab. Never ask them to open the
 3. `ffmpeg` missing → if Homebrew exists, `brew install ffmpeg`; otherwise download static macOS builds of `ffmpeg` and `ffprobe` into `~/.local/bin`, `chmod +x`, clear quarantine (`xattr -d com.apple.quarantine`), and add `export PATH="$HOME/.local/bin:$PATH"` to `~/.zprofile`.
 4. `npx skills add heygen-com/hyperframes -y` if the HyperFrames skills are missing.
 5. `bash scripts/setup_engine.sh` (animation library + sound effects).
+5a. `bash scripts/setup_motion.sh` (the Remotion motion library in their brand: `~/motion` + the `motion-brand` skill, ~1 GB, about a minute; it renders one test element). Run it again after the brand file exists (step «Before anything else»), so colours and fonts come from their brand: every render re-reads `brand.json` anyway.
 6. Speech recognition: connect ElevenLabs Scribe (section «Connecting ElevenLabs Scribe» below). It is required: there is no local recogniser, so nothing large is downloaded. Walk them through creating the key in one short step at a time.
 7. `mkdir -p ~/reels/fonts ~/reels/assets` (the reels workspace).
 8. `bash scripts/doctor.sh` and tell them in one sentence that everything is ready and that next time they open the Code tab with the folder `reels` and write «змонтуй рілс».

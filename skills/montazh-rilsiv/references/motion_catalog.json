@@ -1,5 +1,5 @@
 {
- "about": "All 456 HyperFrames registry items, classified for a vertical talking-head reel; the usable ones are rendered alone on a real reel (Ukrainian text, brand colours via scripts/brand_recolor.py, over the video, never moving the person). status: ready = checked in the frame, suggested; replace = checked, English text baked in: swap the listed strings with card \"replace\"; full_only = works only as a whole-frame moment for 2-3 s, suggested marked «на весь кадр»; card \"layout\": \"dim\" keeps the video as a darkened background (card \"dim\" = opacity, default 0.82) with the effect on top, captions step aside; image slots (carousels, galleries, device mocks) take card \"images\" (her photos, screenshots); manual = works but small or niche, only when the person asks (maps; brand-name examples where card \"replace\" swaps the company name and the logo image must be hers); candidate = not checked in the frame yet, never suggested; skip = don't use (reason in note). keep_ui = a real product UI (ChatGPT, Claude, iPhone...), keeps its own colours. card = placement copied into the edit.json card by build_reel (card fields win).",
+ "about": "All 456 HyperFrames registry items, classified for a vertical talking-head reel; the usable ones are rendered alone on a real reel (Ukrainian text, brand colours via scripts/brand_recolor.py, over the video, never moving the person). status: ready = checked in the frame, suggested; replace = checked, English text baked in: swap the listed strings with card \"replace\"; full_only = works only as a whole-frame moment for 2-3 s, suggested marked «на весь кадр»; card \"layout\": \"dim\" keeps the video as a darkened background (card \"dim\" = opacity, default 0.82) with the effect on top, captions step aside; image slots (carousels, galleries, device mocks) take card \"images\" (her photos, screenshots); manual = works but small or niche, only when the person asks (maps; brand-name examples where card \"replace\" swaps the company name and the logo image must be hers); candidate = not checked in the frame yet, never suggested; caption = a caption style: edit.json \"caption_style\" (picked on the review page) draws all the captions with their words and timing (\"cap_at\" = where its line sits in the 1920x1080 style); skip = don't use (reason in note). keep_ui = a real product UI (ChatGPT, Claude, iPhone...), keeps its own colours. card = placement copied into the edit.json card by build_reel (card fields win).",
  "moments": [
   "хук / ключова фраза",
   "цифра",
@@ -2344,87 +2344,71 @@
   },
   {
    "name": "caption-clip-wipe",
-   "ua": "Слова субтитрів відкриваються шторкою",
+   "ua": "Слова відкриваються шторкою зліва направо",
    "moments": [
-    "хук / ключова фраза"
+    "субтитри"
    ],
-   "status": "manual",
+   "status": "caption",
    "card": {
     "place": "low",
     "layout": "front"
    },
    "text": "",
    "rank": 5,
-   "note": "стиль субтитрів: англійське речення в окремому списку слів, треба підключати до субтитрів",
    "use": "overlay",
    "quality": 3,
-   "text_vars": [],
-   "replace": {
-    "Clip Wipe": "<її слова>"
-   }
+   "text_vars": []
   },
   {
    "name": "caption-emoji-pop",
-   "ua": "Субтитри з обведенням та емодзі",
+   "ua": "Слова вистрибують, ключове з акцентом",
    "moments": [
-    "хук / ключова фраза"
+    "субтитри"
    ],
-   "status": "manual",
+   "status": "caption",
    "card": {
     "place": "low",
     "layout": "front"
    },
    "text": "",
    "rank": 5,
-   "note": "стиль субтитрів: англійське речення в окремому списку слів, треба підключати до субтитрів",
    "use": "overlay",
    "quality": 4,
-   "text_vars": [],
-   "replace": {
-    "Emoji Pop": "<її слова>"
-   }
+   "text_vars": []
   },
   {
    "name": "caption-gradient-fill",
-   "ua": "Субтитри з градієнтом і пружним входом",
+   "ua": "Слова заливаються градієнтом під час мовлення",
    "moments": [
-    "хук / ключова фраза"
+    "субтитри"
    ],
-   "status": "manual",
+   "status": "caption",
    "card": {
     "place": "low",
     "layout": "front"
    },
    "text": "",
    "rank": 5,
-   "note": "стиль субтитрів: англійське речення в окремому списку слів, треба підключати до субтитрів",
    "use": "overlay",
    "quality": 3,
-   "text_vars": [],
-   "replace": {
-    "Gradient Fill": "<її слова>"
-   }
+   "text_vars": []
   },
   {
    "name": "caption-highlight",
-   "ua": "Плашка підсвічує активне слово як у TikTok",
+   "ua": "Великі літери, сказане слово підсвічується",
    "moments": [
-    "хук / ключова фраза"
+    "субтитри"
    ],
-   "status": "manual",
+   "status": "caption",
    "card": {
     "place": "low",
     "layout": "front"
    },
    "text": "",
    "rank": 5,
-   "note": "стиль субтитрів: англійське речення в окремому списку слів, треба підключати до субтитрів",
    "use": "overlay",
    "quality": 5,
-   "text_vars": [],
-   "replace": {
-    "Highlight": "<її слова>"
-   }
+   "text_vars": []
   },
   {
    "name": "caption-kinetic-slam",
@@ -2448,45 +2432,37 @@
   },
   {
    "name": "caption-matrix-decode",
-   "ua": "Субтитри розшифровуються з хаосу символів",
+   "ua": "Слова «розшифровуються» з випадкових літер",
    "moments": [
-    "питання / ШІ"
+    "субтитри"
    ],
-   "status": "manual",
+   "status": "caption",
    "card": {
     "place": "low",
     "layout": "front"
    },
    "text": "",
    "rank": 5,
-   "note": "стиль субтитрів: англійське речення в окремому списку слів, треба підключати до субтитрів",
    "use": "overlay",
    "quality": 3,
-   "text_vars": [],
-   "replace": {
-    "Matrix Decode": "<її слова>"
-   }
+   "text_vars": []
   },
   {
    "name": "caption-pill-karaoke",
-   "ua": "Субтитри в плашці, слово підсвічується караоке",
+   "ua": "Світла плашка, слова підсвічуються як караоке",
    "moments": [
-    "хук / ключова фраза"
+    "субтитри"
    ],
-   "status": "manual",
+   "status": "caption",
    "card": {
     "place": "low",
     "layout": "front"
    },
    "text": "",
    "rank": 5,
-   "note": "стиль субтитрів: англійське речення в окремому списку слів, треба підключати до субтитрів",
    "use": "overlay",
    "quality": 5,
-   "text_vars": [],
-   "replace": {
-    "Pill Karaoke": "<її слова>"
-   }
+   "text_vars": []
   },
   {
    "name": "cursor-annotate",
@@ -6609,9 +6585,9 @@
   },
   {
    "name": "caption-glitch-rgb",
-   "ua": "Субтитри з RGB глітчем і сканлайнами",
+   "ua": "Глітч: слова з'являються з кольоровим зсувом",
    "moments": [
-    "проблема / тиск"
+    "субтитри"
    ],
    "use": "overlay",
    "quality": 2,
@@ -6620,17 +6596,13 @@
     "place": "low",
     "layout": "front"
    },
-   "status": "manual",
-   "note": "стиль субтитрів: англійське речення в окремому списку слів, треба підключати до субтитрів",
-   "replace": {
-    "Glitch RGB": "<її слова>"
-   }
+   "status": "caption"
   },
   {
    "name": "caption-neon-accent",
-   "ua": "Субтитри з неоновими кольоровими акцентами",
+   "ua": "Неоновий акцент на ключовому слові, легке гойдання",
    "moments": [
-    "хук / ключова фраза"
+    "субтитри"
    ],
    "use": "overlay",
    "quality": 2,
@@ -6639,17 +6611,13 @@
     "place": "low",
     "layout": "front"
    },
-   "status": "manual",
-   "note": "стиль субтитрів: англійське речення в окремому списку слів, треба підключати до субтитрів",
-   "replace": {
-    "Neon Accent": "<її слова>"
-   }
+   "status": "caption"
   },
   {
    "name": "caption-neon-glow",
-   "ua": "Субтитри з неоновим сяйвом",
+   "ua": "Слова світяться неоном",
    "moments": [
-    "хук / ключова фраза"
+    "субтитри"
    ],
    "use": "overlay",
    "quality": 2,
@@ -6658,11 +6626,7 @@
     "place": "low",
     "layout": "front"
    },
-   "status": "manual",
-   "note": "стиль субтитрів: англійське речення в окремому списку слів, треба підключати до субтитрів",
-   "replace": {
-    "Neon Glow": "<її слова>"
-   }
+   "status": "caption"
   },
   {
    "name": "caption-parallax-layers",
@@ -6684,10 +6648,9 @@
   },
   {
    "name": "caption-particle-burst",
-   "ua": "Ключові слова вибухають частинками",
+   "ua": "Ключове слово розсипається іскрами",
    "moments": [
-    "хук / ключова фраза",
-    "успіх / готово"
+    "субтитри"
    ],
    "use": "overlay",
    "quality": 3,
@@ -6696,11 +6659,7 @@
     "place": "low",
     "layout": "front"
    },
-   "status": "manual",
-   "note": "стиль субтитрів: англійське речення в окремому списку слів, треба підключати до субтитрів",
-   "replace": {
-    "Particle Burst": "<її слова>"
-   }
+   "status": "caption"
   },
   {
    "name": "caption-texture",
@@ -6723,9 +6682,9 @@
   },
   {
    "name": "caption-weight-shift",
-   "ua": "Рядки субтитрів плавно змінюють товщину шрифту",
+   "ua": "Сказане слово стає жирнішим",
    "moments": [
-    "хук / ключова фраза"
+    "субтитри"
    ],
    "use": "overlay",
    "quality": 4,
@@ -6734,11 +6693,8 @@
     "place": "low",
     "layout": "front"
    },
-   "status": "manual",
-   "note": "стиль субтитрів: англійське речення в окремому списку слів, треба підключати до субтитрів",
-   "replace": {
-    "Weight Shift": "<її слова>"
-   }
+   "status": "caption",
+   "cap_at": 970
   },
   {
    "name": "card-resize",
