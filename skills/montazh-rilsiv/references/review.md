@@ -9,6 +9,7 @@ A private page on the person's claude.ai account where they approve the edit bef
 3. Make the assets (keep them light, `nice -n 15`):
    - a 540x960 source proxy of `raw.mov` with the **cleaned** `voice.wav` as its audio (h264, ~900 kbps). The raw phone audio is ~20 dB quieter, so a proxy with it makes the voice sound broken
    - per graphic: `thumb_<id>.jpg` (180x320 frame at its anchor word) and `img_<id>.jpg` (its screenshot/image, 480 wide)
+   - **storyboard** (every time graphics are proposed): `python3 scripts/storyboard.py <reel>` → `<reel>/storyboard/story_<id>.jpg`, one 540x960 still per graphic: their own frame at that moment with that very card on it (brand, tested placement), ~10 s a card, no render. Plus `hook_<n>.jpg` for each `"hookOptions"` text in proposal.json. Upload them and set each board item's `storyUrl` and `hookOptions: [{text, img}]` in `reel/current`: «Графіка» then shows the real look (tap = big) instead of a frame with a text box, and the hook as pictures A/B/C next to the field for their own. Look at every still before sending the link; a still that shows something wrong is fixed in proposal.json first.
    - `audio_original.mp4` / `audio_cleaned.mp4` (same 10 s), `colour_before.jpg` / `colour_after.jpg` (same frame, grade applied), `sfx_<name>.mp4` for each sound
    - the brand's caption fonts (.otf/.ttf/.woff2) **only if the person owns them and the page stays private**
    Asset uploads accept mp4 (audio too), jpg/png, fonts; not m4a or wav.

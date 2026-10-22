@@ -7,6 +7,7 @@ The cut timeline is computed by review/core.js (run with node), the same file th
 
 proposal.json (Claude writes this per reel):
   {"title", "proposedCut": [[srcStart, srcEnd], ...] (kept lines), "accentWords": ["claude", ...],
+   "hookOptions": ["3 hooks in their words, / = new line"] (optional, scripts/storyboard.py draws them),
    "cards": [{"id","type","kind","what","anchor":"word","after":srcSec,"end_anchor"?,"place":[x,y,w,h], "sfx":{"name","db"}, ...build_reel fields}]}"""
 import json, os, re, shutil, subprocess, sys
 from pathlib import Path
@@ -150,7 +151,7 @@ def export(reel, proposal, out):
     reel_json = {"title": proposal["title"], "srcDur": float(subprocess.run(["ffprobe", "-v", "error", "-show_entries",
                  "format=duration", "-of", "csv=p=0", str(raw_clip(reel))], capture_output=True, text=True).stdout),
                  "theme": _theme(brand), "handle": brand.get("handle", ""), "speed": pacing(brand)["speed"], "pacing": pacing(brand), "words": words, "proposedCut": proposed_cut, "keepPauses": keep_pauses,
-                 "captions": caps, "board": board, "manual": manual_effects(), "capStyles": caption_styles(), "libCount": lib_count(),
+                 "captions": caps, "board": board, "manual": manual_effects(), "capStyles": caption_styles(), "hookOptions": [{"text": t} for t in proposal.get("hookOptions") or []], "libCount": lib_count(),
                  "style": {"capSize": brand["captions"].get("size", 104), "capY": brand["captions"].get("y", 1250),
                            "mode": mode, "editorial": brand["captions"].get("style") == "editorial",
                            "cap": brand["colors"].get("caption", "#FFFFFF"), "acc": brand["colors"].get("caption_accent", "#FF7DB8"), "acc2": brand["colors"].get("caption_accent_2"),

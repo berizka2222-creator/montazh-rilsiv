@@ -58,6 +58,13 @@ h1{font-family:var(--f-display);font-size:44px;line-height:1;margin:0;color:var(
 .capopt{font:inherit;font-size:12px;text-align:left;background:var(--surface);color:var(--ink);border:2px solid var(--line);border-radius:12px;padding:6px;cursor:pointer;display:flex;flex-direction:column;gap:6px}
 .capopt[aria-pressed=true]{border-color:var(--lime,#D2DB76)}
 .capopt video,.capopt .capnone{width:100%;aspect-ratio:9/16;border-radius:8px;object-fit:cover;background:#000;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:11px;text-align:center}
+.thumb.story{width:132px;cursor:zoom-in;box-shadow:0 0 0 1px var(--line)}
+.bigview{position:fixed;inset:0;background:rgba(0,0,0,.82);display:flex;align-items:center;justify-content:center;z-index:60;padding:16px;cursor:zoom-out}
+.bigview img{max-height:92vh;max-width:100%;border-radius:14px}
+.hookopts{display:flex;gap:10px;margin:6px 0 10px;flex-wrap:wrap}
+.hookopt{font:inherit;font-size:12px;background:var(--surface);color:var(--ink);border:2px solid var(--line);border-radius:12px;padding:6px;cursor:pointer;width:118px;display:flex;flex-direction:column;gap:6px;text-align:left}
+.hookopt[aria-pressed=true]{border-color:var(--lime,#D2DB76)}
+.hookopt img{width:100%;aspect-ratio:9/16;object-fit:cover;border-radius:8px}
 .lede{margin:0 0 8px;color:var(--muted);font-size:14px;max-width:62ch}
 .tally{font:500 13px var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums;margin-bottom:10px;display:flex;gap:6px 14px;flex-wrap:wrap}
 .tally b{color:var(--ink)}
@@ -580,6 +587,7 @@ section[data-p="effects"].with{margin-top:34px;padding-top:24px;border-top:1px s
         <p class="mode" id="stylehint" style="margin-top:4px"></p>
         <label id="speedlabel">Швидкість руху графіки</label>
         <div class="gpre" id="speedpick" role="group" aria-labelledby="speedlabel"></div>
+        <div id="hookoptbox" hidden><label>Хук: обери варіант або напиши свій</label><div class="hookopts" id="hookopts"></div></div>
         <label for="hooktext">Хук: заголовок на початку</label>
         <input type="text" id="hooktext" placeholder="Напр.: Чому не / виходить / заробляти? (/ = новий рядок)">
         <details class="lookdet" id="hooklookdet"><summary>Вигляд хука: кольори рядків, контур, тінь, фон</summary><div id="hooklook"></div></details>
@@ -1273,9 +1281,15 @@ function cardList(box, list) {
     const st = (S.board[g.id] || {}).state || "k"; n[st]++;
     const el = document.createElement("div"); el.className = "card" + (st === "d" ? " dropped" : ""); el.dataset.id = g.id;
     const th = document.createElement("div");
-    const tb = document.createElement("div"); tb.className = "thumb"; if (g.thumbUrl) tb.style.backgroundImage = `url(${JSON.stringify(g.thumbUrl)})`;
-    tb.appendChild(box_(g)); const ap = document.createElement("div"); ap.className = "approx"; ap.textContent = "Приблизно";
-    th.append(tb, ap);
+    const tb = document.createElement("div"); tb.className = "thumb";
+    if (g.storyUrl) {   // storyboard: their frame with this very graphic on it (scripts/storyboard.py), tap to see it big
+      tb.classList.add("story"); tb.style.backgroundImage = `url(${JSON.stringify(g.storyUrl)})`; tb.title = "Так буде виглядати. Натисни, щоб збільшити";
+      tb.addEventListener("click", () => showBig(g.storyUrl, g.kind)); th.append(tb);
+    } else {
+      if (g.thumbUrl) tb.style.backgroundImage = `url(${JSON.stringify(g.thumbUrl)})`;
+      tb.appendChild(box_(g)); const ap = document.createElement("div"); ap.className = "approx"; ap.textContent = "Приблизно";
+      th.append(tb, ap);
+    }
     const body = document.createElement("div");
     const kind = document.createElement("div"); kind.className = "kind";
     const who = document.createElement("span"); who.className = "who" + (g.user || g.own ? " mine" : ""); who.textContent = g.user || g.own ? "твоє" : "від Claude";
@@ -1425,6 +1439,25 @@ $("#ovadd").addEventListener("click", async () => {
   } catch (e) { msg.textContent = "Не вдалося завантажити (" + (e?.code || "помилка") + "). Спробуй ще раз або кинь файл у папку рілса."; }
   finally { btn.disabled = false; }
 });
+
+// ---------- storyboard: a big view of one frame, and the hook options as pictures (reel.json "hookOptions": [{text, img}]) ----------
+function showBig(url, label) {
+  const d = document.createElement("div"); d.className = "bigview"; d.setAttribute("role", "dialog"); d.setAttribute("aria-label", label || "Кадр");
+  const im = document.createElement("img"); im.src = url; im.alt = label || ""; d.appendChild(im);
+  const close = () => { d.remove(); document.removeEventListener("keydown", esc); }; const esc = e => { if (e.key === "Escape") close(); };
+  d.addEventListener("click", close); document.addEventListener("keydown", esc); document.body.appendChild(d);
+}
+function renderHookOpts() {
+  const all = ((R && R.hookOptions) || []).filter(o => o.text); $("#hookoptbox").hidden = !all.length; if (!all.length) return;
+  const box = $("#hookopts"), cur = ($("#hooktext").value || "").trim(); box.textContent = "";
+  all.forEach((o, i) => {
+    const b = document.createElement("button"); b.type = "button"; b.className = "hookopt"; b.setAttribute("aria-pressed", o.text.trim() === cur);
+    if (o.img) { const im = document.createElement("img"); im.src = o.img; im.alt = ""; im.loading = "lazy"; b.appendChild(im); }
+    const t = document.createElement("span"); t.textContent = String.fromCharCode(65 + i) + ": " + o.text.replace(/\s*\/\s*/g, " "); b.appendChild(t);
+    b.addEventListener("click", () => { $("#hooktext").value = o.text; mutate(() => { S.hook = o.text; }); });
+    box.appendChild(b);
+  });
+}
 
 // ---------- «Анімація субтитрів»: a caption style from the catalog (reel.json "capStyles"), saved as S.capStyle -> edit.json "caption_style" ----------
 function renderCapStyles() {
@@ -1962,7 +1995,7 @@ $("#revadd").addEventListener("click", () => {
 });
 
 function renderAll() {
-  renderCuts(); renderGraphics(); renderEffects(); renderManual(); renderCapStyles(); renderCaptions(); renderSound(); renderPreview(); syncHookCta(); renderStage(); renderCapPlace(); renderStylePick(); renderCutBox();
+  renderCuts(); renderGraphics(); renderEffects(); renderManual(); renderCapStyles(); renderCaptions(); renderSound(); renderPreview(); syncHookCta(); renderHookOpts(); renderStage(); renderCapPlace(); renderStylePick(); renderCutBox();
   const sent = { mystyle: !!S.style, cuts: S.cut != null, overlays: (S.overlays || []).length, effects: (S.effects || []).length, graphics: Object.keys(S.board).length || (S.hook != null) || !!S.cta || !!S.style || !!S.speedMul, captions: S.captions != null, sound: Object.keys(S.sfxOff).length || S.voiceClean === false || !ReelCore.isNeutral(S.grade) };
   $$(".tab:not(.tabx)").forEach(b => { const d = b.querySelector(".dot"); if (d) d.hidden = !sent[b.dataset.tab]; });
   styleDot();
