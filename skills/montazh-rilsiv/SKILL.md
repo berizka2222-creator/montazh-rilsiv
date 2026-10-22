@@ -84,6 +84,11 @@ Each reel gets its own folder: `~/reels/<yyyy-mm-dd>-<short-name>/`. Copy the ra
 
 Tell them what changed, and what to check by ear (cuts, names, brand words spelled right).
 
+## Reference reel («зроби як тут»)
+When they send a reel link they like (chat or the review page's «Рілс-референс»), follow `references/reference.md`:
+`scripts/reference.py` downloads it (with their browser login when Instagram refuses), measures the pace and lays out the
+frames; name its techniques and map them to this skill's motions, caption styles and cards, then plan the reel with them.
+
 ## Own motion design on phrases
 Besides the template cards, the person can ask for their own motion on a phrase or sentence: over the video, or a full-screen takeover that covers them for a few seconds. Offer it in the graphics plan where a line deserves it; they decide.
 - If they already have the element as a transparent video (Remotion, After Effects...), use it as an `overlay` card instead of writing a new composition.

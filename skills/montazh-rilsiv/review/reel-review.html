@@ -561,6 +561,10 @@ section[data-p="effects"].with{margin-top:34px;padding-top:24px;border-top:1px s
       <div class="sechead"><h2>Ефекти, які <em>хочеш</em></h2><div class="sectools"><button class="icon notebtn" type="button">+ Нотатка</button></div></div>
       <p class="lede">Постав чорновий монтаж на потрібну секунду, опиши ефект або встав назву з бібліотеки. Якщо для ефекту потрібні фото, додай їх тут.</p>
       <p><a class="libbtn" id="eflib" href="https://hyperframes.heygen.com/catalog" target="_blank" rel="noopener">Відкрити бібліотеку ефектів ↗</a></p>
+      <div class="panel"><label for="refurl">Рілс-референс: «зроби як тут»</label>
+        <div class="ctl"><input type="text" id="refurl" placeholder="Посилання на рілс в Instagram або TikTok, монтаж якого подобається"><button class="b" id="refadd" type="button">Додати</button></div>
+        <p class="mode" style="margin:6px 0 0">Claude розбере прийоми (хук, субтитри, темп, графіку) і перенесе їх у твій рілс твоїми словами й кольорами.</p>
+        <div id="reflist"></div></div>
       <div class="panel" id="efbox">
         <label for="eftext">Ефект на <span class="tc" id="efat">0:00.0</span></label>
         <textarea id="eftext" placeholder="Напр.: count-up від 0 до 20 клієнтів, або: фото вилітають віялом з-за мене"></textarea>
@@ -1483,6 +1487,19 @@ function renderStyleGrid() {
   }
 }
 
+// ---------- reference reels by link (S.refs), import prints REFERENCE: <url> ----------
+function renderRefs() {
+  const box = $("#reflist"); if (!box) return; box.textContent = "";
+  for (const u of S.refs || []) {
+    const r = document.createElement("div"); r.className = "manrow"; const a = document.createElement("span"); a.textContent = u; a.style.wordBreak = "break-all";
+    const x = document.createElement("button"); x.type = "button"; x.className = "b quiet"; x.textContent = "Прибрати";
+    x.addEventListener("click", () => mutate(() => { S.refs = (S.refs || []).filter(v => v !== u); })); r.append(a, x); box.appendChild(r);
+  }
+}
+$("#refadd").addEventListener("click", () => { const u = $("#refurl").value.trim();
+  if (!/^https?:\/\/\S+$/.test(u)) { $("#refurl").focus(); return; }
+  mutate(() => { S.refs = [...new Set([...(S.refs || []), u])]; }); $("#refurl").value = ""; });
+
 // ---------- «Анімація субтитрів»: a caption style from the catalog (reel.json "capStyles"), saved as S.capStyle -> edit.json "caption_style" ----------
 function renderCapStyles() {
   const box = $("#capgrid"), all = (R && R.capStyles) || []; $("#capstylebox").hidden = !all.length; if (!all.length) return;
@@ -2019,7 +2036,7 @@ $("#revadd").addEventListener("click", () => {
 });
 
 function renderAll() {
-  renderCuts(); renderGraphics(); renderEffects(); renderManual(); renderCapStyles(); renderCaptions(); renderSound(); renderPreview(); syncHookCta(); renderHookOpts(); renderStyleGrid(); renderStage(); renderCapPlace(); renderStylePick(); renderCutBox();
+  renderCuts(); renderGraphics(); renderEffects(); renderManual(); renderCapStyles(); renderCaptions(); renderSound(); renderPreview(); syncHookCta(); renderHookOpts(); renderStyleGrid(); renderRefs(); renderStage(); renderCapPlace(); renderStylePick(); renderCutBox();
   const sent = { mystyle: !!S.style, cuts: S.cut != null, overlays: (S.overlays || []).length, effects: (S.effects || []).length, graphics: Object.keys(S.board).length || (S.hook != null) || !!S.cta || !!S.style || !!S.speedMul, captions: S.captions != null, sound: Object.keys(S.sfxOff).length || S.voiceClean === false || !ReelCore.isNeutral(S.grade) };
   $$(".tab:not(.tabx)").forEach(b => { const d = b.querySelector(".dot"); if (d) d.hidden = !sent[b.dataset.tab]; });
   styleDot();

@@ -258,6 +258,7 @@ def do_import(reel, review):
         if page_look and (d.get("look") or {}).get("keep"):   # becomes the brand default (reel.json "look" on the next reels)
             bp = HOME / "brand.json"; bj = json.load(open(bp)); bj["text_look"] = look
             json.dump(bj, open(bp, "w"), ensure_ascii=False, indent=2); print("TEXT LOOK saved to brand.json for the next reels")
+    for u in d.get("refs") or []: print("REFERENCE:", u, "→ references/reference.md")   # «зроби як тут» links from «Ефекти»
     if d.get("capStyle"): extra["caption_style"] = d["capStyle"]; print("CAPTION STYLE:", d["capStyle"])   # «Анімація субтитрів» on «Субтитри»
     if d.get("speedMul"): extra["motion_mul"] = d["speedMul"]; print("MOTION SPEED for this reel: x" + str(d["speedMul"]))   # «Повільніше / Швидше» on «Графіка»
     st = d.get("style")   # the editing style she picked on «Графіка» (~/reels/styles/<name>.json); "brand" = brand.json only
