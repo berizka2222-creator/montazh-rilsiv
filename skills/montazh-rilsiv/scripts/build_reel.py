@@ -595,10 +595,10 @@ for i, c in enumerate(edit.get("cards", [])):
             roles = ["accent" if LH.get("l2acc") and j % 2 else "head" for j in range(len(lines))]
             sizes = [c.get("size") or min(fit(x, 230, 230 // 16 + float(LH.get("sw") or 0), role=r), brand.get("title_max_px", 999)) for x, r in zip(lines, roles)]
             lk = lambda j: {**LH, "c1": LH["l2"].get("c1") or LH.get("c1"), "c2": LH["l2"].get("c2")} if j % 2 and LH.get("l2") else LH
-            back.append(f'<div id="{cid}" class="title" style="{font("head", sizes[0])};top:{c.get("y", brand.get("title_y", 360))}px;letter-spacing:{brand.get("title_tracking", -0.045)}em;text-shadow:none">'
+            back.append(f'<div id="{cid}" class="title" style="{font("head", sizes[0])};top:{c.get("y", brand.get("title_y", 360))}px;left:{c.get("x", 90) - 90}px;letter-spacing:{brand.get("title_tracking", -0.045)}em;text-shadow:none">'
                         + "".join(f'<div class="tl" style="{font(r, px) if r != "head" else f"font-size:{px}px"};text-align:{("left", "right")[j % 2] if len(lines) > 1 else "center"}">'
                                   f'<span style="{look_bg(LH)}">{look_run(lk(j), esc(x), "hk")}</span></div>' for j, (x, px, r) in enumerate(zip(lines, sizes, roles))) + "</div>")
-        else: back.append(f'<div id="{cid}" class="title" style="{font("head", sizes[0])};top:{c.get("y", brand.get("title_y", 360))}px;color:{c.get("color", TITLE_COLOR)};letter-spacing:{brand.get("title_tracking", -0.045)}em">'
+        else: back.append(f'<div id="{cid}" class="title" style="{font("head", sizes[0])};top:{c.get("y", brand.get("title_y", 360))}px;left:{c.get("x", 90) - 90}px;color:{c.get("color", TITLE_COLOR)};letter-spacing:{brand.get("title_tracking", -0.045)}em">'
                     + ('<div class="tg glass">' if brand.get("title_glass") else "")
                     + "".join(f'<div class="tl" style="font-size:{px}px;text-align:{brand.get("title_align") or (("left", "right")[j % 2] if len(lines) > 1 and not brand.get("title_glass") else "center")}{st(px)}">{esc(x)}</div>' for j, (x, px) in enumerate(zip(lines, sizes)))
                     + ("</div>" if brand.get("title_glass") else "") + "</div>")

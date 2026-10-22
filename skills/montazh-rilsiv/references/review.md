@@ -28,6 +28,16 @@ The page shows steps (1 her edit → 2 Claude's proposals → 3 draft → 4 fina
 - `finalRequest` / «фінал» → QA, deliver, covers only if brand.json `covers` isn't false; then `builds/latest` gets `final: true` (step 4).
 Reply in the comment thread in one line («Взяв, роблю пропозиції, ~10 хв») and resolve it when done. If no session is listening the page tells her to type the word in chat instead.
 
+## «Стиль монтажу» examples (step 1)
+
+The tab shows every saved style as a looping example (style/list `url`) plus «Тільки бренд» and «Без стилю: мікс ефектів»,
+so they pick by look, not by name. Those two need their own examples, made once per person on their own video: brand = a
+~12 s draft (`style: "brand"`, the hook title, one camera move, one brand panel such as `push`), mix = ~1.3 s cuts of 8-9
+different effects from a mix draft joined into one clip. Upload them and put the urls in
+`<REELS_HOME>/.motion_previews.json` as `"style:brand"` / `"style:mix"`: `review_sync.py export` passes them as
+`stylePreviews`. Text cards (the hook first) can be dragged on the video («Перемістити»): the review doc keeps
+`board.<id>.place` and `import` writes the card's `x` / `y`.
+
 ## «Стиль» tab (their style, in rounds)
 
 The page also holds the style lab: db `style/round` (written by Claude: the round's sections and variants with their mp4/poster urls) and `style/votes` (her verdicts, notes and references: reel links and uploaded files). It works with or without a reel loaded. db `style/list` (from `~/reels/styles/list.json`) feeds the «Стиль монтажу» buttons on «Графіка»: her pick is `style` in the review doc (part of the decisions hash) and `review_sync.py import` turns it into `<reel>/style.txt`. Under it, «Швидкість руху графіки» (Повільніше x0.75 / Як у стилі / Швидше x1.3) is `speedMul`; import prints `MOTION SPEED` and writes edit.json `motion_mul`, which build_reel multiplies into the style's speed. «Змінити» on a card now asks for a note before «Готово → Claude» / «Зібрати чернетку» (she can still send without one: then ask in one line what to change instead of guessing). The «Готово → Claude» button there sends a «Send to Claude» comment naming the round. Everything else (making rounds, reading verdicts, writing styles) is in `references/style-lab.md`.

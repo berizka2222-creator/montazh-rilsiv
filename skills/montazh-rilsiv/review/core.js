@@ -87,8 +87,9 @@
   // graphics anchored to source words -> cut-time windows; a card ends with its phrase unless endWord is set
   function graphics(reel, d, P) {
     const W = reel.words, firstKeptFrom = i => { for (let k = i; k < W.length; k++) if (!P.removed(k)) return k; return null; };
-    const out = reel.board.map(g => {
-      const state = ((d.board || {})[g.id] || {}).state || "k";
+    const out = reel.board.map(g0 => { let g = g0;
+      const state = ((d.board || {})[g.id] || {}).state || "k", bp = ((d.board || {})[g.id] || {}).place;   // bp: dragged on the page
+      if (bp) g = { ...g, place: bp, placed: true };
       const a = firstKeptFrom(g.w0);
       if (a === null) return { ...g, state, gone: true };
       let endSrc;
@@ -133,7 +134,7 @@
     const cy = capY(reel, d), zones = [[F[1] - 20, F[1] + F[3] + 20], [cy - 10, cy + CAP_H]];
     const hits = (y, h) => zones.some(([a, b]) => y < b && a < y + h);
     for (const g of out) {
-      const p = g.place; if (!p || g.gone || (g.user && g.box) || (p[2] >= 1000 && p[3] >= 1800)) continue;
+      const p = g.place; if (!p || g.gone || (g.user && g.box) || g.placed || (p[2] >= 1000 && p[3] >= 1800)) continue;   // dragged by hand: stays put
       if (g.behind) {   // behind the person only shows where the background is: above the head, tucked a little behind the hair
         const tuck = g.type === "bigtext" || g.type === "title" ? 0.35 : 0.08;   // big words may hide behind the hair; lists and cards stay readable
         let h = p[3], w = p[2], x = p[0], y = Math.round(F[1] - h * (1 - tuck));

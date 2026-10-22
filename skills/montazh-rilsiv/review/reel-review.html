@@ -65,6 +65,11 @@ h1{font-family:var(--f-display);font-size:44px;line-height:1;margin:0;color:var(
 .hookopt{font:inherit;font-size:12px;background:var(--surface);color:var(--ink);border:2px solid var(--line);border-radius:12px;padding:6px;cursor:pointer;width:118px;display:flex;flex-direction:column;gap:6px;text-align:left}
 .hookopt[aria-pressed=true]{border-color:var(--lime,#D2DB76)}
 .hookopt img{width:100%;aspect-ratio:9/16;object-fit:cover;border-radius:8px}
+.pickgrid{margin-top:14px}
+.stpick{font:inherit;text-align:left;background:var(--surface);color:var(--ink);border:2px solid var(--line);border-radius:16px;padding:8px;cursor:pointer;display:flex;flex-direction:column;gap:6px}
+.stpick[aria-pressed=true]{border-color:var(--lime,#D2DB76)}
+.stpick video{width:100%;aspect-ratio:9/16;object-fit:cover;border-radius:10px;background:#000}
+.stpick b{font-size:14px}.stpick span{font-size:12px;color:var(--muted);line-height:1.35}
 .lede{margin:0 0 8px;color:var(--muted);font-size:14px;max-width:62ch}
 .tally{font:500 13px var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums;margin-bottom:10px;display:flex;gap:6px 14px;flex-wrap:wrap}
 .tally b{color:var(--ink)}
@@ -94,7 +99,7 @@ textarea{min-height:80px;resize:vertical}
 .pz.kept{border-style:solid;border-color:var(--keep);color:var(--keep)}
 /* graphics */
 .cards{display:flex;flex-direction:column;gap:10px}
-.card{display:grid;grid-template-columns:90px minmax(0,1fr);gap:14px;padding:12px;border-radius:16px;background:var(--surface);border:2px solid var(--line)}
+.card{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;padding:12px;border-radius:16px;background:var(--surface);border:2px solid var(--line)}
 .card.now{border-color:var(--pink)}
 .card.dropped{opacity:.55}
 .thumb{position:relative;width:90px;aspect-ratio:9/16;border-radius:10px;overflow:hidden;background:#222 center/cover}
@@ -659,6 +664,7 @@ section[data-p="effects"].with{margin-top:34px;padding-top:24px;border-top:1px s
         <div class="gpre" id="stylepick1" role="group" aria-labelledby="stylepick1label"></div>
         <p class="mode" id="stylehint1" style="margin-top:8px"></p>
       </div>
+      <div class="stgrid pickgrid" id="stylegrid1"></div>
     </section>
 
     <section data-p="preview" hidden>
@@ -1282,7 +1288,7 @@ function cardList(box, list) {
     const el = document.createElement("div"); el.className = "card" + (st === "d" ? " dropped" : ""); el.dataset.id = g.id;
     const th = document.createElement("div");
     const tb = document.createElement("div"); tb.className = "thumb";
-    if (g.storyUrl) {   // storyboard: their frame with this very graphic on it (scripts/storyboard.py), tap to see it big
+    if (g.storyUrl && !g.placed) {   // storyboard: their frame with this very graphic on it (scripts/storyboard.py), tap to see it big
       tb.classList.add("story"); tb.style.backgroundImage = `url(${JSON.stringify(g.storyUrl)})`; tb.title = "Так буде виглядати. Натисни, щоб збільшити";
       tb.addEventListener("click", () => showBig(g.storyUrl, g.kind)); th.append(tb);
     } else {
@@ -1305,7 +1311,7 @@ function cardList(box, list) {
       const p = document.createElement("span"); p.textContent = placeText(g); meta.append(p);
       if (g.shifted) p.title = g.behind ? "Над головою, щоб було видно за тобою" : "Відсунуто, щоб не перекривати обличчя й субтитри";
       if (g.user && g.type !== "bigtext") { const fx = document.createElement("span"); fx.textContent = "ефект: " + ({ soft: "плавна поява", slide: "виліт збоку", polaroid: "полароїд", glass: "скло", zoom: "наближення" }[g.effect] || g.effect); meta.append(fx); }
-      if (g.user) {
+      if (g.user || ["title", "bigtext", "card", "tag", "cta"].includes(g.type)) {   // their overlays, and Claude's text cards (the hook first of all), can be dragged
         const mvb = document.createElement("button"); mvb.type = "button"; mvb.className = "b quiet"; const on = placing?.id === g.id;
         mvb.textContent = on ? "Готово" : "Перемістити"; mvb.title = "Перетягни рамку на відео, щоб змінити місце";
         mvb.addEventListener("click", () => { if (on) stopPlacing(); else { setPos(g.start + 0.3); startPlacing(g.place, g.id); } }); meta.append(mvb); }
@@ -1382,7 +1388,8 @@ function placeBox() {
     const mv = ev => { p[0] = Math.round(clamp(x0 + (ev.clientX - sx) * k, 0, 1080 - p[2])); p[1] = Math.round(clamp(y0 + (ev.clientY - sy) * k, 0, 1920 - p[3]));
                        el.style.left = p[0] / 10.8 + "%"; el.style.top = p[1] / 19.2 + "%"; };
     const up = () => { el.removeEventListener("pointermove", mv); el.removeEventListener("pointerup", up);
-      if (placing?.id) { const id = placing.id, np = [...p]; mutate(() => { const o = (S.overlays || []).find(x => x.id === id); if (o) o.place = np; }); } };
+      if (placing?.id) { const id = placing.id, np = [...p]; mutate(() => { const o = (S.overlays || []).find(x => x.id === id);
+        if (o) o.place = np; else S.board = { ...S.board, [id]: { ...(S.board[id] || {}), place: np } }; }); } };
     el.addEventListener("pointermove", mv); el.addEventListener("pointerup", up);
   });
   if (p[2] < 300 || p[3] < 160) el.style.fontSize = "0";   // a sticker-sized box: no label, just the picture and the corner
@@ -1457,6 +1464,23 @@ function renderHookOpts() {
     b.addEventListener("click", () => { $("#hooktext").value = o.text; mutate(() => { S.hook = o.text; }); });
     box.appendChild(b);
   });
+}
+
+// ---------- «Стиль монтажу» on step 1: every style as a looping example to pick by look (style/list + reel.json "stylePreviews") ----------
+function renderStyleGrid() {
+  const box = $("#stylegrid1"); if (!box || !R) return; box.textContent = "";
+  const SP = R.stylePreviews || {}, cur = S.style || "";
+  const opts = [...STYLE_LIST.map(x => ({ n: x.name, t: x.title || x.name, w: x.what || "", u: x.url, p: x.posterUrl })),
+    { n: "brand", t: "Тільки бренд", w: "Твої кольори й шрифти, фірмові картки й списки, спокійно й впізнавано.", u: SP.brand },
+    { n: "mix", t: "Без стилю: мікс ефектів", w: "Ефекти з усієї бібліотеки, щоразу інші: два рілси не схожі.", u: SP.mix }];
+  for (const o of opts) {
+    const b = document.createElement("button"); b.type = "button"; b.className = "stpick"; b.setAttribute("aria-pressed", o.n === cur);
+    if (o.u) { const v = document.createElement("video"); v.muted = true; v.loop = true; v.playsInline = true; v.preload = "none"; if (o.p) v.poster = o.p;
+      v.dataset.src = o.u; manObs.observe(v); b.appendChild(v); }
+    const t = document.createElement("b"); t.textContent = o.t; const w = document.createElement("span"); w.textContent = o.w; b.append(t, w);
+    b.addEventListener("click", () => mutate(() => { S.style = o.n; }));
+    box.appendChild(b);
+  }
 }
 
 // ---------- «Анімація субтитрів»: a caption style from the catalog (reel.json "capStyles"), saved as S.capStyle -> edit.json "caption_style" ----------
@@ -1995,7 +2019,7 @@ $("#revadd").addEventListener("click", () => {
 });
 
 function renderAll() {
-  renderCuts(); renderGraphics(); renderEffects(); renderManual(); renderCapStyles(); renderCaptions(); renderSound(); renderPreview(); syncHookCta(); renderHookOpts(); renderStage(); renderCapPlace(); renderStylePick(); renderCutBox();
+  renderCuts(); renderGraphics(); renderEffects(); renderManual(); renderCapStyles(); renderCaptions(); renderSound(); renderPreview(); syncHookCta(); renderHookOpts(); renderStyleGrid(); renderStage(); renderCapPlace(); renderStylePick(); renderCutBox();
   const sent = { mystyle: !!S.style, cuts: S.cut != null, overlays: (S.overlays || []).length, effects: (S.effects || []).length, graphics: Object.keys(S.board).length || (S.hook != null) || !!S.cta || !!S.style || !!S.speedMul, captions: S.captions != null, sound: Object.keys(S.sfxOff).length || S.voiceClean === false || !ReelCore.isNeutral(S.grade) };
   $$(".tab:not(.tabx)").forEach(b => { const d = b.querySelector(".dot"); if (d) d.hidden = !sent[b.dataset.tab]; });
   styleDot();

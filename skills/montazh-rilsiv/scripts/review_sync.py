@@ -59,6 +59,12 @@ def lib_count():
     lib = Path(os.environ.get("MOTION_HOME", "~/motion")).expanduser() / "library.json"
     return sum(1 for m in cat if m.get("status") in ("ready", "replace", "full_only")) + (len(json.load(open(lib))["elements"]) if lib.exists() else 0)
 
+def style_previews():
+    """Looping examples for «Тільки бренд» and «Мікс ефектів» on «Стиль монтажу» (<REELS_HOME>/.motion_previews.json "style:brand" / "style:mix")."""
+    pv = HOME / ".motion_previews.json"
+    pv = json.load(open(pv)) if pv.exists() else {}
+    return {k: pv[f"style:{k}"] for k in ("brand", "mix") if f"style:{k}" in pv}
+
 def caption_styles():
     """Caption styles from the catalog (status "caption") for «Анімація субтитрів» on the «Субтитри» tab."""
     cat = json.load(open(Path(__file__).resolve().parent.parent / "references" / "motion_catalog.json"))["motions"]
@@ -151,7 +157,7 @@ def export(reel, proposal, out):
     reel_json = {"title": proposal["title"], "srcDur": float(subprocess.run(["ffprobe", "-v", "error", "-show_entries",
                  "format=duration", "-of", "csv=p=0", str(raw_clip(reel))], capture_output=True, text=True).stdout),
                  "theme": _theme(brand), "handle": brand.get("handle", ""), "speed": pacing(brand)["speed"], "pacing": pacing(brand), "words": words, "proposedCut": proposed_cut, "keepPauses": keep_pauses,
-                 "captions": caps, "board": board, "manual": manual_effects(), "capStyles": caption_styles(), "hookOptions": [{"text": t} for t in proposal.get("hookOptions") or []], "libCount": lib_count(),
+                 "captions": caps, "board": board, "stylePreviews": style_previews(), "manual": manual_effects(), "capStyles": caption_styles(), "hookOptions": [{"text": t} for t in proposal.get("hookOptions") or []], "libCount": lib_count(),
                  "style": {"capSize": brand["captions"].get("size", 104), "capY": brand["captions"].get("y", 1250),
                            "mode": mode, "editorial": brand["captions"].get("style") == "editorial",
                            "cap": brand["colors"].get("caption", "#FFFFFF"), "acc": brand["colors"].get("caption_accent", "#FF7DB8"), "acc2": brand["colors"].get("caption_accent_2"),
@@ -215,10 +221,12 @@ def do_import(reel, review):
         if g.get("gone") or g["state"] == "d": continue
         note = ((d.get("board") or {}).get(g["id"]) or {}).get("note")
         if g["state"] == "c": changes.append(f"{g['id']} @ cut {g['start']:.1f}s: {note or '(no note)'}")
-        spec = {k: v for k, v in g.items() if k not in ("id", "kind", "what", "w0", "w1", "state", "place", "moved", "gone", "own", "shifted", "capsAside")}
+        spec = {k: v for k, v in g.items() if k not in ("id", "kind", "what", "w0", "w1", "state", "place", "moved", "gone", "own", "shifted", "capsAside", "placed", "storyUrl")}
         if g.get("capsAside"): spec["quiet"] = True   # captions step aside while this card shows (no room for both)
         if g.get("shifted") and g.get("type") in ("motion", "custom") and not g.get("user"):
             pass   # catalog motions keep their tested placement (band / split / full, see build_reel); the page only shifts their preview box
+        elif g.get("placed") and g.get("type") in ("card", "tag", "title", "bigtext", "cta"):   # dragged on the page: exactly there
+            spec["y"], spec["x"] = g["place"][1], g["place"][0]
         elif g.get("shifted"):   # core.js moved it off the face / captions: the render uses the new spot
             if g.get("type") in ("card", "tag", "title", "bigtext", "cta"):
                 spec["y"] = g["place"][1]
