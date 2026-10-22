@@ -434,6 +434,8 @@ def shader_transition(src, comp, join, half, frame_px):
     t = t.replace("onUpdate: function () {\n            var t = tl.time();", "onUpdate: function () {\n            if (!shotsUp()) return;\n            var t = tl.time();", 1)
     t = t.replace("if (t >= 1.0 && t < 3.0) {", f"if (t < {dur}) {{").replace("easeInOut((t - 1.0) / 2.0)", f"easeInOut(Math.max(0, t) / {dur})")
     t = t.replace("} else if (t >= 3.0) {", f"}} else if (t >= {dur}) {{")
+    t = t.replace("return p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;",   # snappier: cubic in-out, most of the change mid-cut
+                  "return p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;")
     t = t.replace('tl.to({ v: 0 }, { v: 1, duration: 4, ease: "none" }, 0);', f'tl.to({{ v: 0 }}, {{ v: 1, duration: {dur}, ease: "none" }}, 0);')
     ok = all(s in t for s in ("if (!shotsUp()) return;", f"if (t < {dur})", f"duration: {dur}, ease", "gl.viewport(0, 0, 1080, 1920)", 'id="tr_s2"'))
     return t, a_, b_, ok
@@ -495,6 +497,13 @@ for n in sorted({n for n in _mnames if _mnames.count(n) > 1}): print(f"variety: 
 for k in range(len(_seq) - 2):
     if _seq[k] == _seq[k + 1] == _seq[k + 2]: print(f"variety: three '{_seq[k]}' graphics in a row - swap one for a list, split, push or steps")
 
+# shader transitions are loud: at most 2 per reel, only where the topic changes, at least 12 s apart
+_trs = sorted(k["start"] for k in edit.get("cards", []) if k["type"] == "motion"
+              and (k.get("layout") or MOTION_PRESETS.get(k.get("name"), {}).get("card", {}).get("layout")) == "transition"
+              and any("captureScene" in f.read_text() for f in (HF / "compositions").rglob(f"{k.get('name')}.html")))
+if len(_trs) > 2: print(f"variety: {len(_trs)} shader transitions - keep at most 2 per reel, only on a change of topic")
+for _x, _y in zip(_trs, _trs[1:]):
+    if _y - _x < 12: print(f"variety: shader transitions at {_x:.1f}s and {_y:.1f}s are {_y - _x:.1f} s apart - keep them 12 s or more apart")
 quiet = []                                      # spans where a card carries its own words, so captions step aside
 # "behind": true on a card puts it between the background and the person: the person is cut out (AI matting, local)
 # for that window and laid back on top, so text, photos or motion sit behind them.
@@ -742,14 +751,14 @@ for i, c in enumerate(edit.get("cards", [])):
             if join is None:
                 print(f"warning: transition {c['name']!r} at {c['start']:.1f}s has no cut within 1.5 s (edl.json): put it on a join"); join = c["start"]
             comp = f"tr-{i}"
-            mt, a, b, ok = shader_transition(src, comp, join, float(c.get("half", 0.3)), 540 if DRAFT else 1080)
+            mt, a, b, ok = shader_transition(src, comp, join, float(c.get("half", 0.19)), 540 if DRAFT else 1080)   # ~0.38 s: quick, these are loud
             if not ok: print(f"warning: transition {c['name']!r}: this catalog file has a different layout, check it in the draft")
             (proj / rel).unlink(missing_ok=True)
             rel = f"compositions/{comp}.html"; (proj / rel).write_text(mt)
             mid.append(f'<div id="{cid}" class="clip" data-composition-id="{comp}" data-composition-src="{rel}" '
                        f'data-start="{a}" data-duration="{q(b - a)}" data-track-index="{40 + i}" data-width="1080" data-height="1920" '
                        f'style="position:absolute;left:0;top:0;width:1080px;height:1920px;z-index:0"></div>')   # z-index: its canvas (z 10) stays under the captions
-            sfx("whoosh_soft", a, -14)
+            sfx("whoosh_soft", a, -24)                    # quiet: the picture already does the work
             print(f"transition {c['name']} on the cut at {join:.2f}s ({a:.2f}-{b:.2f}s)")
             zone(cid, "transition", a, b, (0, 0, W, H), text=False, full=True)
             continue

@@ -53,6 +53,9 @@ def recent_names():
     return {n for e in log_data()[-RECENT_REELS:] for n in e["motions"]}
 
 
+TR_RULE = "шейдерні переходи (момент «перехід»): дуже активні, максимум 2 на рілс, лише на зміні теми, не на сусідніх склейках, щонайменше 12 с між ними; start = час склейки"
+
+
 def menu(moment=None):
     by = {}
     for m in READY:
@@ -67,6 +70,7 @@ def menu(moment=None):
         for m in ms:
             flag = "  [був у останніх рілсах]" if m["name"] in rec else ""
             print(f"  {m['name']:26s} {m['ua']}{' · текст через replace' if m['status'] == 'replace' else ''}{flag}")
+        if mo == "перехід": print(f"  ! {TR_RULE}")
     if any(m["status"] == "brand" for m in READY) and not moment:
         print("\n[бренд] = Remotion-елемент: ~/motion/scripts/render-overlay.sh <Element> '<props>' <reel>/overlays/brand-<Element>-<slug>.webm,"
               "\n          картка {\"type\": \"overlay\", \"brand\": \"<Element>\", \"src\": ..., \"start\": .., \"end\": ..}")
@@ -132,6 +136,17 @@ def ideas(reel):
                               + ("  [render-overlay.sh, картка overlay + \"brand\"]" if m["status"] == "brand" else ""))
 
 
+def tr_hint(reel):
+    """The cut points (edl.json) a shader transition could sit on, with the rule."""
+    try:
+        t, joins = 0.0, []
+        for a, b in json.load(open(reel / "edl.json"))["keep"][:-1]:
+            t += b - a; joins.append(f"{t:.1f}")
+        print(f"\n{TR_RULE}\n  склейки: {', '.join(joins)} (обери 1-2 там, де починається нова думка)")
+    except (OSError, KeyError, ValueError):
+        pass
+
+
 def log(reel):
     reel = Path(reel).expanduser().resolve()
     names = sorted(card_names(json.load(open(reel / "edit.json"))))
@@ -144,7 +159,7 @@ def log(reel):
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "menu"
     if cmd == "menu": menu(sys.argv[2] if len(sys.argv) > 2 else None)
-    elif cmd == "ideas": ideas(sys.argv[2])
+    elif cmd == "ideas": ideas(sys.argv[2]); tr_hint(Path(sys.argv[2]).expanduser().resolve())
     elif cmd == "log": log(sys.argv[2])
     elif cmd == "recent":
         for e in log_data()[-RECENT_REELS:]: print(e["reel"], ", ".join(e["motions"]))

@@ -72,10 +72,11 @@ with what each one is for, its moment and its tested placement, is `references/m
   Manual: domain-warp-dissolve (neon pink/cyan edge baked into the shader), gravitational-lens (a black hole over the face),
   ridged-burn (fire edge). Card: `{"type": "motion", "name": "sdf-iris", "start": <the join>}`; no `end`.
   build_reel snaps `start` to the nearest join of edl.json (within 1.5 s; `"join": 24.92` to name it exactly), takes the frame of
-  master.mp4 at join-0.3 s and at join+0.3 s, embeds them in the shader as its two scenes and plays the warp over those 0.6 s
-  (`"half": 0.4` for a slower one). The shader starts on the live picture and lands on the live picture, so neither side jumps;
-  the person freezes for the 0.6 s, which reads as part of the transition. Captions stay on top. At most one per 8-10 s, a
-  different one each time, only on a cut between two thoughts. Check them with a short draft render (`REEL_DRAFT=1 render.sh`),
+  master.mp4 at join-0.19 s and at join+0.19 s, embeds them in the shader as its two scenes and plays the warp over those ~0.38 s
+  with a snappy cubic ease (`"half"` changes it, default 0.19). The shader starts on the live picture and lands on the live
+  picture, so neither side jumps. Captions stay on top; the whoosh is quiet (whoosh_soft at -24 dB, under the voice).
+  **They are loud effects: at most 2 per reel, only where the topic changes (a new thought or section), never on neighbouring
+  joins, at least 12 s apart.** build_reel warns (`variety:`) when a reel has more or they sit closer. Check them with a short draft render (`REEL_DRAFT=1 render.sh`),
   not `hyperframes snapshot`.
 - Carousels take `"images": [..]`, every slot is filled for you.
 
