@@ -225,17 +225,19 @@ if proj.exists(): shutil.rmtree(proj)
 shutil.copy(ENGINE / "gsap.min.js", proj / "vendor/gsap.min.js")
 DRAFT = bool(os.environ.get("REEL_DRAFT"))   # fast review draft: rendered at 540x960 from a 540p copy of the master (a quarter of the pixels)
 _mh = int(subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=height", "-of", "csv=p=0", str(reel / "master.mp4")], capture_output=True, text=True).stdout or 1920)
+def link_or_copy(src, dst):   # a hard link, not a second copy of the video on disk (copy only across volumes)
+    try: os.link(src, dst)
+    except OSError: shutil.copy(src, dst)
 if DRAFT and _mh <= 960:   # cut.py already made a 540p draft master
-    shutil.copy(reel / "master.mp4", proj / "master.mp4")
+    link_or_copy(reel / "master.mp4", proj / "master.mp4")
 elif DRAFT:
     m540 = reel / "master_540.mp4"
     if not m540.exists() or m540.stat().st_mtime < (reel / "master.mp4").stat().st_mtime:
         subprocess.run(["nice", "-n", "10", "ffmpeg", "-nostdin", "-v", "error", "-y", "-i", str(reel / "master.mp4"), "-vf", "scale=540:960",
                         "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-g", "30", "-c:a", "copy", str(m540)], check=True)
-    shutil.copy(m540, proj / "master.mp4")
+    link_or_copy(m540, proj / "master.mp4")
 else:
-    try: os.link(reel / "master.mp4", proj / "master.mp4")
-    except OSError: shutil.copy(reel / "master.mp4", proj / "master.mp4")
+    link_or_copy(reel / "master.mp4", proj / "master.mp4")
 for f in (ENGINE / "sfx").glob("*.wav"): shutil.copy(f, proj / "sfx" / f.name)
 for f in (Path(__file__).resolve().parent.parent / "sfx").glob("*.wav"): shutil.copy(f, proj / "sfx" / f.name)   # the skill's CC0 library
 for f in (HOME / "assets" / "sfx").glob("*.wav"): shutil.copy(f, proj / "sfx" / f.name)   # their own sound library wins on a shared name
