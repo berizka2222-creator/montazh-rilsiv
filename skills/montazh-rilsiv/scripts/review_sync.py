@@ -59,6 +59,14 @@ def lib_count():
     lib = Path(os.environ.get("MOTION_HOME", "~/motion")).expanduser() / "library.json"
     return sum(1 for m in cat if m.get("status") in ("ready", "replace", "full_only")) + (len(json.load(open(lib))["elements"]) if lib.exists() else 0)
 
+def my_stamps():
+    """«Мої марки»: graphics from their finished reels (scripts/motions.py stamp), with their uploaded stills."""
+    st = HOME / "stamps.json"
+    if not st.exists(): return []
+    pv = HOME / ".motion_previews.json"; pv = json.load(open(pv)) if pv.exists() else {}
+    return [{"key": x["key"], "ua": x["ua"], "uses": x.get("uses", 1), **({"img": pv["stamp:" + x["id"]]} if "stamp:" + x["id"] in pv else {})}
+            for x in sorted(json.load(open(st)), key=lambda x: -x.get("uses", 1))]
+
 def style_previews():
     """Looping examples for «Тільки бренд» and «Мікс ефектів» on «Стиль монтажу» (<REELS_HOME>/.motion_previews.json "style:brand" / "style:mix")."""
     pv = HOME / ".motion_previews.json"
@@ -157,7 +165,7 @@ def export(reel, proposal, out):
     reel_json = {"title": proposal["title"], "srcDur": float(subprocess.run(["ffprobe", "-v", "error", "-show_entries",
                  "format=duration", "-of", "csv=p=0", str(raw_clip(reel))], capture_output=True, text=True).stdout),
                  "theme": _theme(brand), "handle": brand.get("handle", ""), "speed": pacing(brand)["speed"], "pacing": pacing(brand), "words": words, "proposedCut": proposed_cut, "keepPauses": keep_pauses,
-                 "captions": caps, "board": board, "stylePreviews": style_previews(), "manual": manual_effects(), "capStyles": caption_styles(), "hookOptions": [{"text": t} for t in proposal.get("hookOptions") or []], "libCount": lib_count(),
+                 "captions": caps, "board": board, "stylePreviews": style_previews(), "stamps": my_stamps(), "manual": manual_effects(), "capStyles": caption_styles(), "hookOptions": [{"text": t} for t in proposal.get("hookOptions") or []], "libCount": lib_count(),
                  "style": {"capSize": brand["captions"].get("size", 104), "capY": brand["captions"].get("y", 1250),
                            "mode": mode, "editorial": brand["captions"].get("style") == "editorial",
                            "cap": brand["colors"].get("caption", "#FFFFFF"), "acc": brand["colors"].get("caption_accent", "#FF7DB8"), "acc2": brand["colors"].get("caption_accent_2"),

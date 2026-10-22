@@ -574,6 +574,11 @@ section[data-p="effects"].with{margin-top:34px;padding-top:24px;border-top:1px s
         <div class="ctl" style="margin-top:10px"><button class="b primary" id="efadd" type="button">Додати ефект</button><span class="mode" id="efmsg" aria-live="polite"></span></div>
       </div>
       <div class="cards" id="eflist"></div>
+      <details class="panel manlib" id="stamplib" hidden open>
+        <summary><b>Мої марки</b> <span class="mode" id="stampcount"></span></summary>
+        <p class="lede">Ефекти з твоїх готових рілсів. Claude пропонує їх першими. Постав чорновий монтаж на потрібну секунду і натисни «На цю секунду».</p>
+        <div class="capgrid" id="stamplist"></div>
+      </details>
       <details class="panel manlib" id="manlib" hidden>
         <summary><b>Тільки вручну</b> <span class="mode" id="mancount"></span></summary>
         <p class="lede">Claude сам їх не пропонує: вони для особливих моментів. Біля кожного коротке прев’ю поверх відео. Постав чорновий монтаж на потрібну секунду і натисни «На цю секунду».</p>
@@ -1500,6 +1505,20 @@ $("#refadd").addEventListener("click", () => { const u = $("#refurl").value.trim
   if (!/^https?:\/\/\S+$/.test(u)) { $("#refurl").focus(); return; }
   mutate(() => { S.refs = [...new Set([...(S.refs || []), u])]; }); $("#refurl").value = ""; });
 
+// ---------- «Мої марки»: graphics their finished reels kept (reel.json "stamps": [{key, ua, uses, img}]) ----------
+function renderStamps() {
+  const all = (R && R.stamps) || []; $("#stamplib").hidden = !all.length; if (!all.length) return;
+  $("#stampcount").textContent = all.length; const box = $("#stamplist"); box.textContent = "";
+  for (const m of all) {
+    const b = document.createElement("button"); b.type = "button"; b.className = "capopt"; b.title = "На цю секунду";
+    if (m.img) { const im = document.createElement("img"); im.src = m.img; im.alt = ""; im.loading = "lazy"; im.style.cssText = "width:100%;aspect-ratio:9/16;object-fit:cover;border-radius:8px"; b.appendChild(im); }
+    const t = document.createElement("span"); t.textContent = m.ua + (m.uses > 1 ? ` · ×${m.uses}` : ""); b.appendChild(t);
+    b.addEventListener("click", () => { $("#eftext").value = `моя марка ${m.key}: ${m.ua}. `; $("#efbox").scrollIntoView({ behavior: "smooth", block: "center" });
+      $("#eftext").focus(); $("#efmsg").textContent = "Допиши свої слова для ефекту, перевір секунду і натисни «Додати ефект»."; });
+    box.appendChild(b);
+  }
+}
+
 // ---------- «Анімація субтитрів»: a caption style from the catalog (reel.json "capStyles"), saved as S.capStyle -> edit.json "caption_style" ----------
 function renderCapStyles() {
   const box = $("#capgrid"), all = (R && R.capStyles) || []; $("#capstylebox").hidden = !all.length; if (!all.length) return;
@@ -2036,7 +2055,7 @@ $("#revadd").addEventListener("click", () => {
 });
 
 function renderAll() {
-  renderCuts(); renderGraphics(); renderEffects(); renderManual(); renderCapStyles(); renderCaptions(); renderSound(); renderPreview(); syncHookCta(); renderHookOpts(); renderStyleGrid(); renderRefs(); renderStage(); renderCapPlace(); renderStylePick(); renderCutBox();
+  renderCuts(); renderGraphics(); renderEffects(); renderManual(); renderCapStyles(); renderCaptions(); renderSound(); renderPreview(); syncHookCta(); renderHookOpts(); renderStyleGrid(); renderRefs(); renderStamps(); renderStage(); renderCapPlace(); renderStylePick(); renderCutBox();
   const sent = { mystyle: !!S.style, cuts: S.cut != null, overlays: (S.overlays || []).length, effects: (S.effects || []).length, graphics: Object.keys(S.board).length || (S.hook != null) || !!S.cta || !!S.style || !!S.speedMul, captions: S.captions != null, sound: Object.keys(S.sfxOff).length || S.voiceClean === false || !ReelCore.isNeutral(S.grade) };
   $$(".tab:not(.tabx)").forEach(b => { const d = b.querySelector(".dot"); if (d) d.hidden = !sent[b.dataset.tab]; });
   styleDot();

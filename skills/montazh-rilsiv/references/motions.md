@@ -113,6 +113,13 @@ sits in its 1920x1080 frame). brand.json `captions.anim` makes one the default f
 captions while reviewing; the style appears on the draft. editorial-emphasis, texture and blend-difference stay manual: they
 show no text with fed-in words on this HyperFrames version.
 
+## «Мої марки» (stamps)
+
+After each final, `motions.py stamp <reel>` collects every graphic the reel kept (catalog motion, brand element, template
+card, camera move) into `<REELS_HOME>/stamps.json`: key, Ukrainian name, moments, the settings that worked (`spec`), which
+reels used it and a still. `ideas` offers up to two stamps per phrase before the catalog (★ моя марка), `menu` lists them.
+The review page shows them under «Ефекти» → «Мої марки». Reuse a stamp's `spec` as the card's settings, with new words.
+
 ## Re-testing the library (after a HyperFrames update or for new items)
 
 `python3 scripts/test_motions.py <any cut reel> <out dir> --status candidate` (or `--names a,b`, or `--status manual`)
