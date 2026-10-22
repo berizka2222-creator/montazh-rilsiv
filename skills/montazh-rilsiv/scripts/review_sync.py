@@ -82,7 +82,7 @@ def caption_styles():
             for m in cat if m.get("status") == "caption"]
 
 def manual_effects():
-    """Catalog effects that work but are never suggested on their own («Тільки вручну» on the page's «Ефекти» tab)."""
+    """«Меню ефектів» on the page's «Ефекти» tab: every usable catalog effect, k "a" = Claude suggests it, "m" = only when asked."""
     cat = json.load(open(Path(__file__).resolve().parent.parent / "references" / "motion_catalog.json"))["motions"]
     def group(m):
         n, note = m["name"], m.get("note") or ""
@@ -91,8 +91,9 @@ def manual_effects():
                 else "Переходи між склейками" if "перехід" in (m.get("moments") or [""])[0] else (lambda x: x[:1].upper() + x[1:])((m.get("moments") or ["інше"])[0]))
     pv = HOME / ".motion_previews.json"            # {name: url}: 3 s looping previews uploaded to the page's assets
     pv = json.load(open(pv)) if pv.exists() else {}
-    out = [{"n": m["name"], "ua": m.get("ua") or m["name"], "g": group(m), **({"p": pv[m["name"]]} if m["name"] in pv else {})}
-           for m in cat if m.get("status") == "manual"]
+    out = [{"n": m["name"], "ua": m.get("ua") or m["name"], "g": group(m), "k": "m" if m.get("status") == "manual" else "a",
+            **({"p": pv[m["name"]]} if m["name"] in pv else {})}
+           for m in cat if m.get("status") in ("manual", "ready", "replace", "full_only")]
     return sorted(out, key=lambda x: (x["g"], x["ua"]))
 
 def export(reel, proposal, out):
@@ -267,6 +268,7 @@ def do_import(reel, review):
             bp = HOME / "brand.json"; bj = json.load(open(bp)); bj["text_look"] = look
             json.dump(bj, open(bp, "w"), ensure_ascii=False, indent=2); print("TEXT LOOK saved to brand.json for the next reels")
     for u in d.get("refs") or []: print("REFERENCE:", u, "→ references/reference.md")   # «зроби як тут» links from «Ефекти»
+    if d.get("picks"): extra["menu_picks"] = d["picks"]; print("MENU PICKS (their basket, use every one where a line fits):", ", ".join(d["picks"]))
     if d.get("capStyle"): extra["caption_style"] = d["capStyle"]; print("CAPTION STYLE:", d["capStyle"])   # «Анімація субтитрів» on «Субтитри»
     if d.get("speedMul"): extra["motion_mul"] = d["speedMul"]; print("MOTION SPEED for this reel: x" + str(d["speedMul"]))   # «Повільніше / Швидше» on «Графіка»
     st = d.get("style")   # the editing style she picked on «Графіка» (~/reels/styles/<name>.json); "brand" = brand.json only

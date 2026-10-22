@@ -70,6 +70,9 @@ h1{font-family:var(--f-display);font-size:44px;line-height:1;margin:0;color:var(
 .stpick[aria-pressed=true]{border-color:var(--lime,#D2DB76)}
 .stpick video{width:100%;aspect-ratio:9/16;object-fit:cover;border-radius:10px;background:#000}
 .stpick b{font-size:14px}.stpick span{font-size:12px;color:var(--muted);line-height:1.35}
+.basket{display:flex;gap:10px;align-items:center;justify-content:space-between;margin:10px 0;padding:10px 12px;border-radius:12px;background:var(--surface);border:2px solid var(--lime,#D2DB76);font-size:13px}
+.menuopt{position:relative}.menuopt[aria-pressed=true]{border-color:var(--lime,#D2DB76)}
+.menuat{position:absolute;top:10px;right:10px;font:inherit;font-size:14px;line-height:1;border:0;border-radius:999px;padding:6px 7px;background:rgba(0,0,0,.55);color:#fff;cursor:pointer}
 .lede{margin:0 0 8px;color:var(--muted);font-size:14px;max-width:62ch}
 .tally{font:500 13px var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums;margin-bottom:10px;display:flex;gap:6px 14px;flex-wrap:wrap}
 .tally b{color:var(--ink)}
@@ -579,10 +582,12 @@ section[data-p="effects"].with{margin-top:34px;padding-top:24px;border-top:1px s
         <p class="lede">Ефекти з твоїх готових рілсів. Claude пропонує їх першими. Постав чорновий монтаж на потрібну секунду і натисни «На цю секунду».</p>
         <div class="capgrid" id="stamplist"></div>
       </details>
-      <details class="panel manlib" id="manlib" hidden>
-        <summary><b>Тільки вручну</b> <span class="mode" id="mancount"></span></summary>
-        <p class="lede">Claude сам їх не пропонує: вони для особливих моментів. Біля кожного коротке прев’ю поверх відео. Постав чорновий монтаж на потрібну секунду і натисни «На цю секунду».</p>
-        <input type="text" id="mansearch" placeholder="Пошук: мапа, перехід, субтитри, 3D…" aria-label="Пошук ефекту">
+      <details class="panel manlib" id="manlib" hidden open>
+        <summary><b>Меню ефектів</b> <span class="mode" id="mancount"></span></summary>
+        <p class="lede">Кожен ефект на тобі, у твоїх кольорах. Тицяй ті, що подобаються: вони збираються в «Мій вибір», і Claude поставить їх у рілс на фрази, яким вони пасують. Щоб поставити на конкретну секунду, натисни «⏱».</p>
+        <div class="gpre" id="menufilter" role="group" aria-label="Які ефекти показати"></div>
+        <input type="text" id="mansearch" placeholder="Пошук: цифра, список, чат, мапа, перехід…" aria-label="Пошук ефекту" style="margin-top:8px">
+        <div class="basket" id="basket" hidden></div>
         <div id="manlist"></div>
       </details>
     </section>
@@ -1537,23 +1542,36 @@ function renderCapStyles() {
 // ---------- «Тільки вручну»: catalog effects Claude never suggests on its own (reel.json "manual"), one tap puts one on this second ----------
 const manObs = new IntersectionObserver(es => { for (const e of es) { const v = e.target;   // previews load and play only while on screen
   if (e.isIntersecting) { if (!v.src) v.src = v.dataset.src; v.play().catch(() => {}); } else v.pause(); } }, { rootMargin: "200px" });
+let MENU_F = "all";
 function renderManual() {
   const box = $("#manlist"), all = (R && R.manual) || []; $("#manlib").hidden = !all.length; if (!all.length) return;
-  const q = ($("#mansearch").value || "").trim().toLowerCase();
-  const list = all.filter(m => !q || (m.ua + " " + m.n + " " + m.g).toLowerCase().includes(q));
-  $("#mancount").textContent = q ? `${list.length} з ${all.length}` : `${all.length}`; box.textContent = "";
-  let g = null;
+  const fb = $("#menufilter"); fb.textContent = "";
+  for (const [k, t] of [["all", "Усі"], ["a", "Claude пропонує"], ["m", "Тільки вручну"], ["mine", "Мій вибір"]]) {
+    const b = document.createElement("button"); b.type = "button"; b.textContent = t; b.setAttribute("aria-pressed", MENU_F === k);
+    b.addEventListener("click", () => { MENU_F = k; renderManual(); }); fb.appendChild(b); }
+  const picks = new Set(S.picks || []), q = ($("#mansearch").value || "").trim().toLowerCase();
+  const list = all.filter(m => (MENU_F === "all" || (MENU_F === "mine" ? picks.has(m.n) : (m.k || "m") === MENU_F))
+                              && (!q || (m.ua + " " + m.n + " " + m.g).toLowerCase().includes(q)));
+  $("#mancount").textContent = list.length === all.length ? `${all.length}` : `${list.length} з ${all.length}`;
+  const bk = $("#basket"); bk.hidden = !picks.size; bk.textContent = "";
+  if (picks.size) { const t = document.createElement("span"); t.innerHTML = `<b>Мій вибір: ${picks.size}</b> · Claude поставить їх у рілс, коли натиснеш велику кнопку внизу`;
+    const c = document.createElement("button"); c.type = "button"; c.className = "b quiet"; c.textContent = "Очистити";
+    c.addEventListener("click", () => mutate(() => { delete S.picks; })); bk.append(t, c); }
+  box.textContent = ""; let g = null, grid = null;
   for (const m of list) {
-    if (m.g !== g) { g = m.g; const h = document.createElement("h4"); h.textContent = g; box.appendChild(h); }
-    const row = document.createElement("div"); row.className = "manrow";
-    if (m.p) { const v = document.createElement("video"); v.className = "manprev"; v.muted = true; v.loop = true; v.playsInline = true;
-      v.preload = "none"; v.title = "Так виглядає поверх відео"; v.dataset.src = m.p; manObs.observe(v); row.appendChild(v); }
-    const t = document.createElement("div"); t.style.flex = "1"; const a = document.createElement("div"); a.textContent = m.ua;
-    const n = document.createElement("div"); n.className = "nm"; n.textContent = m.n + (m.why ? " · " + m.why : ""); t.append(a, n);
-    const b = document.createElement("button"); b.type = "button"; b.className = "b quiet"; b.textContent = "На цю секунду";
-    b.addEventListener("click", () => { $("#eftext").value = `${m.n}: ${m.ua}. `; $("#efbox").scrollIntoView({ behavior: "smooth", block: "center" });
+    if (m.g !== g) { g = m.g; const h = document.createElement("h4"); h.textContent = g; grid = document.createElement("div"); grid.className = "capgrid"; box.append(h, grid); }
+    const card = document.createElement("div"); card.className = "capopt menuopt"; card.setAttribute("role", "button"); card.tabIndex = 0;
+    card.setAttribute("aria-pressed", picks.has(m.n)); card.title = picks.has(m.n) ? "Прибрати з мого вибору" : "Додати в мій вибір";
+    if (m.p) { const v = document.createElement("video"); v.muted = true; v.loop = true; v.playsInline = true; v.preload = "none"; v.dataset.src = m.p; manObs.observe(v); card.appendChild(v); }
+    else { const d = document.createElement("div"); d.className = "capnone"; d.textContent = "прев'ю ще готується"; card.appendChild(d); }
+    const t = document.createElement("span"); t.textContent = (picks.has(m.n) ? "✓ " : "") + m.ua; card.appendChild(t);
+    const at = document.createElement("button"); at.type = "button"; at.className = "menuat"; at.textContent = "⏱"; at.title = "На цю секунду";
+    at.addEventListener("click", e => { e.stopPropagation(); $("#eftext").value = `${m.n}: ${m.ua}. `; $("#efbox").scrollIntoView({ behavior: "smooth", block: "center" });
       $("#eftext").focus(); $("#efmsg").textContent = "Допиши свої слова для ефекту, перевір секунду і натисни «Додати ефект»."; });
-    row.append(t, b); box.appendChild(row);
+    card.appendChild(at);
+    const tog = () => mutate(() => { const p = new Set(S.picks || []); p.has(m.n) ? p.delete(m.n) : p.add(m.n); S.picks = [...p]; if (!S.picks.length) delete S.picks; });
+    card.addEventListener("click", tog); card.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tog(); } });
+    grid.appendChild(card);
   }
 }
 $("#mansearch").addEventListener("input", renderManual);

@@ -28,6 +28,15 @@ The page shows steps (1 her edit → 2 Claude's proposals → 3 draft → 4 fina
 - `finalRequest` / «фінал» → QA, deliver, covers only if brand.json `covers` isn't false; then `builds/latest` gets `final: true` (step 4).
 Reply in the comment thread in one line («Взяв, роблю пропозиції, ~10 хв») and resolve it when done. If no session is listening the page tells her to type the word in chat instead.
 
+## «Меню ефектів» on their face («Ефекти» tab)
+
+Every usable effect (Claude's suggestions and «Тільки вручну») as a 3 s clip on THEIR video in their brand, with a filter,
+search and a basket «Мій вибір». On their first reel start `python3 scripts/menu_previews.py <reel>` in the background
+right after the cut (~40-60 min, resumes; order: manual, caption styles, suggested). Upload `<REELS_HOME>/menu/*.mp4`
+(25 per call) and map name → url in `<REELS_HOME>/.motion_previews.json`; re-export so `reel.json` "manual" carries them
+(items with no clip yet say «прев'ю ще готується»). Their basket comes back on import as `MENU PICKS:` (edit.json
+`menu_picks`): put every picked effect in the plan on a line it fits, and say which one had no line.
+
 ## «Стиль монтажу» examples (step 1)
 
 The tab shows every saved style as a looping example (style/list `url`) plus «Тільки бренд» and «Без стилю: мікс ефектів»,
