@@ -924,7 +924,7 @@
    "card": {
     "place": "low",
     "layout": "front",
-    "zoom": 1.0
+    "zoom": 0.82
    },
    "text": "vars.words (через кому)",
    "rank": 4,
@@ -3776,7 +3776,7 @@
    "status": "manual",
    "card": {
     "layout": "dim",
-    "zoom": 1.0
+    "zoom": 0.82
    },
    "text": "",
    "rank": 5,
@@ -3869,7 +3869,7 @@
    "status": "manual",
    "card": {
     "layout": "dim",
-    "zoom": 1.0
+    "zoom": 0.82
    },
    "text": "",
    "rank": 5,
@@ -4043,7 +4043,7 @@
    "status": "manual",
    "card": {
     "layout": "dim",
-    "zoom": 1.0
+    "zoom": 0.82
    },
    "text": "",
    "rank": 5,
@@ -8466,7 +8466,7 @@
    "card": {
     "place": "low",
     "layout": "front",
-    "zoom": 1.0
+    "zoom": 0.82
    },
    "replace": {
     "Spotlight Card": "<її слова>",
@@ -8528,7 +8528,7 @@
    "card": {
     "place": "low",
     "layout": "front",
-    "zoom": 1.0
+    "zoom": 0.82
    },
    "no": 151
   },
@@ -8722,7 +8722,7 @@
    "card": {
     "place": "low",
     "layout": "front",
-    "zoom": 1.0
+    "zoom": 0.82
    },
    "replace": {
     "Swipe Rail": "<її слова>"
@@ -8777,7 +8777,7 @@
    "card": {
     "place": "low",
     "layout": "front",
-    "zoom": 1.0
+    "zoom": 0.82
    },
    "replace": {
     "Terminal Simulator": "<її слова>",
