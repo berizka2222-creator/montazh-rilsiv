@@ -73,3 +73,6 @@
 Основа: [claude-reel-editor](https://github.com/nicolapocock/claude-reel-editor) від Nicola Pocock (@getgitgirl), ліцензія MIT. Українська адаптація, власні моушн-ефекти, скляний стиль і українська сторінка перевірки: Інна Березова. Графіка рендериться через [HyperFrames](https://github.com/heygen-com/hyperframes).
 
 [MIT](LICENSE)
+
+## Монтаж тексту на відео (урок 4.7)
+Папка [`montazh-tekstu`](montazh-tekstu) — рушій для скілу `montazh-tekstu`: текст на рекламному відео з'являється по черзі, редактор з таймлайном і 14 стилями, рендер 9:16 і 4:5. Скіл завантажує її сам, ставити нічого не треба.

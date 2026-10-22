@@ -1,0 +1,371 @@
+[
+{
+"key": "alegreya",
+"dir": "alegreya",
+"family": "Alegreya",
+"italic": false,
+"wmin": 400,
+"wmax": 900,
+"cat": "Антикви"
+},
+{
+"key": "amaticsc-700",
+"dir": "amaticsc",
+"family": "Amatic SC",
+"italic": false,
+"wmin": 700,
+"wmax": 700,
+"cat": "Рукописні"
+},
+{
+"key": "amaticsc-400",
+"dir": "amaticsc",
+"family": "Amatic SC",
+"italic": false,
+"wmin": 400,
+"wmax": 400,
+"cat": "Рукописні"
+},
+{
+"key": "badscript-400",
+"dir": "badscript",
+"family": "Bad Script",
+"italic": false,
+"wmin": 400,
+"wmax": 400,
+"cat": "Рукописні"
+},
+{
+"key": "climatecrisis",
+"dir": "climatecrisis",
+"family": "Climate Crisis",
+"italic": false,
+"wmin": 400,
+"wmax": 400,
+"cat": "Акцидентні"
+},
+{
+"key": "comfortaa",
+"dir": "comfortaa",
+"family": "Comfortaa",
+"italic": false,
+"wmin": 300,
+"wmax": 700,
+"cat": "Гротески"
+},
+{
+"key": "cormorantgaramond",
+"dir": "cormorantgaramond",
+"family": "Cormorant Garamond",
+"italic": false,
+"wmin": 300,
+"wmax": 700,
+"cat": "Антикви"
+},
+{
+"key": "ebgaramond-i",
+"dir": "ebgaramond",
+"family": "EB Garamond",
+"italic": true,
+"wmin": 400,
+"wmax": 800,
+"cat": "Антикви"
+},
+{
+"key": "ebgaramond",
+"dir": "ebgaramond",
+"family": "EB Garamond",
+"italic": false,
+"wmin": 400,
+"wmax": 800,
+"cat": "Антикви"
+},
+{
+"key": "exo2",
+"dir": "exo2",
+"family": "Exo 2",
+"italic": false,
+"wmin": 100,
+"wmax": 900,
+"cat": "Гротески"
+},
+{
+"key": "forum-400",
+"dir": "forum",
+"family": "Forum",
+"italic": false,
+"wmin": 400,
+"wmax": 400,
+"cat": "Антикви"
+},
+{
+"key": "geologica",
+"dir": "geologica",
+"family": "Geologica",
+"italic": false,
+"wmin": 100,
+"wmax": 900,
+"cat": "Гротески"
+},
+{
+"key": "golostext",
+"dir": "golostext",
+"family": "Golos Text",
+"italic": false,
+"wmin": 400,
+"wmax": 900,
+"cat": "Гротески"
+},
+{
+"key": "intertight",
+"dir": "intertight",
+"family": "Inter Tight",
+"italic": false,
+"wmin": 100,
+"wmax": 900,
+"cat": "Гротески"
+},
+{
+"key": "kellyslab-400",
+"dir": "kellyslab",
+"family": "Kelly Slab",
+"italic": false,
+"wmin": 400,
+"wmax": 400,
+"cat": "Акцидентні"
+},
+{
+"key": "literata",
+"dir": "literata",
+"family": "Literata",
+"italic": false,
+"wmin": 200,
+"wmax": 900,
+"cat": "Антикви"
+},
+{
+"key": "lobster-400",
+"dir": "lobster",
+"family": "Lobster",
+"italic": false,
+"wmin": 400,
+"wmax": 400,
+"cat": "Рукописні"
+},
+{
+"key": "lora-i",
+"dir": "lora",
+"family": "Lora",
+"italic": true,
+"wmin": 400,
+"wmax": 700,
+"cat": "Антикви"
+},
+{
+"key": "lora",
+"dir": "lora",
+"family": "Lora",
+"italic": false,
+"wmin": 400,
+"wmax": 700,
+"cat": "Антикви"
+},
+{
+"key": "manrope",
+"dir": "manrope",
+"family": "Manrope",
+"italic": false,
+"wmin": 200,
+"wmax": 800,
+"cat": "Гротески"
+},
+{
+"key": "marckscript-400",
+"dir": "marckscript",
+"family": "Marck Script",
+"italic": false,
+"wmin": 400,
+"wmax": 400,
+"cat": "Рукописні"
+},
+{
+"key": "montserrat-i",
+"dir": "montserrat",
+"family": "Montserrat",
+"italic": true,
+"wmin": 100,
+"wmax": 900,
+"cat": "Гротески"
+},
+{
+"key": "montserrat",
+"dir": "montserrat",
+"family": "Montserrat",
+"italic": false,
+"wmin": 100,
+"wmax": 900,
+"cat": "Гротески"
+},
+{
+"key": "neucha-400",
+"dir": "neucha",
+"family": "Neucha",
+"italic": false,
+"wmin": 400,
+"wmax": 400,
+"cat": "Рукописні"
+},
+{
+"key": "nunito",
+"dir": "nunito",
+"family": "Nunito",
+"italic": false,
+"wmin": 200,
+"wmax": 1000,
+"cat": "Гротески"
+},
+{
+"key": "oldstandardtt-700",
+"dir": "oldstandardtt",
+"family": "Old Standard TT",
+"italic": false,
+"wmin": 700,
+"wmax": 700,
+"cat": "Антикви"
+},
+{
+"key": "oldstandardtt-400",
+"dir": "oldstandardtt",
+"family": "Old Standard TT",
+"italic": false,
+"wmin": 400,
+"wmax": 400,
+"cat": "Антикви"
+},
+{
+"key": "onest",
+"dir": "onest",
+"family": "Onest",
+"italic": false,
+"wmin": 100,
+"wmax": 900,
+"cat": "Гротески"
+},
+{
+"key": "pacifico-400",
+"dir": "pacifico",
+"family": "Pacifico",
+"italic": false,
+"wmin": 400,
+"wmax": 400,
+"cat": "Рукописні"
+},
+{
+"key": "prata-400",
+"dir": "prata",
+"family": "Prata",
+"italic": false,
+"wmin": 400,
+"wmax": 400,
+"cat": "Антикви"
+},
+{
+"key": "ptserif-700",
+"dir": "ptserif",
+"family": "PT Serif",
+"italic": false,
+"wmin": 700,
+"wmax": 700,
+"cat": "Антикви"
+},
+{
+"key": "ptserif-400",
+"dir": "ptserif",
+"family": "PT Serif",
+"italic": false,
+"wmin": 400,
+"wmax": 400,
+"cat": "Антикви"
+},
+{
+"key": "raleway",
+"dir": "raleway",
+"family": "Raleway",
+"italic": false,
+"wmin": 100,
+"wmax": 900,
+"cat": "Гротески"
+},
+{
+"key": "rubik",
+"dir": "rubik",
+"family": "Rubik",
+"italic": false,
+"wmin": 300,
+"wmax": 900,
+"cat": "Гротески"
+},
+{
+"key": "rubikmonoone-400",
+"dir": "rubikmonoone",
+"family": "Rubik Mono One",
+"italic": false,
+"wmin": 400,
+"wmax": 400,
+"cat": "Акцидентні"
+},
+{
+"key": "ruslandisplay-400",
+"dir": "ruslandisplay",
+"family": "Ruslan Display",
+"italic": false,
+"wmin": 400,
+"wmax": 400,
+"cat": "Акцидентні"
+},
+{
+"key": "russoone-400",
+"dir": "russoone",
+"family": "Russo One",
+"italic": false,
+"wmin": 400,
+"wmax": 400,
+"cat": "Акцидентні"
+},
+{
+"key": "spectral-700",
+"dir": "spectral",
+"family": "Spectral",
+"italic": false,
+"wmin": 700,
+"wmax": 700,
+"cat": "Антикви"
+},
+{
+"key": "spectral-400",
+"dir": "spectral",
+"family": "Spectral",
+"italic": false,
+"wmin": 400,
+"wmax": 400,
+"cat": "Антикви"
+},
+{
+"key": "tektur",
+"dir": "tektur",
+"family": "Tektur",
+"italic": false,
+"wmin": 400,
+"wmax": 900,
+"cat": "Акцидентні"
+},
+{
+"key": "tenorsans-400",
+"dir": "tenorsans",
+"family": "Tenor Sans",
+"italic": false,
+"wmin": 400,
+"wmax": 400,
+"cat": "Гротески"
+}
+]
