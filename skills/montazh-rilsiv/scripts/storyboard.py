@@ -61,6 +61,7 @@ def one(job):
     b = subprocess.run([sys.executable, str(SK / "scripts/build_reel.py"), str(d)], capture_output=True, text=True, env={**os.environ, "REEL_DRAFT": "1"})
     if b.returncode: return name, "build_fail " + b.stderr.strip()[-160:]
     peak = st + min(1.4, (en - st) * 0.6)                  # far enough in that the card has fully arrived
+    if spec.get("type") == "head" or str(spec.get("name", "")).startswith("head-"): peak = max(st + 0.6, en - 0.35)   # a head layout: all its words are on
     subprocess.run(["npx", "-y", "hyperframes@0.8.145", "snapshot", str(d / "proj"), "--at", f"{peak:.2f}", "--no-end", "--describe", "false",
                     "--timeout", "25000", "-o", str(d / "snaps")], capture_output=True, text=True)
     png = sorted(glob.glob(str(d / "snaps/frame-*.png")))

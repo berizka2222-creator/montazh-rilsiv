@@ -17,6 +17,7 @@ prints `REFERENCE: <url>`). Take its techniques, never its content: their words,
    - transitions and sound (flash, whoosh, music under the voice).
 3. Map each technique to this skill: catalog motions (`motions.py menu <moment>`), caption styles (`caption_style`),
    camera moves, template cards (title, push, list, split, steps, bigtext), real logos (`inserts.py`), brand elements
-   (`brand:<Element>`). Say plainly what has no match.
+   (`brand:<Element>`), «подачі голови» when the person's video itself shrinks into a window / circle / polaroid / collage
+   on a coloured background (`head` cards, «Подачі голови» in motions.md). Say plainly what has no match.
 4. Tell them in a short table (their technique → what we use), then plan proposal.json with it: same pace and moments,
    their own words. The storyboard shows how it will look before any render.

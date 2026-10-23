@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """The effects menu on their own face: a 3 s looping clip of every effect in the library, made on THEIR reel in THEIR brand.
 
-  menu_previews.py <reel> [--only manual|caption|suggested] [--workers 2]
+  menu_previews.py <reel> [--only manual|caption|heads|suggested] [--workers 2]
 
 Run it once in the background during the person's first reel (~40-60 min on an 8 GB Mac; it resumes where it stopped).
-Order: «Тільки вручну» effects, then the caption styles (with their own words), then everything Claude suggests
+Order: «Тільки вручну» effects, then the caption styles (with their own words), then the «подачі голови» (their own
+words, frames of their reel as the photos), then everything Claude suggests
 (ready / replace / full_only). Clips land in <REELS_HOME>/menu/<name>.mp4 (360x640, a real 24 fps render of ~3-4 s, ~100-200 KB). Upload them to the review
 page (25 per call) and map name -> url in <REELS_HOME>/.motion_previews.json: the page's «Меню ефектів» shows each effect
 on them, with a basket «Мій вибір»."""
@@ -66,8 +67,36 @@ def captions():
         print("ok" if ok else "render_fail", n, flush=True)
     shutil.rmtree(OUT / "w", ignore_errors=True)
 
-steps = {"manual": lambda: motions("manual"), "caption": captions, "suggested": lambda: motions("ready,replace,full_only")}
-for k in ([A.only] if A.only else ["manual", "caption", "suggested"]):
+def heads():
+    """Each «подача голови» (catalog use "head", scripts/heads.py) on their short clip with their own first words; collage,
+    pile and picture get frames of their own reel as the photos."""
+    d = OUT / "w" / "_heads"; (d / "photos").mkdir(parents=True, exist_ok=True)
+    for f in ("master.mp4", "master_540.mp4", "master_transcript.json", "face.json"):
+        if (SRC / f).exists() and not (d / f).exists(): os.symlink(SRC / f, d / f)
+    full = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(reel / "master.mp4")],
+                                capture_output=True, text=True).stdout or 30)
+    photos = []
+    for k in range(6):
+        p = d / "photos" / f"f{k}.jpg"
+        if not p.exists():
+            subprocess.run(["ffmpeg", "-nostdin", "-v", "error", "-y", "-ss", f"{full * (k + 1) / 8:.2f}", "-i", str(reel / "master.mp4"),
+                            "-frames:v", "1", "-vf", "scale=600:-2", "-q:v", "3", str(p)])
+        if p.exists(): photos.append(f"photos/{p.name}")
+    ws = [w["text"].strip(" ,.!?:;") for w in json.load(open(SRC / "master_transcript.json")) if len(w.get("text", "").strip(" ,.!?:;")) >= 4]
+    ws = ws[:4] or ["перше", "друге", "третє"]
+    for m in [m for m in cat if m.get("use") == "head"]:
+        n = m["name"]
+        if (OUT / f"{n}.mp4").exists(): continue
+        card = {"type": "head", "look": m["card"]["look"], "start": 0.2, "end": SHORT - 0.15, "words": ws[:3], "images": photos}
+        json.dump({"captions": [], "punch": [], "cards": [card], "style": "brand", "no_carousel_ok": True}, open(d / "edit.json", "w"), ensure_ascii=False)
+        b = subprocess.run([sys.executable, str(SK / "scripts/build_reel.py"), str(d)], capture_output=True, text=True, env={**os.environ, "REEL_DRAFT": "1"})
+        if b.returncode: print("build_fail", n, b.stderr[-300:], flush=True); continue
+        ok = preview_clip(d / "proj", OUT / f"{n}.mp4", 0.1, SHORT - 0.1)
+        print("ok" if ok else "render_fail", n, flush=True)
+    shutil.rmtree(OUT / "w", ignore_errors=True)
+
+steps = {"manual": lambda: motions("manual"), "caption": captions, "heads": heads, "suggested": lambda: motions("ready,replace,full_only")}
+for k in ([A.only] if A.only else ["manual", "caption", "heads", "suggested"]):
     print(f"== {k}", flush=True); steps[k]()
 done = sorted(p.stem for p in OUT.glob("*.mp4"))
 print(f"menu: {len(done)} clips in {OUT}")

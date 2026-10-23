@@ -31,7 +31,7 @@ SRC, OUT = Path(A.reel).expanduser().resolve(), Path(A.out).expanduser().resolve
 OUT.mkdir(parents=True, exist_ok=True)
 cat = json.load(open(SK / "references/motion_catalog.json"))["motions"]
 names = [n for n in A.names.split(",") if n]
-items = [m for m in cat if (m["name"] in names if names else m.get("status") in A.status.split(","))]
+items = [m for m in cat if m.get("use") != "head" and (m["name"] in names if names else m.get("status") in A.status.split(","))]   # head layouts: menu_previews.py heads()
 EXT = ".mp4" if A.previews else "_fit.json" if A.fit else "_mid.png"
 items = [m for m in items if not (OUT / f"{m['name']}{EXT}").exists()]
 if not (SRC / "master_540.mp4").exists():          # one 540p copy for every test, never one per motion

@@ -96,7 +96,7 @@
       let endSrc;
       if (g.w1 != null && !P.removed(g.w1)) endSrc = W[g.w1].e;
       else { let k = a; while (k < W.length - 1 && !/[.,!?;:]$/.test(W[k].text) && W[k + 1].s - W[k].e < 0.35 && P.toCut(W[k].e) - P.toCut(W[a].s) < 4) k++; endSrc = W[k].e; }
-      const minDur = g.type === "block" ? 2.2 : ["card", "list", "split", "steps"].includes(g.type) ? 2.5 : g.type === "push" ? 2 : g.type === "follow" ? 2.5 : 1;   // long enough to read past the entrance animation
+      const minDur = g.type === "block" ? 2.2 : ["card", "list", "split", "steps"].includes(g.type) ? 2.5 : g.type === "push" ? 2 : g.type === "follow" ? 2.5 : g.type === "head" ? 1.6 : 1;   // long enough to read past the entrance animation
       const start = P.toCut(W[a].s), end = bb.dur != null ? start + Math.max(0.5, bb.dur) : Math.max(start + minDur, P.toCut(endSrc) + 0.15);   // dur: stretched on the timeline
       return { ...g, state, start, end: Math.min(end, P.cutDur), moved: a !== g.w0, durSet: bb.dur != null };
     }).concat((d.overlays || []).map(o => {   // overlays they added on the page: an uploaded image/video (or big text) from a word, for o.dur seconds

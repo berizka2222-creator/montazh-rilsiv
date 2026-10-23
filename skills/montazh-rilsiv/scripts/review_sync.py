@@ -8,7 +8,9 @@ The cut timeline is computed by review/core.js (run with node), the same file th
 proposal.json (Claude writes this per reel):
   {"title", "proposedCut": [[srcStart, srcEnd], ...] (kept lines), "accentWords": ["claude", ...],
    "hookOptions": ["3 hooks in their words, / = new line"] (optional, scripts/storyboard.py draws them),
-   "cards": [{"id","type","kind","what","anchor":"word","after":srcSec,"end_anchor"?,"place":[x,y,w,h], "sfx":{"name","db"}, ...build_reel fields}]}"""
+   "cards": [{"id","type","kind","what","anchor":"word","after":srcSec,"end_anchor"?,"place":[x,y,w,h], "sfx":{"name","db"}, ...build_reel fields}]}
+  A «подача голови» is {"type": "head", "look": ..., "words": [...], "kind": "Подача голови: коло", "place": [0, 0, 1080, 1920],
+  "end_anchor": last word of its phrase}: full frame, so the page shows its storyboard still and never moves it off the face."""
 import json, os, re, shutil, subprocess, sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -86,7 +88,7 @@ def manual_effects():
     cat = json.load(open(Path(__file__).resolve().parent.parent / "references" / "motion_catalog.json"))["motions"]
     def group(m):
         n, note = m["name"], m.get("note") or ""
-        return ("Мапи" if "мапа" in note else "Переходи між склейками" if "перехід" in note or m.get("card", {}).get("layout") == "transition"
+        return ("Подачі голови" if m.get("use") == "head" else "Мапи" if "мапа" in note else "Переходи між склейками" if "перехід" in note or m.get("card", {}).get("layout") == "transition"
                 else "Стилі субтитрів" if n.startswith("caption-") else "Потрібен свій логотип" if "лого" in note or "бренд" in note
                 else "Переходи між склейками" if "перехід" in (m.get("moments") or [""])[0] else (lambda x: x[:1].upper() + x[1:])((m.get("moments") or ["інше"])[0]))
     pv = HOME / ".motion_previews.json"            # {name: url}: 3 s looping previews uploaded to the page's assets

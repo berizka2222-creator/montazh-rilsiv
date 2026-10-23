@@ -53,6 +53,11 @@ edit.json (written by auto_edit.py, then Claude marks accents and adds cards):
      camera {move: "in"|"out"|"whip"|"shrink"|"shake", scale?, text?: "words / here" (shrink only)}   moves the clip itself:
                                                      in = slow push-in, out = starts close and pulls back, whip = fast zoom hit,
                                                      shrink = frame pulls back into a rounded window on the brand colour (words above), shake = jolt
+     head   {look: "window"|"circle"|"cloud"|"soft"|"polaroid"|"bigword"|"top"|"collage"|"pile"|"around"|"picture",
+             words: ["their", "words"], bg?, images?: [..], word?}   подача голови: the person's own video becomes the graphic
+                                                     for one phrase (shrinks into a shape on a brand background, their words appear
+                                                     as they say them); scripts/heads.py, references/motions.md «Подачі голови».
+                                                     A catalog name "head-<look>" in a motion card works too
      (list and steps never cover the face: face.json moves them below the chin or above the head, shrinking if needed)
      (every card and caption is checked against Instagram's Reels screen: scripts/safezones.py -> <reel>/safezones.json)
   Any card: "glass": true gives the frosted liquid-glass look (card, tag).
@@ -395,7 +400,8 @@ def show(sel, a, b, fade=0.18):
     js.append(f'tl.set("{sel}",{{autoAlpha:1}},{q(a)});tl.to("{sel}",{{autoAlpha:0,duration:{fade}}},{q(b - fade)});')
 
 # ---- camera punch-ins ---------------------------------------------------------------------------------------------
-CAM_WIN = [(k["start"] - 0.3, (k.get("end") or k["start"] + 1.5) + 0.3) for k in edit.get("cards", []) if k["type"] in ("camera", "push")]
+CAM_WIN = [(k["start"] - 0.3, (k.get("end") or k["start"] + 1.5) + 0.3) for k in edit.get("cards", []) if k["type"] in ("camera", "push", "head")
+           or (k["type"] == "motion" and str(k.get("name", "")).startswith("head-"))]
 for k, t in enumerate(edit.get("punch", [])):   # [t, scale] forces a zoom level (e.g. a spoken "zoom in")
     t, z = t if isinstance(t, list) else (t, 1.0 if k % 2 else 1.07)
     if any(a0 <= t <= b0 for a0, b0 in CAM_WIN): continue   # a camera move owns the camera there
@@ -537,7 +543,7 @@ for c in edit.get("cards", []):
         _turn = (LIST_LAYOUTS.index(pick) + 1) % len(LIST_LAYOUTS); c["layout"] = pick
     elif c["layout"] == _prev: print(f"variety: two lists in a row use the '{_prev}' layout ({c['start']:.1f}s) - pick another")
     _prev = c["layout"]
-_seq = [(k["type"] + ("/" + k["layout"] if k.get("layout") else "") + ("/" + k.get("name", "") if k["type"] == "motion" else ""))   # different
+_seq = [(k["type"] + ("/" + k["layout"] if k.get("layout") else "") + ("/" + k.get("name", "") if k["type"] == "motion" else "") + ("/" + k.get("look", "") if k["type"] == "head" else ""))   # different
         for k in sorted(edit.get("cards", []), key=lambda k: k["start"])]                                                     # catalog motions differ
 _mnames = [k.get("name") for k in edit.get("cards", []) if k["type"] == "motion"]
 for n in sorted({n for n in _mnames if _mnames.count(n) > 1}): print(f"variety: motion '{n}' is used {_mnames.count(n)} times - pick another from scripts/motions.py menu")
@@ -552,6 +558,14 @@ if len(_trs) > 2: print(f"variety: {len(_trs)} shader transitions - keep at most
 for _x, _y in zip(_trs, _trs[1:]):
     if _y - _x < 12: print(f"variety: shader transitions at {_x:.1f}s and {_y:.1f}s are {_y - _x:.1f} s apart - keep them 12 s or more apart")
 quiet = []                                      # spans where a card carries its own words, so captions step aside
+import heads
+headbg, HEAD_FILES, HEAD_DUO = [], {}, []
+def _hwidth(text, px, role="head"):
+    adv = _advance(text, role); return (adv or len(text) * EM) * px
+_fc = (FACE[0] + FACE[2] / 2, FACE[1] + FACE[3] / 2) if FACE else (540, 820)
+HX = {"js": js, "front": front, "headbg": headbg, "sfx": sfx, "font": font, "fit": fit, "width": _hwidth, "img": img, "esc": esc,
+      "zone": zone, "quiet": quiet, "q": q, "MAIN": MAIN, "POP": POP, "SOFT": _SOFT, "DEEP": _DEEP, "LIGHT": LIGHT,
+      "face": FACE, "face_c": _fc, "transcript": _tw, "files": HEAD_FILES, "need_duo": lambda: HEAD_DUO.append(1)}
 # "behind": true on a card puts it between the background and the person: the person is cut out (AI matting, local)
 # for that window and laid back on top, so text, photos or motion sit behind them.
 behind, BEHIND_WIN = [], []
@@ -562,6 +576,8 @@ for i, c in enumerate(edit.get("cards", [])):
     a, b, cid = c["start"], c.get("end") or phrase_end(c["start"]), f"k{i}"
     b = min(b, DUR)
     kind = c["type"]
+    if kind == "motion" and str(c.get("name", "")).startswith("head-"):   # a «подача голови» picked from the effects menu by its catalog name
+        kind = "head"; c.setdefault("look", c["name"][5:]); c.setdefault("words", list((c.get("vars") or {}).values())[:1] if c.get("vars") else [])
     if c.get("layout") == "behind": c["behind"] = True   # a catalog motion laid out behind her
     back, mid, front = (behind, behind, behind) if c.get("behind") else (_BACK, _MID, _FRONT)
     if c.get("quiet"): quiet.append((a, b))      # review_sync: no room for this card and the captions at once
@@ -806,6 +822,8 @@ for i, c in enumerate(edit.get("cards", [])):
         sfx("swish", a - 0.08, -12)
         zone(cid, "page", a, b, (0, 0, W, H), full=True)
         if c.get("title"): zone(cid, "page title", a, b, (*tw(c["title"], 92)[:1], 150, tw(c["title"], 92)[1], 92))
+    elif kind == "head":
+        heads.build(c, a, b, cid, HX)
     elif kind == "motion":
         src = next((f for f in (HF / "compositions").rglob(f"{c['name']}.html")), None)
         if not src:
@@ -1288,7 +1306,20 @@ doc = f"""<!doctype html>
 {chr(10).join(font_css)}
 html, body {{ margin: 0; background: #000; overflow: hidden; }}
 #stage {{ position: relative; width: {W // 2 if DRAFT else W}px; height: {H // 2 if DRAFT else H}px; overflow: hidden; }}
-#cam {{ position: absolute; inset: 0; transform-origin: 50% 38%; overflow: hidden; }}
+#cam {{ position: absolute; inset: 0; transform-origin: 50% 38%; overflow: hidden; box-sizing: border-box;
+        -webkit-mask-size: 100% 100%; mask-size: 100% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }}
+#headBg {{ position: absolute; inset: 0; }}
+.hbg, .hph, .hw, #headDuoWrap {{ position: absolute; visibility: hidden; opacity: 0; }}
+.hbg {{ inset: 0; overflow: hidden; }}
+.hduo {{ position: absolute; inset: 0; filter: grayscale(1) contrast(1.35) brightness(1.15); }}
+.htint {{ position: absolute; inset: 0; mix-blend-mode: multiply; }}
+.hdots {{ position: absolute; inset: 0; background: radial-gradient(circle, rgba(0,0,0,.28) 3px, transparent 4px) 0 0 / 14px 14px; mix-blend-mode: overlay; }}
+#headDuoWrap {{ inset: 0; overflow: hidden; }}
+#headDuoVid {{ position: absolute; width: 2700px; height: 4800px; object-fit: cover; filter: grayscale(1) contrast(1.35) brightness(1.15); }}
+.hph {{ box-sizing: border-box; }}
+.hph img {{ width: 100%; height: 100%; object-fit: cover; display: block; }}
+.hnum {{ position: absolute; right: -2px; top: -44px; }}
+.hw {{ line-height: 1; }}
 #camBg {{ position: absolute; inset: 0; background: {MAIN}; }}   /* shows only when a camera move shrinks the frame */
 #cam > video {{ position: absolute; left: 0; top: 0; width: {W}px; height: {H}px; object-fit: cover; }}
 #back, #mid, #front {{ position: absolute; inset: 0; }}
@@ -1380,6 +1411,7 @@ html, body {{ margin: 0; background: #000; overflow: hidden; }}
 <div id="stage" data-composition-id="main" data-start="0" data-duration="{DUR}" data-fps="{FPS}" data-width="{W // 2 if DRAFT else W}" data-height="{H // 2 if DRAFT else H}">
   <div id="scaler" style="position:absolute;left:0;top:0;width:{W}px;height:{H}px;{'zoom:.5;' if DRAFT else ''}">
   <div id="camBg"></div>
+  <div id="headBg">{('<div id="headDuoWrap"><video id="headDuoVid" class="clip" src="master.mp4" muted playsinline data-has-audio="false" data-start="0" data-duration="' + str(DUR) + '" data-track-index="7"></video></div>') if HEAD_DUO else ""}{"".join(headbg)}</div>
   <div id="cam"><video id="bg" class="clip" src="master.mp4" playsinline data-has-audio="true" data-start="0" data-duration="{DUR}" data-track-index="1"></video>
     <div id="behind">{"".join(behind)}</div><div id="subj">{"".join(subj)}</div>
     <div id="back">{"".join(back)}</div></div>
@@ -1394,6 +1426,7 @@ html, body {{ margin: 0; background: #000; overflow: hidden; }}
     window.__timelines["main"] = tl; }})();</script>
 </div></body></html>"""
 (proj / "index.html").write_text(doc)
+for _n, _t in HEAD_FILES.items(): (proj / _n).write_text(_t)
 sys.path.insert(0, str(Path(__file__).resolve().parent)); import safezones
 safezones.save(reel, ZONES)
 if FIT_MEASURE: json.dump(FIT_LOG, open(reel / "fit.json", "w"))

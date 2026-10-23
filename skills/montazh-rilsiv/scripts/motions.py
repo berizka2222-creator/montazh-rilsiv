@@ -40,6 +40,7 @@ def card_names(edit):
     out = set()
     for c in edit.get("cards", []):
         if c.get("type") == "motion" and c.get("name"): out.add(c["name"])
+        elif c.get("type") == "head": out.add(f"head-{c.get('look', 'window')}")   # «подачі голови» count like catalog motions
         elif c.get("type") == "overlay":
             b = c.get("brand") or (re.match(r"brand-([A-Za-z]+)", Path(c.get("src", "")).name) or [None, None])[1]
             if b: out.add(f"brand:{b}")

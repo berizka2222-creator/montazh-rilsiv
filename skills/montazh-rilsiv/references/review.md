@@ -44,6 +44,10 @@ do NOT run menu_previews.py again; only when the catalog gained effects with no 
 that exists and renders just the new ones), upload those and add them to the map. A new review page means re-uploading the
 saved clips, never re-rendering them. Their basket comes back on import as `MENU PICKS:` (edit.json
 `menu_picks`): put every picked effect in the plan on a line it fits, and say which one had no line.
+«Подачі голови» (`head-*`, №299-309) are in the same menu; their clips come from `menu_previews.py --only heads` (their own
+first words, frames of their reel as the photos, ~2 min for all 11). A person whose menu was made before 2026-10-23 has no
+clips for them yet: run that once, upload the 11 and add them to the map. A head layout on the board is a full-frame card
+(`place` `[0, 0, 1080, 1920]`), so the page shows its storyboard still and never moves it.
 
 ## «Стиль монтажу» examples (step 1)
 

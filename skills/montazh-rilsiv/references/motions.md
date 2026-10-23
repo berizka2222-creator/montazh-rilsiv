@@ -84,6 +84,48 @@ with what each one is for, its moment and its tested placement, is `references/m
   not `hyperframes snapshot`.
 - Carousels take `"images": [..]`, every slot is filled for you.
 
+## Подачі голови (head layouts, `scripts/heads.py`)
+
+The person's own video becomes the graphic: for one phrase the frame shrinks into a shape on a brand background and their
+key words, photos or a picture gather around it, then the frame comes back. It is the look of reels that «rearrange the
+talking head» on every phrase. Catalog entries `head-<look>` (use `head`, group «Подачі голови» in the effects menu, №299-309).
+
+```json
+{"type": "head", "look": "circle", "start": 4.2, "end": 8.1, "words": ["гроші", "сертифікат", "без клієнтів"]}
+```
+(`{"type": "motion", "name": "head-circle", "words": [...]}` works the same: that is what a pick from the menu becomes.)
+
+| look | № | what | words | photos | bg |
+|---|---|---|---|---|---|
+| `window` | 299 | rounded window on the light colour, words stacked in head / accent (on a pop box) / body font | 1-3 | - | light |
+| `circle` | 300 | circle with a dark ring on the pop colour with dots, words above, the last one in a dark pill | 1-3 | - | pop |
+| `cloud` | 301 | cloud-shaped window, words in [brackets] gather around it | 2-4 | - | soft |
+| `soft` | 302 | window with blurred edges on the dark colour; the shortest word (a number: «20%») goes huge | 1-3 | - | main |
+| `polaroid` | 303 | tilted polaroid, a label above, words written on its frame; the background changes on each word | label + 1-3 | 1-3 optional | duo |
+| `bigword` | 304 | one huge blurred word over a small window, it snaps into focus when said | 1 (`word`) | - | pop |
+| `top` | 305 | the person in the top half, words in [brackets] drop onto the light bottom | 2-4 | - | light |
+| `collage` | 306 | numbered photos (1)-(5), the person is (4), words beside | 1-2 | 2-4 required | light |
+| `pile` | 307 | black-and-white photos fly into a pile, the person on top in a white frame, words in a pop plate | 1-2 | 3-6 required | light |
+| `around` | 308 | full frame, words in [brackets] appear around the head, the last in a dark pill | 2-3 | - | none |
+| `picture` | 309 | a picture above, the person below (soft edges), a pill caption changes word by word | 1-3 | 1 required | light |
+
+- `words`: THEIR words from that very phrase, short (one word or two). Each appears the moment they say it: heads.py finds it
+  in `master_transcript.json` by its first letters (so «знання» finds «знаннями»); `{"text", "t"}` forces a time.
+  More words than the look holds are dropped with a printed line.
+- `bg`: `main` / `deep` / `pop` / `soft` / `light` / `"#hex"`; default as in the table. `duo` (polaroid): their photos as a
+  changing background, or without photos their own video blown up, black-and-white and tinted main → pop → soft, with a
+  halftone dot texture. `"brackets": false` drops the [ ].
+- `images`: only their photos (uploaded on the page, «Мої файли», `<reel>/` or `~/reels/assets/`) or pictures they picked in
+  «Знайти». Never stock you chose, never frames from another of their videos without asking. collage / pile / picture
+  without enough photos fall back to `window` (printed).
+- Timing: one card = one phrase, 1.5-5 s, `start` on the phrase's first word, `end` on its last. The style of the reference
+  reels is 2-5 different looks in a row on consecutive phrases, then back to the full frame; never the same look twice in a
+  row (build_reel's `variety:` check tells looks apart), at most 6 per reel unless the person asks for more.
+- Fonts and colours are the brand's (or the reel's style); captions step aside for the card's seconds (it carries the
+  words); punch-ins don't fire inside it; the frame comes back on its own at `end`. Full frame on the page: `place` =
+  `[0, 0, 1080, 1920]`, the storyboard still is taken near its end with all words on.
+- Tested 2026-10-23 on two different reels (540p drafts, every look, captions around them) and as menu previews.
+
 ## Transparent motion elements (WebM with alpha, ProRes 4444)
 
 A second source of motions besides the catalog: an element rendered with a transparent background in any tool (Remotion,
