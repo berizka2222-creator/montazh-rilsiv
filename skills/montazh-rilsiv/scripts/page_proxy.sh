@@ -12,4 +12,4 @@ if [ "$(uname)" = Darwin ]; then HW=(-hwaccel videotoolbox); ENC=(-c:v h264_vide
 if [ "$A" = "-" ]; then MAP=(-map 0:v:0 -map "0:a:0?"); IN2=(); else MAP=(-map 0:v:0 -map 1:a:0); IN2=(-i "$A"); fi
 nice -n 10 ffmpeg -v error -y "${HW[@]}" -i "$V" ${IN2[@]+"${IN2[@]}"} "${MAP[@]}" -vf "scale=540:960:force_original_aspect_ratio=increase,crop=540:960" \
   "${ENC[@]}" -g 30 -pix_fmt yuv420p -c:a aac -b:a 96k -movflags +faststart "$OUT"
-echo "$OUT $(( $(stat -f %z "$OUT" 2>/dev/null || stat -c %s "$OUT") / 1048576 )) MB, video ${VB} kbps"
+echo "$OUT $(( $(wc -c < "$OUT" | tr -d ' ') / 1048576 )) MB, video ${VB} kbps"   # wc, not stat: its flags differ on Mac, Linux and Git Bash

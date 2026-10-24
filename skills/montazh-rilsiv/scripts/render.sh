@@ -15,7 +15,7 @@ RES="$(python3 -c "import json;r=json.load(open('$BRAND')).get('resolution',[108
 stamp() { echo "$(date +%s) $1" >> "$REEL/timings.log"; }
 # low priority, but never past 19: the renderer sets its own setup worker to 19, and a shell that already runs jobs niced
 # (zsh puts background jobs at +5) plus nice 15 = 20 makes that a priority raise macOS refuses (uv_os_setpriority EACCES)
-CUR_NICE="$(ps -o nice= -p $$ 2>/dev/null | tr -d ' ')"; case "$CUR_NICE" in ''|*[!0-9-]*) CUR_NICE=0;; esac; NI=$(( 19 - ${CUR_NICE:-0} )); [ "$NI" -gt 15 ] && NI=15; [ "$NI" -lt 0 ] && NI=0
+CUR_NICE="$( (ps -o nice= -p $$ 2>/dev/null || true) | tr -d ' ')"   # Git Bash's ps has no -o: never let that stop the script (set -e + pipefail); case "$CUR_NICE" in ''|*[!0-9-]*) CUR_NICE=0;; esac; NI=$(( 19 - ${CUR_NICE:-0} )); [ "$NI" -gt 15 ] && NI=15; [ "$NI" -lt 0 ] && NI=0
 
 # a preview cut leaves a 1080p master.mp4; re-cut it at the brand resolution so the final isn't an upscale
 if [ "$FINAL" = 1 ] || [ -z "${REEL_DRAFT:-}" ]; then   # the real render needs a full-quality master: a draft cut (540p) is re-cut first
