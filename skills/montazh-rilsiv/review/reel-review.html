@@ -579,9 +579,8 @@ section[data-p="captions"] .lookcards{counter-reset:none}
 .tlsel{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
 .tlsel span{flex:1;min-width:160px}.tlsel .b{font-size:12px!important;padding:4px 10px!important}
 @media (max-width:560px){.tlrow{grid-template-columns:58px minmax(0,1fr)}.tlplay{left:calc(66px + (100% - 66px) * var(--p, 0))}.tlhead .mode{display:none}}
-.tlplay{pointer-events:auto!important;cursor:ew-resize;touch-action:none;z-index:2}
-.tlplay::before{content:"";position:absolute;left:-9px;right:-9px;top:0;bottom:0}
-.tlplay::after{content:"";position:absolute;top:-6px;left:50%;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px var(--bg)}
+.tlplay{pointer-events:none!important;touch-action:none;z-index:2}   /* the line lets clicks through to the blocks under it: only the knob on top drags */
+.tlplay::after{content:"";position:absolute;top:-8px;left:50%;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px var(--bg);pointer-events:auto;cursor:ew-resize}
 .tlruler .tllane,.tllane{cursor:ew-resize}.tllane .tlb{cursor:grab}
 body.scrubbing,body.scrubbing *{cursor:ew-resize!important;user-select:none}
 /* step 2: one place: timeline -> the picked element's panel (preview, decision, timing, its own settings) -> everything as a list */
