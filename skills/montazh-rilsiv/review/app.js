@@ -190,7 +190,7 @@ function overlay(c) {
   if (!R || tab === "preview" || c == null || (mode !== "rough" && mode !== "roughPaused" && mode !== "cutvid" && !placing)) { highlight(null); return; }
   if (mode === "cutvid" && CB?.rendered)   // baked graphics she removed on the timeline: still in this video, marked until the draft
     for (const g of GFX) if (baked(g) && (g.gone || g.state === "d") && c >= g.start && c < g.end) { const m = box(g, false); m.classList.add("gone"); m.textContent = "Прибрано: " + (g.kind || "ефект") + " (зникне в чернетці)"; ov.appendChild(m); }
-  for (const g of GFX) if (!g.gone && g.state !== "d" && c >= g.start && c < g.end && !(placing && g.id === placing.id) && !(baked(g) && TLSEL !== "g:" + g.id)) {
+  for (const g of GFX) if (!g.gone && g.state !== "d" && c >= g.start && c < g.end && !(placing && g.id === placing.id) && !(baked(g) && (TLSEL !== "g:" + g.id || g.type === "title"))) {
     if ((g.type === "title" || g.type === "cta") && (g.text || "").trim()) { const h = hookEl(g); ov.appendChild(h); fitHook(h); }
     else if (g.user && g.type === "bigtext") { const t = txtEl(g.text, g.place, lookOf("ov:" + g.id)); ov.appendChild(t); fitHook(t); }
     else ov.appendChild(box(g, true)); }
@@ -705,7 +705,7 @@ function cardList(box, list) {
       const p = document.createElement("span"); p.textContent = placeText(g); meta.append(p);
       if (g.shifted) p.title = g.behind ? "Над головою, щоб було видно за тобою" : "Відсунуто, щоб не перекривати обличчя й субтитри";
       if (g.user && g.type !== "bigtext") { const fx = document.createElement("span"); fx.textContent = "ефект: " + ({ soft: "плавна поява", slide: "виліт збоку", polaroid: "полароїд", glass: "скло", zoom: "наближення" }[g.effect] || g.effect); meta.append(fx); }
-      if (g.user || ["title", "bigtext", "card", "tag", "cta"].includes(g.type)) {   // their overlays, and Claude's text cards (the hook first of all), can be dragged
+      if (g.user || ["bigtext", "card", "tag", "cta"].includes(g.type)) {   // their overlays and Claude's text cards can be dragged (the hook: on step 1)
         const mvb = document.createElement("button"); mvb.type = "button"; mvb.className = "b quiet"; const on = placing?.id === g.id;
         mvb.textContent = on ? "Готово" : "Перемістити"; mvb.title = "Перетягни рамку на відео, щоб змінити місце";
         mvb.addEventListener("click", () => { if (on) stopPlacing(); else { setPos(g.start + 0.3); startPlacing(g.place, g.id); } }); meta.append(mvb); }
@@ -1680,11 +1680,11 @@ function tlSelect(key, go) {
 function keptWords() { return [...P.kept].filter(i => !R.words[i].filler).sort((a, b) => a - b); }
 function renderInspector() {
   const insp = $("#insp"), holder = $("#holder"); if (!insp || !holder || !P) return;
-  holder.append($("#hookbox"), $("#ctabox"));
+  holder.append($("#ctabox"));   // the hook lives on step 1 («Хук і субтитри»), never in this panel
   const items = tlItems();
   if (TLSEL === "cta:new" && items.some(x => x.key === "g:cta")) TLSEL = "g:cta";   // she just typed the CTA: stay on it
   if (TLSEL === "g:cta" && !items.some(x => x.key === "g:cta")) TLSEL = "cta:new";
-  if (!TLSEL || !items.some(x => x.key === TLSEL)) TLSEL = (items.find(x => x.key === "g:hook") || items[0] || {}).key || null;
+  if (!TLSEL || !items.some(x => x.key === TLSEL)) TLSEL = (items.find(x => x.kind === "board" && x.key !== "g:hook" && !x.off) || items[0] || {}).key || null;   // the hook is set on step 1
   const it = items.find(x => x.key === TLSEL);
   insp.textContent = ""; if (!it) { insp.innerHTML = '<div class="empty">Тапни елемент на таймлайні.</div>'; return; }
   let body;
@@ -1700,8 +1700,13 @@ function renderInspector() {
   if (!it.off && !it.ghost) body.appendChild(timeRow(it));
   if (it.kind === "ef") { const del = document.createElement("button"); del.type = "button"; del.className = "b quiet"; del.textContent = "✕ Прибрати ефект"; del.addEventListener("click", () => tlRemove(it)); body.appendChild(del); }
   const g = (it.kind === "board" || it.kind === "cta") && GFX.find(x => x.id === it.id);
-  if (g && g.type === "title") body.appendChild($("#hookbox"));
-  const txt = g && (g.type === "title" || g.type === "cta") && !g.gone && g.state !== "d" && (g.text || "").trim();   // picked hook / CTA: drag it right on the video
+  if (g && g.type === "title") {   // the hook is set up before the montage, on step 1: here it is only shown
+    const h = document.createElement("p"); h.className = "mode"; h.textContent = "Хук налаштовується на кроці 1, у «Хук і субтитри»: текст, вигляд кожного рядка, місце на відео.";
+    const go = document.createElement("button"); go.type = "button"; go.className = "b quiet"; go.textContent = "Відкрити налаштування хука";
+    go.addEventListener("click", () => { showTab("captions"); $("#hookhome").scrollIntoView({ behavior: "smooth", block: "start" }); });
+    body.append(h, go);
+  }
+  const txt = g && g.type === "cta" && !g.gone && g.state !== "d" && (g.text || "").trim();   // picked hook / CTA: drag it right on the video
   if (txt && tab === "graphics" && placing?.id !== g.id) setTimeout(() => { if (TLSEL === it.key) startPlacing(g.place || [90, 1000, 900, 320], g.id, true); }, 0);
   else if (!txt && placing?.id && GFX.some(x => x.id === placing.id && (x.type === "title" || x.type === "cta"))) setTimeout(stopPlacing, 0);
   if (txt) { const h = document.createElement("p"); h.className = "mode"; h.textContent = "Тягни текст прямо на відео, щоб поставити, де подобається."; body.insertBefore(h, body.children[2] || null); }

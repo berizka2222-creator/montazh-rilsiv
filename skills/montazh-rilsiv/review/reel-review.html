@@ -735,7 +735,7 @@ body.scrubbing,body.scrubbing *{cursor:ew-resize!important;user-select:none}
       <button class="tab" role="tab" data-tab="overlays">Накладення <span class="dot" hidden></span></button>
       <button class="tab" role="tab" data-tab="effects" hidden>Ефекти <span class="dot" hidden></span></button>
       <button class="tab gone" role="tab" data-tab="graphics">Графіка <span class="dot" hidden></span></button>
-      <button class="tab" role="tab" data-tab="captions">Субтитри <span class="dot" hidden></span></button>
+      <button class="tab" role="tab" data-tab="captions">Хук і субтитри <span class="dot" hidden></span></button>
       <button class="tab" role="tab" data-tab="sound">Звук і колір <span class="dot" hidden></span></button>
       <button class="tab" role="tab" data-tab="mystyle">Стиль монтажу <span class="dot" hidden></span></button>
       <button class="tab gone" role="tab" data-tab="preview">Чернетка</button>
@@ -831,13 +831,6 @@ body.scrubbing,body.scrubbing *{cursor:ew-resize!important;user-select:none}
       <div class="tl" id="tl" hidden></div>
       <div class="insp" id="insp"></div>
       <div id="holder" hidden>
-        <div id="hookbox" class="ibox">
-          <div id="hookoptbox" hidden><label>Обери варіант або напиши свій</label><div class="hookopts" id="hookopts"></div></div>
-          <label for="hooktext">Текст хука</label>
-          <input type="text" id="hooktext" placeholder="Напр.: Чому не / виходить / заробляти? (/ = новий рядок)">
-          <div class="ctl" hidden><button class="b quiet" id="hookmove" type="button">Перемістити хук на відео</button><span class="mode" id="hookmovemsg"></span></div>
-          <details class="lookdet" id="hooklookdet"><summary>Вигляд хука: розташування, розмір, кожен рядок окремо (шрифт, колір, контур, фон), тінь</summary><div id="hooklook"></div></details>
-        </div>
         <div id="ctabox" class="ibox">
           <label for="ctatext">Текст заклику</label>
           <input type="text" id="ctatext" placeholder="Напр.: Пиши АНКЕТА в директ (слово КАПСОМ стане рожевим)">
@@ -855,8 +848,18 @@ body.scrubbing,body.scrubbing *{cursor:ew-resize!important;user-select:none}
     </section>
 
     <section data-p="captions" hidden>
-      <div class="sechead"><h2>Субтитри</h2><div class="sectools"><button class="icon notebtn" type="button">+ Нотатка</button></div></div>
+      <div class="sechead"><h2>Хук і <em>субтитри</em></h2><div class="sectools"><button class="icon notebtn" type="button">+ Нотатка</button></div></div>
       <p class="lede">Тапни слово, щоб зробити його акцентом. <b>правити</b> змінює текст, ±0,1 зсуває початок, <b>об'єднати</b> склеює з наступним, <b>роз'єднати</b> ставить кожне слово окремо.</p>
+      <div class="panel hookhome" id="hookhome"><div class="gtop"><label style="margin:0">Хук</label><span class="mode">перші 3,5 с рілса. Налаштовуєш тут, до монтажу: потім він уже буде у відео з ефектами.</span></div>
+          <div id="hookbox" class="ibox">
+            <div id="hookoptbox" hidden><label>Обери варіант або напиши свій</label><div class="hookopts" id="hookopts"></div></div>
+            <label for="hooktext">Текст хука</label>
+            <input type="text" id="hooktext" placeholder="Напр.: Чому не / виходить / заробляти? (/ = новий рядок)">
+            <div class="ctl"><button class="b quiet" id="hookmove" type="button">Перемістити хук на відео</button><span class="mode" id="hookmovemsg"></span></div>
+            <details class="lookdet" id="hooklookdet" open><summary>Вигляд хука: розташування, розмір, кожен рядок окремо (шрифт, колір, контур, фон), тінь</summary><div id="hooklook"></div></details>
+          </div>
+      </div>
+      <div class="gtop" style="margin-top:18px"><label style="margin:0">Субтитри</label></div>
       <div class="capplace"><div class="ggrid lookcards capcards">
         <div class="ggroup"><div class="gtitle">Де субтитри</div><div class="gpre" id="capplace"></div>
           <p class="mode" style="margin:8px 0 0">Зараз: <b id="capyval"></b>. Або перетягни субтитр на відео.</p></div>
