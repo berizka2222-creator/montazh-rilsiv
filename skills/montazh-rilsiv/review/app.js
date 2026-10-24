@@ -1568,8 +1568,8 @@ function tlItems() {
                  off: g.state === "d", kind: g.id === "cta" ? "cta" : g.user ? "ov" : "board", id: g.id });
   }
   if (!((S.cta || {}).text || "").trim()) items.push({ key: "cta:new", track: 0, start: Math.max(0, P.cutDur - 4), end: P.cutDur, label: "+ CTA", kind: "ctanew", ghost: true });
-  for (const r of sfxRows()) if (r.cur || r.off) { const lb = (sfxLib()[r.cur] || {}).label || r.cur;   // «Звуки»: one small block per sound, under its graphic
-    items.push({ key: "s:" + r.id, track: 4, start: r.start, end: Math.min(r.start + 1.2, P.cutDur), label: r.off ? "без звуку" : "♪ " + lb, kind: "sfx", id: r.id, off: r.off }); }
+  for (const r of sfxRows()) { const lb = (sfxLib()[r.cur] || {}).label || r.cur, none = r.off || !r.cur;   // «Звуки»: a block under every graphic; none yet = «+ звук»
+    items.push({ key: "s:" + r.id, track: 4, start: r.start, end: Math.min(r.start + 1.2, P.cutDur), label: none ? "+ звук" : "♪ " + lb, kind: "sfx", id: r.id, off: none }); }
   if (tab === "preview") (S.revisions || []).forEach((r, k) => items.push({ key: "n:" + k, track: 5, start: r.t, end: r.t + 0.2, label: r.text, kind: "note", pin: true }));
   for (const e of S.effects || []) { const w = R.words[e.w0]; if (!w || P.removed(e.w0)) continue; const st = P.toCut(w.s);
     items.push({ key: "e:" + e.id, track: 2, start: st, end: Math.min(st + (e.dur || 3), P.cutDur), label: "Ефект: " + e.text, kind: "ef", id: e.id }); }
@@ -1716,6 +1716,11 @@ function renderInspector() {
   }
   if (!it.off && !it.ghost) body.appendChild(timeRow(it));
   if (it.kind === "ef") { const del = document.createElement("button"); del.type = "button"; del.className = "b quiet"; del.textContent = "✕ Прибрати ефект"; del.addEventListener("click", () => tlRemove(it)); body.appendChild(del); }
+  { const sr = sfxRows().find(x => x.id === it.id);   // its sound, right under the picked element
+    if (sr) { const row = document.createElement("div"); row.className = "insptime"; const lb = (sfxLib()[sr.cur] || {}).label || sr.cur;
+      const t = document.createElement("span"); t.className = "mode"; t.textContent = sr.off || !sr.cur ? "Звук: без звуку" : "Звук: " + lb;
+      const b = document.createElement("button"); b.type = "button"; b.className = "b quiet"; b.textContent = sr.off || !sr.cur ? "+ Додати звук" : "♪ Змінити звук"; b.addEventListener("click", () => openSfxPick(sr.id));
+      row.append(t, b); body.appendChild(row); } }
   const g = (it.kind === "board" || it.kind === "cta") && GFX.find(x => x.id === it.id);
   if (g && g.type === "title") {   // the hook is set up before the montage, on step 1: here it is only shown
     const h = document.createElement("p"); h.className = "mode"; h.textContent = "Хук налаштовується на кроці 1, у «Хук і субтитри»: текст, вигляд кожного рядка, місце на відео.";
