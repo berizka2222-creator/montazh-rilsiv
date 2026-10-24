@@ -1221,24 +1221,31 @@ function renderSound() {
   renderGrade();
   const cues = $("#cues"); cues.textContent = "";
   const lib = sfxLib(), names = Object.keys(lib);
-  for (const g of GFX.filter(g => g.sfx && !g.gone && g.state !== "d")) {
-    const off = !!S.sfxOff[g.id], cur = (S.sfxSwap || {})[g.id] || g.sfx.name;
-    const row = document.createElement("div"); row.className = "cue" + (off ? " off" : "");
+  // every graphic on the reel, Claude's and hers: the board cards, her photos / GIFs, the effects she added with «+ Додати»
+  const rows = GFX.filter(g => !g.gone && g.state !== "d" && g.type !== "camera").map(g => ({ id: g.id, start: g.start, kind: g.kind + (g.user ? " · твоє" : ""), sfx: g.sfx || null }))
+    .concat((S.effects || []).filter(e => R.words[e.w0] && !P.removed(e.w0)).map(e => ({ id: e.id, start: P.toCut(R.words[e.w0].s), kind: "Твій ефект: " + String(e.text).replace(/^№\d+\s+\S+:\s*/, ""), sfx: { name: "whoosh_soft", db: -14 } })))
+    .sort((x, y) => x.start - y.start);
+  for (const g of rows) {
+    const off = !!S.sfxOff[g.id], base = g.sfx ? g.sfx.name : "", cur = (S.sfxSwap || {})[g.id] || base, db = g.sfx ? g.sfx.db : -14;
+    const row = document.createElement("div"); row.className = "cue" + (off || !cur ? " off" : "");
     const t = document.createElement("span"); t.className = "tc"; t.textContent = fmt(g.start);
+    t.style.cursor = "pointer"; t.title = "Перейти до цього місця"; t.addEventListener("click", () => tlGo(g.start + 0.05));
     const w = document.createElement("span"); w.className = "what"; w.textContent = g.kind;
     const ctl = document.createElement("span"); ctl.className = "ctl";
     const sel = document.createElement("select"); sel.className = "sfxsel"; sel.setAttribute("aria-label", "Звук для " + g.kind);
-    const groups = {}; for (const n of new Set([cur, ...names])) (groups[(lib[n] || {}).cat || "Інше"] ||= []).push(n);
+    if (!base) { const o = document.createElement("option"); o.value = ""; o.textContent = "Без звуку"; o.selected = !cur; sel.appendChild(o); }
+    const groups = {}; for (const n of new Set([cur, ...names].filter(Boolean))) (groups[(lib[n] || {}).cat || "Інше"] ||= []).push(n);
     for (const [cat, ns] of Object.entries(groups)) { const og = document.createElement("optgroup"); og.label = cat;
       for (const n of ns) { const o = document.createElement("option"); o.value = n; o.textContent = (lib[n] || {}).label || n; o.selected = n === cur; og.appendChild(o); } sel.appendChild(og); }
-    sel.addEventListener("change", () => { playSfx(sel.value, g.sfx.db); mutate(() => { S.sfxSwap = { ...(S.sfxSwap || {}) }; if (sel.value === g.sfx.name) delete S.sfxSwap[g.id]; else S.sfxSwap[g.id] = sel.value; }); });
-    const play = document.createElement("button"); play.type = "button"; play.className = "b quiet"; play.textContent = "▶"; play.title = "Слухати";
-    play.addEventListener("click", () => playSfx(sel.value, g.sfx.db));
-    const tg = document.createElement("button"); tg.type = "button"; tg.className = "b quiet"; tg.textContent = off ? "Увімкнути" : "Вимкнути";
-    tg.addEventListener("click", () => mutate(() => { if (off) delete S.sfxOff[g.id]; else S.sfxOff[g.id] = true; }));
-    ctl.append(sel, play, tg); row.append(t, w, ctl); cues.appendChild(row);
+    sel.addEventListener("change", () => { if (sel.value) playSfx(sel.value, db); mutate(() => { S.sfxSwap = { ...(S.sfxSwap || {}) }; if (sel.value === base) delete S.sfxSwap[g.id]; else S.sfxSwap[g.id] = sel.value; }); });
+    const play = document.createElement("button"); play.type = "button"; play.className = "b quiet"; play.textContent = "▶"; play.title = "Слухати"; play.disabled = !sel.value;
+    play.addEventListener("click", () => sel.value && playSfx(sel.value, db));
+    ctl.append(sel, play);
+    if (cur) { const tg = document.createElement("button"); tg.type = "button"; tg.className = "b quiet"; tg.textContent = off ? "Увімкнути" : "Вимкнути";
+      tg.addEventListener("click", () => mutate(() => { if (off) delete S.sfxOff[g.id]; else S.sfxOff[g.id] = true; })); ctl.append(tg); }
+    row.append(t, w, ctl); cues.appendChild(row);
   }
-  if (!cues.children.length) cues.innerHTML = `<div class="empty">Звуків на графіці ще немає.</div>`;
+  if (!cues.children.length) cues.innerHTML = `<div class="empty">Графіки ще немає: звуки з’являться тут разом з ефектами.</div>`;
   // the whole library to listen through, by category
   const det = document.createElement("details"); det.className = "sfxlib"; det.innerHTML = `<summary>Бібліотека звуків (${names.length})</summary>`;
   const byCat = {}; for (const n of names) (byCat[lib[n].cat || "Інше"] ||= []).push(n);

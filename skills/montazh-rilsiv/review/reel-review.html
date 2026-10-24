@@ -843,6 +843,8 @@ body.scrubbing,body.scrubbing *{cursor:ew-resize!important;user-select:none}
         <div class="ctl" style="margin-top:6px"><input type="text" id="cutnote" placeholder="Що не так у нарізці в цей момент (склейка, зайве слово)"><button class="b" id="cutadd" type="button">Нотатка на цю секунду</button></div>
         <div id="cutnotes"></div>
       </div>
+      <details class="panel" id="cuesbox" open><summary><b>Звуки на графіці</b> <span class="mode">кожен ефект, твій і від Claude: заміни звук, послухай або вимкни</span></summary>
+        <div id="cues" style="margin-top:8px"></div></details>
       <details class="panel alllist" id="alllist"><summary><b>Усі елементи списком</b> <span class="tally" id="gtally"></span></summary>
         <div class="cards" id="cards"><div class="empty">Графіка з'явиться тут, коли рілс завантажиться.</div></div></details>
     </section>
@@ -892,9 +894,6 @@ body.scrubbing,body.scrubbing *{cursor:ew-resize!important;user-select:none}
           <div class="gtop"><div class="gpre" id="gradepre"></div></div>
           <div id="gradebox"></div>
           <div class="pair" id="colour"></div></div>
-        <div class="panel scard"><div class="gtitle">Звуки на графіці</div>
-          <p class="lede">Звуки на появі графіки. Вимкни зайві або заміни.</p>
-          <div id="cues"></div></div>
       </div>
     </section>
 

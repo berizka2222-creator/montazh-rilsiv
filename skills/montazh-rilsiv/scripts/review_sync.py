@@ -258,7 +258,8 @@ def do_import(reel, review):
                 if g.get("zoom"): spec["x"] = g["place"][0]   # shrunk to fit above the head (behind the person)
             elif g.get("type") in ("motion", "custom", "shot", "image"): spec["box" if g["type"] in ("motion", "custom") else "y"] = g["place"] if g["type"] in ("motion", "custom") else g["place"][1]
         spec.update(start=round(g["start"], 3), end=round(g["end"], 3), id=g["id"])
-        if (d.get("sfxSwap") or {}).get(g["id"]) and isinstance(spec.get("sfx"), dict): spec["sfx"] = {**spec["sfx"], "name": d["sfxSwap"][g["id"]]}
+        if (d.get("sfxSwap") or {}).get(g["id"]):   # a sound picked on «Звуки на графіці» (her photos / GIFs had none: they get one now)
+            spec["sfx"] = {**(spec["sfx"] if isinstance(spec.get("sfx"), dict) else {"db": -14}), "name": d["sfxSwap"][g["id"]]}
         if g["id"] in (d.get("sfxOff") or {}) and d["sfxOff"][g["id"]]: spec["sfx"] = False
         if g.get("type") == "overlay" and g.get("assetId"):   # uploaded on the page: Claude downloads the asset into <reel>/overlays/ before rendering (Claude's own brand overlays carry their src)
             spec = {k: v for k, v in spec.items() if k not in ("imgUrl", "user", "media", "file", "memeText", "findOpt")}
@@ -344,8 +345,9 @@ def do_import(reel, review):
     for e in sorted(d.get("effects") or [], key=lambda e: e.get("at", 0)):   # effects they asked for on the page («Ефекти»)
         w = W[e["w0"]] if 0 <= e.get("w0", -1) < len(W) else {"text": "?", "s": 0}
         files = "; ".join(f"{f['name']} -> DOWNLOAD asset {f['id']} into {reel / 'effects'}" for f in e.get("files") or [])
+        snd = "off" if (d.get("sfxOff") or {}).get(e["id"]) else (d.get("sfxSwap") or {}).get(e["id"]) or "whoosh_soft"   # «Звуки на графіці»
         print(f"EFFECT REQUESTED @ cut {e.get('at', 0):.1f}s for {e.get('dur', 3)}s, from word \"{w['text']}\" (source {w['s']:.1f}s): {e['text']}"
-              + (f" | files: {files}" if files else ""))
+              + f" | sound: {snd}" + (f" | files: {files}" if files else ""))
     for k, n in (d.get("notes") or {}).items():
         if n.strip(): print(f"NOTE ({k}):", n.strip())
     for k, files in (d.get("refs") or {}).items():   # reference pictures/videos she attached to a section's note
