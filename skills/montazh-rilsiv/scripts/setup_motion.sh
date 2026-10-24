@@ -17,6 +17,8 @@ if [ ! -d "$HOME/.claude/skills/motion-brand" ]; then
   mkdir -p "$HOME/.claude/skills/motion-brand"; cp -R "$SK/motion/skill/." "$HOME/.claude/skills/motion-brand/"
   echo "motion-brand skill installed"
 fi
+# a project made by an older version of the skill: bring in the scripts it gained since (never touches the person's own files)
+for f in "$SK/motion/scripts/"*; do [ -e "$M/scripts/$(basename "$f")" ] || cp "$f" "$M/scripts/"; done
 cd "$M"
 [ -d node_modules/@remotion/cli ] || npm ci --no-audit --no-fund --loglevel=error
 python3 scripts/sync-brand.py

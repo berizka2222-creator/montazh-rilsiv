@@ -13,6 +13,9 @@ BRAND="${REELS_HOME:-$HOME/reels}/brand.json"
 RES="$(python3 -c "import json;r=json.load(open('$BRAND')).get('resolution',[1080,1920]);print('portrait-4k' if r[0]>=2160 else 'portrait')")"
 [ "$FINAL" = 1 ] || RES=portrait                 # previews at 1080p: a quarter of the pixels of 4K
 stamp() { echo "$(date +%s) $1" >> "$REEL/timings.log"; }
+# low priority, but never past 19: the renderer sets its own setup worker to 19, and a shell that already runs jobs niced
+# (zsh puts background jobs at +5) plus nice 15 = 20 makes that a priority raise macOS refuses (uv_os_setpriority EACCES)
+CUR_NICE="$(ps -o nice= -p $$ 2>/dev/null | tr -d ' ')"; case "$CUR_NICE" in ''|*[!0-9-]*) CUR_NICE=0;; esac; NI=$(( 19 - ${CUR_NICE:-0} )); [ "$NI" -gt 15 ] && NI=15; [ "$NI" -lt 0 ] && NI=0
 
 # a preview cut leaves a 1080p master.mp4; re-cut it at the brand resolution so the final isn't an upscale
 if [ "$FINAL" = 1 ] || [ -z "${REEL_DRAFT:-}" ]; then   # the real render needs a full-quality master: a draft cut (540p) is re-cut first
@@ -29,10 +32,10 @@ if [ -n "${REEL_DRAFT:-}" ]; then   # fast review draft at 540x960 (build_reel.p
   # 540p frames are small, so HyperFrames' automatic low-memory profile (1 worker) is switched off. 3 workers were faster on a
   # 30 s draft, but on a 90 s reel with many motions (8 GB) they timed out and redid 408 frames in one worker: 6m48 instead
   # of ~2 min (2026-10-24). 2 workers on 8 GB, 3 on bigger Macs. Fast capture can't help: glass cards use backdrop-filter.
-  nice -n 15 npx -y hyperframes@0.8.145 render "$REEL/proj" --workers "${REEL_DRAFT_WORKERS:-$([ "$MEM_GB" -le 8 ] && echo 2 || echo 3)}" --no-low-memory-mode --gpu -o "$REEL/draft.mp4" --quality draft --quiet
+  nice -n "$NI" npx -y hyperframes@0.8.145 render "$REEL/proj" --workers "${REEL_DRAFT_WORKERS:-$([ "$MEM_GB" -le 8 ] && echo 2 || echo 3)}" --no-low-memory-mode --gpu -o "$REEL/draft.mp4" --quality draft --quiet
   stamp "render:end"; echo "draft: $REEL/draft.mp4"; exit 0
 fi
-nice -n 15 npx -y hyperframes@0.8.145 render "$REEL/proj" --workers "$WORKERS" -o "$REEL/final.mp4" --resolution "$RES" --quality delivery --crf "${REEL_CRF:-14}" --quiet   # CRF 14: graphics and skin stay clean through Instagram's own re-encode
+nice -n "$NI" npx -y hyperframes@0.8.145 render "$REEL/proj" --workers "$WORKERS" -o "$REEL/final.mp4" --resolution "$RES" --quality delivery --crf "${REEL_CRF:-14}" --quiet   # CRF 14: graphics and skin stay clean through Instagram's own re-encode
 stamp "render:end"
 # Final mix. Optional music bed (brand.json "music": path) sits ~18 dB under the voice and ducks further while she talks.
 # Then bring the whole mix to -14 LUFS (video copied, not re-encoded).
