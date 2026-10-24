@@ -17,6 +17,11 @@ with what each one is for, its moment and its tested placement, is `references/m
 - Never the same motion twice in one reel. Prefer ones the last 3 reels didn't use (`menu` / `ideas` show them).
 - Mix moments: a reel with a number, a list and a CTA gets a number motion, a list motion and a CTA motion, not three text
   effects. The template cards (list, split, push, steps, camera) still go in alongside.
+- Scenes first: a reel of plain text effects looks basic. `ideas` marks every motion `[складне]` (a scene: phone, chat,
+  notification, chart, carousel, lower third, hand-drawn picture, head layout, transition) or `[просте]` (one word, number or
+  phrase animating over the video, `motions.py` `is_simple`). At least two thirds of a reel's motions are `[складне]`, `[просте]`
+  at most a third and never two in a row. Add 1-2 catalog transitions (`use: transition`) where the topic changes.
+- `split`, `push` and `steps` are rare: at most one of them per reel unless the person asked, none when the previous reel had one.
 - A motion still has to show what that exact line says. «ideas» suggests, it doesn't decide.
 
 ## Vertical frame and Ukrainian text (checked 2026-10-21 on all 86, big-face framing)
@@ -50,8 +55,14 @@ with what each one is for, its moment and its tested placement, is `references/m
   - `dim`: the video stays as a darkened background (`"dim": 0.82` = how dark), the effect on top over the whole frame;
     captions step aside. For effects that can't keep off the face: charts, carousels and galleries with their photos,
     phone chats and notes, maps, before/after, device mocks. Status `full_only`, marked «на весь кадр».
-- Image slots (carousels, galleries, device and placeholder grids): fill `"images"` with their photos or screenshots; an
-  empty slot never goes in.
+- Image slots (carousels, galleries, collage / pile / picture heads, device and placeholder grids). Claude picks one of these on
+  its own only when it has real pictures that show THIS line, in this order:
+  1. their own: the overlays and «Мої файли» they put on the page, `~/reels/assets/elements`;
+  2. screenshots of a tool, site or account the line names (`scripts/screenshot.sh`);
+  3. stills from their own reel at the moments the line talks about (`ffmpeg -ss <t> -i master.mp4 -frames:v 1`).
+  Never stock photos or invented pictures in their slots, never an empty slot. In proposal.json say in `what` which pictures went
+  in («3 кадри з твого відео»), so on the page they can swap them for their own. No real pictures for a line = pick a scene
+  without image slots.
 - Follow cards (`instagram-follow`, `tiktok-follow`, `yt-lower-third`, `x-post`) are suggested. Name and handle come from
   brand.json `name` / `handle` (stage 1 files already give them); the person can change them for one reel (card `replace`,
   e.g. `{"HeyGen": "Інна"}`) or for good (brand.json). The buttons stay in English, as in the real apps. The photo is

@@ -350,6 +350,13 @@ for role, key in (("body", "cap"), ("accent", "capacc")):
         fmt = {"otf": "opentype", "ttf": "truetype", "woff2": "woff2", "woff": "woff"}.get(src.suffix[1:].lower(), "truetype")
         font_css.append(f'@font-face {{ font-family: "{f["family"]}-{key}"; src: url("fonts/{src.name}") format("{fmt}"); font-display: block; }}')
         FAM[key] = (f"'{f['family']}-{key}', {FALLBACK}", f.get("weight", 400), f.get("style", "normal")); FONT_FILE[key] = src
+def line_font(f, key):
+    """A face she picked for one hook / CTA line: copied into the project, registered under its own role name."""
+    src = Path(f["file"]).expanduser(); shutil.copy(src, proj / "fonts" / src.name)
+    fmt = {"otf": "opentype", "ttf": "truetype", "woff2": "woff2", "woff": "woff"}.get(src.suffix[1:].lower(), "truetype")
+    font_css.append(f'@font-face {{ font-family: "{f["family"]}-{key}"; src: url("fonts/{src.name}") format("{fmt}"); font-display: block; }}')
+    FAM[key] = (f"'{f['family']}-{key}', {FALLBACK}", f.get("weight", 400), f.get("style", "normal")); FONT_FILE[key] = src
+    return key
 def font(role, px):
     fam, wt, st = FAM[role]
     return f"font-family:{fam};font-weight:{wt};font-style:{st};font-size:{px}px"
@@ -548,7 +555,16 @@ _seq = [(k["type"] + ("/" + k["layout"] if k.get("layout") else "") + ("/" + k.g
 _mnames = [k.get("name") for k in edit.get("cards", []) if k["type"] == "motion"]
 for n in sorted({n for n in _mnames if _mnames.count(n) > 1}): print(f"variety: motion '{n}' is used {_mnames.count(n)} times - pick another from scripts/motions.py menu")
 for k in range(len(_seq) - 2):
-    if _seq[k] == _seq[k + 1] == _seq[k + 2]: print(f"variety: three '{_seq[k]}' graphics in a row - swap one for a list, split, push or steps")
+    if _seq[k] == _seq[k + 1] == _seq[k + 2]: print(f"variety: three '{_seq[k]}' graphics in a row - swap one for another motion")
+# 2026-10-24: splits / push-ins are rare, and a reel of plain text effects looks basic
+_frame = [k for k in edit.get("cards", []) if k["type"] in ("split", "push", "steps")]
+if len(_frame) > 1: print(f"variety: {len(_frame)} split / push / steps cards - keep at most one per reel unless she asked for them")
+try:
+    sys.path.insert(0, str(Path(__file__).resolve().parent)); from motions import is_simple as _simple, CAT as _CATF; _CAT = {m["name"]: m for m in _CATF["motions"]}
+    _mm = [m for m in (_CAT.get(n) for n in _mnames) if m]
+    _ns = sum(1 for m in _mm if _simple(m))
+    if _mm and _ns * 3 > len(_mm): print(f"variety: {_ns} of {len(_mm)} motions are plain text effects - at most a third, use scenes from motions.py ideas [складне]")
+except Exception as _e: pass
 
 # shader transitions are loud: at most 2 per reel, only where the topic changes, at least 12 s apart
 _trs = sorted(k["start"] for k in edit.get("cards", []) if k["type"] == "motion"
@@ -615,6 +631,9 @@ for i, c in enumerate(edit.get("cards", [])):
                 own = (LH.get("lines") or [])[j] if j < len(LH.get("lines") or []) else None
                 return {**LH, **leg, "font": "accent" if LH.get("l2acc") and j % 2 else "head", **(own or {})}
             LJ = [lk(j) for j in range(len(lines))]
+            for j, L in enumerate(LJ):   # a font picked for this very line on the page (look.hook.lines[j].ff): its own role in FAM
+                if (L.get("ff") or {}).get("file") and Path(L["ff"]["file"]).expanduser().exists():
+                    L["font"] = line_font(L["ff"], f"hk{j}")
             roles = [L["font"] if L["font"] in FAM else "head" for L in LJ]
             sizes = [c.get("size") or min(fit(x, 230, 230 // 16 + float(L.get("sw") or 0), role=r), brand.get("title_max_px", 999)) for x, r, L in zip(lines, roles, LJ)]
             sizes = [int(px * float(LH.get("scale") or 100) / 100) for px in sizes]   # «Розмір» on the page
@@ -742,6 +761,8 @@ for i, c in enumerate(edit.get("cards", [])):
         LC = {"c1": MAIN, "bg": "line", "bc": brand.get("cta_bg", LIGHT), "bo": 100, "br": 40, "sh": 0, **LOOK["cta"]}
         lines = [x.strip() for x in c["text"].split("/") if x.strip()]
         LJ = [{**LC, "font": "head", **(((LC.get("lines") or [])[j] if j < len(LC.get("lines") or []) else None) or {})} for j in range(len(lines))]
+        for j, L in enumerate(LJ):   # a font picked for this CTA line on the page
+            if (L.get("ff") or {}).get("file") and Path(L["ff"]["file"]).expanduser().exists(): L["font"] = line_font(L["ff"], f"ct{j}")
         roles = [L["font"] if L["font"] in FAM else "head" for L in LJ]
         sizes = [int(min(fit(x, 200, 200 // 16 + float(L.get("sw") or 0), role=r), brand.get("cta_px", 78) * 1.5) * float(LC.get("scale") or 100) / 100) for x, r, L in zip(lines, roles, LJ)]
         AL = LC.get("align") or "center"
@@ -856,7 +877,9 @@ for i, c in enumerate(edit.get("cards", [])):
                **(c.get("replace") or {})}
         rep = {k: v for k, v in rep.items() if k and not str(v).startswith("<")}   # motions with their text baked in: swap it for their words
         if c.get("_capgroups") is not None:            # a caption style: their words, minus the spans where a card carries the words
-            mt = caption_patch(mt, [g for g in c["_capgroups"] if not any(a - 0.05 <= g["start"] < b for a, b in quiet)], DUR)
+            mt = caption_patch(mt, c["_capgroups"], DUR)   # every group stays (dropping some made the previous one hang on screen)
+            for qa, qb in quiet:                       # the whole caption layer hides while a card carries the words
+                js.append(f'tl.set("#{cid}",{{opacity:0}},{q(max(qa - 0.05, 0))});tl.set("#{cid}",{{opacity:1}},{q(qb)});')
         if _cm.get("avatar") or c.get("avatar"):         # someone else's logo in the avatar slot -> their photo
             av = avatar_img(c.get("avatar"))
             if av:
@@ -868,6 +891,8 @@ for i, c in enumerate(edit.get("cards", [])):
         if rep:                                          # one pass, longest first, whole words only: "Follow" never eats "Following"
             rx = re.compile("|".join(r"(?<![\w-])" + re.escape(k) + r"(?![\w-])" for k in sorted(rep, key=len, reverse=True)))
             mt = rx.sub(lambda m: html.escape(rep[m.group(0)], quote=False), mt)
+        if MOTION_PRESETS.get(c.get("name"), {}).get("keep_ui"):   # a real interface (phone chat, notifications, iOS, X...):
+            c.setdefault("keep_ui", True); c.setdefault("keep_fonts", True)   # its own colours and system font, never her palette (2026-10-24)
         if not c.get("keep_fonts"):                      # the brand's fonts on every catalog motion (their Oswald/Inter/Caveat
             brand_font = (f'[data-composition-id="{comp_id}"], [data-composition-id="{comp_id}"] *:not(code):not(pre) '   # have no
                           f'{{ font-family: "BrandSans", {FALLBACK} !important; }}')                           # Cyrillic either)
@@ -932,8 +957,9 @@ for i, c in enumerate(edit.get("cards", [])):
         if layout == "split":
             PANEL = c.get("panel", 820 if fixed else 1080)   # size-free motions size their text by the panel: a taller panel reads on a phone                  # the brand panel's height; she keeps the rest of the frame
             fx, fy, fw, fh = FACE or (300, 500, 480, 600)
-            src_top = max(0, fy - 0.12 * fh - c.get("headroom", 70))
-            pos = f"50% {max(0, min(100, src_top / PANEL * 100)):.0f}%"
+            # the renderer ignores object-position: the video keeps its full 1080x1920 box and slides up by `off`, so the window
+            # shows her from just above the head down, not the ceiling and the top of her head (2026-10-24)
+            off = round(min(max(0, fy + 0.64 * fh - 0.45 * (H - PANEL)), PANEL))   # face centre (face.json box = hair + face, the face itself is its lower 60%) at 45% of the window
             area = (40, 240, 1000, PANEL - 280)          # under Instagram's top bar, inside the panel
             if not own_box:
                 c["box"] = fit_into(*area) if fixed else list(area)
@@ -941,11 +967,12 @@ for i, c in enumerate(edit.get("cards", [])):
                     z = zget(c, 1.25); bx, by, bw_, bh_ = c["box"]
                     c["box"] = [round(bx - bw_ * (z - 1) / 2), round(by - bh_ * (z - 1) / 2), round(bw_ * z), round(bh_ * z)]
             mid.append(f'<div id="{cid}s" class="sp" style="opacity:0;visibility:hidden">'
-                       f'<div class="spw" style="left:0;top:0;width:1080px;height:1920px"><video src="master.mp4" muted playsinline data-start="{q(a)}" '
-                       f'data-duration="{q(b - a)}" data-media-start="{q(a)}" data-track-index="{9 + i}" style="object-position:{pos}"></video></div>'
+                       f'<div class="spw" style="left:0;top:0;width:1080px;height:1920px"><div class="spv" style="position:absolute;left:0;top:0;width:1080px;height:1920px"><video src="master.mp4" muted playsinline data-start="{q(a)}" '
+                       f'data-duration="{q(b - a)}" data-media-start="{q(a)}" data-track-index="{9 + i}" style="width:1080px;height:1920px"></video></div></div>'
                        f'<div class="spp" style="left:0;top:0;width:1080px;height:{PANEL}px;background:{panel_bg}"></div></div>')
             js.append(f'tl.set("#{cid}s",{{autoAlpha:1}},{q(a)});'
                       f'tl.to("#{cid}s .spw",{{top:{PANEL},height:{H - PANEL},duration:0.55,ease:"power3.inOut"}},{q(a)});'
+                      f'tl.to("#{cid}s .spv",{{y:{-off},duration:0.55,ease:"power3.inOut"}},{q(a)});tl.to("#{cid}s .spv",{{y:0,duration:0.45,ease:"power3.inOut"}},{q(b - 0.45)});'
                       f'tl.fromTo("#{cid}s .spp",{{clipPath:"inset(0% 0% 100% 0%)"}},{{clipPath:"inset(0% 0% 0% 0%)",duration:0.55,ease:"power3.inOut"}},{q(a)});'
                       f'tl.to("#{cid}s .spw",{{top:0,height:{H},duration:0.45,ease:"power3.inOut"}},{q(b - 0.45)});'
                       f'tl.to("#{cid}s .spp",{{clipPath:"inset(0% 0% 100% 0%)",duration:0.45,ease:"power3.inOut"}},{q(b - 0.45)});tl.set("#{cid}s",{{autoAlpha:0}},{q(b)});')
@@ -956,7 +983,7 @@ for i, c in enumerate(edit.get("cards", [])):
                 if fixed:
                     z = zget(c, 1.2); bx, by, bw_, bh_ = c["box"]
                     c["box"] = [round(bx - bw_ * (z - 1) / 2), round(by - bh_ * (z - 1) / 2), round(bw_ * z), round(bh_ * z)]
-            mid.append(f'<div id="{cid}d" style="position:absolute;inset:0;background:{_rgba(_DEEP, c.get("dim", 0.82))};opacity:0;visibility:hidden"></div>')
+            mid.append(f'<div id="{cid}d" style="position:absolute;inset:0;background:{"rgba(0,0,0,%.2f)" % c.get("dim", 0.7) if (c.get("keep_ui") or MOTION_PRESETS.get(c.get("name"), {}).get("keep_ui")) else _rgba(_DEEP, c.get("dim", 0.82))};opacity:0;visibility:hidden"></div>')
             js.append(f'tl.fromTo("#{cid}d",{{autoAlpha:0}},{{autoAlpha:1,duration:0.3,ease:"power2.out"}},{q(a)});'
                       f'tl.to("#{cid}d",{{autoAlpha:0,duration:0.3,ease:"power2.in"}},{q(b - 0.3)});')
             quiet.append((a, b)); c.setdefault("tone", "clear")
@@ -1105,17 +1132,17 @@ for i, c in enumerate(edit.get("cards", [])):
         if side == "left":   # person left, panel right; the window is centred on the face
             win0, win1, pan, tx = "left:0;top:0;width:1080px;height:1920px", {"width": W - PANEL // 2}, f"left:{W - PANEL // 2}px;top:0;width:{PANEL // 2}px;height:1920px", (W - PANEL // 2 + 40, 300, PANEL // 2 - 80)
             clip0 = "inset(0% 0% 0% 100%)"
-            pos = f"{max(0, min(100, (fx + fw / 2 - (W - PANEL // 2) / 2) / (PANEL // 2) * 100)):.0f}% 50%"
+            vmove = {"left": -round(min(max(0, fx + fw / 2 - (W - PANEL // 2) / 2), PANEL // 2))}   # face centred in the window
         else:                # "top": panel above, the person below from just over the head down (face stays clear of Instagram's bottom bar)
             win0, win1, pan, tx = "left:0;top:0;width:1080px;height:1920px", {"top": PANEL, "height": H - PANEL}, f"left:0;top:0;width:1080px;height:{PANEL}px", (90, 250, 900)
             clip0 = "inset(0% 0% 100% 0%)"
-            src_top = max(0, fy - 0.12 * fh - c.get("headroom", 70))   # source row that lands at the window's top edge
-            pos = f"50% {max(0, min(100, src_top / PANEL * 100)):.0f}%"   # cover at scale 1 hides PANEL px of height
+            # the renderer ignores object-position: the video keeps its full box and slides up so the window starts just over the head
+            vmove = {"top": -round(min(max(0, fy + 0.64 * fh - 0.45 * (H - PANEL)), PANEL))}   # face centre (face.json box = hair + face, the face itself is its lower 60%) at 45% of the window
         tpx = min(fit(c.get("title", ""), 104 if side != "left" else 64), 104)
         room = (PANEL if side != "left" else 1480) - 30 - tx[1] - tpx * 1.3     # rows must end inside the panel / above the bottom bar
         rpx = int(min(fit(max(rows, key=len, default=""), 64 if side != "left" else 46), 64, room / max(len(rows), 1) / 1.55))
         mid.append(f'<div id="{cid}" class="sp" style="opacity:0;visibility:hidden">'
-                   f'<div class="spw" style="{win0}"><video id="{cid}v" src="master.mp4" muted playsinline data-start="{q(a)}" data-duration="{q(b - a)}" data-media-start="{q(a)}" data-track-index="{9 + i}" style="object-position:{pos}"></video></div>'
+                   f'<div class="spw" style="{win0}"><div id="{cid}v" style="position:absolute;left:0;top:0;width:1080px;height:1920px"><video src="master.mp4" muted playsinline data-start="{q(a)}" data-duration="{q(b - a)}" data-media-start="{q(a)}" data-track-index="{9 + i}" style="width:1080px;height:1920px"></video></div></div>'
                    f'<div class="spp" style="{pan};background:{bg}">'
                    f'<div class="spt" style="left:{tx[0] - (540 if side == "left" else 0)}px;top:{tx[1]}px;width:{tx[2]}px;{font("head", tpx)};color:{fg}">{esc(case(c.get("title", "")))}</div>'
                    + "".join(f'<div class="spr" id="{cid}r{j}" style="left:{tx[0] - (540 if side == "left" else 0)}px;top:{tx[1] + tpx * 1.3 + j * rpx * 1.55:.0f}px;width:{tx[2]}px;{font("body", rpx)};color:{fg}"><b style="background:{POP}"></b>{esc(r)}</div>' for j, r in enumerate(rows))
@@ -1123,7 +1150,8 @@ for i, c in enumerate(edit.get("cards", [])):
         prop = ",".join(f"{k}:{v}" for k, v in win1.items()); back_ = ",".join(f"{k}:{ {'width': W, 'top': 0, 'height': H}[k]}" for k in win1)
         js.append(f'tl.set("#{cid}",{{autoAlpha:1}},{q(a)});'
                   f'tl.to("#{cid} .spw",{{{prop},duration:0.55,ease:"power3.inOut"}},{q(a)});'
-                  f'tl.fromTo("#{cid} .spp",{{clipPath:"{clip0}"}},{{clipPath:"inset(0% 0% 0% 0%)",duration:0.55,ease:"power3.inOut"}},{q(a)});'
+                  + "".join(f'tl.to("#{cid}v",{{{ {"top": "y", "left": "x"}[k]}:{v},duration:0.55,ease:"power3.inOut"}},{q(a)});tl.to("#{cid}v",{{{ {"top": "y", "left": "x"}[k]}:0,duration:0.45,ease:"power3.inOut"}},{q(b - 0.45)});' for k, v in vmove.items())
+                  + f'tl.fromTo("#{cid} .spp",{{clipPath:"{clip0}"}},{{clipPath:"inset(0% 0% 0% 0%)",duration:0.55,ease:"power3.inOut"}},{q(a)});'
                   f'tl.fromTo("#{cid} .spt",{{y:40,opacity:0}},{{y:0,opacity:1,duration:0.4,ease:"power3.out"}},{q(a + 0.35)});'
                   + "".join(f'tl.fromTo("#{cid}r{j}",{{autoAlpha:0,x:-50}},{{autoAlpha:1,x:0,duration:0.3,ease:"back.out(2)"}},{q(t)});' for j, t in enumerate(rt))
                   + f'tl.to("#{cid} .spw",{{{back_},duration:0.45,ease:"power3.inOut"}},{q(b - 0.45)});'

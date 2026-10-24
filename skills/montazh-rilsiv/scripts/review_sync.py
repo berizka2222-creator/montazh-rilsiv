@@ -153,8 +153,9 @@ def export(reel, proposal, out):
     proposed_cut = [i for i, w in enumerate(words) if not w.get("filler") and
                     not any(a <= (w["s"] + w["e"]) / 2 <= b for a, b in keep)]
     # pauses Claude keeps on purpose: after a question or exclamation, or longer than 0.8 s after a sentence end
-    keep_pauses = [i for i in range(len(words) - 1) if re.search(r"[?!]$", words[i]["text"]) or
-                   (re.search(r"[.]$", words[i]["text"]) and words[i + 1]["s"] - words[i]["e"] > 0.8)]
+    # a silence over 1.5 s (reading notes, thinking) is never kept whole
+    keep_pauses = [i for i in range(len(words) - 1) if words[i + 1]["s"] - words[i]["e"] <= 1.5 and (re.search(r"[?!]$", words[i]["text"]) or
+                   (re.search(r"[.]$", words[i]["text"]) and words[i + 1]["s"] - words[i]["e"] > 0.8))]
     acc = set(proposal.get("accentWords", []))
     mode = brand.get("captions", {}).get("mode", "phrase")
     caps, cur = [], []
@@ -286,6 +287,19 @@ def do_import(reel, review):
                 **({"l2": {**base_look.get(k, {}).get("l2", {}), **page_look.get(k, {}).get("l2", {})},
                     "lines": merge_lines(base_look.get(k, {}).get("lines"), page_look.get(k, {}).get("lines"))} if k in ("hook", "cta") else {})}
             for k in set(base_look) | set(page_look)}
+    def font_file(f):   # a font she picked on the page (design system file or Google Font with Ukrainian letters) -> a local file
+        dst = HOME / "fonts" / f["brandFile"] if f.get("brandFile") else HOME / "fonts" / "google" / (re.sub(r"\W+", "-", f["gf"]).strip("-") + ".ttf")
+        if not dst.exists() and f.get("gf"):
+            import urllib.request
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            css = urllib.request.urlopen(f"https://fonts.googleapis.com/css2?family={f['gf']}&display=swap").read().decode()
+            urllib.request.urlretrieve(re.search(r"url\((https://[^)]+\.ttf)\)", css).group(1), dst)
+        return {"family": f["family"], "file": str(dst), "weight": f.get("weight", 400), "style": f.get("style", "normal")}
+    for k in ("hook", "cta"):   # a font per hook / CTA line («Шрифт» on each line)
+        for j, ln in enumerate((look.get(k) or {}).get("lines") or []):
+            if ln and ln.get("ff") and (ln["ff"].get("gf") or ln["ff"].get("brandFile")):
+                try: ln["ff"] = font_file(ln["ff"]); print(f"{k.upper()} LINE {j + 1} FONT: {ln['ff']['family']}")
+                except Exception as e: print(f"warning: {k} line {j + 1} font {ln['ff'].get('family')} not downloaded ({e}): brand font instead"); ln.pop("ff")
     if look:
         extra["text_look"] = look; print("TEXT LOOK:", json.dumps(look, ensure_ascii=False))
         if page_look and (d.get("look") or {}).get("keep"):   # becomes the brand default (reel.json "look" on the next reels)

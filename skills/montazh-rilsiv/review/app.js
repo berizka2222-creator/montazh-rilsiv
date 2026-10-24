@@ -23,6 +23,9 @@ let R = null, B = null, CB = null, S = blank(), P = null, CAPS = [], GFX = [];
 // the cut on its own (db builds/cut): rendered right after step 1 so the cuts are checked before the graphics
 const cutHash = d => { const x = JSON.stringify([d.cut, d.restoredFillers, d.restoredPauses, d.trimmedPauses]); let h = 5381; for (let i = 0; i < x.length; i++) h = ((h << 5) + h + x.charCodeAt(i)) | 0; return (h >>> 0).toString(36); };
 const cutVid = () => tab === "graphics" && !!CB?.url;
+// step 2 video rendered WITH Claude's graphics and captions (builds/<id>-cut "rendered": true, "ids": the graphics baked in):
+// the page draws only what isn't in the picture yet (her new items, the hook while it has no text) and marks what she removed
+const baked = g => mode === "cutvid" && CB?.rendered && (CB.ids || []).includes(g.id);
 let tab = "cuts", ref = null, saving = Promise.resolve(), timer = null, undo = [], mode = "idle", loop = null;
 function blank() { return { cut: null, restoredFillers: [], restoredPauses: [], trimmedPauses: [], captions: null, board: {}, sfxOff: {}, overlays: [], effects: [], notes: {}, brandRequest: "", revisions: [], buildRequest: null }; }
 
@@ -124,7 +127,7 @@ v.addEventListener("seeked", () => { if (mode === "cutvid") { pos = v.currentTim
 function renderCutBox() {   // notes on the cut video (S.cutNotes, cut seconds) and whether the video still matches her cuts
   const box = $("#cutnotes"); if (!box) return; box.textContent = "";
   const st = $("#cutstate");
-  if (CB?.url) st.textContent = CB.cutHash && S.graphicsRequest && cutHash(decisions()) !== CB.cutHash ? "Ти змінила нарізку після цього відео: Claude врахує це в чернетці." : "Відео нарізки: склейки справжні, графіка рамками.";
+  if (CB?.url) st.textContent = CB.cutHash && S.graphicsRequest && cutHash(decisions()) !== CB.cutHash ? "Ти змінила нарізку після цього відео: Claude врахує це в чернетці." : (CB.rendered ? "Відео з графікою і субтитрами, як буде в рілсі. На таймлайні прибери зайве або додай своє (ефект з бібліотеки, фото, гіфку), потім «Зібрати чернетку»." : "Відео нарізки: склейки справжні, графіка рамками.");
   else st.textContent = S.graphicsRequest ? "Claude збирає відео нарізки (~2–3 хв)…" : "Відео нарізки з'явиться після «Готово → Claude» на кроці 1.";
   $("#cutadd").disabled = !CB?.url;
   for (const [k, n] of (S.cutNotes || []).entries()) {
@@ -185,7 +188,9 @@ v.addEventListener("error", () => pill("Відео не завантажилос
 function overlay(c) {
   ov.textContent = "";
   if (!R || tab === "preview" || c == null || (mode !== "rough" && mode !== "roughPaused" && mode !== "cutvid" && !placing)) { highlight(null); return; }
-  for (const g of GFX) if (!g.gone && g.state !== "d" && c >= g.start && c < g.end && !(placing && g.id === placing.id)) {
+  if (mode === "cutvid" && CB?.rendered)   // baked graphics she removed on the timeline: still in this video, marked until the draft
+    for (const g of GFX) if (baked(g) && (g.gone || g.state === "d") && c >= g.start && c < g.end) { const m = box(g, false); m.classList.add("gone"); m.textContent = "Прибрано: " + (g.kind || "ефект") + " (зникне в чернетці)"; ov.appendChild(m); }
+  for (const g of GFX) if (!g.gone && g.state !== "d" && c >= g.start && c < g.end && !(placing && g.id === placing.id) && !(baked(g) && TLSEL !== "g:" + g.id)) {
     if ((g.type === "title" || g.type === "cta") && (g.text || "").trim()) { const h = hookEl(g); ov.appendChild(h); fitHook(h); }
     else if (g.user && g.type === "bigtext") { const t = txtEl(g.text, g.place, lookOf("ov:" + g.id)); ov.appendChild(t); fitHook(t); }
     else ov.appendChild(box(g, true)); }
@@ -196,8 +201,8 @@ function overlay(c) {
     if (ph && (ph.text || "").trim()) { const h = hookEl({ ...ph, place: placing.place }); h.classList.add("placing"); ov.appendChild(h); fitHook(h); }
     ov.appendChild(placeBox());
   }
-  let cap = GFX.some(g => g.capsAside && !g.gone && g.state !== "d" && c >= g.start && c < g.end) ? null : CAPS.find(x => !x.gone && c >= x.start && c < x.end);
   const place = tab === "captions" && mode !== "rough";
+  let cap = (mode === "cutvid" && CB?.rendered) || GFX.some(g => g.capsAside && !g.gone && g.state !== "d" && c >= g.start && c < g.end) ? null : CAPS.find(x => !x.gone && c >= x.start && c < x.end);   // rendered step-2 video: the captions are in the picture
   if (!cap && place) cap = CAPS.find(x => !x.gone && x.start >= c) || CAPS.filter(x => !x.gone).pop();   // something to drag
   if (cap) { const el = capEl(cap); ov.appendChild(el); fitCap(el); if (place) dragCap(el); }
   highlight(c, cap);
@@ -283,22 +288,42 @@ function fillFontSelects() {
   }
 }
 let popRole = null;
-function openFonts(role) {
-  popRole = role; loadPreviews(); const pop = $("#fontpop"); pop.hidden = false; $("#fontq").value = ""; renderFontList(); $("#fontq").focus();
-  const btn = role === "body" ? $("#capfont") : $("#capacc"); btn.after(pop);
+let popLine = null;   // {K: "hook"|"cta", j}: the font popup picks a font for one hook / CTA line instead of the captions
+function openFonts(role, line, anchor) {
+  popRole = role; popLine = line || null; loadPreviews(); const pop = $("#fontpop"); pop.hidden = false; $("#fontq").value = ""; renderFontList(); $("#fontq").focus();
+  const btn = anchor || (role === "body" ? $("#capfont") : $("#capacc")); btn.after(pop);
+  if (anchor && anchor.parentElement) anchor.parentElement.style.position = "relative";
 }
+// one hook / CTA line: brand roles first, then the design system's fonts, then Google Fonts with Ukrainian letters
+const lineFontName = M => M.ff ? M.ff.family : M.font === "accent" ? brandName("accent") + " italic" : M.font === "body" ? brandName("body") : "Шрифт заголовків (бренд)";
 function renderFontList() {
   const q = $("#fontq").value.trim().toLowerCase(), box = $("#fontlist"); box.textContent = "";
-  const cur = ((S.capFont || {})[popRole] || {}).family || "brand";
-  const groups = [["Дизайн-система", brandFonts(popRole).map(r => ({ id: r[0], label: r[1], spec: brandSpec(r) }))]]
+  const LM = popLine ? (popLine.K === "cta" ? { font: "head", ...((lookOf("cta").lines || [])[popLine.j] || {}) } : lineLook(lookOf("hook"), popLine.j)) : null;
+  const cur = popLine ? (LM.ff ? LM.ff.family : "role:" + LM.font) : ((S.capFont || {})[popRole] || {}).family || "brand";
+  const groups = popLine
+    ? [["Бренд", [["head", "Шрифт заголовків (бренд)"], ["body", brandName("body")], ["accent", brandName("accent") + " italic"]].map(([r, l]) => ({ id: "role:" + r, label: l, role: r, spec: null }))],
+       ["Дизайн-система", ["body", "accent"].flatMap(r => brandFonts(r).filter(x => x[0] !== "brand").map(x => ({ id: x[0], label: x[1], spec: brandSpec(x) })))]]
+    : [["Дизайн-система", brandFonts(popRole).map(r => ({ id: r[0], label: r[1], spec: brandSpec(r) }))]]
     .concat((popRole === "accent" ? [GF_LIST[1], GF_LIST[3], GF_LIST[2], GF_LIST[0]] : GF_LIST).map(([cat, l]) => [cat, l.map(f => ({ id: f.family, label: f.family, spec: f }))]));
   for (const [cat, items] of groups) {
     const list = items.filter(it => !q || it.label.toLowerCase().includes(q)); if (!list.length) continue;
     const h = document.createElement("div"); h.className = "gtitle"; h.textContent = cat; box.appendChild(h);
     for (const it of list) {
       const b = document.createElement("button"); b.type = "button"; b.className = "fontopt"; b.setAttribute("aria-pressed", it.id === cur || (it.spec && it.spec.family === cur));
-      b.innerHTML = `<span></span><small>Їжак ґаву з'їв</small>`; b.firstChild.textContent = it.label; b.firstChild.style.cssText = faceCss(it.spec, popRole); b.lastChild.style.cssText = faceCss(it.spec, popRole);
+      b.innerHTML = `<span></span><small>Їжак ґаву з'їв</small>`; b.firstChild.textContent = it.label;
+      const fc = it.role ? Object.entries(txtFace(it.role)).map(([k, v]) => k.replace(/[A-Z]/g, m => "-" + m.toLowerCase()) + ":" + v).join(";") : faceCss(it.spec, popRole);
+      b.firstChild.style.cssText = fc; b.lastChild.style.cssText = fc;
       if (it.spec && it.spec.gf) b.addEventListener("mouseenter", () => loadGf(it.spec), { once: true });
+      if (popLine) {   // a hook / CTA line: its own font (role or picked face), saved in look[K].lines[j]
+        const { K, j } = popLine;
+        b.addEventListener("click", () => { loadGf(it.spec);
+          mutate(() => { S.look = { ...(S.look || {}) }; const o = { ...(S.look[K] || {}) }; const ls = [...(o.lines || [])];
+            for (let i = 0; i <= j; i++) ls[i] = ls[i] || {}; ls[j] = { ...ls[j], font: it.role || "head", ff: it.spec || null }; o.lines = ls; S.look[K] = o; });
+          const pop = $("#fontpop"); pop.hidden = true; $("#capfont").closest(".fontrow").after(pop);   // the popup goes back home before anything re-renders
+          const btn = popLine && popLine.btn; if (btn) { btn.textContent = it.label; btn.style.cssText = ""; if (it.spec) btn.style.cssText = faceCss(it.spec); else if (it.role !== "head") Object.assign(btn.style, txtFace(it.role)); }
+          popLine = null; lookPreview(K); });
+        box.appendChild(b); continue;
+      }
       b.addEventListener("click", () => { loadGf(it.spec); const role = popRole;
         mutate(() => { const f = { ...(S.capFont || {}) }; if (it.spec) f[role] = it.spec; else delete f[role]; S.capFont = Object.keys(f).length ? f : null; });
         $("#fontpop").hidden = true; setTimeout(() => overlay(pos), 400); });
@@ -311,7 +336,7 @@ $("#capfont").addEventListener("click", () => $("#fontpop").hidden || popRole !=
 $("#capacc").addEventListener("click", () => $("#fontpop").hidden || popRole !== "accent" ? openFonts("accent") : ($("#fontpop").hidden = true));
 $("#fontq").addEventListener("input", renderFontList);
 document.addEventListener("keydown", e => { if (e.key === "Escape") $("#fontpop").hidden = true; });
-document.addEventListener("click", e => { if (!$("#fontpop").hidden && !e.target.closest("#fontpop,.fontbtn")) $("#fontpop").hidden = true; });
+document.addEventListener("click", e => { if (!$("#fontpop").hidden && !e.target.closest("#fontpop,.fontbtn")) { $("#fontpop").hidden = true; popLine = null; } });
 function capWhere(y) { const F = R.face; if (!F) return Math.round(y / 19.2) + "% висоти";
   return y + 150 < F[1] ? "над головою" : y > F[1] + F[3] ? (y > 1350 ? "внизу" : "під підборіддям") : "на обличчі"; }
 function renderCapPlace() {
@@ -378,7 +403,7 @@ function hookEl(g) {   // the hook / CTA on the rough cut, in the picked look (t
     const d = document.createElement("div"), s = document.createElement("span"), alt = j % 2 === 1;
     const M = K === "cta" ? { ...L, font: "head", ...((L.lines || [])[j] || {}) } : lineLook(L, j), al = L.align || (K === "hook" && R.titleAlign) || "center";
     d.className = "hl"; d.style.textAlign = al === "zigzag" ? (lines.length > 1 ? (alt ? "right" : "left") : "center") : al; d.style.fontSize = (K === "cta" ? 96 : 130) * (L.scale || 100) / 100 * k + "px";
-    if (M.font !== "head") Object.assign(d.style, txtFace(M.font));
+    if (M.ff) { loadGf(M.ff); d.style.cssText += ";" + faceCss(M.ff); } else if (M.font !== "head") Object.assign(d.style, txtFace(M.font));
     s.style.cssText = lookBg(M, k); s.appendChild(lookRun(M, k, document.createTextNode(x), "hk")); d.appendChild(s); el.appendChild(d);
   });
   return el;
@@ -454,6 +479,12 @@ function rebalance(text, n) {   // the same words in n lines of about equal leng
   }
   if (cur.length) out.push(cur.join(" ")); return out.join(" / ");
 }
+function fontBtn(K, j, M) {   // «Шрифт» for one line: opens the font list (brand, design system, Google Fonts with Ukrainian letters)
+  const r = document.createElement("div"); r.className = "lrow"; r.innerHTML = `<span class="gl">Шрифт</span><button type="button" class="fontbtn"></button>`;
+  const b = r.lastChild; b.textContent = lineFontName(M); if (M.ff) { loadGf(M.ff); b.style.cssText = faceCss(M.ff); } else if (M.font !== "head") Object.assign(b.style, txtFace(M.font));
+  b.addEventListener("click", e => { e.stopPropagation(); const pop = $("#fontpop"); if (!pop.hidden && popLine && popLine.K === K && popLine.j === j) { pop.hidden = true; return; } openFonts("body", { K, j, btn: b }, b); });
+  return r;
+}
 function renderHookLook(root, K = "hook") {   // hook and CTA: the same controls
   const L = lookOf(K), lines = blockLines(K), n = Math.max(1, lines.length), set = key => v => setLook(K, key, v), live = key => v => setLook(K, key, v, null, true);
   root.textContent = "";
@@ -468,7 +499,7 @@ function renderHookLook(root, K = "hook") {   // hook and CTA: the same controls
     const M = lineLook(L, j), s1 = key => v => setLine(K, j, key, v), lv = key => v => setLine(K, j, key, v, true);
     const t = lines[j] || "", name = `Рядок ${j + 1}` + (t ? ` · «${t.length > 18 ? t.slice(0, 17) + "…" : t}»` : "");
     grid.appendChild(lGroup(name,
-      lSeg("Шрифт", [["Заголовків", "head"], ["Основний", "body"], ["Акцентний", "accent"]], M.font, s1("font")),
+      fontBtn(K, j, M),
       lColor("Колір", M.c1, s1("c1"), lv("c1")),
       lChk("Градієнт", !!M.c2, on => setLine(K, j, "c2", on ? (R.style.acc2 || R.style.acc) : null)),
       M.c2 ? lColor("Другий колір градієнта", M.c2, s1("c2"), lv("c2")) : null,
@@ -2059,7 +2090,7 @@ async function load(id) {
     let firstBuild = true;
     let firstCut = true;
     subs.push(DB.doc(d.cut).onSnapshot(s => { if (!live()) return; const had = CB?.url; CB = s.exists ? s.data() : null;
-      if (!firstCut && CB?.url && CB.url !== had && tab === "graphics") { showTab("graphics"); $("#banner").textContent = "Відео нарізки готове: перевір склейки в плеєрі."; $("#banner").hidden = false; }
+      if (!firstCut && CB?.url && CB.url !== had && tab === "graphics") { showTab("graphics"); $("#banner").textContent = CB.rendered ? "Відео з ефектами готове: дивись, прибирай чи додавай на таймлайні." : "Відео нарізки готове: перевір склейки в плеєрі."; $("#banner").hidden = false; }
       else if (tab === "graphics") showTab("graphics"); renderCutBox(); firstCut = false; }, () => {}));
     subs.push(DB.doc(d.build).onSnapshot(s => { if (!live()) return; const had = B?.url; B = s.exists ? s.data() : null; if (R) { renderPreview(); renderStage(); }
       if (!firstBuild && B?.url && B.url !== had) { showTab("preview"); $("#banner").textContent = "Чернетка готова. Натисни play на відео, лиши нотатки на секундах або «Це фінал»."; $("#banner").hidden = false; }

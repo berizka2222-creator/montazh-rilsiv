@@ -113,6 +113,14 @@ CUES = [
 ]
 
 
+TEXT_ONLY = {"хук / ключова фраза", "цифра", "перехід", "до / після", "успіх / готово"}
+TEXT_FX = {"typewriter", "scramble-reveal", "morph-text", "line-by-line-slide", "titlecard-lockup", "titlecard-calm", "tilt-card"}   # text effects tagged with other moments
+def is_simple(m):
+    """A plain text effect: one word / number / phrase animating over the video, no scene of its own. 2026-10-24: too
+    many of these make a reel look basic, so ideas() puts the scenes first and a reel keeps them to a third of its motions."""
+    return m.get("name") in TEXT_FX or (m.get("use") == "overlay" and m.get("status") != "brand" and set(m.get("moments", [])) <= TEXT_ONLY)
+
+
 def ideas(reel):
     reel = Path(reel).expanduser().resolve()
     words = [w for w in json.load(open(reel / "master_transcript.json")) if w["text"].strip()]
@@ -136,14 +144,22 @@ def ideas(reel):
         pool = [m for m in READY + FULL if set(m["moments"]) & set(moments) and not (m["name"] in seen or seen.add(m["name"]))]
         # fresh first: not in this reel, not in the last reels, offered least so far
         order = {mo: k for k, mo in enumerate(moments)}           # the more specific moment (a number before a key phrase) first
-        pool.sort(key=lambda m: (m["name"] in used_here, m["name"] in rec, min(order.get(x, 99) for x in m["moments"]),
-                                 m.get("status") == "full_only", offered.get(m["name"], 0), -m.get("quality", 3), m.get("rank", 5)))
-        picks = [m for m in pool if m.get("status") != "full_only"][:4] + [m for m in pool if m.get("status") == "full_only"][:1]
+        # scenes before plain text effects (is_simple), then fresh first
+        pool.sort(key=lambda m: (m["name"] in used_here, m["name"] in rec, is_simple(m), min(order.get(x, 99) for x in m["moments"]),
+                                 offered.get(m["name"], 0), -m.get("quality", 3), m.get("rank", 5)))
+        rich = [m for m in pool if not is_simple(m)]
+        # every phrase also gets scenes from any moment that fits a talking head (UI, chats, carousels, lower thirds, transitions)
+        if len(rich) < 3:
+            extra = [m for m in READY + FULL if not is_simple(m) and m["name"] not in {x["name"] for x in rich} and m["name"] not in used_here
+                     and m.get("use") in ("ui", "full", "transition") and m["name"] not in rec]
+            extra.sort(key=lambda m: (offered.get(m["name"], 0), -m.get("quality", 3)))
+            rich += extra[:3 - len(rich)]
+        picks = rich[:3] + [m for m in pool if is_simple(m)][:1]
         for m in picks: offered[m["name"]] = offered.get(m["name"], 0) + 1
         print(f"{ph[0]['start']:6.1f}s  [{', '.join(moments)}]  {text[:90]}")
         mine = [x for x in STAMPS_LIST if set(x["moments"]) & set(moments) and x["key"].split(":")[-1] not in used_here][:2]
         for x in mine: print(f"         ★ моя марка {x['key']}: {x['ua']}  (з рілса {x['reel']}, налаштування: {json.dumps(x['spec'], ensure_ascii=False)})")
-        for m in picks: print(f"         -> {m['name']}: {m['ua']}" + (f"  [текст: {', '.join(m['text_vars'])}]" if m.get("text_vars") else "") + (" [інтерфейс, свої кольори]" if m.get("keep_ui") else "") + (" [на весь кадр]" if m.get("status") == "full_only" else "")
+        for m in picks: print(f"         -> {m['name']}: {m['ua']}" + (" [просте]" if is_simple(m) else " [складне]") + (f"  [текст: {', '.join(m['text_vars'])}]" if m.get("text_vars") else "") + (" [інтерфейс, свої кольори]" if m.get("keep_ui") else "") + (" [на весь кадр]" if m.get("status") == "full_only" else "")
                               + ("  [render-overlay.sh, картка overlay + \"brand\"]" if m["status"] == "brand" else ""))
 
 
