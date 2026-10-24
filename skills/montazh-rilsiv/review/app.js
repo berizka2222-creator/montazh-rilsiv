@@ -714,7 +714,7 @@ function cardList(box, list) {
       if (g.moved) { const m = document.createElement("span"); m.className = "warnline"; m.textContent = "Її перше слово вирізано, тому вона зсунулась на наступне слово."; meta.append(m); }
     }
     const seg = document.createElement("div"); seg.className = "seg"; seg.setAttribute("role", "group"); seg.setAttribute("aria-label", "Рішення для " + g.kind);
-    for (const k of ["k", "c", "d"]) {
+    for (const k of (g.type === "title" ? ["k", "d"] : ["k", "c", "d"])) {   // the hook is changed by her on step 1, not by a «Змінити» note
       const b = document.createElement("button"); b.type = "button"; b.className = k; b.textContent = LABEL[k]; b.setAttribute("aria-pressed", st === k);
       b.addEventListener("click", () => { mutate(() => { S.board[g.id] = { ...(S.board[g.id] || {}), state: k }; }); if (k === "c") setTimeout(() => document.getElementById("note-" + g.id)?.focus(), 0); });
       seg.appendChild(b);
@@ -1482,7 +1482,7 @@ function renderStage() {
 }
 $("#gobtn").addEventListener("click", () => { const k = $("#gobtn").dataset.kind; if (k === "style") askStyle(); else if (k === "tographics") { showTab("graphics"); scrollTo({ top: 0, behavior: "smooth" }); } else if (k) askStep(k); });
 function missingNotes() {   // «Змінити» with no note: Claude would have to guess what to change
-  return Object.entries(S.board || {}).filter(([id, b]) => b.state === "c" && !(b.note || "").trim()).map(([id]) => ({ id, kind: (GFX.find(g => g.id === id) || {}).kind || id }));
+  return Object.entries(S.board || {}).filter(([id, b]) => b.state === "c" && !(b.note || "").trim() && (GFX.find(g => g.id === id) || {}).type !== "title").map(([id]) => ({ id, kind: (GFX.find(g => g.id === id) || {}).kind || id }));
 }
 function askStep(kind) {
   const miss = (kind === "graphics" || kind === "build") ? missingNotes() : [];
