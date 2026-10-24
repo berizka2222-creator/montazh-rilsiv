@@ -541,6 +541,15 @@ section[data-p="captions"] .lookcards{counter-reset:none}
 @media (max-width:560px){.sr{border-radius:16px;flex-wrap:wrap}.sr input{flex:1;width:auto!important;min-width:90px}}
 /* timeline */
 .tl{margin:4px 0 16px;border:1px solid var(--line);border-radius:14px;padding:10px 12px 8px;background:rgba(255,255,255,.025);user-select:none;-webkit-user-select:none}
+#addpick{border:1px solid var(--line);border-radius:18px;padding:0;background:var(--bg);color:var(--ink);width:min(760px,94vw);max-height:88vh}
+#addpick::backdrop{background:rgba(0,0,0,.7)}
+#addpick .apin{padding:14px 16px;display:flex;flex-direction:column;gap:10px;max-height:86vh}
+#addpick .aphead{display:flex;justify-content:space-between;align-items:center;gap:10px}
+#addpick .apbody{overflow:auto;min-height:120px}
+#addpick .apq,#addpick .apown{width:100%;box-sizing:border-box;margin-bottom:8px}
+#addpick .capopt{text-align:left}
+.tladd{padding:4px 12px;font-size:13px}
+.tab[hidden]{display:none!important}
 .tlhead{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:6px}.tlhead b{font-size:14px}.tlhead .mode{font-size:12px}
 .tlbody{position:relative}
 .tlrow{display:grid;grid-template-columns:84px minmax(0,1fr);gap:8px;align-items:center;margin:3px 0}
@@ -724,7 +733,7 @@ body.scrubbing,body.scrubbing *{cursor:ew-resize!important;user-select:none}
     <div class="tabs" role="tablist">
       <button class="tab" role="tab" data-tab="cuts">Нарізка <span class="dot" hidden></span></button>
       <button class="tab" role="tab" data-tab="overlays">Накладення <span class="dot" hidden></span></button>
-      <button class="tab" role="tab" data-tab="effects">Ефекти <span class="dot" hidden></span></button>
+      <button class="tab" role="tab" data-tab="effects" hidden>Ефекти <span class="dot" hidden></span></button>
       <button class="tab gone" role="tab" data-tab="graphics">Графіка <span class="dot" hidden></span></button>
       <button class="tab" role="tab" data-tab="captions">Субтитри <span class="dot" hidden></span></button>
       <button class="tab" role="tab" data-tab="sound">Звук і колір <span class="dot" hidden></span></button>
@@ -806,11 +815,7 @@ body.scrubbing,body.scrubbing *{cursor:ew-resize!important;user-select:none}
         <span class="mode" id="efmsg" aria-live="polite"></span>
         <div class="cards" id="eflist"></div>
       </div>
-      <details class="panel" id="refbox"><summary>Рілс-референс: «зроби як тут»</summary>
-        <div class="ctl" style="margin-top:8px"><input type="text" id="refurl" placeholder="Посилання на рілс в Instagram або TikTok"><button class="b" id="refadd" type="button">Додати</button></div>
-        <p class="mode" style="margin:6px 0 0">Claude розбере прийоми (хук, субтитри, темп, графіку) і перенесе їх у твій рілс твоїми словами й кольорами.</p>
-        <div id="reflist"></div>
-        <p style="margin:10px 0 0"><a class="libbtn" id="eflib" href="https://hyperframes.heygen.com/catalog" target="_blank" rel="noopener">Ще більше ефектів у бібліотеці ↗</a></p></details>
+
     </section>
 
     <section data-p="graphics" hidden>
@@ -914,6 +919,11 @@ body.scrubbing,body.scrubbing *{cursor:ew-resize!important;user-select:none}
         <p class="mode" id="stylehint1" style="margin-top:8px"></p>
       </div>
       <div class="stgrid pickgrid" id="stylegrid1"></div>
+          <details class="panel" id="refbox"><summary>Рілс-референс: «зроби як тут»</summary>
+        <div class="ctl" style="margin-top:8px"><input type="text" id="refurl" placeholder="Посилання на рілс в Instagram або TikTok"><button class="b" id="refadd" type="button">Додати</button></div>
+        <p class="mode" style="margin:6px 0 0">Claude розбере прийоми (хук, субтитри, темп, графіку) і перенесе їх у твій рілс твоїми словами й кольорами.</p>
+        <div id="reflist"></div>
+        <p style="margin:10px 0 0"><a class="libbtn" id="eflib" href="https://hyperframes.heygen.com/catalog" target="_blank" rel="noopener">Бібліотека ефектів ↗</a></p></details>
     </section>
 
     <section data-p="preview" hidden>

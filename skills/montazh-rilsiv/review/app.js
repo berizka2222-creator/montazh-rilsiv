@@ -61,7 +61,7 @@ function decisions() { return { ...S, cut: S.cut || R.proposedCut, captions: S.c
 function recompute() { const d = decisions(); P = ReelCore.plan(R, d); CAPS = ReelCore.captions(R, d, P); GFX = ReelCore.graphics(R, d, P); ReelCore.capsAround(R, d, CAPS, GFX); }
 
 // ---------- tabs ----------
-const STEP_OF = { cuts: 1, overlays: 1, effects: 1, captions: 1, sound: 1, mystyle: 1, graphics: 2, preview: 3 };
+const STEP_OF = { cuts: 1, overlays: 1, effects: 2, captions: 1, sound: 1, mystyle: 1, graphics: 2, preview: 3 };
 let lastSub = "cuts";
 function showTab(t) {
   tab = t;
@@ -96,7 +96,7 @@ $$(".tab").forEach(b => b.addEventListener("click", () => showTab(b.dataset.tab)
 // the steps in order: a number on each tab and a «Далі» button under each section
 const ORDER = $$(".tab:not(.tabx)").map(b => b.dataset.tab);   // «Стиль» is not a step of the reel
 $$("#steps .st, #stylelink").forEach(b => b.addEventListener("click", () => { const go = b.dataset.go;
-  if (b.classList.contains("locked")) { $("#banner").textContent = b.dataset.s === "2" ? "Крок 2 відкриється, коли натиснеш «Готово → пропозиції Claude» внизу: Claude збере нарізку й запропонує графіку." : "Чернетка з'явиться після «Зібрати чернетку» на кроці 2."; $("#banner").hidden = false; return; } showTab(go === "cuts" ? lastSub : go); scrollTo({ top: 0, behavior: "smooth" }); }));
+  if (b.classList.contains("locked")) { $("#banner").textContent = b.dataset.s === "2" ? "Крок 2 відкриється, коли натиснеш «Змонтувати з ефектами» внизу: Claude змонтує відео з ефектами й субтитрами." : "Чернетка з'явиться після «Зібрати чернетку» на кроці 2."; $("#banner").hidden = false; return; } showTab(go === "cuts" ? lastSub : go); scrollTo({ top: 0, behavior: "smooth" }); }));
 $$(".notebtn").forEach(b => b.addEventListener("click", () => { $("#notesbox").hidden = false; $("#notesdet").open = true; $("#notesdet").scrollIntoView({ block: "center", behavior: "smooth" }); setTimeout(() => $("#notes").focus(), 300); }));
 $$(".helpbtn").forEach(b => b.addEventListener("click", () => { const on = $("#legend").hidden; $("#legend").hidden = !on; b.setAttribute("aria-expanded", String(on)); }));
 $("#nextbtn").addEventListener("click", () => { const k = ORDER.indexOf(tab); if (k < ORDER.length - 1) { showTab(ORDER[k + 1]); scrollTo({ top: 0, behavior: "smooth" }); } });
@@ -128,7 +128,7 @@ function renderCutBox() {   // notes on the cut video (S.cutNotes, cut seconds) 
   const box = $("#cutnotes"); if (!box) return; box.textContent = "";
   const st = $("#cutstate");
   if (CB?.url) st.textContent = CB.cutHash && S.graphicsRequest && cutHash(decisions()) !== CB.cutHash ? "Ти змінила нарізку після цього відео: Claude врахує це в чернетці." : (CB.rendered ? "Відео з графікою і субтитрами, як буде в рілсі. На таймлайні прибери зайве або додай своє (ефект з бібліотеки, фото, гіфку), потім «Зібрати чернетку»." : "Відео нарізки: склейки справжні, графіка рамками.");
-  else st.textContent = S.graphicsRequest ? "Claude збирає відео нарізки (~2–3 хв)…" : "Відео нарізки з'явиться після «Готово → Claude» на кроці 1.";
+  else st.textContent = S.graphicsRequest ? "Claude монтує відео з ефектами (~5–8 хв)…" : "Відео з ефектами з'явиться після «Змонтувати з ефектами» на кроці 1.";
   $("#cutadd").disabled = !CB?.url;
   for (const [k, n] of (S.cutNotes || []).entries()) {
     const row = document.createElement("div"); row.className = "rev";
@@ -1415,13 +1415,13 @@ function stage() {
   return { n: 1, wait: false };
 }
 const STEP = {
-  graphics: { title: "Віддати Claude на пропозиції?", yes: "Так, готово → Claude",
-    body: () => `<p class="lede">Усе твоє збережено: нарізка, накладення, ефекти, хук, субтитри, колір.</p><ol>
-      <li><b>Збере відео нарізки</b> (~2–3 хв): справжні склейки, щоб ти перевірила їх до графіки.</li>
-      <li><b>Додасть графіку</b> у вибраному стилі: картки, motion на ключові фрази, лічильники. Твоє не чіпає й не перекриває.</li>
-      <li><b>Сторінка оновиться сама</b> (~5–10 хв) і відкриє крок 2 «Нарізка і графіка». Потім одна кнопка: <b>Зібрати чернетку</b>.</li></ol>
+  graphics: { title: "Змонтувати з ефектами?", yes: "Так, монтуй",
+    body: () => `<p class="lede">Усе твоє збережено: нарізка, накладення, хук, субтитри, колір.</p><ol>
+      <li><b>Змонтує відео з ефектами й субтитрами</b> у вибраному стилі (~5–8 хв). Твоє не чіпає й не перекриває.</li>
+      <li><b>Сторінка відкриє крок 2</b>: дивишся готове відео, на таймлайні прибираєш зайве або додаєш своє кнопкою «+ Додати».</li>
+      <li>Потім одна кнопка: <b>Зібрати чернетку</b>.</li></ol>
       ${STYLE_LIST.length ? `<p class="lede" style="margin-top:4px"><b>Яким стилем монтуємо?</b></p><div class="gpre" id="mstylepick"></div>` : ""}`,
-    say: "графіка", text: "▶ Кнопка «Готово → Claude»: мій монтаж готовий, зроби пропозиції графіки (раунд 2)." },
+    say: "графіка", text: "▶ Кнопка «Змонтувати з ефектами»: мій монтаж готовий, змонтуй відео з ефектами (раунд 2)." },
   build: { title: "Зібрати чернетку?", yes: "Так, збирай",
     body: `<p class="lede">Claude збере відео з усіма рішеннями: твоїми і погодженими пропозиціями.</p><ol>
       <li><b>Перевірить склейки й субтитри</b> до рендеру, щоб чернетка вже була чистою.</li>
@@ -1454,9 +1454,9 @@ function renderStage() {
   const bar = $("#gobar"), txt = $("#gotext"), btn = $("#gobtn"); bar.hidden = false; btn.disabled = false;
   const set = (t, sub, label, kind) => { txt.innerHTML = `<b>${t}</b><span class="sub">${sub}</span>`; btn.innerHTML = label; btn.dataset.kind = kind || ""; btn.disabled = !kind; };
   const newRevs = S.revisions.filter(r => B && r.hash === B.hash && !r.sent).length;
-  if (st.n === 1) set("Крок 1 · твій монтаж", "Коли все своє зроблено, передай Claude.", "Готово → пропозиції Claude", "graphics");
-  else if (st.n === 2 && st.wait) set("Claude готує пропозиції", "Сторінка оновиться сама. Можеш далі правити своє.", `<span class="spin"></span>Claude працює`);
-  else if (st.n === 2) set("Крок 2 · пропозиції Claude", "На «Графіці» все з позначкою «від Claude»: залиш, зміни або прибери.", "Зібрати чернетку", "build");
+  if (st.n === 1) set("Крок 1 · твій монтаж", "Коли все своє зроблено, Claude змонтує відео з ефектами.", "Змонтувати з ефектами", "graphics");
+  else if (st.n === 2 && st.wait) set("Claude монтує з ефектами", "Сторінка оновиться сама (~5–8 хв). Можеш далі правити своє.", `<span class="spin"></span>Claude працює`);
+  else if (st.n === 2) set("Крок 2 · відео з ефектами", "Прибери зайве або додай своє кнопкою «+ Додати» на таймлайні.", "Зібрати чернетку", "build");
   else if (st.n === 3 && st.wait) { const r = renderEta(); set("Claude збирає чернетку", r ? `Минуло ${r.done} хв з ~${r.total}. Сторінка відкриє «Чернетку» сама.` : "~6–10 хв. Сторінка відкриє «Чернетку» сама.", `<span class="spin"></span>${r ? r.pct + "%" : "Рендериться"}`); }
   else if (st.n === 3 && B?.url && B.hash !== ReelCore.hash(decisions())) set("Крок 3 · рішення змінились", "Чернетка зібрана до твоїх змін (стиль, нарізка, графіка). Збери її заново.", "Зібрати чернетку заново", "build");
   else if (st.n === 3 && newRevs) set("Крок 3 · чернетка", `Нотаток: ${newRevs}. Віддай їх Claude одним натиском.`, "Виправити за нотатками", "fixes");
@@ -1563,12 +1563,13 @@ const TL_TRACKS = ["Хук і CTA", "Від Claude", "Твоє", "Камера"]
 function renderTimeline() {
   const el = $("#tl"); if (!el || el.hidden || !P) return;
   const D = P.cutDur, items = tlItems(), pct = t => (t / D * 100).toFixed(3) + "%";
-  el.innerHTML = `<div class="tlhead"><b>Таймлайн</b><span class="mode">Тягни блок, щоб змістити. Тягни край, щоб подовжити. Тапни, щоб обрати й прибрати.</span></div>
+  el.innerHTML = `<div class="tlhead"><b>Таймлайн</b><button type="button" class="b tladd" id="tladd" title="Додати ефект там, де стоїть повзунок">+ Додати</button><span class="mode">Постав повзунок на потрібну секунду і тисни «+ Додати». Тягни блок, щоб змістити, край, щоб подовжити.</span></div>
     <div class="tlbody"><div class="tlrow tlruler"><span></span><div class="tllane" data-ruler></div></div></div>`;
   const body = el.querySelector(".tlbody"), ruler = el.querySelector("[data-ruler]");
   const narrow = el.clientWidth < 520;
   for (let t = 0; t <= D; t += D > 40 ? 5 : narrow ? (D > 20 ? 5 : 2) : D > 20 ? 2 : 1) { const m = document.createElement("span"); m.className = "tltick"; m.style.left = pct(t); m.textContent = Math.round(t) + "с"; ruler.appendChild(m); }
   ruler.addEventListener("pointerdown", tlScrub);
+  el.querySelector("#tladd").addEventListener("click", () => openAddPick());
   (tab === "preview" ? [...TL_TRACKS, "Нотатки"] : TL_TRACKS).forEach((name, k) => {
     const row = document.createElement("div"); row.className = "tlrow";
     row.innerHTML = `<span class="tllab"></span><div class="tllane"></div>`; row.firstChild.textContent = name;
@@ -1589,6 +1590,76 @@ function renderTimeline() {
   body.appendChild(caps);
   const ph = document.createElement("div"); ph.className = "tlplay"; ph.id = "tlplay"; ph.title = "Тягни, щоб перемотати"; ph.addEventListener("pointerdown", tlScrub); body.appendChild(ph);
   tlPlayhead();
+}
+// «+ Додати» on the timeline: at the playhead, pick an effect from the library (or describe one, or add a photo / GIF);
+// it lands as an effect block on the «Твоє» track at that word, ready to drag and stretch; Claude builds it into the draft
+function openAddPick() {
+  if (!P) return;
+  if (cutVid() || tab === "preview") v.pause(); else if (mode === "rough") { stopPlay(); mode = "roughPaused"; }
+  const at = pos, w0 = wordAtCut(at);
+  let d = $("#addpick");
+  if (!d) {
+    d = document.createElement("dialog"); d.id = "addpick";
+    d.innerHTML = `<div class="apin"><div class="aphead"><b class="apt"></b><button type="button" class="b quiet apx" aria-label="Закрити">✕</button></div>
+      <div class="gpre apmodes" role="group"><button type="button" data-m="lib" aria-pressed="true">Ефект з бібліотеки</button><button type="button" data-m="own">Описати своїми словами</button><button type="button" data-m="media">Фото, відео, гіфка</button></div>
+      <div class="apbody"></div></div>`;
+    document.body.appendChild(d);
+    d.querySelector(".apx").addEventListener("click", () => d.close());
+    d.addEventListener("click", e => { if (e.target === d) d.close(); });
+    d.addEventListener("close", () => d.querySelectorAll("video").forEach(x => x.pause()));
+  }
+  const word = w0 != null ? R.words[w0].text.replace(/[.,!?;:]+$/, "") : "";
+  d.querySelector(".apt").textContent = `Додати на ${fmt(at)}` + (word ? ` · «${word}»` : "");
+  const add = (text, dur) => {
+    if (w0 == null) return;
+    const id = "ef" + Date.now().toString(36);
+    mutate(() => { S.effects = [...(S.effects || []), { id, w0, at: +at.toFixed(2), dur, text, files: [] }]; });
+    d.close(); TLSEL = "e:" + id; renderTimeline(); renderInspector();
+    pill("Додано на " + fmt(at) + ": тягни блок на таймлайні, щоб посунути");
+  };
+  const body = d.querySelector(".apbody");
+  const show = m => {
+    d.querySelectorAll(".apmodes button").forEach(b => b.setAttribute("aria-pressed", b.dataset.m === m)); body.textContent = "";
+    if (w0 == null) { body.innerHTML = `<p class="mode">Тут немає жодного слова в нарізці: посунь повзунок.</p>`; return; }
+    if (m === "media") {
+      body.innerHTML = `<p class="mode">Свої фото, відео чи гіфки додаються на вкладці «Накладення»: там їх видно на відео, їх можна тягнути й міняти розмір. Пошук гіфок і фото там же, кнопка «Знайти».</p><button type="button" class="b">Відкрити «Накладення» на ${fmt(at)}</button>`;
+      body.querySelector("button").addEventListener("click", () => { d.close(); showTab("overlays"); });
+      return;
+    }
+    if (m === "own") {
+      body.innerHTML = `<p class="mode">Що має з'явитися? Наприклад: «переписка з клієнтом на весь екран», «цифра 3 рахує», «стрілка на кнопку».</p>
+        <textarea class="apown" rows="3" placeholder="Опиши ефект"></textarea><label class="mode">Скільки секунд <input type="number" class="apdur" min="0.5" max="30" step="0.5" value="3"></label> <button type="button" class="b apgo">Додати</button>`;
+      body.querySelector(".apgo").addEventListener("click", () => { const t = body.querySelector(".apown").value.trim(); if (!t) { body.querySelector(".apown").focus(); return; }
+        add(t, Math.min(30, Math.max(0.5, +body.querySelector(".apdur").value || 3))); });
+      body.querySelector(".apown").focus(); return;
+    }
+    const all = (R && R.manual) || [];
+    if (!all.length) { body.innerHTML = `<p class="mode">Бібліотека ще не завантажена. Опиши ефект своїми словами.</p>`; return; }
+    body.innerHTML = `<input type="search" class="apq" placeholder="Пошук: назва, слово або номер"><div class="aplist"></div>`;
+    const q = body.querySelector(".apq"), list = body.querySelector(".aplist");
+    const draw = () => {
+      list.textContent = ""; const t = q.value.trim().toLowerCase(); let g = null, grid = null;
+      const mine = ((R && R.stamps) || []).filter(x => !t || (x.ua + " " + x.key).toLowerCase().includes(t));   // «Мої марки»: graphics from her finished reels, first
+      if (mine.length) { const h = document.createElement("h4"); h.textContent = "★ Мої марки"; const gr = document.createElement("div"); gr.className = "capgrid"; list.append(h, gr);
+        for (const x of mine) { const c = document.createElement("button"); c.type = "button"; c.className = "capopt menuopt";
+          if (x.img) { const im = document.createElement("img"); im.src = x.img; im.alt = ""; im.loading = "lazy"; c.appendChild(im); } else { const n = document.createElement("div"); n.className = "capnone"; n.textContent = "★"; c.appendChild(n); }
+          const lab = document.createElement("span"); lab.textContent = x.ua; c.appendChild(lab);
+          c.addEventListener("click", () => add(`★ моя марка ${x.key}: ${x.ua}`, 3)); gr.appendChild(c); } }
+      for (const mm of all.filter(x => !t || (/^\d+$/.test(t) ? String(x.no) === t : (x.no + " " + x.ua + " " + x.n + " " + x.g).toLowerCase().includes(t)))) {
+        if (mm.g !== g) { g = mm.g; const h = document.createElement("h4"); h.textContent = g; grid = document.createElement("div"); grid.className = "capgrid"; list.append(h, grid); }
+        const c = document.createElement("button"); c.type = "button"; c.className = "capopt menuopt";
+        if (mm.p) { const vv = document.createElement("video"); vv.muted = true; vv.loop = true; vv.playsInline = true; vv.preload = "none"; vv.dataset.src = mm.p; manObs.observe(vv); c.appendChild(vv); }
+        else { const n = document.createElement("div"); n.className = "capnone"; n.textContent = "прев'ю ще готується"; c.appendChild(n); }
+        const lab = document.createElement("span"); if (mm.no) { const no = document.createElement("b"); no.className = "menuno"; no.textContent = mm.no; lab.appendChild(no); } lab.appendChild(document.createTextNode(mm.ua)); c.appendChild(lab);
+        c.addEventListener("click", () => add(mm.no ? `№${mm.no} ${mm.n}: ${mm.ua}` : `${mm.n}: ${mm.ua}`, 3));
+        grid.appendChild(c);
+      }
+      if (!list.children.length) list.innerHTML = `<p class="mode">Нічого не знайшлось. Спробуй інше слово або «Описати своїми словами».</p>`;
+    };
+    q.addEventListener("input", draw); draw();
+  };
+  d.querySelectorAll(".apmodes button").forEach(b => b.onclick = () => show(b.dataset.m));
+  show("lib"); d.showModal();
 }
 function tlScrub(e) {   // drag the playhead (or press the ruler / an empty track) to scrub: the frame above follows
   if (e.button) return;
@@ -2084,7 +2155,7 @@ async function load(id) {
       if (dirty) { clearTimeout(timer); saveNow(); } await saving.catch(() => {});
       const before = R.claudeRound || 0; R = s.data(); recompute(); renderAll(); setPos(pos); overlay(pos);
       if ((R.claudeRound || 0) > before) { showTab("graphics"); const n = GFX.filter(g => !g.user && !g.own && !g.gone).length;
-        $("#banner").textContent = `Claude додав пропозиції (${n}). Переглянь кожну: залиш, зміни або прибери. Потім «Зібрати чернетку» внизу.`; $("#banner").hidden = false; pill("Пропозиції Claude готові"); }
+        $("#banner").textContent = `Відео з ефектами готове (${n}). Дивись, прибирай зайве чи додавай «+ Додати» на таймлайні. Потім «Зібрати чернетку» внизу.`; $("#banner").hidden = false; pill("Відео з ефектами готове"); }
       else pill("Claude оновив рілс");
     }, () => {}));
     let firstBuild = true;
@@ -2098,7 +2169,7 @@ async function load(id) {
     recompute();
     $("#reelname").textContent = `${R.title} · оригінал ${fmt(R.srcDur)} → рілс ${fmt(P.cutDur)}`; setPos(0);
     $("#brand").value = S.brandRequest || "";
-    renderAll(); showTab(["cuts", "overlays", "effects", "graphics", "captions", "sound", "mystyle", "preview", "style"].includes(location.hash.slice(1)) ? location.hash.slice(1) : tab || "cuts");
+    renderAll(); showTab(["cuts", "overlays", "graphics", "captions", "sound", "mystyle", "preview", "style"].includes(location.hash.slice(1)) ? location.hash.slice(1) : tab || "cuts");
     pill(rv.exists ? "Збережені рішення завантажено" : "Готово");
     useDefaultStyle();
   } catch (e) { if (live()) pill("Не вдалося завантажити рілс (" + (e?.code || "error") + "). Онови сторінку.", true); }
