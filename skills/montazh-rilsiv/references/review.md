@@ -123,6 +123,8 @@ The same page holds a batch: a «Рілс» picker appears at the top when `reel
 
 ## When they say "build preview"
 
+**«Зібрати чернетку» with «Змінити» notes:** the press means «build the draft». Make every change they asked for and render the DRAFT straight away (`builds/<id>`, step 3 opens by itself); never stop at a new step-2 video and make the press the button again. A change they ask for in chat while on step 2 works the same way unless they say they only wants to see it first.
+
 1. `ArtifactData get review/current` (save to a file). Missing is fine: it means "use the proposal".
 2. `python3 scripts/review_sync.py import <reel> <review.json>` → `edl.json` + `edit.json`. Act on every `CHANGE REQUESTED`, `NOTE` and `REVISION` line it prints before rendering; `HOOK` / `CTA` lines are their approved text: use it word for word (it already went into the title / CTA card), don't ask again; for every `OVERLAY ... DOWNLOAD asset <id>` line, fetch their upload with `Artifact` `action: "read"`, `url` = the page, `path` = that asset id, `out_dir` = `<reel>/overlays` (it lands as `<id>.<ext>`; the card already points there); `BRAND CHANGE REQUESTED` only touches brand.json after they confirm.
 3. `python3 scripts/snap_joins.py <reel>`, `REEL_PREVIEW=1 python3 scripts/cut.py <reel>`, then `python3 scripts/precheck.py <reel>` and fix everything it lists (JOIN, MISSING, CHECK) before the draft: `REEL_DRAFT=1 REEL_PREVIEW=1 bash scripts/render.sh <reel>` → `draft.mp4` (540p, fast). The full-quality final renders only after «Це фінал».
