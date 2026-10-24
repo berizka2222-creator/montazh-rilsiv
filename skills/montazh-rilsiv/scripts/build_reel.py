@@ -639,7 +639,7 @@ for i, c in enumerate(edit.get("cards", [])):
             sizes = [int(px * float(LH.get("scale") or 100) / 100) for px in sizes]   # «Розмір» on the page
             AL = LH.get("align") or brand.get("title_align") or "center"            # «Рядки»: center (default) | zigzag | left | right
             lk = lambda j: LJ[j]
-            back.append(f'<div id="{cid}" class="title" style="{font("head", sizes[0])};top:{c.get("y", brand.get("title_y", 360))}px;left:{c.get("x", 90) - 90}px;letter-spacing:{brand.get("title_tracking", -0.045)}em;text-shadow:none">'
+            back.append(f'<div id="{cid}" class="title" style="{font("head", sizes[0])};top:{c.get("y", brand.get("title_y", 360))}px;left:{c.get("x", 90) - 90}px;letter-spacing:{brand.get("title_tracking", -0.045)}em;text-shadow:none;line-height:{0.88 * float(LH.get("lh") or 100) / 100:.3f}">'
                         + "".join(f'<div class="tl" style="{font(r, px) if r != "head" else f"font-size:{px}px"};text-align:{(("left", "right")[j % 2] if len(lines) > 1 else "center") if AL == "zigzag" else AL}">'
                                   f'<span style="{look_bg(lk(j))}">{look_run(lk(j), esc(x), "hk")}</span></div>' for j, (x, px, r) in enumerate(zip(lines, sizes, roles))) + "</div>")
         else: back.append(f'<div id="{cid}" class="title" style="{font("head", sizes[0])};top:{c.get("y", brand.get("title_y", 360))}px;left:{c.get("x", 90) - 90}px;color:{c.get("color", TITLE_COLOR)};letter-spacing:{brand.get("title_tracking", -0.045)}em">'
@@ -776,7 +776,7 @@ for i, c in enumerate(edit.get("cards", [])):
         sizes = [int(min(fit(x, 200, 200 // 16 + float(L.get("sw") or 0), role=r), brand.get("cta_px", 78) * 1.5) * float(LC.get("scale") or 100) / 100) for x, r, L in zip(lines, roles, LJ)]
         AL = LC.get("align") or "center"
         y = c.get("y", 1360)
-        front.append(f'<div id="{cid}" class="title" style="{font("head", sizes[0])};top:{y}px;left:{c.get("x", 90) - 90}px;letter-spacing:-0.02em;text-shadow:none">'
+        front.append(f'<div id="{cid}" class="title" style="{font("head", sizes[0])};top:{y}px;left:{c.get("x", 90) - 90}px;letter-spacing:-0.02em;text-shadow:none;line-height:{0.88 * float(LC.get("lh") or 100) / 100:.3f}">'
                      + "".join(f'<div class="tl" style="{font(r, px) if r != "head" else f"font-size:{px}px"};text-align:{(("left", "right")[j % 2] if len(lines) > 1 else "center") if AL == "zigzag" else AL}">'
                                f'<span style="{look_bg(LJ[j])}">{look_run(LJ[j], esc(x), "hk")}</span></div>' for j, (x, px, r) in enumerate(zip(lines, sizes, roles))) + "</div>")
         show(f"#{cid}", a, b)

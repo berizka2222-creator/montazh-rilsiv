@@ -398,7 +398,7 @@ function hookEl(g) {   // the hook / CTA on the rough cut, in the picked look (t
   const K = g.type === "cta" ? "cta" : "hook", L = lookOf(K), k = $("#player").clientWidth / 1080, el = document.createElement("div"); el.className = "hookov";
   const lines = g.text.split("/").map(x => x.trim()).filter(Boolean).map(x => K === "hook" && R.style.case === "lower" ? x.toLowerCase() : x);
   const bold = Object.keys((R.fonts || {}).extra || {}).find(f => /bold/i.test(f));   // the brand's head face (Gilroy Bold) when it was uploaded
-  Object.assign(el.style, { top: ((g.place || [])[1] ?? R.titleY ?? 360) / 19.2 + "%", transform: `translateX(${(((g.place || [])[0] ?? 90) - 90) / 10.8}%)`, fontFamily: bold ? "bf_" + bold.replace(/\W/g, "_") + ", rb, var(--f-body)" : "rb, var(--f-body)", fontWeight: bold ? 400 : 700 });
+  Object.assign(el.style, { lineHeight: String(0.88 * (L.lh || 100) / 100), top: ((g.place || [])[1] ?? R.titleY ?? 360) / 19.2 + "%", transform: `translateX(${(((g.place || [])[0] ?? 90) - 90) / 10.8}%)`, fontFamily: bold ? "bf_" + bold.replace(/\W/g, "_") + ", rb, var(--f-body)" : "rb, var(--f-body)", fontWeight: bold ? 400 : 700 });
   lines.forEach((x, j) => {
     const d = document.createElement("div"), s = document.createElement("span"), alt = j % 2 === 1;
     const M = K === "cta" ? { ...L, font: "head", ...((L.lines || [])[j] || {}) } : lineLook(L, j), al = L.align || (K === "hook" && R.titleAlign) || "center";
@@ -494,7 +494,8 @@ function renderHookLook(root, K = "hook") {   // hook and CTA: the same controls
   grid.appendChild(lGroup("Розташування і розмір",
     lSeg("Скільки рядків", [["1", 1], ["2", 2], ["3", 3], ["4", 4]], cnt, setCnt),
     lSeg("Рядки", [["По центру", "center"], ["Зигзаг", "zigzag"], ["Ліворуч", "left"], ["Праворуч", "right"]], L.align || R.titleAlign || "center", set("align")),
-    lSlider("Розмір", 50, 150, 5, L.scale || 100, v => v + "%", set("scale"), live("scale")), how));
+    lSlider("Розмір", 50, 150, 5, L.scale || 100, v => v + "%", set("scale"), live("scale")),
+    lSlider("Міжрядковий інтервал", 60, 180, 5, L.lh || 100, v => v < 90 ? v + "% · щільно" : v > 120 ? v + "% · просторо" : v + "%", set("lh"), live("lh")), how));
   for (let j = 0; j < n; j++) {
     const M = lineLook(L, j), s1 = key => v => setLine(K, j, key, v), lv = key => v => setLine(K, j, key, v, true);
     const t = lines[j] || "", name = `Рядок ${j + 1}` + (t ? ` · «${t.length > 18 ? t.slice(0, 17) + "…" : t}»` : "");
@@ -1708,7 +1709,7 @@ function renderInspector() {
   }
   const txt = g && g.type === "cta" && !g.gone && g.state !== "d" && (g.text || "").trim();   // picked hook / CTA: drag it right on the video
   if (txt && tab === "graphics" && placing?.id !== g.id) setTimeout(() => { if (TLSEL === it.key) startPlacing(g.place || [90, 1000, 900, 320], g.id, true); }, 0);
-  else if (!txt && placing?.id && GFX.some(x => x.id === placing.id && (x.type === "title" || x.type === "cta"))) setTimeout(stopPlacing, 0);
+  else if (!txt && placing?.id && GFX.some(x => x.id === placing.id && x.type === "cta")) setTimeout(stopPlacing, 0);   // only the CTA's drag belongs to this panel; the hook is dragged on step 1
   if (txt) { const h = document.createElement("p"); h.className = "mode"; h.textContent = "Тягни текст прямо на відео, щоб поставити, де подобається."; body.insertBefore(h, body.children[2] || null); }
   if (it.kind === "cta" || it.kind === "ctanew") body.appendChild($("#ctabox"));
 }
