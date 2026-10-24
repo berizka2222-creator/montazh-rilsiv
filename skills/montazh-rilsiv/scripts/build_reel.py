@@ -65,7 +65,7 @@ edit.json (written by auto_edit.py, then Claude marks accents and adds cards):
   (brand overrides, allowed list looks and camera moves, rejected types, motion speed, caption entrance + accent look, sounds per event).
   Image paths: relative to the reel folder, or to ~/reels/assets/, or absolute.
 """
-import base64, html, json, os, re, shutil, subprocess, sys
+import base64, hashlib, html, json, os, re, shutil, subprocess, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import brand_recolor
 from pathlib import Path
@@ -596,7 +596,7 @@ for i, c in enumerate(edit.get("cards", [])):
         kind = "head"; c.setdefault("look", c["name"][5:]); c.setdefault("words", list((c.get("vars") or {}).values())[:1] if c.get("vars") else [])
     if c.get("layout") == "behind": c["behind"] = True   # a catalog motion laid out behind her
     back, mid, front = (behind, behind, behind) if c.get("behind") else (_BACK, _MID, _FRONT)
-    if c.get("quiet"): quiet.append((a, b))      # review_sync: no room for this card and the captions at once
+    if c.get("quiet") or (kind == "motion" and "ім'я / хто я" in MOTION_PRESETS.get(c.get("name"), {}).get("moments", [])): quiet.append((a, b))      # review_sync: no room for this card and the captions at once; a name plate carries its own words
     if c.get("behind"): BEHIND_WIN.append((a, b))
     if kind == "_skip": continue                 # a type the style rejects (see the style block at the top)
     if kind == "bigtext":
@@ -679,6 +679,7 @@ for i, c in enumerate(edit.get("cards", [])):
                         "small-l": (80, 170, 400, 500), "tiny": (760, 260, 200, 200)}.get(mode, (90, 150, 900, 640))   # "box": where they dragged it on the page
         full = ow >= 1080 and oh >= 1920
         if not full and y < CAP_Y + 150 and y + oh > CAP_Y - 60: quiet.append((a, b))   # sits on the caption line: captions step aside
+        elif c.get("brand"): quiet.append((a, b))   # a brand element (list, marker, before/after, title) carries its own words
         fx = c.get("effect", "soft")
         if full and fx in ("polaroid", "glass"): fx = "soft"                 # a frame needs a border around it: not on a full screen
         frame = {"polaroid": "padding:14px 14px 48px;background:#fff;border-radius:6px;box-shadow:0 30px 70px rgba(0,0,0,.35)",
@@ -706,8 +707,16 @@ for i, c in enumerate(edit.get("cards", [])):
             codec = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=codec_name", "-of", "csv=p=0",
                                     str(src)], capture_output=True, text=True).stdout.strip()
             dec = {"vp8": ["-c:v", "libvpx"], "vp9": ["-c:v", "libvpx-vp9"]}.get(codec, [])   # ffmpeg's own VP8/VP9 decoders drop the alpha
-            subprocess.run(["ffmpeg", "-v", "error", "-y", *dec, "-i", str(src), "-an", "-vf", "fps=30", "-c:v", "libvpx", "-pix_fmt", "yuva420p",
-                            "-auto-alt-ref", "0", "-b:v", "8M", "-crf", "6", str(dst)], check=True)
+            # cached per source and size: the VP8 transcode took 17-27 s per element on every build. Drafts get a 540 px copy
+            # (the stage is 540 wide; a 1080 alpha video costs the browser 4x the decoding on every frame)
+            st_ = src.stat(); ck = hashlib.sha1(f"{src.resolve()}|{st_.st_size}|{st_.st_mtime_ns}|{'d' if DRAFT else 'f'}".encode()).hexdigest()[:16]
+            cached = reel / ".cache" / "alpha" / f"{ck}.webm"
+            if not cached.exists():
+                cached.parent.mkdir(parents=True, exist_ok=True)
+                subprocess.run(["ffmpeg", "-v", "error", "-y", *dec, "-i", str(src), "-an", "-vf", "fps=30" + (",scale=540:-2" if DRAFT else ""),
+                                "-c:v", "libvpx", "-pix_fmt", "yuva420p", "-auto-alt-ref", "0", "-b:v", "3M" if DRAFT else "8M", "-crf", "10" if DRAFT else "6",
+                                "-deadline", "realtime" if DRAFT else "good", "-cpu-used", "8" if DRAFT else "1", str(cached)], check=True)
+            link_or_copy(cached, dst)
             media = (f'<video id="{cid}v" src="img/{dst.name}" muted playsinline data-start="{q(a)}" data-duration="{q(b - a)}" '
                      f'data-media-start="0" data-track-index="{9 + i}" style="{cover}"></video>')
         elif src.suffix.lower() in (".mp4", ".mov", ".m4v", ".webm"):
@@ -877,9 +886,21 @@ for i, c in enumerate(edit.get("cards", [])):
                **(c.get("replace") or {})}
         rep = {k: v for k, v in rep.items() if k and not str(v).startswith("<")}   # motions with their text baked in: swap it for their words
         if c.get("_capgroups") is not None:            # a caption style: their words, minus the spans where a card carries the words
-            mt = caption_patch(mt, c["_capgroups"], DUR)   # every group stays (dropping some made the previous one hang on screen)
-            for qa, qb in quiet:                       # the whole caption layer hides while a card carries the words
-                js.append(f'tl.set("#{cid}",{{opacity:0}},{q(max(qa - 0.05, 0))});tl.set("#{cid}",{{opacity:1}},{q(qb)});')
+            # while a card carries the words the captions step aside: the groups in that span go, and the style's own timeline
+            # hides its whole layer for the span (the host clip's opacity can't be animated: it renders apart, and an empty
+            # group just merges into the previous phrase, which then hangs on screen)
+            spans = sorted((max(qa - 0.05, 0), qb) for qa, qb in quiet)
+            merged = []
+            for qa, qb in spans:
+                if merged and qa <= merged[-1][1]: merged[-1][1] = max(merged[-1][1], qb)
+                else: merged.append([qa, qb])
+            hit = lambda g: any(g["start"] < qb and g.get("end", g["start"]) > qa + 0.05 for qa, qb in merged)
+            mt = caption_patch(mt, [g for g in c["_capgroups"] if not hit(g)], DUR)
+            if merged:
+                hide = json.dumps([[round(a, 3), round(b, 3)] for a, b in merged])
+                mt = re.sub(r'(window\.__timelines\[(["\'])([^"\']+)\2\]\s*=\s*(\w+)\s*;)',
+                            lambda m_: m_.group(1) + f'(function(T,id){{var k=document.querySelectorAll(\'[data-composition-id="\'+id+\'"] > *\');'
+                                       f'{hide}.forEach(function(s){{T.set(k,{{autoAlpha:0}},s[0]);T.set(k,{{autoAlpha:1}},s[1]);}});}})({m_.group(4)},"{m_.group(3)}");', mt, count=1)
         if _cm.get("avatar") or c.get("avatar"):         # someone else's logo in the avatar slot -> their photo
             av = avatar_img(c.get("avatar"))
             if av:

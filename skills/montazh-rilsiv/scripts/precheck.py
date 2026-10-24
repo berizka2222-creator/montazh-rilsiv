@@ -15,7 +15,13 @@ sys.path.insert(0, str(HERE))
 from pacing import pacing
 SPEED = pacing(json.load(open(Path(os.environ.get("REELS_HOME", "~/reels")).expanduser() / "brand.json")))["speed"]
 norm = lambda s: re.sub(r"[\W_]", "", s.lower())
-subprocess.run([sys.executable, str(HERE / "transcribe.py"), str(reel / "master.mp4"), str(reel / "master_transcript.json")], check=True)
+# the cut didn't change since the last transcription (cut.py's .master_key, master.mp4 older than the transcript): reuse it
+_mk, _mt = reel / ".master_key", reel / "master_transcript.json"
+_tk = reel / ".master_transcript_key"
+if not (_mt.exists() and _mk.exists() and _tk.exists() and _tk.read_text() == _mk.read_text() and _mt.stat().st_mtime >= (reel / "master.mp4").stat().st_mtime):
+    subprocess.run([sys.executable, str(HERE / "transcribe.py"), str(reel / "master.mp4"), str(_mt)], check=True)
+    if _mk.exists(): _tk.write_text(_mk.read_text())
+else: print("master_transcript.json is up to date (same cut): not transcribing again")
 mt = json.load(open(reel / "master_transcript.json"))
 ed = json.load(open(reel / "edit.json"))
 edl = json.load(open(reel / "edl.json"))

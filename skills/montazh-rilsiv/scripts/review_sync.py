@@ -260,7 +260,7 @@ def do_import(reel, review):
         spec.update(start=round(g["start"], 3), end=round(g["end"], 3), id=g["id"])
         if (d.get("sfxSwap") or {}).get(g["id"]) and isinstance(spec.get("sfx"), dict): spec["sfx"] = {**spec["sfx"], "name": d["sfxSwap"][g["id"]]}
         if g["id"] in (d.get("sfxOff") or {}) and d["sfxOff"][g["id"]]: spec["sfx"] = False
-        if g.get("type") == "overlay":   # uploaded on the page: Claude downloads the asset into <reel>/overlays/ before rendering
+        if g.get("type") == "overlay" and g.get("assetId"):   # uploaded on the page: Claude downloads the asset into <reel>/overlays/ before rendering (Claude's own brand overlays carry their src)
             spec = {k: v for k, v in spec.items() if k not in ("imgUrl", "user", "media", "file", "memeText", "findOpt")}
             spec["src"] = f"overlays/{g['assetId']}"
             have = list((reel / "overlays").glob(g["assetId"] + ".*")) if (reel / "overlays").exists() else []
