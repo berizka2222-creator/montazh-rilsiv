@@ -548,6 +548,14 @@ section[data-p="captions"] .lookcards{counter-reset:none}
 #addpick .apbody{overflow:auto;min-height:120px}
 #addpick .apq,#addpick .apown{width:100%;box-sizing:border-box;margin-bottom:8px}
 #addpick .capopt{text-align:left}
+#sfxpick,.pickdlg{border:1px solid var(--line);border-radius:18px;padding:0;background:var(--bg);color:var(--ink);width:min(640px,94vw);max-height:88vh}
+.pickdlg::backdrop{background:rgba(0,0,0,.7)}
+#sfxpick .apin{padding:14px 16px;display:flex;flex-direction:column;gap:10px;max-height:86vh}#sfxpick .aphead{display:flex;justify-content:space-between;align-items:center;gap:10px}#sfxpick .apbody{overflow:auto}
+.sfxtop{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sfxgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:6px}
+.sfxopt{display:flex;gap:4px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:3px}.sfxopt.on{border-color:var(--accent);background:var(--now)}
+.sfxopt .sfxname{flex:1;text-align:left;background:none;border:0;color:var(--ink);font:500 13px var(--f-body);cursor:pointer;padding:6px}
+.tlb.t4{background:rgba(210,219,118,.35);color:var(--ink);cursor:pointer;font-size:10px}.tlb.t4.off{background:transparent;border:1px dashed var(--line);color:var(--muted)}
 .tladd{padding:4px 12px;font-size:13px}
 .tab[hidden]{display:none!important}
 .tlhead{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:6px}.tlhead b{font-size:14px}.tlhead .mode{font-size:12px}
@@ -843,8 +851,6 @@ body.scrubbing,body.scrubbing *{cursor:ew-resize!important;user-select:none}
         <div class="ctl" style="margin-top:6px"><input type="text" id="cutnote" placeholder="Що не так у нарізці в цей момент (склейка, зайве слово)"><button class="b" id="cutadd" type="button">Нотатка на цю секунду</button></div>
         <div id="cutnotes"></div>
       </div>
-      <details class="panel" id="cuesbox" open><summary><b>Звуки на графіці</b> <span class="mode">кожен ефект, твій і від Claude: заміни звук, послухай або вимкни</span></summary>
-        <div id="cues" style="margin-top:8px"></div></details>
       <details class="panel alllist" id="alllist"><summary><b>Усі елементи списком</b> <span class="tally" id="gtally"></span></summary>
         <div class="cards" id="cards"><div class="empty">Графіка з'явиться тут, коли рілс завантажиться.</div></div></details>
     </section>
