@@ -410,7 +410,7 @@ def fx_todo(c, e):
     im = rrect(cw, pad * 2 + lh * (len(items) + 1), cw * 0.07, (250, 248, 242, 235)); d = ImageDraw.Draw(im)
     done = sum(c.lt >= t for t in ticks)
     d.text((pad, pad), e.o.get('title', 'TO DO').upper(), font=font('ui', lh * 0.42), fill=(200, 140, 20, 255))
-    d.text((cw - pad, pad), f'{done} of {len(items)}', font=font('ui', lh * 0.36), fill=(120, 120, 120, 255), anchor='ra')
+    d.text((cw - pad, pad), f'{done} з {len(items)}', font=font('ui', lh * 0.36), fill=(120, 120, 120, 255), anchor='ra')
     f = font('ui', lh * 0.4)
     for i, it in enumerate(items):
         y = pad + lh * (i + 1); bx = lh * 0.42
@@ -1220,7 +1220,7 @@ def fx_checklist(c, e):
         d.line([(sx, sy), (sx + 18 * u * math.cos(ang + math.pi / 4), sy + 18 * u * math.sin(ang + math.pi / 4))], fill=(217, 119, 87, 255), width=int(5 * u))
     d.text((80 * u, hh / 2), e.o.get('title', 'Claude is editing your clip'), font=font('uib', 42 * u), fill=(255, 255, 255, 255), anchor='lm')
     nd = sum(c.lt >= t for t in done_at)
-    d.text((cw - 36 * u, hh / 2), f'{nd} of {n}', font=font('uim', 28 * u), fill=(170, 170, 176, 255), anchor='rm')
+    d.text((cw - 36 * u, hh / 2), f'{nd} з {n}', font=font('uim', 28 * u), fill=(170, 170, 176, 255), anchor='rm')
     d.line([(30 * u, hh), (cw - 30 * u, hh)], fill=(255, 255, 255, 30), width=max(1, int(2 * u)))
     for i, (txt, meta) in enumerate([(r + [''])[:2] for r in rows]):
         y = hh + 13 * u + rh * i + rh / 2; x = 56 * u; r_ = 24 * u
@@ -1893,9 +1893,9 @@ class Tracker:
         from mediapipe.tasks.python.core.base_options import BaseOptions
         self.mp = mp
         self.seg = vision.ImageSegmenter.create_from_options(vision.ImageSegmenterOptions(
-            base_options=BaseOptions(model_asset_path=os.path.join(ROOT, 'models', 'selfie_segmenter.tflite')),
+            base_options=BaseOptions(model_asset_path=os.path.join(os.environ.get('FX_MODELS') or os.path.join(ROOT, 'models'), 'selfie_segmenter.tflite')),
             running_mode=vision.RunningMode.VIDEO, output_confidence_masks=True, output_category_mask=False))
-        self.fd = cv2.FaceDetectorYN.create(os.path.join(ROOT, 'models', 'yunet.onnx'), '', (aw, ah), 0.6, 0.3, 20)
+        self.fd = cv2.FaceDetectorYN.create(os.path.join(os.environ.get('FX_MODELS') or os.path.join(ROOT, 'models'), 'yunet.onnx'), '', (aw, ah), 0.6, 0.3, 20)
         self.prev = None
 
     def __call__(self, rgb, ms):

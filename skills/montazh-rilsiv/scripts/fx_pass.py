@@ -68,6 +68,18 @@ def vpython():
     sys.exit("setup_fx.sh did not create the Python for the effects")
 
 
+def models_env():
+    """MediaPipe / OpenCV can't open a model under a non-Latin path (C:\\Users\\Інна...): use a Latin-only copy then."""
+    src = VD / "models"
+    if str(src).isascii(): return {}
+    import tempfile
+    dst = (Path(os.environ.get("PUBLIC", "C:/Users/Public")) / "montazh-rilsiv" / "fx-models") if os.name == "nt" else Path(tempfile.gettempdir()) / "montazh-rilsiv-fx-models"
+    dst.mkdir(parents=True, exist_ok=True)
+    for f in src.iterdir():
+        if f.is_file() and (not (dst / f.name).exists() or (dst / f.name).stat().st_size != f.stat().st_size): shutil.copy(f, dst / f.name)
+    return {"FX_MODELS": str(dst)}
+
+
 def brand_env(py):
     """FX_FONTS / FX_COLORS: the brand's head / body / accent fonts (as .ttf: Pillow can't read .woff2) and accent colours."""
     b = json.load(open(HOME / "brand.json", encoding="utf-8")) if (HOME / "brand.json").exists() else {}
@@ -150,7 +162,7 @@ def main():
                 "-g", "30", "-c:a", "copy", m540)
         base = m540
     width = 540 if DRAFT else int(os.environ.get("REEL_FX_WIDTH", "1080"))
-    py = vpython(); env = {**os.environ, **brand_env(py), "PYTHONUTF8": "1"}
+    py = vpython(); env = {**os.environ, **brand_env(py), **models_env(), "PYTHONUTF8": "1"}
     th = thumbs(reel, reel / "master.mp4"); D = dur_of(base)
     # effects whose seconds (with 0.4 s around them) overlap go through the effect engine together, so they stack
     groups = []
@@ -197,7 +209,7 @@ def previews():
     """3 s menu clips of every effect on this reel (the «+ Додати» library shows them)."""
     reel = Path(sys.argv[1]).expanduser().resolve()
     names = sys.argv[sys.argv.index("--names") + 1].split(",") if "--names" in sys.argv else None
-    py = vpython(); env = {**os.environ, **brand_env(py), "PYTHONUTF8": "1"}
+    py = vpython(); env = {**os.environ, **brand_env(py), **models_env(), "PYTHONUTF8": "1"}
     base = reel / "master.mp4"; th = thumbs(reel, base)
     D = dur_of(base); a = min(max(1.0, D * 0.3), max(0.0, D - 4.0))
     menu = HOME / "menu"; menu.mkdir(parents=True, exist_ok=True)
