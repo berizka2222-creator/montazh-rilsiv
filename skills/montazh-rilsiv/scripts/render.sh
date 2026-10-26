@@ -39,7 +39,12 @@ if [ -n "${REEL_DRAFT:-}" ]; then   # fast review draft at 540x960 (build_reel.p
   nice -n "$NI" npx -y hyperframes@0.8.145 render "$REEL/proj" --workers "${REEL_DRAFT_WORKERS:-$([ "$MEM_GB" -le 8 ] && echo 2 || echo 3)}" --no-low-memory-mode --gpu -o "$REEL/draft.mp4" --quality draft --quiet
   stamp "render:end"; echo "draft: $REEL/draft.mp4"; exit 0
 fi
-nice -n "$NI" npx -y hyperframes@0.8.145 render "$REEL/proj" --workers "$WORKERS" -o "$REEL/final.mp4" --resolution "$RES" --quality delivery --crf "${REEL_CRF:-14}" --quiet   # CRF 14: graphics and skin stay clean through Instagram's own re-encode
+if ! nice -n "$NI" npx -y hyperframes@0.8.145 render "$REEL/proj" --workers "$WORKERS" -o "$REEL/final.mp4" --resolution "$RES" --quality delivery --crf "${REEL_CRF:-14}" --quiet; then   # CRF 14: graphics and skin stay clean through Instagram's own re-encode
+  # 2026-10-26: on an 8 GB Mac the one-worker (low-memory, sequential) capture stalled at the same frames 8 times in a row;
+  # two parallel workers got through (frames they miss are retried on one worker). Same path the drafts take.
+  echo "final render failed: retrying with 2 parallel workers"
+  nice -n "$NI" npx -y hyperframes@0.8.145 render "$REEL/proj" --workers 2 --no-low-memory-mode -o "$REEL/final.mp4" --resolution "$RES" --quality delivery --crf "${REEL_CRF:-14}" --quiet
+fi
 stamp "render:end"
 # Final mix. Optional music bed (brand.json "music": path) sits ~18 dB under the voice and ducks further while she talks.
 # Then bring the whole mix to -14 LUFS (video copied, not re-encoded).
