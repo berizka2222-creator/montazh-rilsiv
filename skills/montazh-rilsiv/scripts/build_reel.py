@@ -509,6 +509,38 @@ def shader_transition(src, comp, join, half, frame_px):
 # the face (scripts/face_box.py -> face.json {"box": [x, y, w, h]}, cut-reel pixels): lists and steps never cover it
 _fj = reel / "face.json"
 FACE = json.load(open(_fj)).get("box") if _fj.exists() else None
+SPLIT_PANEL = 960                                # the screen splits exactly in half (reference reel, 2026-10-26)
+def split_frame(panel=SPLIT_PANEL, head=0.10, face=0.34):
+    """How her video sits in the lower window of a top/bottom split: (x, y, scale) for a 1080x1920 video with
+    transform-origin 0 0 inside the window. Like the reference: the video is zoomed in so the top of her hair is
+    `head` (~10%) of the window below the split line and hair+face take `face` (~34%) of the window height; centred
+    on the face, never showing an edge of the video. face.json box = hair + face."""
+    wh = H - panel
+    fx, fy, fw, fh = FACE or (300, 500, 480, 600)
+    s = max(1.0, min(1.9, face * wh / max(fh, 1)))
+    x = min(0, max(W - s * W, W / 2 - s * (fx + fw / 2)))
+    y = min(0, max(wh - s * H, head * wh - s * fy))
+    return round(x), round(y), round(s, 3)
+def split_html(sid, a, b, track, panel, bg, inner=""):
+    """The split layer: her video in the lower window (framed by split_frame) and the panel on top (inner = its content)."""
+    return (f'<div id="{sid}" class="sp" style="opacity:0;visibility:hidden">'
+            f'<div class="spw" style="left:0;top:0;width:1080px;height:1920px"><div class="spv" style="position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:0 0">'
+            f'<video src="master.mp4" muted playsinline data-start="{q(a)}" data-duration="{q(b - a)}" data-media-start="{q(a)}" data-track-index="{track}" style="width:1080px;height:1920px"></video></div></div>'
+            f'<div class="spp" style="left:0;top:0;width:1080px;height:{panel}px;background:{bg};box-shadow:0 6px 22px rgba(0,0,0,.18)">{inner}</div></div>')
+def split_js(sid, a, b, panel, enter="cut"):
+    """enter "cut" (default, like the reference): the frame is split from the first frame and back on a hard cut, so
+    splits placed back to back read as one long split while the panel's content changes. "slide": the old animated split."""
+    x, y, s = split_frame(panel)
+    if enter != "slide":
+        return (f'tl.set("#{sid}",{{autoAlpha:1}},{q(a)});tl.set("#{sid} .spw",{{top:{panel},height:{H - panel}}},{q(a)});'
+                f'tl.set("#{sid} .spv",{{x:{x},y:{y},scale:{s}}},{q(a)});tl.set("#{sid}",{{autoAlpha:0}},{q(b)});')
+    return (f'tl.set("#{sid}",{{autoAlpha:1}},{q(a)});'
+            f'tl.to("#{sid} .spw",{{top:{panel},height:{H - panel},duration:0.55,ease:"power3.inOut"}},{q(a)});'
+            f'tl.to("#{sid} .spv",{{x:{x},y:{y},scale:{s},duration:0.55,ease:"power3.inOut"}},{q(a)});'
+            f'tl.fromTo("#{sid} .spp",{{clipPath:"inset(0% 0% 100% 0%)"}},{{clipPath:"inset(0% 0% 0% 0%)",duration:0.55,ease:"power3.inOut"}},{q(a)});'
+            f'tl.to("#{sid} .spv",{{x:0,y:0,scale:1,duration:0.45,ease:"power3.inOut"}},{q(b - 0.45)});'
+            f'tl.to("#{sid} .spw",{{top:0,height:{H},duration:0.45,ease:"power3.inOut"}},{q(b - 0.45)});'
+            f'tl.to("#{sid} .spp",{{clipPath:"inset(0% 0% 100% 0%)",duration:0.45,ease:"power3.inOut"}},{q(b - 0.45)});tl.set("#{sid}",{{autoAlpha:0}},{q(b)});')
 def off_face(c, h, default_y):
     """Where a block of height h goes so it misses the face: (y, scale). Below the chin if it fits above Instagram's
     bottom bar, else above the head, else shrunk into the bigger of the two gaps. "behind": true or "keep_y": true = as given."""
@@ -562,9 +594,9 @@ _mnames = [k.get("name") for k in edit.get("cards", []) if k["type"] == "motion"
 for n in sorted({n for n in _mnames if _mnames.count(n) > 1}): print(f"variety: motion '{n}' is used {_mnames.count(n)} times - pick another from scripts/motions.py menu")
 for k in range(len(_seq) - 2):
     if _seq[k] == _seq[k + 1] == _seq[k + 2]: print(f"variety: three '{_seq[k]}' graphics in a row - swap one for another motion")
-# 2026-10-24: splits / push-ins are rare, and a reel of plain text effects looks basic
-_frame = [k for k in edit.get("cards", []) if k["type"] in ("split", "push", "steps")]
-if len(_frame) > 1: print(f"variety: {len(_frame)} split / push / steps cards - keep at most one per reel unless she asked for them")
+# 2026-10-24: push-ins are rare, and a reel of plain text effects looks basic
+_frame = [k for k in edit.get("cards", []) if k["type"] in ("push", "steps")]   # splits are a regular tool since 2026-10-26: only push / steps stay rare
+if len(_frame) > 1: print(f"variety: {len(_frame)} push / steps cards - keep at most one per reel unless asked for them")
 try:
     sys.path.insert(0, str(Path(__file__).resolve().parent)); from motions import is_simple as _simple, CAT as _CATF; _CAT = {m["name"]: m for m in _CATF["motions"]}
     _mm = [m for m in (_CAT.get(n) for n in _mnames) if m]
@@ -878,6 +910,8 @@ for i, c in enumerate(edit.get("cards", [])):
         if not src:
             print(f"warning: motion {c['name']!r} not cached - add it: cd {HF} && npx hyperframes add {c['name']}"); continue
         c = {**MOTION_PRESETS.get(c["name"], {}).get("card", {}), **c, "_own": tuple(c)}   # tested placement / tone, the card wins
+        if c.get("layout") in ("split", "full", "dim") and "layout" in c["_own"] and "place" not in c["_own"]:
+            c.pop("place", None)                         # the card asked for a split / full frame: the catalog's band (low/top/chest) would undo it
         rel = mount(src); txt = src.read_text()
         if not re.search(r'data-composition-id="([^"]+)"', txt):
             print(f"warning: motion {c['name']!r} is a raw snippet with no composition (wrap_snippets.py could not wrap it): skipped"); continue
@@ -995,28 +1029,17 @@ for i, c in enumerate(edit.get("cards", [])):
                 bx, by, bw_, bh_ = c["box"]; c["box"] = [round(bx + (bw_ - bh_) / 2), by, bh_, bh_]
             if fixed: c["box"] = fit_into(*c["box"])
         if layout == "split":
-            PANEL = c.get("panel", 820 if fixed else 1080)   # size-free motions size their text by the panel: a taller panel reads on a phone                  # the brand panel's height; she keeps the rest of the frame
-            fx, fy, fw, fh = FACE or (300, 500, 480, 600)
-            # the renderer ignores object-position: the video keeps its full 1080x1920 box and slides up by `off`, so the window
-            # shows her from just above the head down, not the ceiling and the top of her head (2026-10-24)
-            off = round(min(max(0, fy + 0.64 * fh - 0.45 * (H - PANEL)), PANEL))   # face centre (face.json box = hair + face, the face itself is its lower 60%) at 45% of the window
+            PANEL = c.get("panel", SPLIT_PANEL)          # exactly half: the motion on top, she keeps talking in the lower half
             area = (40, 240, 1000, PANEL - 280)          # under Instagram's top bar, inside the panel
             if not own_box:
                 c["box"] = fit_into(*area) if fixed else list(area)
                 if fixed:   # catalog motions are drawn for 16:9 with wide margins: blow them up to fill the panel (the overspill is panel colour)
                     z = zget(c, 1.25); bx, by, bw_, bh_ = c["box"]
                     c["box"] = [round(bx - bw_ * (z - 1) / 2), round(by - bh_ * (z - 1) / 2), round(bw_ * z), round(bh_ * z)]
-            mid.append(f'<div id="{cid}s" class="sp" style="opacity:0;visibility:hidden">'
-                       f'<div class="spw" style="left:0;top:0;width:1080px;height:1920px"><div class="spv" style="position:absolute;left:0;top:0;width:1080px;height:1920px"><video src="master.mp4" muted playsinline data-start="{q(a)}" '
-                       f'data-duration="{q(b - a)}" data-media-start="{q(a)}" data-track-index="{9 + i}" style="width:1080px;height:1920px"></video></div></div>'
-                       f'<div class="spp" style="left:0;top:0;width:1080px;height:{PANEL}px;background:{panel_bg}"></div></div>')
-            js.append(f'tl.set("#{cid}s",{{autoAlpha:1}},{q(a)});'
-                      f'tl.to("#{cid}s .spw",{{top:{PANEL},height:{H - PANEL},duration:0.55,ease:"power3.inOut"}},{q(a)});'
-                      f'tl.to("#{cid}s .spv",{{y:{-off},duration:0.55,ease:"power3.inOut"}},{q(a)});tl.to("#{cid}s .spv",{{y:0,duration:0.45,ease:"power3.inOut"}},{q(b - 0.45)});'
-                      f'tl.fromTo("#{cid}s .spp",{{clipPath:"inset(0% 0% 100% 0%)"}},{{clipPath:"inset(0% 0% 0% 0%)",duration:0.55,ease:"power3.inOut"}},{q(a)});'
-                      f'tl.to("#{cid}s .spw",{{top:0,height:{H},duration:0.45,ease:"power3.inOut"}},{q(b - 0.45)});'
-                      f'tl.to("#{cid}s .spp",{{clipPath:"inset(0% 0% 100% 0%)",duration:0.45,ease:"power3.inOut"}},{q(b - 0.45)});tl.set("#{cid}s",{{autoAlpha:0}},{q(b)});')
-            sfx("whoosh_soft", b - 0.45, -16); quiet.append((a, b)); zone(cid, "split", a, b, (0, 0, W, H), full=True)
+            mid.append(split_html(f"{cid}s", a, b, 9 + i, PANEL, panel_bg))
+            js.append(split_js(f"{cid}s", a, b, PANEL, c.get("enter", "cut")))
+            if c.get("enter") == "slide": sfx("whoosh_soft", b - 0.45, -16)
+            quiet.append((a, b)); zone(cid, "split", a, b, (0, 0, W, H), full=True)
         elif layout == "dim":   # an effect too big to keep off the face: the video stays as a dimmed background, the effect on top
             if not own_box:
                 c["box"] = fit_into(40, 240, 1000, 1400) if fixed else [40, 240, 1000, 1400]
@@ -1168,7 +1191,7 @@ for i, c in enumerate(edit.get("cards", [])):
         bg = c.get("color", MAIN); fg = LIGHT if bg.lower() in (MAIN.lower(), C.get("deep", "").lower()) else MAIN
         rt = row_times(c, a, b, len(rows))
         fx, fy, fw, fh = FACE or (300, 500, 480, 600)
-        PANEL = c.get("panel", 760)          # the brand panel's share; the person keeps the rest (more of them than half)
+        PANEL = c.get("panel", SPLIT_PANEL if side != "left" else 760)   # top/bottom: exactly half, like the reference
         if side == "left":   # person left, panel right; the window is centred on the face
             win0, win1, pan, tx = "left:0;top:0;width:1080px;height:1920px", {"width": W - PANEL // 2}, f"left:{W - PANEL // 2}px;top:0;width:{PANEL // 2}px;height:1920px", (W - PANEL // 2 + 40, 300, PANEL // 2 - 80)
             clip0 = "inset(0% 0% 0% 100%)"
@@ -1181,14 +1204,24 @@ for i, c in enumerate(edit.get("cards", [])):
         tpx = min(fit(c.get("title", ""), 104 if side != "left" else 64), 104)
         room = (PANEL if side != "left" else 1480) - 30 - tx[1] - tpx * 1.3     # rows must end inside the panel / above the bottom bar
         rpx = int(min(fit(max(rows, key=len, default=""), 64 if side != "left" else 46), 64, room / max(len(rows), 1) / 1.55))
-        mid.append(f'<div id="{cid}" class="sp" style="opacity:0;visibility:hidden">'
+        if side != "left":   # the title + rows sit in the middle of the panel, close to the split line like the reference, not stuck at the top
+            tx = (tx[0], round(max(tx[1], tx[1] + (PANEL - 60 - tx[1] - tpx * 1.3 - len(rows) * rpx * 1.55) / 2)), tx[2])
+        inner = (f'<div class="spt" style="left:{tx[0] - (540 if side == "left" else 0)}px;top:{tx[1]}px;width:{tx[2]}px;{font("head", tpx)};color:{fg}">{esc(case(c.get("title", "")))}</div>'
+                 + "".join(f'<div class="spr" id="{cid}r{j}" style="left:{tx[0] - (540 if side == "left" else 0)}px;top:{tx[1] + tpx * 1.3 + j * rpx * 1.55:.0f}px;width:{tx[2]}px;{font("body", rpx)};color:{fg}"><b style="background:{POP}"></b>{esc(r)}</div>' for j, r in enumerate(rows)))
+        if side != "left":   # top/bottom: her video zoomed into the lower half (split_frame), hard cut in and out by default
+            mid.append(split_html(cid, a, b, 9 + i, PANEL, bg, inner))
+            js.append(split_js(cid, a, b, PANEL, c.get("enter", "cut"))
+                      + f'tl.fromTo("#{cid} .spt",{{y:40,opacity:0}},{{y:0,opacity:1,duration:0.4,ease:"power3.out"}},{q(a + 0.1)});'
+                      + "".join(f'tl.fromTo("#{cid}r{j}",{{autoAlpha:0,x:-50}},{{autoAlpha:1,x:0,duration:0.3,ease:"back.out(2)"}},{q(t)});' for j, t in enumerate(rt)))
+        else:
+          mid.append(f'<div id="{cid}" class="sp" style="opacity:0;visibility:hidden">'
                    f'<div class="spw" style="{win0}"><div id="{cid}v" style="position:absolute;left:0;top:0;width:1080px;height:1920px"><video src="master.mp4" muted playsinline data-start="{q(a)}" data-duration="{q(b - a)}" data-media-start="{q(a)}" data-track-index="{9 + i}" style="width:1080px;height:1920px"></video></div></div>'
                    f'<div class="spp" style="{pan};background:{bg}">'
                    f'<div class="spt" style="left:{tx[0] - (540 if side == "left" else 0)}px;top:{tx[1]}px;width:{tx[2]}px;{font("head", tpx)};color:{fg}">{esc(case(c.get("title", "")))}</div>'
                    + "".join(f'<div class="spr" id="{cid}r{j}" style="left:{tx[0] - (540 if side == "left" else 0)}px;top:{tx[1] + tpx * 1.3 + j * rpx * 1.55:.0f}px;width:{tx[2]}px;{font("body", rpx)};color:{fg}"><b style="background:{POP}"></b>{esc(r)}</div>' for j, r in enumerate(rows))
                    + '</div></div>')
-        prop = ",".join(f"{k}:{v}" for k, v in win1.items()); back_ = ",".join(f"{k}:{ {'width': W, 'top': 0, 'height': H}[k]}" for k in win1)
-        js.append(f'tl.set("#{cid}",{{autoAlpha:1}},{q(a)});'
+          prop = ",".join(f"{k}:{v}" for k, v in win1.items()); back_ = ",".join(f"{k}:{ {'width': W, 'top': 0, 'height': H}[k]}" for k in win1)
+          js.append(f'tl.set("#{cid}",{{autoAlpha:1}},{q(a)});'
                   f'tl.to("#{cid} .spw",{{{prop},duration:0.55,ease:"power3.inOut"}},{q(a)});'
                   + "".join(f'tl.to("#{cid}v",{{{ {"top": "y", "left": "x"}[k]}:{v},duration:0.55,ease:"power3.inOut"}},{q(a)});tl.to("#{cid}v",{{{ {"top": "y", "left": "x"}[k]}:0,duration:0.45,ease:"power3.inOut"}},{q(b - 0.45)});' for k, v in vmove.items())
                   + f'tl.fromTo("#{cid} .spp",{{clipPath:"{clip0}"}},{{clipPath:"inset(0% 0% 0% 0%)",duration:0.55,ease:"power3.inOut"}},{q(a)});'
@@ -1196,7 +1229,7 @@ for i, c in enumerate(edit.get("cards", [])):
                   + "".join(f'tl.fromTo("#{cid}r{j}",{{autoAlpha:0,x:-50}},{{autoAlpha:1,x:0,duration:0.3,ease:"back.out(2)"}},{q(t)});' for j, t in enumerate(rt))
                   + f'tl.to("#{cid} .spw",{{{back_},duration:0.45,ease:"power3.inOut"}},{q(b - 0.45)});'
                   f'tl.to("#{cid} .spp",{{clipPath:"{clip0}",duration:0.45,ease:"power3.inOut"}},{q(b - 0.45)});tl.set("#{cid}",{{autoAlpha:0}},{q(b)});')
-        sfx("whoosh_soft", a - 0.05, -13); sfx("whoosh_soft", b - 0.45, -16)
+        if side == "left" or c.get("enter") == "slide": sfx("whoosh_soft", a - 0.05, -13); sfx("whoosh_soft", b - 0.45, -16)
         for t in rt: sfx("pop", t, -16, "lots")
         zone(cid, "split", a, b, (0, 0, W, H), full=True)
         zone(cid, "split text", a, b, (tx[0], tx[1], tx[2], tpx * 1.3 + len(rows) * rpx * 1.55))
