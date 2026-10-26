@@ -211,7 +211,7 @@ if done:
     for i, c in enumerate(done):
         ins += ["-i", str(out / f"{c.get('id') or c['type']}.jpg")]
         txt = f"{c.get('id')} {label(c)} {c['start']:.1f}s"[:30]
-        dt = f",drawtext=fontfile='{font}':text='{esc(txt)}':x=6:y={H + 8}:fontsize=17:fontcolor=black" if font and DRAWTEXT else ""
+        dt = f",drawtext=fontfile='{font.replace(':', chr(92) + ':')}':text='{esc(txt)}':x=6:y={H + 8}:fontsize=17:fontcolor=black" if font and DRAWTEXT else ""
         fl.append(f"[{i}:v]scale={W}:{H},pad={W}:{H + T}:0:0:white{dt}[p{i}]")
     rows = (len(done) + N - 1) // N; cols = min(N, len(done))
     for k in range(len(done), rows * cols):
@@ -220,6 +220,11 @@ if done:
     fl.append("".join(f"[p{k}]" for k in range(rows * cols)) + (f"xstack=inputs={rows * cols}:layout={lay}" if rows * cols > 1 else "null") + "[o]")
     r = subprocess.run(["ffmpeg", "-v", "error", "-y", *ins, "-filter_complex", ";".join(fl), "-map", "[o]", "-frames:v", "1", "-q:v", "3",
                         str(out / "sheet.jpg")], capture_output=True, text=True)
+    if r.returncode and DRAWTEXT:   # a label the text filter can't take must never cost the sheet: again without labels
+        DRAWTEXT = False
+        fl = [re.sub(r",drawtext=[^\[]*", "", x) for x in fl]
+        r = subprocess.run(["ffmpeg", "-v", "error", "-y", *ins, "-filter_complex", ";".join(fl), "-map", "[o]", "-frames:v", "1", "-q:v", "3",
+                            str(out / "sheet.jpg")], capture_output=True, text=True)
     print(f"frames: {len(done)} -> {out / 'sheet.jpg'}" if r.returncode == 0 else "sheet failed: " + r.stderr[-300:])
     if not DRAWTEXT:   # this ffmpeg has no text filter: the order, left to right, top to bottom
         for i, c in enumerate(done, 1): print(f"  {i:2d}. {c.get('id')} {label(c)} {c['start']:.1f}s")
