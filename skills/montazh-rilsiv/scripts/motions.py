@@ -26,6 +26,16 @@ SUGGEST = ("ready", "replace")
 READY = [m for m in CAT["motions"] if m.get("status") in SUGGEST]
 FULL = [m for m in CAT["motions"] if m.get("status") == "full_only"]
 HOME = Path(os.environ.get("REELS_HOME", "~/reels")).expanduser()
+# Their black list (<REELS_HOME>/blacklist.json, grows reel by reel): effects they don't want are never suggested.
+# {"items": [{"name": "notification-cascade", "why": "...", "date": "2026-10-26", "rebuild": true}]}; rebuild = comes back
+# once it is rebuilt the way they asked (then drop the item).
+def blacklist():
+    f = HOME / "blacklist.json"
+    try: return {i["name"]: i for i in json.load(open(f)).get("items", [])} if f.exists() else {}
+    except Exception: return {}
+BLACK = blacklist()
+READY = [m for m in READY if m["name"] not in BLACK]
+FULL = [m for m in FULL if m["name"] not in BLACK]
 # Brand motion library (Remotion, ~/motion, skill motion-brand): suggested on equal terms with the catalog, as "brand:<Element>".
 # They go in as transparent overlay cards with "brand": "<Element>" (that field is how the log and "used here" see them).
 BRAND_LIB = Path(os.environ.get("MOTION_HOME", "~/motion")).expanduser() / "library.json"

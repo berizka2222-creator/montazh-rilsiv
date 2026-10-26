@@ -27,6 +27,8 @@ if [ "$FINAL" = 1 ] || [ -z "${REEL_DRAFT:-}" ]; then   # the real render needs 
 fi
 
 [ -s "$S/../engine/gsap.min.js" ] || bash "$S/setup_engine.sh"
+# graphics checked on stills first (fx_check.py): a render is never how we find a wrong effect
+[ -n "${REEL_NO_CHECK:-}" ] || python3 "$S/fx_check.py" "$REEL" --verify || exit 3
 stamp "fx:start"; python3 "$S/fx_pass.py" "$REEL"; stamp "fx:end"   # Vibha's effects («fx» cards) into the cut first; nothing to do without them
 stamp "build:start"; python3 "$S/build_reel.py" "$REEL" ${ARGS[@]+"${ARGS[@]}"}; stamp "build:end"
 stamp "render:start"

@@ -3,12 +3,15 @@
 After Claude's proposals are on the board: import her decisions, cut (cached when nothing changed), render a 540p draft with
 every graphic and the captions, and print the db doc for builds/<id>-cut. The page then plays this video on «Графіка» and
 draws only what isn't in the picture yet; she removes or adds on the timeline, then «Зібрати чернетку».
-Usage: graphics_preview.py <reel> <review.json>     -> <reel>/gfx_preview.mp4 + <reel>/gfx_preview.json (the db doc)
+Usage: graphics_preview.py <reel> <review.json>     -> import, cut, precheck, then fx_check.py: STOPS with check/sheet.jpg
+       graphics_preview.py <reel> <review.json> --checked  -> after you looked at the sheet and fixed it: the render
+       -> <reel>/gfx_preview.mp4 + <reel>/gfx_preview.json (the db doc)
 A hook with no text yet (she hasn't picked A/B/C) stays out of the picture: the page draws it live."""
 import json, os, shutil, subprocess, sys, time
 from pathlib import Path
 S = Path(__file__).resolve().parent
 reel, review = Path(sys.argv[1]).expanduser(), Path(sys.argv[2]).expanduser()
+CHECKED = "--checked" in sys.argv
 run = lambda *a, **k: subprocess.run([*a], check=True, **k)
 run(sys.executable, str(S / "review_sync.py"), "import", str(reel), str(review))
 run(sys.executable, str(S / "snap_joins.py"), str(reel))
@@ -19,6 +22,10 @@ if not (d.get("hook") or "").strip():   # placeholder hook: not baked, the page 
     e["cards"] = [c for c in e["cards"] if not (c["type"] == "title" and c.get("id") == "hook")]
     json.dump(e, open(reel / "edit.json", "w"), ensure_ascii=False, indent=1)
 run(sys.executable, str(S / "precheck.py"), str(reel))
+if not CHECKED:   # stills of every graphic first; the render waits until they look right (2026-10-26)
+    r = subprocess.run([sys.executable, str(S / "fx_check.py"), str(reel)])
+    sys.exit(f"graphics check {'found ERRORs' if r.returncode else 'done'}: look at {reel / 'check' / 'sheet.jpg'}, fix edit.json / "
+             f"proposal.json, then run again with --checked (cut and effects are cached)")
 run("bash", str(S / "render.sh"), str(reel), env={**os.environ, "REEL_DRAFT": "1", "REEL_PREVIEW": "1"})
 shutil.copy(reel / "draft.mp4", reel / "gfx_preview.mp4")
 dur = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(reel / "gfx_preview.mp4")], capture_output=True, text=True).stdout)

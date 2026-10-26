@@ -39,7 +39,7 @@ MUST = {"locked-on": ["text"], "backdrop-word": ["text"], "the-bill": ["text"], 
         "tier-list": ["title", "item", "others"], "broll-split": ["text"], "phone-fan": ["text"], "headline-wall": ["text", "label", "total"],
         "checklist": ["text", "title"], "liquid-glass-graph": ["text", "to"], "carousel-spin": ["text"], "match-cut": ["text"],
         "apple-toggles": ["text"], "led-sign": ["text"], "comment-box": ["text"], "lineup": ["text"], "spotlight": [], "slow-push": []}
-BRAND_OPTS = {"pastel-word": ["name", "handle"], "check-pills": ["handle"], "timeline": ["handle"], "profile-wall": ["name"],
+BRAND_OPTS = {"pastel-word": ["name", "handle"], "check-pills": ["handle"], "timeline": ["handle"], "profile-wall": ["name"], "headline-wall": ["handle"],
               "glass-widgets": ["name", "handle"], "reel-frame": ["text"]}
 # the menu clips: Ukrainian sample words for every option, so no clip shows her English defaults
 SAMPLE_OPT = {"todo": {"title": "ЗРОБИТИ"}, "cover-star": {"issue": "ЖОВТЕНЬ · 2026", "lines": "три питання|до ціни|оффер|результат"},
