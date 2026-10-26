@@ -226,7 +226,7 @@ def build(c, a, b, cid, X):
                   f'tl.to("#{wid}",{{filter:"blur(0px)",opacity:1,duration:.35,ease:"power2.out"}},{q(max(tt, a + 0.75))});')
 
     elif look == "top":
-        frame(a, (0, 0, W, 1020), 1.0, fy=0.62, pop=False)
+        frame(a, (0, 0, W, 1020), 1.0, fy=c.get("fy", 0.5), pop=False)   # face centred in the top window: whole face, little air above the head (2026-10-26)
         js.append(f'tl.fromTo("#cam",{{y:-120}},{{y:0,duration:.5,ease:"power3.out",immediateRender:false}},{q(a)});')
         slots = [(140, 1110), (500, 1230), (170, 1360), (560, 1480)]
         for j, (t, tt, role) in enumerate(take(4)):

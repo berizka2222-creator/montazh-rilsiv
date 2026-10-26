@@ -758,7 +758,8 @@ for i, c in enumerate(edit.get("cards", [])):
             if not cached.exists():
                 cached.parent.mkdir(parents=True, exist_ok=True)
                 subprocess.run(["ffmpeg", "-v", "error", "-y", *dec, "-i", str(src), "-an", "-vf", "fps=30" + (",scale=540:-2" if DRAFT else ""),
-                                "-c:v", "libvpx", "-pix_fmt", "yuva420p", "-auto-alt-ref", "0", "-b:v", "3M" if DRAFT else "8M", "-crf", "10" if DRAFT else "6",
+                                "-c:v", "libvpx", "-pix_fmt", "yuva420p", "-auto-alt-ref", "0", "-g", "15", "-b:v", "3M" if DRAFT else "8M",   # -g 15: a keyframe every 0.5 s, the render seeks frame by frame and a long 1080 GOP stalled it (2026-10-26)
+                                 "-crf", "10" if DRAFT else "6",
                                 "-deadline", "realtime" if DRAFT else "good", "-cpu-used", "8" if DRAFT else "1", str(cached)], check=True)
             link_or_copy(cached, dst)
             media = (f'<video id="{cid}v" src="img/{dst.name}" muted playsinline data-start="{q(a)}" data-duration="{q(b - a)}" '
