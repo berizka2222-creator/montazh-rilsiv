@@ -283,6 +283,12 @@ elif DRAFT:
     link_or_copy(m540, proj / "master.mp4")
 else:
     link_or_copy(reel / "master.mp4", proj / "master.mp4")
+# Vibha's effects («fx» cards) are already drawn into the cut by fx_pass.py: that version is the video under everything else
+_FXC = [k for k in edit.get("cards", []) if k.get("type") == "fx"]
+_FXM = reel / ("master_fx_540.mp4" if DRAFT else "master_fx.mp4")
+if _FXC and _FXM.exists():
+    (proj / "master.mp4").unlink(); link_or_copy(_FXM, proj / "master.mp4"); print(f"fx: {len(_FXC)} effects drawn into the video ({_FXM.name})")
+elif _FXC: print("warning: fx cards but no " + _FXM.name + ": run scripts/fx_pass.py first (render.sh does)")
 for f in (ENGINE / "sfx").glob("*.wav"): shutil.copy(f, proj / "sfx" / f.name)
 for f in (Path(__file__).resolve().parent.parent / "sfx").glob("*.wav"): shutil.copy(f, proj / "sfx" / f.name)   # the skill's CC0 library
 for f in (HOME / "assets" / "sfx").glob("*.wav"): shutil.copy(f, proj / "sfx" / f.name)   # their own sound library wins on a shared name
@@ -852,6 +858,10 @@ for i, c in enumerate(edit.get("cards", [])):
         sfx("swish", a - 0.08, -12)
         zone(cid, "page", a, b, (0, 0, W, H), full=True)
         if c.get("title"): zone(cid, "page title", a, b, (*tw(c["title"], 92)[:1], 150, tw(c["title"], 92)[1], 92))
+    elif kind == "fx":   # drawn into the video by fx_pass.py; here only the captions step aside (no captions over an effect)
+        quiet.append((a, b)); zone(cid, "fx " + c.get("fx", ""), a, b, (0, 0, W, H), text=False, full=True)
+        if CARD_SFX: sfx("whoosh_soft", a - 0.05, -14)
+        continue
     elif kind == "head":
         heads.build(c, a, b, cid, HX)
     elif kind == "motion":

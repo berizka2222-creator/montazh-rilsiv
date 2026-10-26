@@ -2,3 +2,4 @@ __pycache__/
 *.pyc
 .DS_Store
 skills/montazh-rilsiv/engine/
+skills/montazh-rilsiv/vendor/vibha-fx/.venv/

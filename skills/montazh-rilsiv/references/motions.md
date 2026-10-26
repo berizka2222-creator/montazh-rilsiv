@@ -24,6 +24,29 @@ with what each one is for, its moment and its tested placement, is `references/m
 - `split`, `push` and `steps` are rare: at most one of them per reel unless the person asked, none when the previous reel had one.
 - A motion still has to show what that exact line says. «ideas» suggests, it doesn't decide.
 
+## Ефекти Vibha (42, `vendor/vibha-fx`)
+
+42 talking-head effects by Vibha Ramprakash (@vibha.in.progress, github.com/Vibha-Ramprakash/claude-video-effects, MIT),
+built into the reel: catalog entries `fx-<name>` (№310-351, group «Ефекти Vibha», `engine: "fx"`), suggested by
+`motions.py ideas` like any other motion (marked «ефект Vibha») and in the page's «+ Додати» library with a clip on the person.
+- **Card:** `{"type": "fx", "fx": "orbit", "start": 3.2, "end": 6.0, "text": "...", "opt": {"lines": "...", "color": "#FFC3CC"}, "images": "shots"}`.
+  Options per effect: the catalog entry's `text_vars` / `note` (the same as Vibha's README). `images`: a folder in the reel
+  (her reels' screenshots for orbit, noise, phone-fan, profile-wall, carousel-spin, check-pills, broll-split); without one the
+  cards are 10 stills of this reel.
+- **How it renders:** `render.sh` runs `scripts/fx_pass.py` first: only the seconds with an effect (±0.4 s) go through the
+  effect engine (face tracked on every frame, MediaPipe cut-out for «behind you»), effects that overlap go through together
+  so they stack, every piece is cached, and the result `master_fx[_540].mp4` is the video under the captions and graphics.
+  First use installs its Python (`scripts/setup_fx.sh`, Python 3.10-3.12 + MediaPipe, ~1 min). ~3 s of work per second of effect at 1080p.
+- **Her words, never Vibha's:** every text option the effect shows must be filled with the person's words (`fx_pass` prints
+  `WARNING fx … not set` otherwise and her English sample words would show). Name / handle come from brand.json. Numbers
+  (`to`, `total`, glass-widgets `text`) only real ones she said.
+- Fonts and accents: the brand's (head / body / accent fonts, `pop` / `soft` colours) through `FX_FONTS` / `FX_COLORS`;
+  her own fonts have no Cyrillic. Interfaces inside (Instagram comment, Follow, iPhone toggles) keep their look.
+- Captions step aside for every fx card (no captions over an effect). Count as `[складне]` scenes except lean-in, moody,
+  slow-push. Use 1.5-4 s windows. Decorative filler inside some effects stays as she drew it (match-cut's newspaper text).
+- Menu clips: `python3 scripts/fx_pass.py <reel> --previews` → `<REELS_HOME>/menu/fx-*.mp4` (~4 min for all 42, once per person),
+  upload and map them in `.motion_previews.json` like the other menu clips.
+
 ## Vertical frame and Ukrainian text (checked 2026-10-21 on all 86, big-face framing)
 
 - A catalog motion never moves or crops the person to make room: it plays over the video in a free area (chest, low third,

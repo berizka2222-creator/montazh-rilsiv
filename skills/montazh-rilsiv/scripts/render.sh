@@ -27,6 +27,7 @@ if [ "$FINAL" = 1 ] || [ -z "${REEL_DRAFT:-}" ]; then   # the real render needs 
 fi
 
 [ -s "$S/../engine/gsap.min.js" ] || bash "$S/setup_engine.sh"
+stamp "fx:start"; python3 "$S/fx_pass.py" "$REEL"; stamp "fx:end"   # Vibha's effects («fx» cards) into the cut first; nothing to do without them
 stamp "build:start"; python3 "$S/build_reel.py" "$REEL" ${ARGS[@]+"${ARGS[@]}"}; stamp "build:end"
 stamp "render:start"
 if [ -n "${REEL_DRAFT:-}" ]; then   # fast review draft at 540x960 (build_reel.py shrinks the stage); -> draft.mp4, final.mp4 untouched

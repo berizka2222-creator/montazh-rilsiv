@@ -9510,6 +9510,899 @@
    "images": "потрібна 1 картинка (її фото або знайдена в «Знайти»)",
    "note": "подача голови (scripts/heads.py): перевірено 23.10.2026 на її рілсі, 540p і повний кадр; одна фраза 1.5-5 с, кадр повертається сам",
    "no": 309
+  },
+  {
+   "name": "fx-noise",
+   "fx": "noise",
+   "engine": "fx",
+   "ua": "Твої рілси сиплються купою за головою",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "images (папка скрінів)",
+    "size"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"noise\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: images (папка скрінів), size",
+   "no": 310
+  },
+  {
+   "name": "fx-lineup",
+   "fx": "lineup",
+   "engine": "fx",
+   "ua": "Нумеровані плитки віялом над головою",
+   "moments": [
+    "список / кроки"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "text (назви через |)"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"lineup\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (назви через |)",
+   "no": 311
+  },
+  {
+   "name": "fx-locked-on",
+   "fx": "locked-on",
+   "engine": "fx",
+   "ua": "Рамки фіксуються на обличчі, камера йде за тобою",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "zoom",
+    "text (бирка)"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"locked-on\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: zoom, text (бирка)",
+   "no": 312
+  },
+  {
+   "name": "fx-orbit",
+   "fx": "orbit",
+   "engine": "fx",
+   "ua": "Твої рілси кружляють навколо голови: спереду внизу, за тобою вгорі",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "images",
+    "count",
+    "speed",
+    "size"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"orbit\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: images, count, speed, size",
+   "no": 313
+  },
+  {
+   "name": "fx-lean-in",
+   "fx": "lean-in",
+   "engine": "fx",
+   "ua": "Швидкий наїзд на одне слово",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "use": "overlay",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "zoom (до 2)",
+    "speed"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"lean-in\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: zoom (до 2), speed",
+   "no": 314
+  },
+  {
+   "name": "fx-backdrop-word",
+   "fx": "backdrop-word",
+   "engine": "fx",
+   "ua": "Величезне слово падає за тобою",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "text",
+    "color",
+    "font (bold/serif)"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"backdrop-word\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text, color, font (bold/serif)",
+   "no": 315
+  },
+  {
+   "name": "fx-spotlight",
+   "fx": "spotlight",
+   "engine": "fx",
+   "ua": "Світло гасне, ти лишаєшся в промені, слово світиться за тобою",
+   "moments": [
+    "проблема / тиск"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "text",
+    "color",
+    "push; look=sparkle (золоті промені)"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"spotlight\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text, color, push; look=sparkle (золоті промені)",
+   "no": 316
+  },
+  {
+   "name": "fx-the-bill",
+   "fx": "the-bill",
+   "engine": "fx",
+   "ua": "Твої пункти друкуються чеком-квитанцією над головою",
+   "moments": [
+    "список / кроки"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "text (рядки через |)"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"the-bill\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (рядки через |)",
+   "no": 317
+  },
+  {
+   "name": "fx-moody",
+   "fx": "moody",
+   "engine": "fx",
+   "ua": "Темна кінематографічна кольорокорекція",
+   "moments": [
+    "перехід"
+   ],
+   "status": "ready",
+   "use": "overlay",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "grade (moody/bw/warm/cool/pop)"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"moody\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: grade (moody/bw/warm/cool/pop)",
+   "no": 318
+  },
+  {
+   "name": "fx-swipe",
+   "fx": "swipe",
+   "engine": "fx",
+   "ua": "Слайдер «до / після» проходить через тебе",
+   "moments": [
+    "до / після"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "grade (вигляд «після»)"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"swipe\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: grade (вигляд «після»)",
+   "no": 319
+  },
+  {
+   "name": "fx-todo",
+   "fx": "todo",
+   "engine": "fx",
+   "ua": "Чекліст біля голови, пункти відмічаються, поки говориш",
+   "moments": [
+    "список / кроки"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "text (пункти через |)",
+    "ticks (секунди через |)",
+    "title"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"todo\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (пункти через |), ticks (секунди через |), title",
+   "no": 320
+  },
+  {
+   "name": "fx-comment-box",
+   "fx": "comment-box",
+   "engine": "fx",
+   "ua": "Коментар Instagram сам друкується і публікується",
+   "moments": [
+    "заклик (CTA)"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "text (слово",
+    "напр. АНКЕТА)"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"comment-box\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (слово, напр. АНКЕТА)",
+   "no": 321
+  },
+  {
+   "name": "fx-tap",
+   "fx": "tap",
+   "engine": "fx",
+   "ua": "Кнопка Follow перемикається на Following",
+   "moments": [
+    "заклик (CTA)"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "at (секунда)",
+    "x",
+    "y",
+    "color"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"tap\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: at (секунда), x, y, color",
+   "no": 322
+  },
+  {
+   "name": "fx-pause-point",
+   "fx": "pause-point",
+   "engine": "fx",
+   "ua": "Стоп-кадр і намальована стрілка на тебе",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "text (підпис)",
+    "color"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"pause-point\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (підпис), color",
+   "no": 323
+  },
+  {
+   "name": "fx-uninstall",
+   "fx": "uninstall",
+   "engine": "fx",
+   "ua": "Глітч-смуга «видалення» ламає кадр",
+   "moments": [
+    "проблема / тиск"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "text"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"uninstall\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text",
+   "no": 324
+  },
+  {
+   "name": "fx-reel-frame",
+   "fx": "reel-frame",
+   "engine": "fx",
+   "ua": "Відео стискається в картку рілса",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "text (нік)"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"reel-frame\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (нік)",
+   "no": 325
+  },
+  {
+   "name": "fx-shortcut-rain",
+   "fx": "shortcut-rain",
+   "engine": "fx",
+   "ua": "Клавіші сиплються дощем за тобою",
+   "moments": [
+    "питання / ШІ"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "text (клавіші через |)",
+    "count"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"shortcut-rain\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (клавіші через |), count",
+   "no": 326
+  },
+  {
+   "name": "fx-reject-stamp",
+   "fx": "reject-stamp",
+   "engine": "fx",
+   "ua": "Великий червоний штамп «НІ»",
+   "moments": [
+    "проблема / тиск"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "text",
+    "color",
+    "angle",
+    "y"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"reject-stamp\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text, color, angle, y",
+   "no": 327
+  },
+  {
+   "name": "fx-countdown-flip",
+   "fx": "countdown-flip",
+   "engine": "fx",
+   "ua": "Табло 3-2-1 над головою",
+   "moments": [
+    "цифра"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "from"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"countdown-flip\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: from",
+   "no": 328
+  },
+  {
+   "name": "fx-rabbit-hole",
+   "fx": "rabbit-hole",
+   "engine": "fx",
+   "ua": "Кімната тунелем закручується за тобою",
+   "moments": [
+    "перехід"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "ratio",
+    "speed",
+    "spin"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"rabbit-hole\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: ratio, speed, spin",
+   "no": 329
+  },
+  {
+   "name": "fx-cover-star",
+   "fx": "cover-star",
+   "engine": "fx",
+   "ua": "Ти на обкладинці журналу, назва за головою",
+   "moments": [
+    "ім'я / хто я"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "text (назва)",
+    "lines (через |)",
+    "issue",
+    "color; look=editorial"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"cover-star\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (назва), lines (через |), issue, color; look=editorial",
+   "no": 330
+  },
+  {
+   "name": "fx-scribble",
+   "fx": "scribble",
+   "engine": "fx",
+   "ua": "Маркерні каракулі малюються навколо тебе",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "text (підпис)",
+    "color"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"scribble\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (підпис), color",
+   "no": 331
+  },
+  {
+   "name": "fx-glass-widgets",
+   "fx": "glass-widgets",
+   "engine": "fx",
+   "ua": "Скляні віджети й міні-картки пливуть навколо голови",
+   "moments": [
+    "цифра"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "text (велике число)",
+    "name",
+    "handle",
+    "look=simple"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"glass-widgets\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (велике число), name, handle, look=simple",
+   "no": 332
+  },
+  {
+   "name": "fx-red-collage",
+   "fx": "red-collage",
+   "engine": "fx",
+   "ua": "Ти чорно-біла, велике червоне слово за тобою, три рядки влітають",
+   "moments": [
+    "проблема / тиск"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "text (слово)",
+    "lines (через |)",
+    "tag"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"red-collage\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (слово), lines (через |), tag",
+   "no": 333
+  },
+  {
+   "name": "fx-split-headline",
+   "fx": "split-headline",
+   "engine": "fx",
+   "ua": "Картка-заголовок з'їжджає згори і ставить тебе в нижню половину",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "text (рядки через |)",
+    "hl (виділене слово)",
+    "pill"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"split-headline\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (рядки через |), hl (виділене слово), pill",
+   "no": 334
+  },
+  {
+   "name": "fx-pastel-word",
+   "fx": "pastel-word",
+   "engine": "fx",
+   "ua": "Лавандова кімната, велике слово за тобою, картку профілю підписують",
+   "moments": [
+    "ім'я / хто я"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "text",
+    "name",
+    "handle"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"pastel-word\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text, name, handle",
+   "no": 335
+  },
+  {
+   "name": "fx-check-pills",
+   "fx": "check-pills",
+   "engine": "fx",
+   "ua": "Кімната в клітинку, твої рілси на стіні, курсор клікає пігулки",
+   "moments": [
+    "список / кроки"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "text (пігулки через |)",
+    "images"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"check-pills\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (пігулки через |), images",
+   "no": 336
+  },
+  {
+   "name": "fx-timeline",
+   "fx": "timeline",
+   "engine": "fx",
+   "ua": "Червоний кіно-фільтр, таймлайн монтажу, REC і плейхед",
+   "moments": [
+    "перехід"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "text (назва)",
+    "sub",
+    "tc"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"timeline\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (назва), sub, tc",
+   "no": 337
+  },
+  {
+   "name": "fx-headline-box",
+   "fx": "headline-box",
+   "engine": "fx",
+   "ua": "Наїзд і заголовок у два рядки, другий у білій плашці",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "text (рядки через |)",
+    "zoom"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"headline-box\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (рядки через |), zoom",
+   "no": 338
+  },
+  {
+   "name": "fx-profile-wall",
+   "fx": "profile-wall",
+   "engine": "fx",
+   "ua": "Сітка твоїх рілсів заповнює стіну, лічильник росте",
+   "moments": [
+    "відгук / доказ"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "images",
+    "count",
+    "label"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"profile-wall\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: images, count, label",
+   "no": 339
+  },
+  {
+   "name": "fx-tier-list",
+   "fx": "tier-list",
+   "engine": "fx",
+   "ua": "Тір-лист: щось залітає в S-рівень",
+   "moments": [
+    "до / після"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "title",
+    "item",
+    "others"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"tier-list\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: title, item, others",
+   "no": 340
+  },
+  {
+   "name": "fx-broll-split",
+   "fx": "broll-split",
+   "engine": "fx",
+   "ua": "Картинка зверху з цінником-стікером, ти знизу",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "images",
+    "text (цінник)"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"broll-split\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: images, text (цінник)",
+   "no": 341
+  },
+  {
+   "name": "fx-phone-fan",
+   "fx": "phone-fan",
+   "engine": "fx",
+   "ua": "Твої рілси віялом, як телефони в руці, під заголовком",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "images",
+    "text (рядки через |)"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"phone-fan\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: images, text (рядки через |)",
+   "no": 342
+  },
+  {
+   "name": "fx-dot-reveal",
+   "fx": "dot-reveal",
+   "engine": "fx",
+   "ua": "Кадр складається зі світних крапок і стає чітким",
+   "moments": [
+    "перехід"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "color",
+    "cell"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"dot-reveal\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: color, cell",
+   "no": 343
+  },
+  {
+   "name": "fx-headline-wall",
+   "fx": "headline-wall",
+   "engine": "fx",
+   "ua": "Твої заголовки накопичуються за головою, потім підсумок спереду",
+   "moments": [
+    "відгук / доказ"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "text (заголовок::підпис|...)",
+    "total",
+    "label"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"headline-wall\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (заголовок::підпис|...), total, label",
+   "no": 344
+  },
+  {
+   "name": "fx-checklist",
+   "fx": "checklist",
+   "engine": "fx",
+   "ua": "Список задач під підборіддям: кожен крок крутиться і стає зеленим",
+   "moments": [
+    "список / кроки"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "text (крок::підпис|...)",
+    "title"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"checklist\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (крок::підпис|...), title",
+   "no": 345
+  },
+  {
+   "name": "fx-liquid-glass-graph",
+   "fx": "liquid-glass-graph",
+   "engine": "fx",
+   "ua": "Скляна картка: графік росте, цифра рахує (look=bento: скляний дашборд)",
+   "moments": [
+    "ріст / падіння"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "text (підпис)",
+    "from",
+    "to (напр. 197K",
+    "59%)",
+    "color"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"liquid-glass-graph\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (підпис), from, to (напр. 197K, 59%), color",
+   "no": 346
+  },
+  {
+   "name": "fx-carousel-spin",
+   "fx": "carousel-spin",
+   "engine": "fx",
+   "ua": "Твої рілси кружляють 3D-каруселлю навколо тебе",
+   "moments": [
+    "картинки / приклади"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "images",
+    "count"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"carousel-spin\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: images, count",
+   "no": 347
+  },
+  {
+   "name": "fx-match-cut",
+   "fx": "match-cut",
+   "engine": "fx",
+   "ua": "Сторінки новин міняються на одному слові за твоєю головою",
+   "moments": [
+    "відгук / доказ"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "text"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"match-cut\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text",
+   "no": 348
+  },
+  {
+   "name": "fx-apple-toggles",
+   "fx": "apple-toggles",
+   "engine": "fx",
+   "ua": "Перемикачі iPhone вмикаються під підборіддям, по рядку",
+   "moments": [
+    "список / кроки"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "text (рядки через |)"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"apple-toggles\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (рядки через |)",
+   "no": 349
+  },
+  {
+   "name": "fx-led-sign",
+   "fx": "led-sign",
+   "engine": "fx",
+   "ua": "Світло гасне, LED-вивіска друкується за тобою",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [
+    "text"
+   ],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"led-sign\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text",
+   "no": 350
+  },
+  {
+   "name": "fx-slow-push",
+   "fx": "slow-push",
+   "engine": "fx",
+   "ua": "Повільний кіно-наїзд, кімната розмивається",
+   "moments": [
+    "перехід"
+   ],
+   "status": "ready",
+   "use": "overlay",
+   "quality": 4,
+   "rank": 3,
+   "group": "Ефекти Vibha",
+   "text": "fx",
+   "text_vars": [],
+   "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"slow-push\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: —",
+   "no": 351
   }
  ]
 }

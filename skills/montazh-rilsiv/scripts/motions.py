@@ -26,8 +26,8 @@ SUGGEST = ("ready", "replace")
 READY = [m for m in CAT["motions"] if m.get("status") in SUGGEST]
 FULL = [m for m in CAT["motions"] if m.get("status") == "full_only"]
 HOME = Path(os.environ.get("REELS_HOME", "~/reels")).expanduser()
-# Own motion library (Remotion project, ~/motion/library.json), only when it exists: suggested on equal terms with the catalog,
-# as "brand:<Element>". They go in as transparent overlay cards with "brand": "<Element>" (how the log and "used here" see them).
+# Brand motion library (Remotion, ~/motion, skill motion-brand): suggested on equal terms with the catalog, as "brand:<Element>".
+# They go in as transparent overlay cards with "brand": "<Element>" (that field is how the log and "used here" see them).
 BRAND_LIB = Path(os.environ.get("MOTION_HOME", "~/motion")).expanduser() / "library.json"
 if BRAND_LIB.exists():
     for e in json.load(open(BRAND_LIB))["elements"]:
@@ -41,6 +41,7 @@ def card_names(edit):
     for c in edit.get("cards", []):
         if c.get("type") == "motion" and c.get("name"): out.add(c["name"])
         elif c.get("type") == "head": out.add(f"head-{c.get('look', 'window')}")   # «подачі голови» count like catalog motions
+        elif c.get("type") == "fx" and c.get("fx"): out.add(f"fx-{c['fx']}")   # Vibha's effects (vendor/vibha-fx)
         elif c.get("type") == "overlay":
             b = c.get("brand") or (re.match(r"brand-([A-Za-z]+)", Path(c.get("src", "")).name) or [None, None])[1]
             if b: out.add(f"brand:{b}")
@@ -160,7 +161,8 @@ def ideas(reel):
         mine = [x for x in STAMPS_LIST if set(x["moments"]) & set(moments) and x["key"].split(":")[-1] not in used_here][:2]
         for x in mine: print(f"         ★ моя марка {x['key']}: {x['ua']}  (з рілса {x['reel']}, налаштування: {json.dumps(x['spec'], ensure_ascii=False)})")
         for m in picks: print(f"         -> {m['name']}: {m['ua']}" + (" [просте]" if is_simple(m) else " [складне]") + (f"  [текст: {', '.join(m['text_vars'])}]" if m.get("text_vars") else "") + (" [інтерфейс, свої кольори]" if m.get("keep_ui") else "") + (" [на весь кадр]" if m.get("status") == "full_only" else "")
-                              + ("  [render-overlay.sh, картка overlay + \"brand\"]" if m["status"] == "brand" else ""))
+                              + ("  [render-overlay.sh, картка overlay + \"brand\"]" if m["status"] == "brand" else "")
+                              + (f"  [ефект Vibha: картка {{\"type\": \"fx\", \"fx\": \"{m['fx']}\"}}]" if m.get("engine") == "fx" else ""))
 
 
 # «Мої марки» (stamps): every graphic a finished reel kept, with a still from that reel and its tested settings.
@@ -184,6 +186,7 @@ def stamps_data():
 def stamp_key(c):
     t = c.get("type")
     if t == "motion": return f"motion:{c.get('name')}"
+    if t == "fx": return f"fx:{c.get('fx')}"
     if t == "overlay": return f"brand:{c['brand']}" if c.get("brand") else None   # their own photos / videos are not stamps
     if t == "camera": return f"camera:{c.get('move', 'in')}"
     v = c.get("layout") or c.get("side")

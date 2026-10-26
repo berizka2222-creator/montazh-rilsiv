@@ -88,6 +88,7 @@ def manual_effects():
     cat = json.load(open(Path(__file__).resolve().parent.parent / "references" / "motion_catalog.json"))["motions"]
     def group(m):
         n, note = m["name"], m.get("note") or ""
+        if m.get("group"): return m["group"]   # e.g. «Ефекти Vibha» (vendor/vibha-fx)
         return ("Подачі голови" if m.get("use") == "head" else "Мапи" if "мапа" in note else "Переходи між склейками" if "перехід" in note or m.get("card", {}).get("layout") == "transition"
                 else "Стилі субтитрів" if n.startswith("caption-") else "Потрібен свій логотип" if "лого" in note or "бренд" in note
                 else "Переходи між склейками" if "перехід" in (m.get("moments") or [""])[0] else (lambda x: x[:1].upper() + x[1:])((m.get("moments") or ["інше"])[0]))
