@@ -105,7 +105,7 @@
       const g = o.kind === "text"
         ? { id: o.id, type: "bigtext", kind: o.behind ? "Текст за тобою" : "Текст", what: o.text, text: o.text, y: place[1], size: (o.look || {}).px || autoPx(o.text, place),
             look: o.look && Object.keys(o.look).length ? o.look : undefined,
-            behind: !!o.behind, place, w0: o.w0, user: true }
+            behind: !!o.behind, place, w0: o.w0, user: true, ...(o.placed ? { placed: true } : {}) }   // placed = she dragged it on the video: stays exactly there, centred on her frame
         : { id: o.id, type: "overlay", kind: o.behind ? "Накладення за тобою" : "Накладення", what: o.name, mode: o.mode, effect: o.effect || "soft", media: o.kind, assetId: o.assetId, ...(o.file ? { file: o.file } : {}), ...(o.memeText != null ? { memeText: o.memeText, findOpt: o.findOpt } : {}),
             place, box: o.place || undefined, imgUrl: o.kind === "image" ? o.url : null, behind: !!o.behind, w0: o.w0, user: true };
       if (a === null) return { ...g, state, gone: true };

@@ -580,6 +580,7 @@ if len(_trs) > 2: print(f"variety: {len(_trs)} shader transitions - keep at most
 for _x, _y in zip(_trs, _trs[1:]):
     if _y - _x < 12: print(f"variety: shader transitions at {_x:.1f}s and {_y:.1f}s are {_y - _x:.1f} s apart - keep them 12 s or more apart")
 quiet = []                                      # spans where a card carries its own words, so captions step aside
+KEEP_CAPS = []   # transitions on a join and camera moves keep the captions (2026-10-26)
 import heads
 headbg, HEAD_FILES, HEAD_DUO = [], {}, []
 def _hwidth(text, px, role="head"):
@@ -598,6 +599,10 @@ for i, c in enumerate(edit.get("cards", [])):
     a, b, cid = c["start"], c.get("end") or phrase_end(c["start"]), f"k{i}"
     b = min(b, DUR)
     kind = c["type"]
+    _mp = MOTION_PRESETS.get(c.get("name"), {}) if kind == "motion" else {}
+    if kind == "camera" or (kind == "motion" and (_mp.get("use") == "transition" or c.get("layout") == "transition"
+                                                  or _mp.get("card", {}).get("layout") == "transition")):
+        KEEP_CAPS.append((a, b))
     if kind == "motion" and str(c.get("name", "")).startswith("head-"):   # a «подача голови» picked from the effects menu by its catalog name
         kind = "head"; c.setdefault("look", c["name"][5:]); c.setdefault("words", list((c.get("vars") or {}).values())[:1] if c.get("vars") else [])
     if c.get("layout") == "behind": c["behind"] = True   # a catalog motion laid out behind her
@@ -618,11 +623,12 @@ for i, c in enumerate(edit.get("cards", [])):
             body = "".join(f'<div class="btl">' + (" ".join(piece(w) for w in x.split()) if L.get("bg") == "word" else piece(x)) + "</div>" for x in lines)
         else:
             body = "".join(f'<div class="btl">{esc(x)}</div>' for x in lines)
-        front.append(f'<div id="{cid}" class="bigtext" style="top:{c.get("y", 430)}px;{font(role, px)};color:{c.get("color", LIGHT)}">' + body + "</div>")
+        dx = round(c["cx"] - W / 2) if c.get("cx") is not None else 0   # "cx": dragged on the page, centred on her frame (default: the middle of the screen)
+        front.append(f'<div id="{cid}" class="bigtext" style="top:{c.get("y", 430)}px;{f"left:{dx}px;" if dx else ""}{font(role, px)};color:{c.get("color", LIGHT)}">' + body + "</div>")
         show(f"#{cid}", a, b, 0.2)
         js.append(f'tl.fromTo("#{cid} .btl",{{y:140,opacity:0}},{{y:0,opacity:1,duration:0.6,ease:"power3.out",stagger:0.12}},{q(a)});')
         sfx("whoosh", a - 0.05, -13)
-        zone(cid, "bigtext", a, b, (*tw(max(lines, key=len), px)[:1], c.get("y", 430), tw(max(lines, key=len), px)[1], len(lines) * px * 0.86))
+        zone(cid, "bigtext", a, b, (tw(max(lines, key=len), px)[0] + dx, c.get("y", 430), tw(max(lines, key=len), px)[1], len(lines) * px * 0.86))
         continue
     if kind == "title":
         lines = [x.strip().upper() if brand.get("title_case") == "upper" else case(x.strip()) for x in c["text"].split("/")]   # brand "title_case": "upper" = hook in capitals even when captions are lowercase
@@ -725,11 +731,13 @@ for i, c in enumerate(edit.get("cards", [])):
             link_or_copy(cached, dst)
             media = (f'<video id="{cid}v" src="img/{dst.name}" muted playsinline data-start="{q(a)}" data-duration="{q(b - a)}" '
                      f'data-media-start="0" data-track-index="{9 + i}" style="{cover}"></video>')
-        elif src.suffix.lower() in (".mp4", ".mov", ".m4v", ".webm"):
-            b = min(b, a + dur_of(src))                                      # never outlast the clip
+        elif src.suffix.lower() in (".mp4", ".mov", ".m4v", ".webm", ".gif"):
+            gif = src.suffix.lower() == ".gif"                               # a GIF loops for as long as she set it (a browser <img> GIF would not follow the render clock)
+            if not gif: b = min(b, a + dur_of(src))                          # never outlast the clip
             dst = proj / "img" / f"ov{i}.mp4"                                # one clean H.264 copy at its display size, no audio
             vf = "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920" if full else "scale=1280:-2"
-            subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(src), "-an", "-vf", vf + ",fps=30", "-c:v", "libx264", "-preset", "medium",
+            subprocess.run(["ffmpeg", "-v", "error", "-y", *(["-ignore_loop", "0", "-t", f"{b - a + 0.5:.2f}"] if gif else []), "-i", str(src), "-an",
+                            "-vf", vf + ",fps=30" + (",scale=trunc(iw/2)*2:trunc(ih/2)*2" if gif else ""), "-c:v", "libx264", "-preset", "medium",
                             "-crf", "14", "-g", "30", "-keyint_min", "30", "-pix_fmt", "yuv420p", str(dst)], check=True)
             media = (f'<video id="{cid}v" src="img/{dst.name}" muted playsinline data-start="{q(a)}" data-duration="{q(b - a)}" '
                      f'data-media-start="0" data-track-index="{9 + i}" style="{cover}"></video>')
@@ -740,8 +748,9 @@ for i, c in enumerate(edit.get("cards", [])):
             f'<div class="m" style="width:100%;height:100%;overflow:hidden;border-radius:{inner_r}">{media}</div></div>')
         show(f"#{cid}", a, b, 0.15)
         side = -1 if x + ow / 2 < 540 else 1                               # flies in / tilts from the side of the frame it sits on
-        if alpha:                       # the element animates itself (no entrance, no sfx) and keeps to the Reels safe area itself
+        if alpha:                       # the element animates itself (no entrance) and keeps to the Reels safe area itself
             if c.get("box"): zone(cid, "overlay", a, b, (x, y, ow, oh), text=False, full=False)
+            if not CARD_MUTE: sfx("pop_drop", a - 0.05, -14)   # 2026-10-26: brand elements were silent; the card's own sound wins
             continue
         js.append({
             "slide": f'tl.fromTo("#{cid}",{{x:{side * 760},rotation:{side * 6}}},{{x:0,rotation:0,duration:0.55,ease:"back.out(1.3)"}},{q(a)});',
@@ -860,7 +869,7 @@ for i, c in enumerate(edit.get("cards", [])):
         if c.get("title"): zone(cid, "page title", a, b, (*tw(c["title"], 92)[:1], 150, tw(c["title"], 92)[1], 92))
     elif kind == "fx":   # drawn into the video by fx_pass.py; here only the captions step aside (no captions over an effect)
         quiet.append((a, b)); zone(cid, "fx " + c.get("fx", ""), a, b, (0, 0, W, H), text=False, full=True)
-        if CARD_SFX: sfx("whoosh_soft", a - 0.05, -14)
+        if not CARD_MUTE: sfx("whoosh_soft", a - 0.05, -14)   # 2026-10-26: effects without a picked sound were silent; the card's own sound wins
         continue
     elif kind == "head":
         heads.build(c, a, b, cid, HX)
@@ -1316,6 +1325,7 @@ def acc_look(col):
     if look == "box": return f"{fill(MAIN)};background:{col};padding:0 .16em;border-radius:.14em;text-shadow:none;filter:none;-webkit-text-stroke:0;box-decoration-break:clone;-webkit-box-decoration-break:clone"
     if look == "underline": return f"{fill((LC or {}).get('c1') or CAP)};box-shadow:inset 0 -.2em 0 {col}"
     return fill(col)
+quiet = [s_ for s_ in quiet if s_ not in KEEP_CAPS]   # a transition never hides the captions; effects over it still do
 cap_json = []
 for i, c in enumerate(edit.get("captions", [])):
     if any(a - 0.05 <= c["start"] < b or (c["start"] < b and c.get("end", c["start"]) > a + 0.2) for a, b in quiet): continue   # overlapping a card that carries its words
@@ -1395,8 +1405,9 @@ html, body {{ margin: 0; background: #000; overflow: hidden; }}
 .frame video {{ width: 100%; height: 100%; object-fit: cover; display: block; }}
 .bl {{ position: absolute; left: 0; width: {W}px; padding: 0 90px; box-sizing: border-box; line-height: .82; letter-spacing: -.05em; white-space: nowrap; }}
 .card {{ position: absolute; left: 90px; top: 150px; width: 900px; background: #fff; border-radius: 40px; overflow: hidden; padding-bottom: 22px; box-shadow: 0 30px 70px rgba(0,0,0,.25); }}
-.ch {{ color: #fff; padding: 24px 36px; display: flex; align-items: center; gap: 18px; letter-spacing: -.02em; }}
-.ch i {{ width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,.7); display: inline-block; }}
+/* scoped to the card: a bare .ch also hit catalog effects that name their letters .ch (hw-text-cloud) */
+.card .ch {{ color: #fff; padding: 24px 36px; display: flex; align-items: center; gap: 18px; letter-spacing: -.02em; }}
+.card .ch i {{ width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,.7); display: inline-block; }}
 .cr {{ display: flex; align-items: center; gap: 24px; height: 110px; margin: 0 36px; border-bottom: 3px solid rgba(0,0,0,.06); letter-spacing: -.02em; }}
 .cr b {{ width: 26px; height: 26px; border-radius: 50%; flex: none; }}
 .tagw, .ctaw {{ position: absolute; left: 0; right: 0; text-align: center; padding: 0 80px; box-sizing: border-box; }}

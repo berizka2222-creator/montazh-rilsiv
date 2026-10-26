@@ -45,7 +45,9 @@ export const BeforeAfter: React.FC<z.infer<typeof beforeAfterSchema>> = ({
         borderRadius: R.glass,
         border: `1px solid ${good ? "rgba(210,219,118,.45)" : C.bd2}`,
         background: good
-          ? "linear-gradient(180deg,rgba(210,219,118,.14),rgba(210,219,118,.04))"
+          ? bg === "none"
+            ? C.lime // over video a faint lime tint vanishes (2026-10-26): a solid plate
+            : "linear-gradient(180deg,rgba(210,219,118,.14),rgba(210,219,118,.04))"
           : bg === "none"
             ? "rgba(7,12,7,.72)"
             : `linear-gradient(180deg,${C.c3},${C.c2})`,
@@ -58,7 +60,7 @@ export const BeforeAfter: React.FC<z.infer<typeof beforeAfterSchema>> = ({
           fontSize: 28,
           letterSpacing: "0.18em",
           textTransform: "uppercase",
-          color: good ? C.lime : C.pink,
+          color: good ? (bg === "none" ? C.main : C.lime) : C.pink,
           marginBottom: 18,
         }}
       >
@@ -73,7 +75,7 @@ export const BeforeAfter: React.FC<z.infer<typeof beforeAfterSchema>> = ({
           fontSize: 64,
           lineHeight: 1.1,
           letterSpacing: "-0.03em",
-          color: good ? C.tx : C.tx2,
+          color: good ? (bg === "none" ? C.main : C.tx) : C.tx2,
         }}
       >
         {text}

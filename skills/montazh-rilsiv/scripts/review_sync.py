@@ -181,7 +181,7 @@ def export(reel, proposal, out):
     reel_json = {"title": proposal["title"], "srcDur": float(subprocess.run(["ffprobe", "-v", "error", "-show_entries",
                  "format=duration", "-of", "csv=p=0", str(raw_clip(reel))], capture_output=True, text=True).stdout),
                  "theme": _theme(brand), "handle": brand.get("handle", ""), "speed": pacing(brand)["speed"], "pacing": pacing(brand), "words": words, "proposedCut": proposed_cut, "keepPauses": keep_pauses,
-                 "captions": caps, "board": board, "stylePreviews": style_previews(), "stamps": my_stamps(), "manual": manual_effects(), "capStyles": caption_styles(), "hookOptions": [{"text": t} for t in proposal.get("hookOptions") or []], "libCount": lib_count(),
+                 "claudeRound": 0, "captions": caps, "board": board, "stylePreviews": style_previews(), "stamps": my_stamps(), "manual": manual_effects(), "capStyles": caption_styles(), "hookOptions": [{"text": t} for t in proposal.get("hookOptions") or []], "libCount": lib_count(),
                  "style": {"capSize": brand["captions"].get("size", 104), "capY": brand["captions"].get("y", 1250),
                            "mode": mode, "editorial": brand["captions"].get("style") == "editorial",
                            "cap": brand["colors"].get("caption", "#FFFFFF"), "acc": brand["colors"].get("caption_accent", "#FF7DB8"), "acc2": brand["colors"].get("caption_accent_2"),
@@ -253,6 +253,7 @@ def do_import(reel, review):
             pass   # catalog motions keep their tested placement (band / split / full, see build_reel); the page only shifts their preview box
         elif g.get("placed") and g.get("type") in ("card", "tag", "title", "bigtext", "cta"):   # dragged on the page: exactly there
             spec["y"], spec["x"] = g["place"][1], g["place"][0]
+            if g["type"] == "bigtext": spec["cx"] = round(g["place"][0] + g["place"][2] / 2)   # centred on the frame she dragged (left/right too)
         elif g.get("shifted"):   # core.js moved it off the face / captions: the render uses the new spot
             if g.get("type") in ("card", "tag", "title", "bigtext", "cta"):
                 spec["y"] = g["place"][1]

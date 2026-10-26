@@ -187,16 +187,18 @@ v.addEventListener("error", () => pill("Відео не завантажилос
 // overlay at a cut time: approximate graphic boxes + caption style preview
 function overlay(c) {
   ov.textContent = "";
-  if (!R || tab === "preview" || c == null || (mode !== "rough" && mode !== "roughPaused" && mode !== "cutvid" && !placing)) { highlight(null); return; }
+  if (!R || (tab === "preview" && !placing) || c == null || (mode !== "rough" && mode !== "roughPaused" && mode !== "cutvid" && !placing)) { highlight(null); return; }
+  if (tab === "preview") { placingLayer(); return; }
   if (mode === "cutvid" && CB?.rendered)   // baked graphics she removed on the timeline: still in this video, marked until the draft
     for (const g of GFX) if (baked(g) && (g.gone || g.state === "d") && c >= g.start && c < g.end) { const m = box(g, false); m.classList.add("gone"); m.textContent = "Прибрано: " + (g.kind || "ефект") + " (зникне в чернетці)"; ov.appendChild(m); }
   for (const g of GFX) if (!g.gone && g.state !== "d" && c >= g.start && c < g.end && !(placing && g.id === placing.id) && !(baked(g) && (TLSEL !== "g:" + g.id || g.type === "title"))) {
     if ((g.type === "title" || g.type === "cta") && (g.text || "").trim()) { const h = hookEl(g); ov.appendChild(h); fitHook(h); }
-    else if (g.user && g.type === "bigtext") { const t = txtEl(g.text, g.place, lookOf("ov:" + g.id)); ov.appendChild(t); fitHook(t); }
+    else if (g.user && g.type === "bigtext") { const t = txtEl(g.text, g.place, lookOf("ov:" + g.id), g.placed); ov.appendChild(t); fitHook(t); }
     else ov.appendChild(box(g, true)); }
-  if (placing) {
+  if (placing) placingLayer();
+  function placingLayer() {
     const pt = placing.id ? (GFX.find(x => x.id === placing.id && x.type === "bigtext") || {}).text : ovKind() === "text" && $("#ovtext").value.trim();
-    if (pt) { const t = txtEl(pt, placing.place, lookOf(placing.id ? "ov:" + placing.id : "txt")); ov.appendChild(t); fitHook(t); }
+    if (pt) { const t = txtEl(pt, placing.place, lookOf(placing.id ? "ov:" + placing.id : "txt"), !!placing.id); t.classList.add("txtov", "placing"); ov.appendChild(t); fitHook(t); }
     const ph = placing.id && GFX.find(x => x.id === placing.id && (x.type === "title" || x.type === "cta"));
     if (ph && (ph.text || "").trim()) { const h = hookEl({ ...ph, place: placing.place }); h.classList.add("placing"); ov.appendChild(h); fitHook(h); }
     ov.appendChild(placeBox());
@@ -572,11 +574,12 @@ function lookAutoPx(k) {   // the size an added text gets from its frame when sh
   if (k.startsWith("ov:")) { const o = ovById(k.slice(3)); return o ? ReelCore.autoPx(o.text, o.place || [90, 300, 900, 300]) : 120; }
   return ReelCore.autoPx($("#ovtext").value || "Текст", (placing && placing.place) || [90, 300, 900, 300]);
 }
-function txtEl(text, place, L) {   // a text they added, in its look (build_reel.py bigtext draws the same)
+function txtEl(text, place, L, placed) {   // a text they added, in its look (build_reel.py bigtext draws the same); placed = centred on her frame, not the screen
   const k = $("#player").clientWidth / 1080, el = document.createElement("div");
   const lines = text.split("/").map(x => x.trim()).filter(Boolean);   // her text exactly as she typed it (caps stay caps)
   const px = L.px || ReelCore.autoPx(text, place);
   Object.assign(el.style, { position: "absolute", left: 0, width: "100%", top: place[1] / 19.2 + "%", textAlign: "center", lineHeight: ".9", letterSpacing: "-.03em", pointerEvents: "none", ...txtFace(L.font) });
+  if (placed) el.style.transform = `translateX(${(place[0] + place[2] / 2 - 540) / 10.8}%)`;
   for (const x of lines) {
     const d = document.createElement("div"); d.style.fontSize = px * k + "px"; d.style.whiteSpace = "nowrap";
     const piece = t => { const s = document.createElement("span"); s.style.cssText = lookBg(L, k); s.appendChild(lookRun(L, k, document.createTextNode(t))); return s; };
@@ -759,7 +762,9 @@ document.querySelectorAll('input[name="ovkind"]').forEach(r => r.addEventListene
 let placing = null;   // {place: [x, y, w, h], id?: overlay being moved, img?: preview of the chosen file}
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 function startPlacing(place, id, quiet) {
-  stopPlay(); placing = { place: [...place], id, img: placing?.img }; const cv = cutVid(); if (cv) { mode = "cutvid"; v.currentTime = pos; } else { mode = "roughPaused"; $("#clock").hidden = false; v.currentTime = P.toSrc(pos); }
+  const mine = id && GFX.find(x => x.id === id && x.user);
+  stopPlay(); placing = { place: [...place], id, img: mine ? mine.imgUrl || null : placing?.img }; const cv = cutVid();
+  if (tab === "preview") v.currentTime = pos; else if (cv) { mode = "cutvid"; v.currentTime = pos; } else { mode = "roughPaused"; $("#clock").hidden = false; v.currentTime = P.toSrc(pos); }
   overlay(pos); renderGraphics();
   if (id && !quiet) setTimeout(() => $("#player").scrollIntoView({ block: "center" }), 0);   // narrow screens: the player is not sticky, bring it to the box
 }
@@ -784,10 +789,11 @@ function placeBox() {
     const k = 1080 / $("#player").clientWidth, sx = e.clientX, sy = e.clientY, x0 = p[0], y0 = p[1];
     const mv = ev => { p[0] = Math.round(clamp(x0 + (ev.clientX - sx) * k, 0, 1080 - p[2])); p[1] = Math.round(clamp(y0 + (ev.clientY - sy) * k, 0, 1920 - p[3]));
                        el.style.left = p[0] / 10.8 + "%"; el.style.top = p[1] / 19.2 + "%";
-                       ov.querySelectorAll(".hookov.placing").forEach(h => { h.style.top = p[1] / 19.2 + "%"; h.style.transform = `translateX(${(p[0] - 90) / 10.8}%)`; }); };   // the hook / CTA text follows the frame
+                       ov.querySelectorAll(".hookov.placing").forEach(h => { h.style.top = p[1] / 19.2 + "%"; h.style.transform = `translateX(${(p[0] - 90) / 10.8}%)`; });   // the hook / CTA text follows the frame
+                       if (placing?.id) ov.querySelectorAll(".txtov.placing").forEach(t => { t.style.top = p[1] / 19.2 + "%"; t.style.transform = `translateX(${(p[0] + p[2] / 2 - 540) / 10.8}%)`; }); };   // so does her own text
     const up = () => { el.removeEventListener("pointermove", mv); el.removeEventListener("pointerup", up);
       if (placing?.id) { const id = placing.id, np = [...p]; mutate(() => { const o = (S.overlays || []).find(x => x.id === id);
-        if (o) o.place = np; else S.board = { ...S.board, [id]: { ...(S.board[id] || {}), place: np } }; }); } };
+        if (o) { o.place = np; o.placed = true; } else S.board = { ...S.board, [id]: { ...(S.board[id] || {}), place: np } }; }); } };
     el.addEventListener("pointermove", mv); el.addEventListener("pointerup", up);
   });
   if (p[2] < 300 || p[3] < 160) el.style.fontSize = "0";   // a sticker-sized box: no label, just the picture and the corner
@@ -798,7 +804,7 @@ function placeBox() {
     const mv = ev => { p[2] = Math.round(clamp(w0 + (ev.clientX - sx) * k, 80, 1080 - p[0])); p[3] = Math.round(clamp(h0 + (ev.clientY - sy) * k, 80, 1920 - p[1]));
                        el.style.width = p[2] / 10.8 + "%"; el.style.height = p[3] / 19.2 + "%"; };
     const up = () => { rz.removeEventListener("pointermove", mv); rz.removeEventListener("pointerup", up);
-      if (placing?.id) { const id = placing.id, np = [...p]; mutate(() => { const o = (S.overlays || []).find(x => x.id === id); if (o) o.place = np; }); } };
+      if (placing?.id) { const id = placing.id, np = [...p]; mutate(() => { const o = (S.overlays || []).find(x => x.id === id); if (o) { o.place = np; o.placed = true; } }); } };
     rz.addEventListener("pointermove", mv); rz.addEventListener("pointerup", up);
   });
   return el;
@@ -1432,7 +1438,7 @@ const STEP = {
   graphics: { title: "Змонтувати з ефектами?", yes: "Так, монтуй",
     body: () => `<p class="lede">Усе твоє збережено: нарізка, накладення, хук, субтитри, колір.</p><ol>
       <li><b>Змонтує відео з ефектами й субтитрами</b> у вибраному стилі (~5–8 хв). Твоє не чіпає й не перекриває.</li>
-      <li><b>Сторінка відкриє крок 2</b>: дивишся готове відео, на таймлайні прибираєш зайве або додаєш своє кнопкою «+ Додати».</li>
+      <li><b>Сторінка відкриє крок 2</b>: дивишся готове відео, на таймлайні прибираєш зайве або додаєш своє кнопками «+ Текст», «+ Фото / відео», «+ Гіфка», «+ Мем», «+ Ефект».</li>
       <li>Потім одна кнопка: <b>Зібрати чернетку</b>.</li></ol>
       ${STYLE_LIST.length ? `<p class="lede" style="margin-top:4px"><b>Яким стилем монтуємо?</b></p><div class="gpre" id="mstylepick"></div>` : ""}`,
     say: "графіка", text: "▶ Кнопка «Змонтувати з ефектами»: мій монтаж готовий, змонтуй відео з ефектами (раунд 2)." },
@@ -1470,7 +1476,7 @@ function renderStage() {
   const newRevs = S.revisions.filter(r => B && r.hash === B.hash && !r.sent).length;
   if (st.n === 1) set("Крок 1 · твій монтаж", "Коли все своє зроблено, Claude змонтує відео з ефектами.", "Змонтувати з ефектами", "graphics");
   else if (st.n === 2 && st.wait) set("Claude монтує з ефектами", "Сторінка оновиться сама (~5–8 хв). Можеш далі правити своє.", `<span class="spin"></span>Claude працює`);
-  else if (st.n === 2) set("Крок 2 · відео з ефектами", "Прибери зайве або додай своє кнопкою «+ Додати» на таймлайні.", "Зібрати чернетку", "build");
+  else if (st.n === 2) set("Крок 2 · відео з ефектами", "Прибери зайве або додай своє кнопками «+» на таймлайні.", "Зібрати чернетку", "build");
   else if (st.n === 3 && st.wait) { const r = renderEta(); set("Claude збирає чернетку", r ? `Минуло ${r.done} хв з ~${r.total}. Сторінка відкриє «Чернетку» сама.` : "~6–10 хв. Сторінка відкриє «Чернетку» сама.", `<span class="spin"></span>${r ? r.pct + "%" : "Рендериться"}`); }
   else if (st.n === 3 && B?.url && B.hash !== ReelCore.hash(decisions())) set("Крок 3 · рішення змінились", "Чернетка зібрана до твоїх змін (стиль, нарізка, графіка). Збери її заново.", "Зібрати чернетку заново", "build");
   else if (st.n === 3 && newRevs) set("Крок 3 · чернетка", `Нотаток: ${newRevs}. Віддай їх Claude одним натиском.`, "Виправити за нотатками", "fixes");
@@ -1552,9 +1558,12 @@ const TL_TABS = ["graphics", "preview"];   // step 2: edit; step 3: the same tim
 function placeTimeline(t) {
   const el = $("#tl"); if (!el) return;
   if (!TL_TABS.includes(t) || !R) { el.hidden = true; return; }
-  const sec = document.querySelector(`section[data-p="${t}"]`), lede = sec && sec.querySelector(".lede");
-  if (t === "preview") { const st = $("#bstate"); if (st && el.previousElementSibling !== st) st.after(el); el.hidden = !B?.url; renderTimeline(); return; }
-  const insp = t === "graphics" && $("#insp");
+  const sec = document.querySelector(`section[data-p="${t}"]`), lede = sec && sec.querySelector(".lede"), ip = $("#insp"), home = $("#holder");
+  if (t === "preview") { const st = $("#bstate"); if (st && el.previousElementSibling !== st) st.after(el); el.hidden = !B?.url;
+    if (ip && el.nextElementSibling !== ip) el.after(ip);   // step 3: her own text / file she picks opens under the timeline («Готово», its look)
+    renderTimeline(); renderInspector(); return; }
+  if (ip && home && ip.nextElementSibling !== home) home.before(ip);   // back home on step 2
+  const insp = t === "graphics" && ip;
   if (insp) { if (el.nextElementSibling !== insp) insp.before(el); }   // step 2: the timeline sits right above the picked element's panel
   else if (lede && el.previousElementSibling !== lede) lede.after(el);
   el.hidden = false; renderTimeline();
@@ -1576,16 +1585,18 @@ function tlItems() {
   return items;
 }
 const TL_TRACKS = ["Хук і CTA", "Від Claude", "Твоє", "Камера", "Звуки"];
+// the timeline's own «+» buttons (2026-10-26): each opens the picker on that mode
+const TL_ADDS = [["text", "+ Текст"], ["media", "+ Фото / відео"], ["gif", "+ Гіфка"], ["meme", "+ Мем"], ["lib", "+ Ефект"], ["own", "+ Своїми словами"]];
 function renderTimeline() {
   const el = $("#tl"); if (!el || el.hidden || !P) return;
   const D = P.cutDur, items = tlItems(), pct = t => (t / D * 100).toFixed(3) + "%";
-  el.innerHTML = `<div class="tlhead"><b>Таймлайн</b><button type="button" class="b tladd" id="tladd" title="Додати ефект там, де стоїть повзунок">+ Додати</button><span class="mode">Постав повзунок на потрібну секунду і тисни «+ Додати». Тягни блок, щоб змістити, край, щоб подовжити.</span></div>
+  el.innerHTML = `<div class="tlhead"><b>Таймлайн</b><span class="tladds" role="group" aria-label="Додати на повзунок">${TL_ADDS.map(([m, t]) => `<button type="button" class="b tladd" data-add="${m}">${t}</button>`).join("")}</span><span class="mode">Постав повзунок на потрібну секунду і тисни, що додати. Тягни блок, щоб змістити, край, щоб подовжити.</span></div>
     <div class="tlbody"><div class="tlrow tlruler"><span></span><div class="tllane" data-ruler></div></div></div>`;
   const body = el.querySelector(".tlbody"), ruler = el.querySelector("[data-ruler]");
   const narrow = el.clientWidth < 520;
   for (let t = 0; t <= D; t += D > 40 ? 5 : narrow ? (D > 20 ? 5 : 2) : D > 20 ? 2 : 1) { const m = document.createElement("span"); m.className = "tltick"; m.style.left = pct(t); m.textContent = Math.round(t) + "с"; ruler.appendChild(m); }
   ruler.addEventListener("pointerdown", tlScrub);
-  el.querySelector("#tladd").addEventListener("click", () => openAddPick());
+  el.querySelectorAll("[data-add]").forEach(b => b.addEventListener("click", () => openAddPick(b.dataset.add)));
   (tab === "preview" ? [...TL_TRACKS, "Нотатки"] : TL_TRACKS).forEach((name, k) => {
     const row = document.createElement("div"); row.className = "tlrow";
     row.innerHTML = `<span class="tllab"></span><div class="tllane"></div>`; row.firstChild.textContent = name;
@@ -1608,9 +1619,22 @@ function renderTimeline() {
   const ph = document.createElement("div"); ph.className = "tlplay"; ph.id = "tlplay"; ph.title = "Тягни, щоб перемотати"; ph.addEventListener("pointerdown", tlScrub); body.appendChild(ph);
   tlPlayhead();
 }
-// «+ Додати» on the timeline: at the playhead, pick an effect from the library (or describe one, or add a photo / GIF);
-// it lands as an effect block on the «Твоє» track at that word, ready to drag and stretch; Claude builds it into the draft
-function openAddPick() {
+// after she lands a text or a file: a bar under the video to put more on the same second (a sticker AND a text in one spot,
+// 2026-10-26), each new one opens its own frame to drag; the ones already placed stay where she put them
+function moreBar(at) {
+  let bar = $("#morebar");
+  if (!bar) { bar = document.createElement("div"); bar.id = "morebar"; bar.className = "morebar"; $("#player").insertAdjacentElement("afterend", bar); }
+  bar.innerHTML = `<span class="mode">Ще на ${fmt(at)}:</span>${TL_ADDS.filter(([m]) => m !== "own").map(([m, t]) => `<button type="button" class="b tladd" data-more="${m}">${t}</button>`).join("")}<button type="button" class="b quiet" data-more="done">Готово</button>`;
+  bar.hidden = false;
+  bar.querySelectorAll("[data-more]").forEach(b => b.addEventListener("click", () => {
+    const m = b.dataset.more; if (m === "done") { bar.hidden = true; if (placing) stopPlacing(); return; }
+    if (placing) stopPlacing(); setPos(at); openAddPick(m);
+  }));
+}
+// «+ Додати» on the timeline: at the playhead, pick an effect from the library (or describe one), type her own text, or upload
+// a photo / video / GIF. Everything lands on the «Твоє» track at that word, ready to drag and stretch. Her text and files are
+// overlays (S.overlays, the same as «Накладення»): their frame opens on the video to drag; review_sync turns them into bigtext / overlay cards.
+function openAddPick(start) {
   if (!P) return;
   if (cutVid() || tab === "preview") v.pause(); else if (mode === "rough") { stopPlay(); mode = "roughPaused"; }
   const at = pos, w0 = wordAtCut(at);
@@ -1618,7 +1642,7 @@ function openAddPick() {
   if (!d) {
     d = document.createElement("dialog"); d.id = "addpick";
     d.innerHTML = `<div class="apin"><div class="aphead"><b class="apt"></b><button type="button" class="b quiet apx" aria-label="Закрити">✕</button></div>
-      <div class="gpre apmodes" role="group"><button type="button" data-m="lib" aria-pressed="true">Ефект з бібліотеки</button><button type="button" data-m="own">Описати своїми словами</button><button type="button" data-m="media">Фото, відео, гіфка</button></div>
+      <div class="gpre apmodes" role="group"><button type="button" data-m="text">Текст</button><button type="button" data-m="media">Фото / відео</button><button type="button" data-m="gif">Гіфка</button><button type="button" data-m="meme">Мем</button><button type="button" data-m="lib" aria-pressed="true">Ефект</button><button type="button" data-m="own">Своїми словами</button></div>
       <div class="apbody"></div></div>`;
     document.body.appendChild(d);
     d.querySelector(".apx").addEventListener("click", () => d.close());
@@ -1634,14 +1658,26 @@ function openAddPick() {
     d.close(); TLSEL = "e:" + id; renderTimeline(); renderInspector();
     pill("Додано на " + fmt(at) + ": тягни блок на таймлайні, щоб посунути");
   };
+  const land = (id, msg) => {   // her text / file: picked on the timeline, its frame open on the video to drag into place
+    d.close(); TLSEL = "g:" + id;
+    const g = GFX.find(x => x.id === id);
+    if (g && !g.gone) { tlGo(g.start + 0.3); startPlacing(g.place, id); }
+    renderTimeline(); renderInspector(); pill(msg); moreBar(at);
+  };
+  const secs = (el, def) => Math.min(30, Math.max(0.5, +el.value || def));
   const body = d.querySelector(".apbody");
   const show = m => {
     d.querySelectorAll(".apmodes button").forEach(b => b.setAttribute("aria-pressed", b.dataset.m === m)); body.textContent = "";
     if (w0 == null) { body.innerHTML = `<p class="mode">Тут немає жодного слова в нарізці: посунь повзунок.</p>`; return; }
-    if (m === "media") {
-      body.innerHTML = `<p class="mode">Свої фото, відео чи гіфки додаються на вкладці «Накладення»: там їх видно на відео, їх можна тягнути й міняти розмір. Пошук гіфок і фото там же, кнопка «Знайти».</p><button type="button" class="b">Відкрити «Накладення» на ${fmt(at)}</button>`;
-      body.querySelector("button").addEventListener("click", () => { d.close(); showTab("overlays"); });
-      return;
+    if (m === "text") { addText(body, at, w0, land, secs); return; }
+    if (m === "media") { addMedia(body, at, w0, land, secs); return; }
+    if (m === "gif" || m === "meme") {   // Claude finds 10-15 options (the «Знайти» flow), she picks them on «Накладення»; her own file goes through «Фото / відео»
+      const what = m === "gif" ? "гіфку" : "мем";
+      body.innerHTML = `<p class="mode">Що ${what === "мем" ? "мем" : "гіфка"} має передати: емоцію, стан, вайб. Claude знайде 10–15 варіантів, ти обереш на вкладці «Накладення». ${m === "gif" ? "Своя гіфка з комп'ютера: кнопка «Фото / відео»." : "Текст мему впишеш, коли обереш шаблон."}</p>
+        <input type="text" class="apfind" placeholder="Напр.: паніка, коли клієнт пише «дорого»"> <button type="button" class="b primary apgo">Знайти варіанти</button>`;
+      body.querySelector(".apgo").addEventListener("click", () => { const q = body.querySelector(".apfind").value.trim(); if (!q) { body.querySelector(".apfind").focus(); return; }
+        FINDK = m; renderFindKinds(); $("#findq").value = q; d.close(); $("#findgo").click(); pill(`Шукаю ${what}: варіанти з'являться на «Накладенні»`); });
+      body.querySelector(".apfind").focus(); return;
     }
     if (m === "own") {
       body.innerHTML = `<p class="mode">Що має з'явитися? Наприклад: «переписка з клієнтом на весь екран», «цифра 3 рахує», «стрілка на кнопку».</p>
@@ -1676,7 +1712,101 @@ function openAddPick() {
     q.addEventListener("input", draw); draw();
   };
   d.querySelectorAll(".apmodes button").forEach(b => b.onclick = () => show(b.dataset.m));
-  show("lib"); d.showModal();
+  show(start || "lib"); d.showModal();
+}
+// «Свій текст»: her own words (a number «01», a phrase), in her brand look; the next one starts from the last one's look, place and length
+function addText(body, at, w0, land, secs) {
+  const prev = [...(S.overlays || [])].reverse().find(o => o.kind === "text");
+  const T = { ...lookOf("txt"), px: 160, c2: null, ...(prev ? lookOf("ov:" + prev.id) : {}) };
+  if (T.px == null) T.px = Math.min(400, Math.max(40, lookAutoPx("ov:" + prev.id)));
+  const next = prev && /^\d+$/.test(prev.text.trim()) ? String(+prev.text.trim() + 1).padStart(prev.text.trim().length, "0") : "";   // numbering: 01 -> 02
+  body.innerHTML = `<p class="mode">Текст з'явиться з повзунка. Потім потягни його на відео, а край блоку на таймлайні задасть, скільки він висить. Знак / починає новий рядок.</p>
+    <input type="text" class="aptext" placeholder="Напр.: 01 або Крок 1" aria-label="Твій текст">
+    <div class="appv" aria-hidden="true"></div><div class="ggrid lookcards aplook"></div>
+    <div class="apfoot"><label class="mode">Скільки секунд <input type="number" class="apdur" min="0.5" max="30" step="0.5"></label><button type="button" class="b apgo">Додати текст</button></div>`;
+  const inp = body.querySelector(".aptext"), pvBox = body.querySelector(".appv"), lk = body.querySelector(".aplook");
+  inp.value = next; body.querySelector(".apdur").value = prev ? prev.dur || 2 : 2;
+  const pv = () => {   // her text in the picked look, at a third of its size on the reel
+    pvBox.textContent = ""; const k = 0.33, L = { ...T, px: Math.min(T.px, 270) };
+    const t = (inp.value.trim() || "Текст").split("/").map(x => x.trim()).filter(Boolean);
+    Object.assign(pvBox.style, txtFace(T.font));
+    for (const x of t) { const r = document.createElement("div"); r.style.fontSize = L.px * k + "px"; const sp = document.createElement("span"); sp.style.cssText = lookBg(L, k); sp.appendChild(lookRun(L, k, document.createTextNode(x))); r.appendChild(sp); pvBox.appendChild(r); }
+  };
+  const draw = () => {
+    const up = (key, val) => { T[key] = val; draw(); }, lv = (key, val) => { T[key] = val; pv(); };
+    lk.textContent = "";
+    lk.append(lGroup("Шрифт і розмір",
+      lSeg("Шрифт", [["Заголовків", "head"], ["Акцентний (курсив)", "accent"], ["Основний", "body"]], T.font || "head", v => up("font", v)),
+      lSlider("Розмір", 40, 400, 2, T.px, v => v + " px", v => up("px", v), v => lv("px", v))),
+      lGroup("Колір і плашка",
+      lColor("Колір тексту", T.c1, v => up("c1", v), v => lv("c1", v)),
+      lChk("Плашка під текстом", T.bg !== "none", on => { T.bg = on ? "line" : "none"; if (on) T.bo = 100; draw(); }),
+      T.bg !== "none" ? lColor("Колір плашки", T.bc, v => up("bc", v), v => lv("bc", v)) : null,
+      T.bg !== "none" ? lSlider("Кути", 0, 60, 1, T.br, v => v ? v + " px" : "чіткі", v => up("br", v), v => lv("br", v)) : null));
+    pv();
+  };
+  inp.addEventListener("input", pv); inp.addEventListener("keydown", e => { if (e.key === "Enter") body.querySelector(".apgo").click(); });
+  draw(); inp.focus(); inp.select();
+  body.querySelector(".apgo").addEventListener("click", () => {
+    const text = inp.value.trim(); if (!text) { inp.focus(); return; }
+    const lines = text.split("/").map(x => x.trim()).filter(Boolean), longest = Math.max(...lines.map(x => x.length));
+    const w = Math.min(1000, Math.round(longest * T.px * 0.62 + 60)), h = Math.min(1700, Math.round(T.px * 0.95 * lines.length + 30));
+    const pp = prev && prev.placed && prev.place, cx = pp ? pp[0] + pp[2] / 2 : 540;   // the next number goes where she put the last one
+    const place = [Math.round(clamp(cx - w / 2, 0, 1080 - w)), pp ? pp[1] : 300, w, h];
+    const look = { font: T.font || "head", px: T.px, c1: T.c1, c2: null, bg: T.bg, bc: T.bc, bo: T.bo, br: T.br };
+    const id = "ov" + Date.now().toString(36);
+    mutate(() => { S.overlays = [...(S.overlays || []), { id, kind: "text", text, name: text, behind: false, dur: secs(body.querySelector(".apdur"), 2), w0, look, place, ...(pp ? { placed: true } : {}) }]; });
+    land(id, `Текст «${text.replace(/\s*\/\s*/g, " ")}» на ${fmt(at)}: потягни його на відео, потім «Готово»`);
+  });
+}
+// «Фото, відео, гіфка»: a file from her computer or «Мої файли», uploaded here, with the overlay sizes and effects of «Накладення»
+function fitPlace(place, url) {   // the frame takes the picture's proportions (same as fitToImage), so nothing gets cropped
+  return new Promise(res => {
+    if (!url || (place[2] >= 1080 && place[3] >= 1920)) return res(place);
+    const im = new Image(), t = setTimeout(() => res(place), 4000);
+    im.onload = () => { clearTimeout(t); if (!im.naturalWidth) return res(place);
+      const cx = place[0] + place[2] / 2, cy = place[1] + place[3] / 2, r = im.naturalHeight / im.naturalWidth;
+      let w = place[2], h = Math.round(w * r); if (h > 1800) { h = 1800; w = Math.round(h / r); }
+      res([Math.round(clamp(cx - w / 2, 0, 1080 - w)), Math.round(clamp(cy - h / 2, 0, 1920 - h)), w, h]); };
+    im.onerror = () => { clearTimeout(t); res(place); }; im.src = url;
+  });
+}
+function addMedia(body, at, w0, land, secs) {
+  if (!assets) { body.innerHTML = `<p class="mode">Завантаження тут недоступне. Кинь файл у папку рілса й напиши Claude, на якій секунді.</p>`; return; }
+  const M = { mode: "small-r", effect: "soft", pick: null };
+  body.innerHTML = `<p class="mode">Фото, відео чи гіфка з'явиться з повзунка. Потім потягни рамку на відео, а куточком зміни розмір.</p>
+    <input type="file" class="apfile" accept="image/png,image/jpeg,image/webp,image/gif,video/mp4,video/quicktime" aria-label="Файл з комп'ютера">
+    <div class="aplib" hidden><div class="gtitle">Мої файли</div><div class="lib"></div></div><div class="apopts"></div>
+    <label class="lchk"><input type="checkbox" class="apsave"><span>Зберегти в «Мої файли»</span></label>
+    <div class="apfoot"><label class="mode">Скільки секунд <input type="number" class="apdur" min="0.5" max="30" step="0.5" value="3"></label><button type="button" class="b apgo">Додати</button><span class="mode apmsg" role="status"></span></div>`;
+  const file = body.querySelector(".apfile"), msg = body.querySelector(".apmsg"), btn = body.querySelector(".apgo"), lib = body.querySelector(".aplib");
+  const drawLib = () => { const box = lib.lastChild; box.textContent = ""; lib.hidden = !LIB.length;
+    for (const it of LIB) { const b = document.createElement("button"); b.type = "button"; b.title = it.name; b.setAttribute("aria-pressed", M.pick?.id === it.id); b.setAttribute("aria-label", it.name);
+      if (it.kind === "image") b.style.backgroundImage = `url(${JSON.stringify(it.url)})`; else b.textContent = "▶ " + it.name;
+      b.addEventListener("click", () => { M.pick = M.pick?.id === it.id ? null : it; file.value = ""; drawLib(); }); box.appendChild(b); } };
+  const drawOpts = () => { const o = body.querySelector(".apopts"); o.textContent = "";
+    const fx = document.createElement("div"); fx.className = "lrow"; fx.innerHTML = `<span class="gl">Ефект появи</span><select aria-label="Ефект появи"></select>`;
+    const sel = fx.lastChild; sel.innerHTML = $("#oveffect").innerHTML; sel.value = M.effect; sel.addEventListener("change", () => { M.effect = sel.value; });
+    o.append(lSeg("Розмір", [["Маленьке справа", "small-r"], ["Маленьке зліва", "small-l"], ["Велике", "big"], ["Стікер", "tiny"], ["На весь екран", "full"]], M.mode, v => { M.mode = v; drawOpts(); }), fx); };
+  file.addEventListener("change", () => { if (file.files[0]) { M.pick = null; drawLib(); } });
+  drawLib(); drawOpts();
+  btn.addEventListener("click", async () => {
+    const f = file.files[0], pick = !f && M.pick;
+    if (!f && !pick) { msg.textContent = "Спершу вибери файл або щось із «Моїх файлів»."; file.focus(); return; }
+    if (f && f.size > 20 * 1024 * 1024) { msg.textContent = "Файл більший за 20 МБ. Кинь його в папку рілса й напиши Claude, на якій секунді."; return; }
+    btn.disabled = true; msg.textContent = "Завантажую…";
+    try {
+      const up = pick ? { id: pick.id, url: pick.url } : await assets.upload(f);
+      const name = pick ? pick.name : f.name, kind = pick ? pick.kind : f.type.startsWith("video") ? "video" : "image";
+      if (!pick && body.querySelector(".apsave").checked && libRef) await saveToLib({ id: up.id, url: up.url, name, kind });
+      const place = kind === "image" ? await fitPlace([...OV_PLACE[M.mode]], f ? URL.createObjectURL(f) : up.url) : [...OV_PLACE[M.mode]];
+      const id = "ov" + Date.now().toString(36);
+      mutate(() => { S.overlays = [...(S.overlays || []), { id, assetId: up.id, url: up.url, name, kind, mode: M.mode, effect: M.effect,
+        dur: secs(body.querySelector(".apdur"), 3), w0, behind: false, place }]; });
+      land(id, `«${name}» на ${fmt(at)}: потягни рамку на відео, потім «Готово»`);
+    } catch (e) { msg.textContent = "Не вдалося завантажити (" + (e?.code || "помилка") + "). Спробуй ще раз або кинь файл у папку рілса."; }
+    finally { btn.disabled = false; }
+  });
 }
 function tlScrub(e) {   // drag the playhead (or press the ruler / an empty track) to scrub: the frame above follows
   if (e.button) return;
@@ -1703,6 +1833,7 @@ function renderInspector() {
   if (TLSEL === "g:cta" && !items.some(x => x.key === "g:cta")) TLSEL = "cta:new";
   if (!TLSEL || !items.some(x => x.key === TLSEL)) TLSEL = (items.find(x => x.kind === "board" && x.key !== "g:hook" && !x.off) || items[0] || {}).key || null;   // the hook is set on step 1
   const it = items.find(x => x.key === TLSEL);
+  insp.hidden = tab === "preview" && !(it && it.kind === "ov");   // on «Чернетка» only her own pieces open here
   insp.textContent = ""; if (!it) { insp.innerHTML = '<div class="empty">Тапни елемент на таймлайні.</div>'; return; }
   let body;
   if (it.kind === "ctanew" || it.kind === "ef") {
@@ -2182,7 +2313,7 @@ async function load(id) {
       if (dirty) { clearTimeout(timer); saveNow(); } await saving.catch(() => {});
       const before = R.claudeRound || 0; R = s.data(); recompute(); renderAll(); setPos(pos); overlay(pos);
       if ((R.claudeRound || 0) > before) { showTab("graphics"); const n = GFX.filter(g => !g.user && !g.own && !g.gone).length;
-        $("#banner").textContent = `Відео з ефектами готове (${n}). Дивись, прибирай зайве чи додавай «+ Додати» на таймлайні. Потім «Зібрати чернетку» внизу.`; $("#banner").hidden = false; pill("Відео з ефектами готове"); }
+        $("#banner").textContent = `Відео з ефектами готове (${n}). Дивись, прибирай зайве чи додавай своє кнопками «+» на таймлайні. Потім «Зібрати чернетку» внизу.`; $("#banner").hidden = false; pill("Відео з ефектами готове"); }
       else pill("Claude оновив рілс");
     }, () => {}));
     let firstBuild = true;

@@ -92,7 +92,7 @@ def fx_defaults():
 
 def label(c):
     return c.get("name") or (c.get("fx") and "fx-" + c["fx"]) or (c.get("brand") and "brand:" + c["brand"]) or \
-        (c.get("look") and "head-" + c["look"]) or c.get("type")
+        (isinstance(c.get("look"), str) and "head-" + c["look"]) or c.get("type")   # a text she added carries a look object (font, colour...), not a head style
 
 # 1. text check
 BL = black(); FXD = fx_defaults()
