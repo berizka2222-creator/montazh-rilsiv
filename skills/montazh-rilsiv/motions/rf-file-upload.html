@@ -1,0 +1,77 @@
+<!doctype html>
+<!-- rf-file-upload: a chat window; a video file chip drops in, a progress line fills with %, then a tick and the chip's label.
+     Made for the top half of a split. Own motion of the reel skill (reference reel 2026-10-26). Brand colours from the reel. -->
+<html lang="uk" data-composition-id="rf-file-upload" data-composition-duration="600" data-width="1000" data-height="700" data-composition-variables='[
+  { "id": "title", "type": "string", "label": "Назва вікна", "default": "Claude" },
+  { "id": "headline", "type": "string", "label": "Заголовок над вікном", "default": "Скидаємо сирий Reels" },
+  { "id": "file", "type": "string", "label": "Назва файлу", "default": "IMG_8899.MOV" },
+  { "id": "label", "type": "string", "label": "Підпис файлу", "default": "сирий Reels" },
+  { "id": "done", "type": "string", "label": "Коли завантажилось", "default": "завантажено" },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 4 },
+  { "id": "brand_main", "type": "color", "label": "Темний", "default": "#0D1A0F" },
+  { "id": "brand_pop", "type": "color", "label": "Акцент", "default": "#FFC3CC" }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-file-upload</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-file-upload" data-duration="600" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; font-family: var(--font-body, sans-serif); }
+          .rffu-h { position: absolute; left: 0; right: 0; top: 0; text-align: center; font-family: var(--font-display, sans-serif);
+                    font-weight: 700; font-size: 62px; line-height: 1.05; text-transform: uppercase; }
+          .rffu { position: absolute; left: 40px; right: 40px; top: 120px; height: 540px; background: #fff; border-radius: 34px;
+                  box-shadow: 0 24px 60px rgba(0,0,0,.18); overflow: hidden; }
+          .rffu .bar { height: 76px; display: flex; align-items: center; gap: 12px; padding: 0 30px; border-bottom: 2px solid rgba(0,0,0,.06);
+                       font-size: 28px; font-weight: 700; color: #222; }
+          .rffu .bar i { width: 16px; height: 16px; border-radius: 50%; display: inline-block; }
+          .chip { position: absolute; left: 34px; top: 112px; width: 560px; border-radius: 22px; padding: 22px 26px 26px; }
+          .chip .nm { display: flex; align-items: baseline; gap: 14px; font-size: 32px; font-weight: 700; }
+          .chip .nm small { font-size: 24px; font-weight: 400; opacity: .7; }
+          .chip .pl { height: 8px; border-radius: 8px; margin-top: 18px; background: rgba(0,0,0,.08); overflow: hidden; }
+          .chip .pl b { display: block; height: 100%; width: 0%; border-radius: 8px; }
+          .chip .pc { position: absolute; right: 24px; top: 24px; font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+          .ok { position: absolute; left: 34px; top: 300px; display: flex; align-items: center; gap: 14px; font-size: 30px; font-weight: 700; opacity: 0; }
+          .ok svg { width: 44px; height: 44px; }
+          .inp { position: absolute; left: 34px; right: 34px; bottom: 30px; height: 96px; border-radius: 24px; border: 2px solid rgba(0,0,0,.08); }
+          .inp em { position: absolute; right: 18px; top: 18px; width: 60px; height: 60px; border-radius: 50%; background: rgba(0,0,0,.08); }
+        </style>
+        <div class="rffu-h"></div>
+        <div class="rffu">
+          <div class="bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span class="tt" style="margin-left:12px"></span></div>
+          <div class="chip"><div class="nm">▶ <span class="fn"></span><small class="lb"></small></div><div class="pc">0%</div><div class="pl"><b></b></div></div>
+          <div class="ok"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="20" /><path d="M13 22.5l6 6L31 16" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" /></svg><span class="dn"></span></div>
+          <div class="inp"><em></em></div>
+        </div>
+        <script>
+          (function () {
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            var main = v.brand_main || "#0D1A0F", pop = v.brand_pop || "#FFC3CC", secs = Math.max(2, +v.seconds || 4);
+            var q = function (s) { return document.querySelector(s); };
+            var hw = String(v.headline || "").trim().split(/\s+/), h = q(".rffu-h");   // first word plain, the rest on a pop marker (pale pop on white can't be read)
+            h.textContent = hw.shift() + " "; h.style.color = main;
+            if (hw.length) { var mk = document.createElement("span"); mk.textContent = hw.join(" ");
+              mk.style.cssText = "background:" + pop + ";padding:0 .18em;border-radius:.12em;box-decoration-break:clone;-webkit-box-decoration-break:clone"; h.appendChild(mk); }
+            q(".tt").textContent = v.title || "Claude";
+            q(".fn").textContent = v.file || "IMG_8899.MOV"; q(".lb").textContent = v.label || "";
+            q(".dn").textContent = v.done || "завантажено";
+            var chip = q(".chip"); chip.style.background = pop + "33"; chip.style.border = "2px solid " + pop; chip.style.color = main;
+            q(".pl b").style.background = main; q(".pc").style.color = main;
+            q(".ok").style.color = main; q(".ok circle").setAttribute("fill", main);
+            var p = { v: 0 }, up = Math.min(2.2, secs * 0.5);
+            var tl = gsap.timeline({ paused: true });
+            tl.fromTo(".rffu-h", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: "power3.out" }, 0.05);
+            tl.fromTo(".rffu", { y: 40, opacity: 0, scale: 0.96 }, { y: 0, opacity: 1, scale: 1, duration: 0.4, ease: "power3.out" }, 0.1);
+            tl.fromTo(chip, { y: -120, opacity: 0, rotation: -4 }, { y: 0, opacity: 1, rotation: 0, duration: 0.45, ease: "back.out(1.8)" }, 0.45);
+            tl.fromTo(p, { v: 0 }, { v: 100, duration: up, ease: "power1.inOut",
+              onUpdate: function () { q(".pl b").style.width = p.v + "%"; q(".pc").textContent = Math.round(p.v) + "%"; } }, 0.8);
+            tl.to(".pc", { opacity: 0, duration: 0.15 }, 0.8 + up);
+            tl.fromTo(".ok", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.3, ease: "back.out(2)" }, 0.85 + up);
+            tl.to("#root", { opacity: 1, duration: Math.max(0.1, secs - 1 - up) }, 1 + up);
+            window.__timelines = window.__timelines || {};
+            window.__timelines["rf-file-upload"] = tl;
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

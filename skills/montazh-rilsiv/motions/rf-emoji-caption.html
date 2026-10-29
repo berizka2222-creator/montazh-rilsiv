@@ -1,0 +1,66 @@
+<!doctype html>
+<!-- rf-emoji-caption: caption style. A row of emoji stays beside the head and the word being said appears under it, one word
+     at a time (accent words in the pop colour). Own motion of the reel skill (reference reel 2026-10-26).
+     build_reel's caption_patch fills WORDS / KEYWORDS / DURATION; face + brand colours come from the reel;
+     edit.json "caption_vars": {"emojis": "🎧🌸💗", "side": "right"}. -->
+<html lang="uk" data-composition-id="rf-emoji-caption" data-composition-duration="8.0" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "emojis", "type": "string", "label": "Емодзі над словом", "default": "🎧🌸💗" },
+  { "id": "side", "type": "enum", "label": "Збоку від голови", "default": "right", "options": [{ "value": "right", "label": "праворуч" }, { "value": "left", "label": "ліворуч" }] },
+  { "id": "face", "type": "json", "label": "Обличчя [x, y, w, h]", "default": [300, 500, 480, 600] },
+  { "id": "brand_light", "type": "color", "label": "Колір слова", "default": "#FFFFFF" },
+  { "id": "brand_pop", "type": "color", "label": "Колір ключового слова", "default": "#FFC3CC" }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-emoji-caption</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-emoji-caption" data-duration="8.0" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; }
+          .rfec { position: absolute; width: 300px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+          .rfec .em { font-size: 54px; line-height: 1.1; letter-spacing: 4px; text-shadow: 0 3px 14px rgba(0,0,0,.25);
+                      }
+          .rfec .em i { font-style: normal; display: inline-block; }
+          .rfec .wd { position: relative; height: 70px; width: 300px; }
+          .rfec .w { position: absolute; left: 0; right: 0; text-align: center; white-space: nowrap; font-family: var(--font-body, sans-serif);
+                     font-size: 50px; line-height: 70px; text-shadow: 0 3px 16px rgba(0,0,0,.45); opacity: 0; }
+        </style>
+        <div class="rfec"><div class="em"></div><div class="wd"></div></div>
+        <script>
+          (function () {
+            var WORDS = [];
+            var KEYWORDS = new Set([]);
+            var DURATION = 8.0;
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            var f = Array.isArray(v.face) ? v.face : [300, 500, 480, 600];
+            var box = document.querySelector(".rfec"), em = box.querySelector(".em"), wd = box.querySelector(".wd");
+            Array.from(String(v.emojis || "🎧🌸💗")).filter(function (c) { return c.trim() && c !== "️"; }).forEach(function (c) {
+              var i = document.createElement("i"); i.textContent = c; em.appendChild(i); });
+            // beside the eyes, just off the face box; the box is 300 wide and stays inside the frame
+            var cx = v.side === "left" ? Math.max(170, f[0] - 40) : Math.min(1080 - 170, f[0] + f[2] + 40);
+            box.style.left = (cx - 150) + "px";
+            box.style.top = Math.max(250, f[1] + f[3] * 0.18) + "px";
+            var tl = gsap.timeline({ paused: true });
+            var icons = em.querySelectorAll("i");
+            tl.fromTo(icons, { scale: 0, y: 10 }, { scale: 1, y: 0, duration: 0.4, ease: "back.out(2.4)", stagger: 0.08 }, 0.1);
+            for (var k = 0; k < icons.length; k++)   // a slow bob so the row feels alive
+              tl.to(icons[k], { y: -6, duration: 0.9, ease: "sine.inOut", yoyo: true, repeat: Math.max(1, Math.floor(DURATION / 0.9)) }, 0.6 + k * 0.25);
+            WORDS.forEach(function (w, j) {
+              var d = document.createElement("div"); d.className = "w"; d.textContent = w.text;
+              d.style.color = KEYWORDS.has(j) ? (v.brand_pop || "#FFC3CC") : (v.brand_light || "#FFFFFF");
+              if (KEYWORDS.has(j)) d.style.fontFamily = "var(--font-display, sans-serif)", d.style.fontWeight = "700";
+              d.style.fontSize = Math.min(50, Math.floor(300 / Math.max(1, w.text.length) * 1.8)) + "px";
+              wd.appendChild(d);
+              var next = j + 1 < WORDS.length ? WORDS[j + 1].start : w.end + 0.4;
+              var out = Math.min(next, w.end + 0.6);
+              tl.fromTo(d, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.12, ease: "power2.out" }, w.start);
+              tl.to(d, { opacity: 0, duration: 0.08 }, Math.max(w.start + 0.12, out));
+            });
+            tl.to(box, { opacity: 0, duration: 0.3 }, Math.max(0.5, DURATION - 0.3));
+            window.__timelines = window.__timelines || {};
+            window.__timelines["rf-emoji-caption"] = tl;
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

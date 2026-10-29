@@ -10406,6 +10406,156 @@
    "text_vars": [],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"slow-push\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: —",
    "no": 351
+  },
+  {
+   "name": "rf-stopwatch",
+   "ua": "Секундомір у пігулці рахує час рілса (доказ «за хвилину»)",
+   "moments": [
+    "цифра",
+    "відгук / доказ"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "front",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": false
+   },
+   "keep_ui": true,
+   "text": "vars",
+   "text_vars": [
+    "from",
+    "y"
+   ],
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої (з рілс-референсу)",
+   "no": 352,
+   "note": "Картка на весь рілс або великий шматок: {\"type\":\"motion\",\"name\":\"rf-stopwatch\",\"start\":0,\"end\":<кінець>}. Тривалість і кольори підставляє build_reel; vars.from = з якої секунди рахувати, vars.y = висота пігулки.",
+   "caps_ok": true,
+   "on_top": true
+  },
+  {
+   "name": "rf-step-tag",
+   "ua": "Номер кроку [2] біля голови",
+   "moments": [
+    "список / кроки"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "front",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": false
+   },
+   "keep_ui": true,
+   "text": "vars.step",
+   "text_vars": [
+    "step",
+    "side"
+   ],
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої (з рілс-референсу)",
+   "no": 353,
+   "note": "Тримай на весь крок (у спліті теж працює: став той самий start/end, що й спліт, і \"box\" не треба). vars.step = \"2\", vars.side = right|left. Місце бере з face.json.",
+   "caps_ok": true
+  },
+  {
+   "name": "rf-emoji-caption",
+   "ua": "Субтитри: емодзі біля голови і сказане слово під ними",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "caption",
+   "cap_at": "full",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "keep_ui": true,
+   "text": "",
+   "text_vars": [
+    "emojis",
+    "side"
+   ],
+   "rank": 2,
+   "use": "caption",
+   "quality": 4,
+   "group": "Свої (з рілс-референсу)",
+   "no": 354,
+   "note": "Стиль підписів: edit.json \"caption_style\": \"rf-emoji-caption\", \"caption_vars\": {\"emojis\": \"🎧🌸💗\", \"side\": \"right\"}. Ключові слова (accent) акцентним кольором.",
+   "caps_ok": true
+  },
+  {
+   "name": "rf-file-upload",
+   "ua": "Файл падає в чат і завантажується зі смужкою відсотків",
+   "moments": [
+    "питання / ШІ",
+    "повідомлення / чат"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "split",
+    "tone": "light",
+    "keep_fonts": false,
+    "zoom": 1.0
+   },
+   "keep_ui": true,
+   "text": "vars",
+   "text_vars": [
+    "headline",
+    "title",
+    "file",
+    "label",
+    "done"
+   ],
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої (з рілс-референсу)",
+   "no": 355,
+   "note": "Для верхньої половини спліта, 3-5 с. vars.headline (перше слово темним, решта акцентом), title, file, label, done."
+  },
+  {
+   "name": "rf-pause-cut",
+   "ua": "Звукова доріжка: паузи підсвічуються, вирізаються, хвиля стуляється",
+   "moments": [
+    "до / після",
+    "успіх / готово"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "split",
+    "tone": "light",
+    "keep_fonts": false,
+    "zoom": 1.0
+   },
+   "keep_ui": true,
+   "text": "vars",
+   "text_vars": [
+    "headline",
+    "file",
+    "badge"
+   ],
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої (з рілс-референсу)",
+   "no": 356,
+   "note": "Для верхньої половини спліта, 3-5 с. vars.headline, file, badge (напр. «−12 пауз»)."
   }
  ]
 }

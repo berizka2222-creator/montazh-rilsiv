@@ -28,6 +28,8 @@ done
 H="$E/hf"; mkdir -p "$H"
 [ -f "$H/hyperframes.json" ] || printf '%s' '{"$schema":"https://hyperframes.heygen.com/schema/hyperframes.json","registry":"https://raw.githubusercontent.com/heygen-com/hyperframes/main/registry","paths":{"blocks":"compositions","components":"compositions/components","assets":"assets"}}' > "$H/hyperframes.json"
 [ -f "$H/package.json" ] || echo '{"name":"engine","private":true,"type":"module"}' > "$H/package.json"
+# the skill's own motions (rf-*, motions/ in this skill): not in the HyperFrames registry, copied in on every setup
+mkdir -p "$H/compositions/components" && cp "$(dirname "$E")/motions/"*.html "$H/compositions/components/" 2>/dev/null || true
 # every motion the catalog marks ready/replace (references/motion_catalog.json), plus the follow card's caption-camera-follow
 MOTIONS="$(python3 -c "import json,sys;print(' '.join(['caption-camera-follow']+[m['name'] for m in json.load(open(sys.argv[1]))['motions'] if m['status']!='skip']))" "$(dirname "$E")/references/motion_catalog.json")"
 for m in $MOTIONS; do

@@ -229,7 +229,7 @@ case = lambda s: s.lower() if CASE == "lower" else s
 CAP_STYLE = edit.get("caption_style") or CAPS.get("anim")
 if CAP_STYLE and edit.get("captions") and not CAPCUT:
     edit["cards"] = edit.get("cards", []) + [{"type": "motion", "name": CAP_STYLE, "start": 0, "end": DUR, "id": "capstyle", "sfx": False, "layout": "front",
-        "tone": "clear", "box": [-420, int(CAP_Y) - MOTION_PRESETS.get(CAP_STYLE, {}).get("cap_at", 1020), 1920, 1080], "_capgroups": [c for c in edit["captions"] if not c.get("plain")]}]
+        "tone": "clear", "box": [0, 0, W, H] if MOTION_PRESETS.get(CAP_STYLE, {}).get("cap_at") == "full" else [-420, int(CAP_Y) - MOTION_PRESETS.get(CAP_STYLE, {}).get("cap_at", 1020), 1920, 1080], "_capgroups": [c for c in edit["captions"] if not c.get("plain")], "vars": edit.get("caption_vars", {})}]   # caption_vars: e.g. {"emojis": "🎧🌸💗"} for rf-emoji-caption
     edit["captions"] = []
 def caption_patch(mt, groups, dur):
     """Their words into a catalog caption style: the WORDS / TRANSCRIPT list, its groups and key words, the duration, and a
@@ -596,7 +596,7 @@ for k in range(len(_seq) - 2):
     if _seq[k] == _seq[k + 1] == _seq[k + 2]: print(f"variety: three '{_seq[k]}' graphics in a row - swap one for another motion")
 # 2026-10-24: push-ins are rare, and a reel of plain text effects looks basic
 _frame = [k for k in edit.get("cards", []) if k["type"] in ("push", "steps")]   # splits are a regular tool since 2026-10-26: only push / steps stay rare
-if len(_frame) > 1: print(f"variety: {len(_frame)} push / steps cards - keep at most one per reel unless asked for them")
+if len(_frame) > 1: print(f"variety: {len(_frame)} push / steps cards - keep at most one per reel unless she asked for them")
 try:
     sys.path.insert(0, str(Path(__file__).resolve().parent)); from motions import is_simple as _simple, CAT as _CATF; _CAT = {m["name"]: m for m in _CATF["motions"]}
     _mm = [m for m in (_CAT.get(n) for n in _mnames) if m]
@@ -987,6 +987,17 @@ for i, c in enumerate(edit.get("cards", [])):
         nw, nh = (int(re.search(r'data-width="(\d+)"', txt).group(1)), int(re.search(r'data-height="(\d+)"', txt).group(1))) \
             if re.search(r'data-width="(\d+)"', txt) else (1080, 1080)
         vars_ = dict(c.get("vars", {}))
+        # our own motions (rf-*) ask for what only the reel knows: brand colours, where the face is, how long the card lasts
+        for k_ in ("main", "pop", "light", "soft", "deep"):
+            if f'"id": "brand_{k_}"' in txt and C.get(k_): vars_.setdefault(f"brand_{k_}", C[k_])
+        if '"id": "face"' in txt:                         # inside a split her face sits in the lower half, zoomed (split_frame)
+            f_ = FACE or [300, 500, 480, 600]
+            if any(k_.get("type") == "split" and k_.get("side", "top") != "left" or (k_.get("type") == "motion" and k_.get("layout") == "split")
+                   for k_ in edit.get("cards", []) if k_ is not c and k_.get("start", 0) <= a + 0.05 and k_.get("end", 0) >= min(b, a + 0.5)):
+                sx_, sy_, ss_ = split_frame()
+                f_ = [round(sx_ + ss_ * f_[0]), round(SPLIT_PANEL + sy_ + ss_ * f_[1]), round(ss_ * f_[2]), round(ss_ * f_[3])]
+            vars_.setdefault("face", f_)
+        if '"id": "seconds"' in txt: vars_.setdefault("seconds", round(b - a, 2))
         if (c.get("place") == "low" or c.get("layout") in ("front", "behind", "over") or c.get("tone") == "clear") and not c.get("keep_ui"):
             vars_ = brand_recolor.over_vars(txt, vars_)   # light ink over the video: tone "ink" (for light frames) -> "paper"
         if c.get("images"):                              # carousels: fill every image slot, cycling the supplied images
@@ -1031,7 +1042,7 @@ for i, c in enumerate(edit.get("cards", [])):
             if fixed: c["box"] = fit_into(*c["box"])
         if layout == "split":
             PANEL = c.get("panel", SPLIT_PANEL)          # exactly half: the motion on top, she keeps talking in the lower half
-            area = (40, 240, 1000, PANEL - 280)          # under Instagram's top bar, inside the panel
+            area = (40, 330, 1000, PANEL - 370)          # under Instagram's top bar and the stopwatch row, inside the panel, close to the seam
             if not own_box:
                 c["box"] = fit_into(*area) if fixed else list(area)
                 if fixed:   # catalog motions are drawn for 16:9 with wide margins: blow them up to fill the panel (the overspill is panel colour)
@@ -1070,12 +1081,13 @@ for i, c in enumerate(edit.get("cards", [])):
         if FIT_MEASURE and (c.get("id") or c["name"]) in FIT_LOG:   # measuring: only the motion itself differs from the plain video
             FIT_LOG[c.get("id") or c["name"]]["box"] = [x, y, bw, bh]
             mid.append(f'<style>#{cid}s,#{cid}d,#{cid}f,#bg{{opacity:0!important}}#cam,#scaler{{background:#f0f!important}}</style>')   # magenta stage: whatever is not magenta is the motion
-        if y + bh * 0.7 > CAP_Y or c.get("place") == "low": quiet.append((a, b))   # motion sits over the caption zone: captions step aside
+        _pre = MOTION_PRESETS.get(c.get("name"), {})       # rf-* draw something small inside a full-frame canvas: "caps_ok" keeps captions
+        if not _pre.get("caps_ok") and (y + bh * 0.7 > CAP_Y or c.get("place") == "low"): quiet.append((a, b))   # motion sits over the caption zone: captions step aside
         vals = html.escape(json.dumps(vars_), quote=True)
         tone = TONES.get(c.get("tone", "dark"), TONES["dark"]) + "".join(f"{k}:{v};" for k, v in (c.get("css") or {}).items())
         if layout == "bubble":                           # a rounded window (or a circle) with clean edges
             tone += f'border-radius:{"50%" if c.get("shape") == "circle" else f"{round(40 / sc)}px"};overflow:hidden;'
-        mid.append(f'<div id="{cid}" class="clip" data-composition-id="{comp_id}" data-composition-src="{rel}" data-variable-values="{vals}" '
+        (front if _pre.get("on_top") else mid).append(f'<div id="{cid}" class="clip" data-composition-id="{comp_id}" data-composition-src="{rel}" data-variable-values="{vals}" '
                    f'data-start="{q(a)}" data-duration="{q(b - a)}" data-track-index="{40 + i}" data-width="{nw}" data-height="{nh}" '
                    f'style="position:absolute;left:{x}px;top:{y}px;width:{nw}px;height:{nh}px;transform:scale({sc:.4f});transform-origin:0 0;'
                    f'{tone}--font-display:{FAM["head"][0]};--font-body:{FAM["body"][0]};--font-sans:{FAM["body"][0]};--font-serif:{FAM["accent"][0]}"></div>')

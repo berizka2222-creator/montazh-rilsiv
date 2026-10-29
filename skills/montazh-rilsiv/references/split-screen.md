@@ -40,17 +40,17 @@
 
 | Moment in the reference | Ours |
 |---|---|
-| Stopwatch pill counting the whole reel (proof «за хвилину») | none: new, build as a reel-long overlay |
+| Stopwatch pill counting the whole reel (proof «за хвилину») | `rf-stopwatch` (on top of everything, splits too) |
 | Round «1:00» timer badge popping next to her | `fx-countdown-flip`, `count-up` (partial) |
 | Typewriter caption `// Давай я тобі розповім` with one bold word | `typewriter`, `streaming-text` |
-| Emoji row + current word beside the head (karaoke) | none: new caption style |
-| Step number `[1] [2] [3]` beside the head | none: new small tag (`tag` card is close) |
+| Emoji row + current word beside the head (karaoke) | `rf-emoji-caption` (caption style, `caption_vars.emojis`) |
+| Step number `[1] [2] [3]` beside the head | `rf-step-tag` (follows her face inside a split) |
 | Full pink takeover: list rows appear with icons, earlier rows dim | `line-swap`, `focus-swap`, list `drop` (partial: no dimming) |
 | Dark neon progress ring 44→100% + segmented bar «МОНТУЄ CLAUDE» | `conic-progress-ring`, `mk-progress-stat` |
 | Browser window: URL typed, page opens, cursor clicks «Копіювати» → «Скопійовано» | `browser-device-stage` + `oversized-cursor` / `press-ripple` (combine) |
 | Split: Claude Code window, command typed, install log, spinner → «все встановлено» | `typed-prompt`, `terminal-simulator`, `success-check` |
-| Split: file chip uploads with a progress line | none: new |
-| Split: waveform with pauses, pauses close up («без вирізаних пауз») | none: new (`waveform` is skip) |
+| Split: file chip uploads with a progress line | `rf-file-upload` |
+| Split: waveform with pauses, pauses close up («без вирізаних пауз») | `rf-pause-cut` |
 | Neon dropdown, cursor picks «Opus 5.5», spinner → check | `cursor-context-menu` (replace) |
 | White screen, typed text with `[опишемо]` and `/наприклад/` | `typewriter` |
 | Small word trail over a big word: «субтитри / заголовок / ХУК» | `kinetic-type-swap` (partial) |
@@ -62,3 +62,16 @@
 | Three checks pop one by one + «ДУЖЕ ПРОСТО» | `fx-checklist`, `success-check` |
 | CTA: «пиши мені слово МОНТАЖ», dashed arrow, comment bar types the word | `fx-comment-box`, `hw-arrow` |
 | Punch-in on her right after a takeover / split | `punch` in edit.json |
+
+## Our own reference motions (`rf-*`, catalog group «Свої (з рілс-референсу)»)
+
+They take the brand colours, the face position (mapped into the lower half during a split) and their own duration from the
+reel, so the card needs only the words. Example of one split step:
+
+```json
+{"type": "motion", "name": "rf-file-upload", "layout": "split", "start": 21, "end": 25,
+ "vars": {"headline": "Скидаємо сирий Reels", "file": "IMG_8899.MOV", "label": "сирий Reels"}},
+{"type": "motion", "name": "rf-pause-cut", "layout": "split", "start": 25, "end": 29, "vars": {"badge": "−12 пауз"}},
+{"type": "motion", "name": "rf-step-tag", "start": 21, "end": 29, "vars": {"step": "3"}},
+{"type": "motion", "name": "rf-stopwatch", "start": 0, "end": 73}
+```

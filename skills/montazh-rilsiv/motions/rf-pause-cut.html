@@ -1,0 +1,73 @@
+<!doctype html>
+<!-- rf-pause-cut: a sound wave with silent gaps; the gaps light up, drop out and the wave closes up («без пауз»).
+     Made for the top half of a split. Own motion of the reel skill (reference reel 2026-10-26). Brand colours from the reel. -->
+<html lang="uk" data-composition-id="rf-pause-cut" data-composition-duration="600" data-width="1000" data-height="700" data-composition-variables='[
+  { "id": "headline", "type": "string", "label": "Заголовок", "default": "Без пауз" },
+  { "id": "file", "type": "string", "label": "Назва файлу", "default": "IMG_8899.MOV" },
+  { "id": "badge", "type": "string", "label": "Плашка після", "default": "−12 пауз" },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 4 },
+  { "id": "brand_main", "type": "color", "label": "Темний", "default": "#0D1A0F" },
+  { "id": "brand_pop", "type": "color", "label": "Акцент", "default": "#FFC3CC" }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-pause-cut</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-pause-cut" data-duration="600" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; font-family: var(--font-body, sans-serif); }
+          .rfpc-h { position: absolute; left: 0; right: 0; top: 0; text-align: center; font-family: var(--font-display, sans-serif);
+                    font-weight: 700; font-size: 62px; line-height: 1.05; text-transform: uppercase; }
+          .rfpc { position: absolute; left: 40px; right: 40px; top: 120px; height: 540px; background: #fff; border-radius: 34px;
+                  box-shadow: 0 24px 60px rgba(0,0,0,.18); overflow: hidden; }
+          .rfpc .fl { position: absolute; left: 34px; top: 36px; font-size: 30px; font-weight: 700; display: flex; gap: 12px; align-items: center; }
+          .rfpc .bdg { position: absolute; right: 34px; top: 30px; padding: 10px 22px; border-radius: 999px; font-size: 28px; font-weight: 700; opacity: 0; }
+          .wave { position: absolute; left: 34px; right: 34px; top: 150px; height: 300px; }
+          .wave b { position: absolute; top: 50%; width: 10px; border-radius: 6px; }
+          .gap { position: absolute; top: 40px; height: 220px; border-radius: 16px; opacity: 0; }
+        </style>
+        <div class="rfpc-h"></div>
+        <div class="rfpc"><div class="fl">▶ <span class="fn"></span></div><div class="bdg"></div><div class="wave"></div></div>
+        <script>
+          (function () {
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            var main = v.brand_main || "#0D1A0F", pop = v.brand_pop || "#FFC3CC", secs = Math.max(2, +v.seconds || 4);
+            var q = function (s) { return document.querySelector(s); };
+            q(".rfpc-h").textContent = v.headline || "Без пауз"; q(".rfpc-h").style.color = main;
+            q(".fn").textContent = v.file || "IMG_8899.MOV"; q(".fl").style.color = main;
+            var bdg = q(".bdg"); bdg.textContent = v.badge || ""; bdg.style.background = pop; bdg.style.color = main;
+            // speech segments (bars) with silent gaps between them; a fixed pattern so every render is the same
+            var segs = [9, 6, 11, 7, 10, 8], gapW = 46, bw = 10, step = 13, wave = q(".wave");
+            var hs = [.35,.7,.5,.9,.6,.4,.8,.55,.3,.75,.95,.5,.65,.4,.85,.6,.45,.7,.9,.5,.35,.6,.8,.45,.7,.55,.9,.4,.65,.5,.75,.35,.6,.85,.5,.7,.4,.8,.55,.65,.45,.9,.6,.5,.7,.35,.8,.6,.45,.7,.55];
+            var x = 0, n = 0, bars = [], gaps = [], shifts = [];   // shifts[i] = how far bar i moves left when the gaps close
+            segs.forEach(function (cnt, s) {
+              for (var k = 0; k < cnt; k++) {
+                var b = document.createElement("b"), h = 260 * hs[n % hs.length];
+                b.style.left = x + "px"; b.style.height = h + "px"; b.style.marginTop = (-h / 2) + "px"; b.style.background = main;
+                wave.appendChild(b); bars.push(b); shifts.push(s * gapW); x += step; n++;
+              }
+              if (s < segs.length - 1) {   // a pause: two tiny bars of near-silence, marked
+                var g = document.createElement("div"); g.className = "gap"; g.style.left = (x - 3) + "px"; g.style.width = (gapW - 8) + "px";
+                g.style.background = pop; wave.appendChild(g); gaps.push(g);
+                x += gapW;
+              }
+            });
+            var tl = gsap.timeline({ paused: true });
+            tl.set(wave, { x: Math.max(0, (932 - x) / 2) }, 0);
+            tl.fromTo(".rfpc-h", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, ease: "power3.out" }, 0.05);
+            tl.fromTo(".rfpc", { y: 40, opacity: 0, scale: 0.96 }, { y: 0, opacity: 1, scale: 1, duration: 0.4, ease: "power3.out" }, 0.1);
+            tl.fromTo(bars, { scaleY: 0.05 }, { scaleY: 1, duration: 0.3, ease: "power2.out", stagger: 0.012 }, 0.35);
+            var t1 = 1.2;
+            tl.to(gaps, { opacity: 0.85, duration: 0.2, stagger: 0.12 }, t1);                  // the pauses get marked
+            tl.to(gaps, { opacity: 0, scaleX: 0, duration: 0.3, ease: "power2.in", stagger: 0.05 }, t1 + 0.9);   // and cut out
+            bars.forEach(function (b, i) { if (shifts[i]) tl.to(b, { x: -shifts[i], duration: 0.5, ease: "power3.inOut" }, t1 + 1.1); });
+            tl.to(wave, { x: "+=" + ((segs.length - 1) * gapW / 2), duration: 0.5, ease: "power3.inOut" }, t1 + 1.1);   // stays centred
+            tl.fromTo(bdg, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2.2)" }, t1 + 1.6);
+            tl.to("#root", { opacity: 1, duration: Math.max(0.1, secs - t1 - 2) }, t1 + 1.9);
+            window.__timelines = window.__timelines || {};
+            window.__timelines["rf-pause-cut"] = tl;
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>
