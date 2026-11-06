@@ -16,6 +16,9 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ENG = {"gv": HERE / "fx12.py", "e9": HERE / "fx9.py"}
 PICS = (".jpg", ".jpeg", ".png", ".webp")
+# rembg keeps its model in ~/.u2net; onnxruntime can't open it under a non-Latin profile (C:\\Users\\Інна...)
+if "U2NET_HOME" not in os.environ and not str(Path.home()).isascii():
+    os.environ["U2NET_HOME"] = str((Path(os.environ.get("PUBLIC", "C:/Users/Public")) if os.name == "nt" else Path(tempfile.gettempdir())) / "montazh-rilsiv" / "u2net")
 
 
 def rgb(v):
