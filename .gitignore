@@ -3,3 +3,4 @@ __pycache__/
 .DS_Store
 skills/montazh-rilsiv/engine/
 skills/montazh-rilsiv/vendor/vibha-fx/.venv/
+skills/montazh-rilsiv/vendor/cutout/cutout_vision

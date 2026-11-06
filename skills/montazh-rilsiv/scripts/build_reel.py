@@ -74,6 +74,8 @@ reel = Path(sys.argv[1]).expanduser()
 CAPCUT = "--capcut" in sys.argv
 HOME = Path(os.environ.get("REELS_HOME", "~/reels")).expanduser()
 ENGINE = Path(__file__).resolve().parent.parent / "engine"
+SKILL = Path(__file__).resolve().parent.parent
+CUT_SEC = 7   # Apple Vision cut-out: seconds of work per second of video (M1, measured 2026-11-06)
 brand = json.load(open(HOME / "brand.json"))
 edit = json.load(open(reel / "edit.json"))
 
@@ -652,13 +654,32 @@ for i, c in enumerate(edit.get("cards", [])):
         if TL:
             L = {"c1": c.get("color", LIGHT), **_LD, "sh": 0, **TL}
             piece = lambda t: f'<span style="{look_bg(L)}">{look_run(L, esc(t))}</span>'
-            body = "".join(f'<div class="btl">' + (" ".join(piece(w) for w in x.split()) if L.get("bg") == "word" else piece(x)) + "</div>" for x in lines)
+            rows = [(" ".join(piece(w) for w in x.split()) if L.get("bg") == "word" else piece(x)) for x in lines]
         else:
-            body = "".join(f'<div class="btl">{esc(x)}</div>' for x in lines)
+            rows = [esc(x) for x in lines]
+        body = "".join(f'<div class="btl">{r}</div>' for r in rows)
         dx = round(c["cx"] - W / 2) if c.get("cx") is not None else 0   # "cx": dragged on the page, centred on her frame (default: the middle of the screen)
-        front.append(f'<div id="{cid}" class="bigtext" style="top:{c.get("y", 430)}px;{f"left:{dx}px;" if dx else ""}{font(role, px)};color:{c.get("color", LIGHT)}">' + body + "</div>")
-        show(f"#{cid}", a, b, 0.2)
-        js.append(f'tl.fromTo("#{cid} .btl",{{y:140,opacity:0}},{{y:0,opacity:1,duration:0.6,ease:"power3.out",stagger:0.12}},{q(a)});')
+        box = f'class="bigtext" style="top:{c.get("y", 430)}px;{f"left:{dx}px;" if dx else ""}{font(role, px)};color:{c.get("color", LIGHT)}">'
+        # "depth": true (with "behind") = the first line sits behind her, the other lines in front of her: the same block
+        # drawn twice, each copy showing only its own lines, so they line up exactly
+        split = bool(c.get("behind") and c.get("depth") and len(lines) > 1)
+        if split:   # front lines go below her chin ("y2" moves them), never over her face
+            y2 = c.get("y2") or (FACE[1] + FACE[3] + 60 if FACE else c.get("y", 430) + px * 0.9)
+            front.append(f'<div id="{cid}" {box}<div class="btl">{rows[0]}</div></div>')
+            _FRONT.append(f'<div id="{cid}f" {box.replace("top:" + str(c.get("y", 430)) + "px", f"top:{int(y2)}px")}'
+                          + "".join(f'<div class="btl">{r}</div>' for r in rows[1:]) + "</div>")
+        else:
+            front.append(f'<div id="{cid}" {box}' + body + "</div>")
+        for sel in ([f"#{cid}", f"#{cid}f"] if split else [f"#{cid}"]):
+            show(sel, a, b, 0.2)
+            js.append(f'tl.fromTo("{sel} .btl",{{y:140,opacity:0}},{{y:0,opacity:1,duration:0.6,ease:"power3.out",stagger:0.12}},{q(a)});')
+        # words behind her hang in space: a slow drift with a slight 3D turn; the front copy drifts the other way
+        # (parallax: near moves more than far). "float": false keeps them still.
+        if c.get("behind") and c.get("float", True):
+            d = q(max(0.5, b - a))
+            js.append(f'tl.fromTo("#{cid}",{{x:-14,rotationY:7,scale:1,transformPerspective:1100}},{{x:14,rotationY:-5,scale:1.035,duration:{d},ease:"sine.inOut"}},{q(a)});')
+            if split:
+                js.append(f'tl.fromTo("#{cid}f",{{x:22,rotationY:-8,scale:1,transformPerspective:1100}},{{x:-22,rotationY:6,scale:1.07,duration:{d},ease:"sine.inOut"}},{q(a)});')
         sfx("whoosh", a - 0.05, -13)
         zone(cid, "bigtext", a, b, (tw(max(lines, key=len), px)[0] + dx, c.get("y", 430), tw(max(lines, key=len), px)[1], len(lines) * px * 0.86))
         continue
@@ -1348,9 +1369,17 @@ if BEHIND_WIN:
             seg = cache / f"seg_{k}.mp4"
             subprocess.run(["ffmpeg", "-nostdin", "-v", "error", "-y", "-ss", f"{s0:.4f}", "-t", f"{s1 - s0:.4f}", "-i", str(reel / "master.mp4"),
                             "-an", "-c:v", "libx264", "-crf", "12", "-pix_fmt", "yuv420p", str(seg)], check=True)
-            print(f"cutting the person out for {s0:.1f}-{s1:.1f}s (about {int((s1 - s0) * 13) + 15} s)...")
-            subprocess.run(["npx", "-y", "hyperframes@0.8.145", "remove-background", str(seg), "-o", str(out), "--quality", "best"],
-                           check=True, capture_output=True)
+            # Mac: Apple Vision person segmentation (vendor/cutout/cutout.sh) - keeps hair, mic and hands, ~7 s per second.
+            # Elsewhere (exit 3), or with "cutout": "u2net" in edit.json: HyperFrames' u2net cut-out.
+            _cs = SKILL / "vendor" / "cutout" / "cutout.sh"
+            _ok = False
+            if sys.platform == "darwin" and edit.get("cutout") != "u2net":
+                print(f"cutting the person out for {s0:.1f}-{s1:.1f}s (about {int((s1 - s0) * CUT_SEC) + 10} s)...")
+                _ok = subprocess.run(["bash", str(_cs), str(seg), str(out)]).returncode == 0
+            if not _ok:
+                print(f"cutting the person out for {s0:.1f}-{s1:.1f}s (about {int((s1 - s0) * 13) + 15} s)...")
+                subprocess.run(["npx", "-y", "hyperframes@0.8.145", "remove-background", str(seg), "-o", str(out), "--quality", "best"],
+                               check=True, capture_output=True)
             seg.unlink(missing_ok=True)
         shutil.copy(out, proj / "img" / out.name)
         subj.append(f'<video id="sj{k}" class="clip" src="img/{out.name}" muted playsinline data-start="{s0}" data-duration="{q(s1 - s0)}" '
