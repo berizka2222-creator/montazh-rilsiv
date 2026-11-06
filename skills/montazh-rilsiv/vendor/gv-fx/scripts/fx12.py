@@ -91,8 +91,8 @@ _fonts = {}
 
 def _find(kind):
     if kind in FONT_OVERRIDE:
-        p, _, i = FONT_OVERRIDE[kind].partition(':')
-        return p, int(i or 0)
+        p, _, i = FONT_OVERRIDE[kind].rpartition(':')   # "C:/…/font.ttf" on Windows: only a trailing ":N" is the index
+        return (p, int(i)) if p and i.isdigit() else (FONT_OVERRIDE[kind], 0)
     for name in FONT_NAMES[kind]:
         n, _, i = name.partition(':')
         for d in FONT_DIRS:
