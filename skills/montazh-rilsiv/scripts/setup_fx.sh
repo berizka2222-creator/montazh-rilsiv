@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# One-time: Python for Vibha's 42 video effects (vendor/vibha-fx): numpy, OpenCV, Pillow, MediaPipe in their own .venv.
+# One-time: Python for the video effects (vendor/vibha-fx + vendor/gv-fx): numpy, OpenCV, Pillow, MediaPipe, rembg in their own .venv.
 # MediaPipe needs Python 3.10-3.12, so the skill's usual Python is not used. Safe to re-run: prints READY when set.
 set -e
 D="$(cd "$(dirname "$0")/../vendor/vibha-fx" && pwd)"; cd "$D"
 VPY=".venv/bin/python"; [ -x "$VPY" ] || VPY=".venv/Scripts/python.exe"
-if [ -x "$VPY" ] && "$VPY" -c "import mediapipe, cv2, PIL, numpy, fontTools" 2>/dev/null; then echo READY; exit 0; fi
+if [ -x "$VPY" ] && "$VPY" -c "import mediapipe, cv2, PIL, numpy, fontTools, rembg" 2>/dev/null; then echo READY; exit 0; fi
 PY=""
 for v in python3.12 python3.11 python3.10 py; do
   if command -v "$v" >/dev/null 2>&1; then
@@ -19,4 +19,6 @@ else echo "NEED_PYTHON312: install Python 3.12 (Mac: brew install python@3.12, W
 VPY=".venv/bin/python"; [ -x "$VPY" ] || VPY=".venv/Scripts/python.exe"
 if [ -n "${UV:-}" ]; then uv pip install -q -p "$VPY" -r requirements.txt   # a uv venv has no pip of its own
 else "$VPY" -m pip install -q --upgrade pip; "$VPY" -m pip install -q -r requirements.txt; fi
-"$VPY" -c "import mediapipe, cv2, PIL, numpy, fontTools; print('READY')"
+GVR="$D/../gv-fx/requirements.txt"   # rembg: cut-out for the gv-* / e9-* effects (model ~176 MB downloads on first use)
+if [ -n "${UV:-}" ]; then uv pip install -q -p "$VPY" -r "$GVR"; else "$VPY" -m pip install -q -r "$GVR"; fi
+"$VPY" -c "import mediapipe, cv2, PIL, numpy, fontTools, rembg; print('READY')"

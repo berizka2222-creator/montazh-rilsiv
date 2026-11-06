@@ -15,6 +15,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 VD = HERE.parent / "vendor" / "vibha-fx"
+GV = HERE.parent / "vendor" / "gv-fx" / "scripts" / "run.py"   # gv-* (12 effects, Гвоздарев) and e9-* (9 effects): rembg cut-out
 HOME = Path(os.environ.get("REELS_HOME", "~/reels")).expanduser()
 MAC = sys.platform == "darwin"
 DRAFT = bool(os.environ.get("REEL_DRAFT"))
@@ -27,7 +28,8 @@ SAMPLE = {"lineup": "ціна|оффер|цінність", "locked-on": "ТИ",
           "red-collage": "ЦІНА", "split-headline": "три питання|до ціни", "pastel-word": "ЦІНА", "check-pills": "питання|оффер|ціна",
           "timeline": "монтаж", "headline-box": "три питання|до ціни", "tier-list": "", "phone-fan": "мої|рілси",
           "headline-wall": "питання::1|оффер::2|ціна::3", "checklist": "питання::крок 1|оффер::крок 2|ціна::крок 3",
-          "liquid-glass-graph": "охоплення", "match-cut": "ЦІНА", "apple-toggles": "питання|оффер|ціна", "led-sign": "ЦІНА"}
+          "liquid-glass-graph": "охоплення", "match-cut": "ЦІНА", "apple-toggles": "питання|оффер|ціна", "led-sign": "ЦІНА",
+          "gv-ransom": "ЦІНА|НЕ ГОЛОВНЕ", "gv-figma": "виділення", "gv-bignum": "3", "gv-spring": "оффер|ціна|результат"}
 
 
 # text options that carry Vibha's own English words / handle when a card leaves them out: Claude fills them with the
@@ -38,9 +40,12 @@ MUST = {"locked-on": ["text"], "backdrop-word": ["text"], "the-bill": ["text"], 
         "check-pills": ["text", "board"], "timeline": ["text", "sub", "reply", "chip"], "headline-box": ["text"], "profile-wall": ["label", "sub"],
         "tier-list": ["title", "item", "others"], "broll-split": ["text"], "phone-fan": ["text"], "headline-wall": ["text", "label", "total"],
         "checklist": ["text", "title"], "liquid-glass-graph": ["text", "to"], "carousel-spin": ["text"], "match-cut": ["text"],
-        "apple-toggles": ["text"], "led-sign": ["text"], "comment-box": ["text"], "lineup": ["text"], "spotlight": [], "slow-push": []}
+        "apple-toggles": ["text"], "led-sign": ["text"], "comment-box": ["text"], "lineup": ["text"], "spotlight": [], "slow-push": [],
+        # gv-* / e9-* (vendor/gv-fx): the ones that write words need the person's
+        "gv-ransom": ["text"], "gv-figma": ["text"], "gv-bignum": ["text"], "gv-spring": ["text", "title"], "gv-meme": ["image"]}
 BRAND_OPTS = {"pastel-word": ["name", "handle"], "check-pills": ["handle"], "timeline": ["handle"], "profile-wall": ["name"], "headline-wall": ["handle"],
-              "glass-widgets": ["name", "handle"], "reel-frame": ["text"]}
+              "glass-widgets": ["name", "handle"], "reel-frame": ["text"],
+              "gv-framebreak": ["handle"], "gv-figma": ["name"]}
 # the menu clips: Ukrainian sample words for every option, so no clip shows her English defaults
 SAMPLE_OPT = {"todo": {"title": "ЗРОБИТИ"}, "cover-star": {"issue": "ЖОВТЕНЬ · 2026", "lines": "три питання|до ціни|оффер|результат"},
               "red-collage": {"lines": "ЦІНА.|ОФФЕР.|РЕЗУЛЬТАТ.", "tag": "REC · ЦІНА"}, "split-headline": {"hl": "питання", "pill": "до ціни ↗"},
@@ -48,7 +53,8 @@ SAMPLE_OPT = {"todo": {"title": "ЗРОБИТИ"}, "cover-star": {"issue": "ЖО
               "timeline": {"sub": "монтаж з Claude", "reply": "надіслала прайс", "chip": "3 питання"}, "profile-wall": {"label": "переглядів", "sub": "топ рілс"},
               "tier-list": {"title": "що спитати першим?", "item": "задачі", "others": "ціна|бюджет|терміни"}, "broll-split": {"text": "1 год → 5 хв"},
               "headline-wall": {"label": "з 3 рілсів"}, "checklist": {"title": "Claude монтує твій рілс"}, "liquid-glass-graph": {"to": "59%"},
-              "carousel-spin": {"text": "рілси"}, "glass-widgets": {}}
+              "carousel-spin": {"text": "рілси"}, "glass-widgets": {},
+              "gv-spring": {"title": "Налаштування"}, "gv-figma": {"under": [[0.6, "як"], [0.9, "у"], [1.1, "Фігмі"]]}}
 
 
 def run(*a, **k): return subprocess.run([str(x) for x in a], check=True, **k)
@@ -59,8 +65,10 @@ def dur_of(p): return float(subprocess.run(["ffprobe", "-v", "error", "-show_ent
 
 
 def vpython():
+    # a .venv from before gv-fx has no rembg: setup_fx.sh adds it (its READY check imports rembg)
+    has_rembg = any((VD / ".venv").glob("lib/python*/site-packages/rembg")) or (VD / ".venv" / "Lib" / "site-packages" / "rembg").exists()
     for p in (VD / ".venv" / "bin" / "python", VD / ".venv" / "Scripts" / "python.exe"):
-        if p.exists(): return p
+        if p.exists() and has_rembg: return p
     print("first use: setting up Python for the effects (about 1 minute)...", flush=True)
     run("bash", HERE / "setup_fx.sh")
     for p in (VD / ".venv" / "bin" / "python", VD / ".venv" / "Scripts" / "python.exe"):
@@ -128,6 +136,8 @@ def fx_plan(cards, a0, reel, th, brand=None):
         d["images"] = str((reel / img) if img and not Path(img).is_absolute() else img) if img else str(th)
         if c.get("sample"): d.update(SAMPLE_OPT.get(c["fx"], {}))
         d.update({k: v for k, v in (c.get("opt") or {}).items()})
+        if c["fx"].startswith(("gv-", "e9-")) and isinstance(d.get("image"), str) and not Path(d["image"]).is_absolute():
+            d["image"] = str(reel / d["image"])   # a meme picture in the reel folder
         h = str(brand.get("handle") or "").lstrip("@")
         for k in BRAND_OPTS.get(c["fx"], []):   # her name / handle, never Vibha's
             if k not in d:
@@ -137,6 +147,31 @@ def fx_plan(cards, a0, reel, th, brand=None):
         if miss: print(f"WARNING fx {c['fx']} at {c['start']:.1f}s: {', '.join(miss)} not set: Vibha's English sample words would show. Put her words in the card.")
         plan.append(d)
     return plan
+
+
+def engine(py, pj, src, out, width, env):
+    """Vibha's engine for her effects, vendor/gv-fx for gv-* / e9-*; a piece with both goes through Vibha first, then gv-fx on top."""
+    effs = json.load(open(pj, encoding="utf-8"))["effects"]
+    own = lambda e: e["fx"].startswith(("gv-", "e9-"))
+    steps = [(VD / "scripts" / "fx.py", [e for e in effs if not own(e)]), (GV, [e for e in effs if own(e)])]
+    steps = [(s, es) for s, es in steps if es]
+    cur, log = Path(src), ""
+    for k, (script, es) in enumerate(steps):
+        last = k == len(steps) - 1
+        o = Path(out) if last else Path(out).with_name(Path(out).stem + f"_step{k}.mp4")
+        p = Path(pj).with_name(Path(pj).stem + f"_s{k}.json"); json.dump({"effects": es}, open(p, "w", encoding="utf-8"), ensure_ascii=False)
+        r = subprocess.run([str(py), str(script), "--plan", str(p), str(cur), str(o), "--width", str(width if last else REEL_W(src))],
+                           env=env, capture_output=True, text=True)
+        log += r.stdout + r.stderr
+        if cur != Path(src): cur.unlink(missing_ok=True)
+        if r.returncode or not o.exists(): return subprocess.CompletedProcess([], r.returncode or 1, log, "")
+        cur = o
+    return subprocess.CompletedProcess([], 0, log, "")
+
+
+def REEL_W(p):
+    return int(subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width", "-of", "csv=p=0", str(p)],
+                              capture_output=True, text=True).stdout or 1080)
 
 
 def enc_args(final):
@@ -183,8 +218,7 @@ def main():
                 "-crf", "12", "-c:a", "aac", src)
             json.dump({"effects": plan}, open(pj, "w", encoding="utf-8"), ensure_ascii=False)
             print(f"fx {', '.join(c['fx'] for c in cs)} at {a:.1f}-{b:.1f}s ...", flush=True)
-            r = subprocess.run([str(py), str(VD / "scripts" / "fx.py"), "--plan", str(pj), str(src), str(seg), "--width", str(width)],
-                               env=env, capture_output=True, text=True)
+            r = engine(py, pj, src, seg, width, env)
             if r.returncode or not seg.exists():
                 sys.exit(f"fx: the effect engine failed on {', '.join(c['fx'] for c in cs)}:\n{(r.stdout + r.stderr)[-1500:]}")
             src.unlink(missing_ok=True)
@@ -223,8 +257,7 @@ def previews():
         if out.exists() and not names: continue
         plan = fx_plan([{"fx": m["fx"], "start": 0.3, "end": 3.4, "sample": True}], 0, reel, th, BRAND)
         pj = src.parent / "preview.json"; json.dump({"effects": plan}, open(pj, "w", encoding="utf-8"), ensure_ascii=False)
-        r = subprocess.run([str(py), str(VD / "scripts" / "fx.py"), "--plan", str(pj), str(src), str(out), "--width", "360"], env=env,
-                           capture_output=True, text=True)
+        r = engine(py, pj, src, out, 360, env)
         print(("ok   " if r.returncode == 0 and out.exists() else "FAIL ") + m["name"] + ("" if r.returncode == 0 else "  " + (r.stderr or r.stdout)[-300:]), flush=True)
 
 

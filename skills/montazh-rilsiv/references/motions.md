@@ -48,6 +48,28 @@ built into the reel: catalog entries `fx-<name>` (№310-351, group «Ефект
 - Menu clips: `python3 scripts/fx_pass.py <reel> --previews` → `<REELS_HOME>/menu/fx-*.mp4` (~4 min for all 42, once per person),
   upload and map them in `.motion_previews.json` like the other menu clips.
 
+## Ефекти Гвоздарева (12) і «9 ефектів» (`vendor/gv-fx`)
+
+Two effect packs (`vendor/gv-fx/NOTICE.md`): `scripts/fx12.py` (Олексій Гвоздарев) and `scripts/fx9.py`, run by
+`scripts/run.py` behind the same call as Vibha's engine, so they are ordinary fx cards: catalog `fx-gv-*` (№372-383, group
+«Ефекти Гвоздарева») and `fx-e9-*` (№384-392, group «9 ефектів (частина 2)»), card `{"type": "fx", "fx": "gv-figma", "start",
+"end", "text"?, "opt"?}`. Recipes, timings and sounds per effect: `vendor/gv-fx/reference/EFFECTS-12.md`, `EFFECTS-9.md`.
+- **Text:** `text` becomes the effect's own field: `gv-ransom` "СЛОВО|СЛОВО" (1-2 words ≤9 letters), `gv-figma` the word
+  (`opt.italic` [from, to) letters in the accent serif, `opt.under` [[s, "слово"], …], `opt.grow_at` s), `gv-bignum` the number,
+  `gv-spring` "a|b|c" rows + `opt.title`. `gv-framebreak` takes the handle from brand.json, button «Стежити»; `gv-figma` cursor
+  label = the person's name. `e9-blueprint` labels via `opt.width_label` / `height_label` / `stamp` (default «АРКУШ 01 · М 1:10»).
+- **Pictures:** `gv-orbit` uses `images` (covers of the person's reels; without them stills of this reel); `gv-meme` needs
+  `opt.image` (a picture the person gave, one meme a reel).
+- **Placement:** these may lie over the body (Figma word, glass lens, orbit in front of the chest), never over the face. Look at
+  the fx_check still for every one.
+- **Colours stay as drawn where they mean something:** Figma blue, cream / yellow of bignum and dust are fine; `color` / `bg`
+  take "#RRGGBB" when a brand colour fits better.
+- Cut-out is rembg (`u2net_human_seg`, ~176 MB model on first use) in the same `.venv` (setup_fx.sh). Drawn at 1080×1920 30 fps,
+  scaled to the draft width. ~10-15 s of work per second of effect (slower than Vibha's): keep windows 1-2 s, as in the recipes.
+  `e9-dust` and `e9-freeze` need a still camera (the clean background is taken from the whole clip).
+- A piece where a Vibha effect and a gv / e9 effect overlap goes through Vibha's engine first, then gv-fx on top.
+- `motions.py ideas` marks vertigo, camzoom, zoomblur, lens, bignum, doodle, wave `[просте]` (accents); the rest are scenes.
+
 ## Vertical frame and Ukrainian text (checked 2026-10-21 on all 86, big-face framing)
 
 - A catalog motion never moves or crops the person to make room: it plays over the video in a free area (chest, low third,

@@ -126,10 +126,11 @@ CUES = [
 
 TEXT_ONLY = {"хук / ключова фраза", "цифра", "перехід", "до / після", "успіх / готово"}
 TEXT_FX = {"typewriter", "scramble-reveal", "morph-text", "line-by-line-slide", "titlecard-lockup", "titlecard-calm", "tilt-card"}   # text effects tagged with other moments
+SIMPLE_FX = {"fx-gv-vertigo", "fx-gv-camzoom", "fx-gv-zoomblur", "fx-gv-lens", "fx-gv-bignum", "fx-gv-doodle", "fx-e9-wave"}   # accents, not scenes (vendor/gv-fx)
 def is_simple(m):
     """A plain text effect: one word / number / phrase animating over the video, no scene of its own. 2026-10-24: too
     many of these make a reel look basic, so ideas() puts the scenes first and a reel keeps them to a third of its motions."""
-    return m.get("name") in TEXT_FX or (m.get("use") == "overlay" and m.get("status") != "brand" and set(m.get("moments", [])) <= TEXT_ONLY)
+    return m.get("name") in TEXT_FX or m.get("name") in SIMPLE_FX or (m.get("use") == "overlay" and m.get("status") != "brand" and set(m.get("moments", [])) <= TEXT_ONLY)
 
 
 def ideas(reel):
@@ -172,7 +173,7 @@ def ideas(reel):
         for x in mine: print(f"         ★ моя марка {x['key']}: {x['ua']}  (з рілса {x['reel']}, налаштування: {json.dumps(x['spec'], ensure_ascii=False)})")
         for m in picks: print(f"         -> {m['name']}: {m['ua']}" + (" [просте]" if is_simple(m) else " [складне]") + (f"  [текст: {', '.join(m['text_vars'])}]" if m.get("text_vars") else "") + (" [інтерфейс, свої кольори]" if m.get("keep_ui") else "") + (" [на весь кадр]" if m.get("status") == "full_only" else "")
                               + ("  [render-overlay.sh, картка overlay + \"brand\"]" if m["status"] == "brand" else "")
-                              + (f"  [ефект Vibha: картка {{\"type\": \"fx\", \"fx\": \"{m['fx']}\"}}]" if m.get("engine") == "fx" else ""))
+                              + (f"  [{'ефект Гвоздарева' if str(m.get('fx', '')).startswith('gv-') else '9 ефектів' if str(m.get('fx', '')).startswith('e9-') else 'ефект Vibha'}: картка {{\"type\": \"fx\", \"fx\": \"{m['fx']}\"}}]" if m.get("engine") == "fx" else ""))
 
 
 # «Мої марки» (stamps): every graphic a finished reel kept, with a still from that reel and its tested settings.
