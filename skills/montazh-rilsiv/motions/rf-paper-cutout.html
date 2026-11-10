@@ -1,0 +1,93 @@
+<!doctype html>
+<!-- rf-paper-cutout: the phrase as torn paper scraps (Vox-style collage). Each word is a hand-torn strip with tape and a real
+     paper shadow; the scraps arrive one by one (fly in from the side, slap down from big, drop with a bounce, or pop),
+     the group jolts when a scrap lands, then they sway gently. Key word (*word*) sits on a brand-coloured scrap.
+     Own motion of the reel skill (ideas from vox-director, MIT). build_reel fills face, seconds and brand colours.
+     Card: {"type":"motion","name":"rf-paper-cutout","start":..,"end":..,"vars":{"text":"ЦЕ / *НЕ* ПРОМТ","entrance":"auto"}} -->
+<html lang="uk" data-composition-id="rf-paper-cutout" data-composition-duration="600" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "text", "type": "string", "label": "Текст: / новий рядок, *слово* = ключове", "default": "ЦЕ / *НЕ* ПРОМТ" },
+  { "id": "entrance", "type": "enum", "label": "Як влітають", "default": "auto", "options": [
+      { "value": "auto", "label": "по черзі різні" }, { "value": "fly", "label": "влітають збоку" },
+      { "value": "slap", "label": "ляскають згори" }, { "value": "drop", "label": "падають з відскоком" }, { "value": "pop", "label": "вискакують" }] },
+  { "id": "y", "type": "number", "label": "Верх блоку, px (0 = над головою)", "default": 0 },
+  { "id": "paper", "type": "color", "label": "Колір паперу", "default": "#F3EBDD" },
+  { "id": "face", "type": "json", "label": "Обличчя [x, y, w, h]", "default": [300, 500, 480, 600] },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 4 },
+  { "id": "brand_pop", "type": "color", "label": "Колір ключового слова", "default": "#E8C77A" },
+  { "id": "brand_deep", "type": "color", "label": "Колір чорнила", "default": "#1B1414" }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-paper-cutout</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-paper-cutout" data-duration="600" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; }
+          .rfpc { position: absolute; left: 60px; right: 60px; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+          .rfpc .rfpc-ln { display: flex; flex-wrap: nowrap; justify-content: center; gap: 16px; }
+          .rfpc .rfpc-pc { position: relative; opacity: 0; filter: drop-shadow(10px 16px 9px rgba(0,0,0,.38)); }
+          .rfpc .rfpc-sc { position: relative; padding: 18px 30px 14px; font-family: var(--font-display, sans-serif); font-weight: 800;
+                      font-size: 104px; line-height: 1; letter-spacing: -1px; white-space: nowrap; }
+          /* print grain + halftone dots, the zine look */
+          .rfpc .rfpc-sc::after { content: ""; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: multiply; opacity: .22;
+                      background-image: radial-gradient(rgba(0,0,0,.55) 1px, transparent 1.4px); background-size: 7px 7px; }
+          .rfpc .rfpc-tp { position: absolute; top: -16px; width: 92px; height: 34px; background: rgba(240,232,200,.72);
+                      box-shadow: 0 1px 2px rgba(0,0,0,.15); z-index: 2; }
+        </style>
+        <div class="rfpc"></div>
+        <script>
+          (function () {
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            var f = Array.isArray(v.face) ? v.face : [300, 500, 480, 600], secs = Math.max(1.2, +v.seconds || 4);
+            var ink = v.brand_deep || "#1B1414", paper = v.paper || "#F3EBDD", pop = v.brand_pop || "#E8C77A";
+            var seed = 7; function rnd() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }   // seek-safe: same scraps every frame
+            function torn(w, h) {                          // a hand-torn outline: jagged points along all four edges
+              var p = [], n = Math.max(8, Math.round(w / 38)), m = Math.max(4, Math.round(h / 34)), j = 7, k;
+              for (k = 0; k <= n; k++) p.push((k / n * 100).toFixed(1) + "% " + (rnd() * j / h * 100).toFixed(1) + "%");
+              for (k = 1; k <= m; k++) p.push((100 - rnd() * j / w * 100).toFixed(1) + "% " + (k / m * 100).toFixed(1) + "%");
+              for (k = n - 1; k >= 0; k--) p.push((k / n * 100).toFixed(1) + "% " + (100 - rnd() * j / h * 100).toFixed(1) + "%");
+              for (k = m - 1; k >= 1; k--) p.push((rnd() * j / w * 100).toFixed(1) + "% " + (k / m * 100).toFixed(1) + "%");
+              return "polygon(" + p.join(",") + ")";
+            }
+            var box = document.querySelector(".rfpc"), pieces = [];
+            String(v.text || "ЦЕ / *НЕ* ПРОМТ").split("/").forEach(function (line) {
+              var ln = document.createElement("div"); ln.className = "rfpc-ln"; box.appendChild(ln);
+              line.trim().split(/\s+/).filter(Boolean).forEach(function (w) {
+                var key = /^\*.*\*$/.test(w), t = w.replace(/^\*|\*$/g, "");
+                var pc = document.createElement("div"); pc.className = "rfpc-pc";
+                var sc = document.createElement("div"); sc.className = "rfpc-sc"; sc.textContent = t;
+                sc.style.background = key ? pop : paper; sc.style.color = ink;
+                if (t.length > 7) sc.style.fontSize = Math.max(64, Math.round(104 * 7 / t.length)) + "px";
+                pc.appendChild(sc);
+                if (rnd() > 0.35) { var tp = document.createElement("div"); tp.className = "rfpc-tp";
+                  tp.style.left = (rnd() > .5 ? 8 : 60) + "%"; tp.style.transform = "rotate(" + (rnd() * 16 - 8) + "deg)"; pc.appendChild(tp); }
+                ln.appendChild(pc); pieces.push({ el: pc, sc: sc, rot: rnd() * 8 - 4 });
+              });
+            });
+            pieces.forEach(function (p) { p.sc.style.clipPath = torn(p.sc.offsetWidth || 300, p.sc.offsetHeight || 130); });
+            // place: above the head (or under the chin when there is no room), never past the Instagram top bar
+            var hgt = box.offsetHeight || 300, top = +v.y || 0;
+            if (!top) { top = f[1] - hgt - 40; if (top < 250) top = Math.min(1500 - hgt, f[1] + f[3] + 30); }
+            box.style.top = Math.max(250, top) + "px";
+            var kinds = ["fly", "slap", "drop", "pop"], mode = v.entrance || "auto";
+            var tl = gsap.timeline({ paused: true }), at = 0.08, step = Math.min(0.32, (secs * 0.45) / Math.max(1, pieces.length));
+            pieces.forEach(function (p, i) {
+              var kind = mode === "auto" ? kinds[i % 4] : mode, el = p.el, r = p.rot;
+              tl.set(el, { opacity: 1 }, at);
+              if (kind === "fly") tl.fromTo(el, { x: (i % 2 ? 1 : -1) * 900, rotation: r + (i % 2 ? 28 : -28) }, { x: 0, rotation: r, duration: 0.42, ease: "back.out(1.6)" }, at);
+              else if (kind === "slap") tl.fromTo(el, { scale: 1.55, rotation: r - 6 }, { scale: 1, rotation: r, duration: 0.24, ease: "power4.in" }, at);
+              else if (kind === "drop") tl.fromTo(el, { y: -520, rotation: r + 10 }, { y: 0, rotation: r, duration: 0.6, ease: "bounce.out" }, at);
+              else tl.fromTo(el, { scale: 0.2, rotation: r }, { scale: 1, duration: 0.36, ease: "back.out(2.6)" }, at);
+              var land = at + (kind === "fly" ? 0.3 : kind === "slap" ? 0.24 : kind === "drop" ? 0.32 : 0.2);
+              if (kind !== "pop") tl.fromTo(box, { y: 0 }, { keyframes: [{ y: 9, duration: 0.04 }, { y: -6, duration: 0.05 }, { y: 3, duration: 0.05 }, { y: 0, duration: 0.06 }] }, land);   // impact shake
+              tl.to(el, { rotation: r + (i % 2 ? 1.6 : -1.6), duration: 1.1, ease: "sine.inOut", yoyo: true, repeat: Math.max(1, Math.floor(secs / 1.1)) }, land + 0.2);   // sway
+              at += step;
+            });
+            tl.to(pieces.map(function (p) { return p.el; }), { opacity: 0, y: -24, duration: 0.22, ease: "power2.in", stagger: 0.03 }, Math.max(at + 0.4, secs - 0.35));
+            window.__timelines = window.__timelines || {};
+            window.__timelines["rf-paper-cutout"] = tl;
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

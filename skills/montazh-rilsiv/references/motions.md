@@ -22,6 +22,7 @@ with what each one is for, its moment and its tested placement, is `references/m
   phrase animating over the video, `motions.py` `is_simple`). At least two thirds of a reel's motions are `[складне]`, `[просте]`
   at most a third and never two in a row. Add 1-2 catalog transitions (`use: transition`) where the topic changes.
 - Own motions `rf-*` (2026-10-29, from a reference reel; files in `motions/`, copied into the engine by setup_engine.sh): `rf-stopwatch`, `rf-step-tag`, `rf-emoji-caption` (caption style), `rf-file-upload`, `rf-pause-cut`; usage in `references/split-screen.md`.
+- Own paper-collage motions (2026-11-10, ideas from vox-director, MIT): `rf-paper-cutout`, `rf-starburst`, `rf-paper-caption` (caption style), `rf-scrapbook` (full frame, their images); usage, retro palettes and Vox AI-insert prompts in `references/paper-collage.md`.
 - `push` and `steps` are rare: at most one of them per reel unless the person asked, none when the previous reel had one. `split` is a regular tool for step-by-step moments: `references/split-screen.md`.
 - A motion still has to show what that exact line says. «ideas» suggests, it doesn't decide.
 

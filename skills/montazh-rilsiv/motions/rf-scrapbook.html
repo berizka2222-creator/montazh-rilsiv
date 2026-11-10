@@ -1,0 +1,85 @@
+<!doctype html>
+<!-- rf-scrapbook: full-frame moment. Their photos / screenshots land one by one as tilted taped prints on a cream paper table
+     (slap or drop, with paper shadows), the table drifts in slowly, and at the end a cut-paper headline slaps on top.
+     For «ось що вийшло», a run of examples / cases, or the closing card. Own motion of the reel skill (ideas from
+     vox-director, MIT). build_reel fills the image slots (card "images"), n_images, seconds and brand colours.
+     Card: {"type":"motion","name":"rf-scrapbook","layout":"full","start":..,"end":..,"images":["shots/a.png","b.jpg"],
+            "vars":{"text":"3 САЙТИ / ЗА ВЕЧІР"}} -->
+<html lang="uk" data-composition-id="rf-scrapbook" data-composition-duration="600" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "text", "type": "string", "label": "Заголовок наприкінці (/ новий рядок, можна порожньо)", "default": "ОСЬ ЩО / ВИЙШЛО" },
+  { "id": "image1", "type": "image", "label": "Фото 1", "default": "" },
+  { "id": "image2", "type": "image", "label": "Фото 2", "default": "" },
+  { "id": "image3", "type": "image", "label": "Фото 3", "default": "" },
+  { "id": "image4", "type": "image", "label": "Фото 4", "default": "" },
+  { "id": "image5", "type": "image", "label": "Фото 5", "default": "" },
+  { "id": "image6", "type": "image", "label": "Фото 6", "default": "" },
+  { "id": "n_images", "type": "number", "label": "Скільки фото", "default": 0 },
+  { "id": "table", "type": "color", "label": "Колір столу", "default": "#E9E1D0" },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 5 },
+  { "id": "brand_pop", "type": "color", "label": "Папір ключового слова", "default": "#E8C77A" },
+  { "id": "brand_deep", "type": "color", "label": "Колір чорнила", "default": "#1B1414" }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-scrapbook</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-scrapbook" data-duration="600" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; overflow: hidden; }
+          .rfsk { position: absolute; inset: -40px; transform-origin: 50% 45%;
+                  background-image: radial-gradient(rgba(120,100,70,.10) 1px, transparent 1.5px),
+                                    repeating-linear-gradient(17deg, rgba(255,255,255,.05) 0 3px, rgba(0,0,0,.025) 3px 6px); background-size: 9px 9px, auto; }
+          .rfsk .rfsk-cd { position: absolute; background: #FBF8F1; padding: 18px 18px 54px; box-shadow: 0 2px 3px rgba(0,0,0,.2);
+                      filter: drop-shadow(12px 20px 14px rgba(0,0,0,.35)); opacity: 0; }
+          .rfsk .rfsk-cd img { display: block; width: 100%; height: 100%; object-fit: cover; }
+          .rfsk .rfsk-tp { position: absolute; top: -18px; left: 50%; width: 130px; height: 40px; margin-left: -65px; background: rgba(240,232,200,.75);
+                      box-shadow: 0 1px 2px rgba(0,0,0,.15); }
+          .rfsk .rfsk-hd { position: absolute; left: 60px; right: 60px; top: 1180px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+          .rfsk .rfsk-hd b { display: block; padding: 16px 34px 12px; font-family: var(--font-display, sans-serif); font-weight: 900; font-size: 108px;
+                        line-height: 1; white-space: nowrap; opacity: 0; filter: drop-shadow(10px 16px 10px rgba(0,0,0,.4)); }
+        </style>
+        <div class="rfsk"></div>
+        <script>
+          (function () {
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            var secs = Math.max(2, +v.seconds || 5), table = document.querySelector(".rfsk");
+            table.style.backgroundColor = v.table || "#E9E1D0";
+            var ims = [1, 2, 3, 4, 5, 6].map(function (k) { return v["image" + k]; }).filter(Boolean);
+            var n = +v.n_images || 0; if (n > 0) ims = ims.slice(0, n);          // the slots cycle the images: show each one once
+            // spots for 1..6 prints: x, y, width, height, tilt (kept under the Instagram top bar, the headline goes low)
+            var SPOTS = [[140, 300, 520, 640, -6], [470, 420, 480, 600, 7], [90, 820, 470, 560, 4], [520, 900, 470, 560, -8], [260, 560, 520, 620, -2], [600, 300, 380, 470, 10]];
+            if (ims.length === 1) SPOTS = [[190, 380, 700, 820, -4]];
+            if (ims.length === 2) SPOTS = [[90, 330, 560, 680, -7], [440, 700, 560, 680, 6]];
+            var tl = gsap.timeline({ paused: true }), at = 0.1, step = Math.min(0.55, (secs * 0.55) / Math.max(1, ims.length));
+            tl.fromTo(table, { scale: 1 }, { scale: 1.06, duration: secs, ease: "none" }, 0);   // slow push-in on the table
+            ims.forEach(function (src, i) {
+              var s = SPOTS[i % SPOTS.length], cd = document.createElement("div"); cd.className = "rfsk-cd";
+              cd.style.left = s[0] + "px"; cd.style.top = s[1] + "px"; cd.style.width = s[2] + "px"; cd.style.height = s[3] + "px";
+              var im = document.createElement("img"); im.src = src; cd.appendChild(im);
+              var tp = document.createElement("div"); tp.className = "rfsk-tp"; tp.style.transform = "rotate(" + (i % 2 ? 6 : -5) + "deg)"; cd.appendChild(tp);
+              table.appendChild(cd);
+              tl.set(cd, { opacity: 1 }, at);
+              if (i % 2) tl.fromTo(cd, { y: -900, rotation: s[4] + 14 }, { y: 0, rotation: s[4], duration: 0.6, ease: "bounce.out" }, at);
+              else tl.fromTo(cd, { scale: 1.45, rotation: s[4] - 8 }, { scale: 1, rotation: s[4], duration: 0.26, ease: "power4.in" }, at);
+              tl.fromTo(table, { x: 0 }, { keyframes: [{ x: 8, duration: 0.04 }, { x: -6, duration: 0.05 }, { x: 0, duration: 0.06 }] }, at + (i % 2 ? 0.33 : 0.26));
+              at += step;
+            });
+            var hd = document.createElement("div"); hd.className = "rfsk-hd"; table.appendChild(hd);
+            var lines = String(v.text || "").split("/").map(function (x) { return x.trim(); }).filter(Boolean);
+            var hAt = Math.max(at + 0.3, secs * 0.62);
+            lines.forEach(function (t, i) {
+              var b = document.createElement("b"); b.textContent = t; b.style.color = v.brand_deep || "#1B1414";
+              b.style.background = i === lines.length - 1 ? (v.brand_pop || "#E8C77A") : "#F3EBDD";
+              b.style.transform = "rotate(" + (i % 2 ? 3 : -3) + "deg)";
+              b.style.clipPath = "polygon(0% 5%,18% 0%,40% 6%,63% 0%,84% 5%,100% 1%,98% 50%,100% 96%,80% 100%,58% 94%,36% 100%,14% 95%,0% 100%,2% 48%)";
+              if (t.length > 10) b.style.fontSize = Math.max(64, Math.round(108 * 10 / t.length)) + "px";
+              hd.appendChild(b);
+              tl.fromTo(b, { opacity: 0, scale: 1.6 }, { opacity: 1, scale: 1, duration: 0.24, ease: "power4.in" }, hAt + i * 0.22);
+            });
+            window.__timelines = window.__timelines || {};
+            window.__timelines["rf-scrapbook"] = tl;
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

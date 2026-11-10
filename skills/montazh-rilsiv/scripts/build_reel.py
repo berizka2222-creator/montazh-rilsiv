@@ -1019,6 +1019,8 @@ for i, c in enumerate(edit.get("cards", [])):
                 f_ = [round(sx_ + ss_ * f_[0]), round(SPLIT_PANEL + sy_ + ss_ * f_[1]), round(ss_ * f_[2]), round(ss_ * f_[3])]
             vars_.setdefault("face", f_)
         if '"id": "seconds"' in txt: vars_.setdefault("seconds", round(b - a, 2))
+        if '"id": "cap_y"' in txt: vars_.setdefault("cap_y", int(CAP_Y))   # rf-paper-caption: their caption line
+        if '"id": "n_images"' in txt and c.get("images"): vars_.setdefault("n_images", len(c["images"]))   # rf-scrapbook: no repeats
         if (c.get("place") == "low" or c.get("layout") in ("front", "behind", "over") or c.get("tone") == "clear") and not c.get("keep_ui"):
             vars_ = brand_recolor.over_vars(txt, vars_)   # light ink over the video: tone "ink" (for light frames) -> "paper"
         if c.get("images"):                              # carousels: fill every image slot, cycling the supplied images

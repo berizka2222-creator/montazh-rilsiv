@@ -10998,6 +10998,131 @@
    ],
    "no": 392,
    "note": "9 ефектів (частина 2): картка {\"type\": \"fx\", \"fx\": \"e9-wave\", \"start\", \"end\", \"text\"?, \"opt\"?}. Панчлайн, «бах». 0.9-1.3 с. Може лягати на тіло, обличчя вільне."
+  },
+  {
+   "name": "rf-paper-cutout",
+   "ua": "Фраза рваними паперовими вирізками зі скотчем: влітають, ляскають, падають, погойдуються",
+   "moments": [
+    "хук / ключова фраза",
+    "проблема / тиск"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "front",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": false
+   },
+   "keep_ui": true,
+   "text": "vars.text",
+   "text_vars": [
+    "text",
+    "entrance",
+    "y"
+   ],
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: паперовий колаж (Vox)",
+   "note": "vars.text = 2-6 слів, / новий рядок, *слово* = ключове на кольоровому папері. vars.entrance = auto|fly|slap|drop|pop. Ставить над головою (або під підборіддям); vars.y щоб задати верх блоку. 2.5-4 с.",
+   "no": 393
+  },
+  {
+   "name": "rf-starburst",
+   "ua": "Цифра чи слово на паперовій вирізці, за нею обертаються промені в кольорах бренду",
+   "moments": [
+    "цифра",
+    "успіх / готово",
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "card": {
+    "layout": "front",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": false
+   },
+   "keep_ui": true,
+   "text": "vars.text",
+   "text_vars": [
+    "text",
+    "sub",
+    "side"
+   ],
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: паперовий колаж (Vox)",
+   "note": "Одна сильна цифра на рілс. vars.text = \"-50$\", vars.sub = підпис (можна порожньо), vars.side = auto|right|left. 2-3.5 с.",
+   "no": 394
+  },
+  {
+   "name": "rf-paper-caption",
+   "ua": "Субтитри «вирізаний папір»: кожне слово паперовою смужкою, ключове на кольоровому папері з обводкою",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "caption",
+   "use": "caption",
+   "cap_at": "full",
+   "card": {
+    "place": "low",
+    "layout": "front"
+   },
+   "keep_ui": true,
+   "text": "",
+   "rank": 2,
+   "quality": 4,
+   "group": "Свої: паперовий колаж (Vox)",
+   "note": "Стиль субтитрів: edit.json \"caption_style\": \"rf-paper-caption\" (необов'язково \"caption_vars\": {\"paper\": \"#F3EBDD\", \"tilt\": 3}). Висоту бере з рядка субтитрів бренду. Пасує до рілсів з паперовими ефектами, не змішувати з неоновими стилями.",
+   "no": 395,
+   "text_vars": [
+    "paper",
+    "tilt"
+   ],
+   "caps_ok": true
+  },
+  {
+   "name": "rf-scrapbook",
+   "ua": "Скрапбук: їхні фото і скріни лягають нахиленими картками зі скотчем на кремовий стіл, наприкінці паперовий заголовок",
+   "moments": [
+    "картинки / приклади",
+    "відгук / доказ",
+    "успіх / готово"
+   ],
+   "status": "full_only",
+   "card": {
+    "layout": "full",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": false
+   },
+   "keep_ui": true,
+   "text": "vars.text",
+   "text_vars": [
+    "text"
+   ],
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: паперовий колаж (Vox)",
+   "note": "На весь кадр 3.5-6 с: {\"type\":\"motion\",\"name\":\"rf-scrapbook\",\"layout\":\"full\",\"images\":[2-6 їхніх фото/скрінів],\"vars\":{\"text\":\"ОСЬ ЩО / ВИЙШЛО\"}}. Тільки їхні картинки, без них не ставити. Добре як фінальна картка перед CTA.",
+   "no": 396
   }
  ]
 }

@@ -1,0 +1,68 @@
+<!doctype html>
+<!-- rf-starburst: a big number or word on a torn paper scrap, with paper rays turning behind it (Vox / atomic-age collage).
+     For the one figure or word of the reel that must hit. Own motion of the reel skill (ideas from vox-director, MIT).
+     build_reel fills face, seconds and brand colours.
+     Card: {"type":"motion","name":"rf-starburst","start":..,"end":..,"vars":{"text":"-50$","sub":"за квиток"}} -->
+<html lang="uk" data-composition-id="rf-starburst" data-composition-duration="600" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "text", "type": "string", "label": "Цифра або слово", "default": "-50$" },
+  { "id": "sub", "type": "string", "label": "Підпис під ним (можна порожньо)", "default": "" },
+  { "id": "side", "type": "enum", "label": "Де", "default": "auto", "options": [{ "value": "auto", "label": "над головою" }, { "value": "right", "label": "праворуч" }, { "value": "left", "label": "ліворуч" }] },
+  { "id": "face", "type": "json", "label": "Обличчя [x, y, w, h]", "default": [300, 500, 480, 600] },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 3 },
+  { "id": "brand_main", "type": "color", "label": "Колір променів 1", "default": "#7D1520" },
+  { "id": "brand_pop", "type": "color", "label": "Колір променів 2", "default": "#E8C77A" },
+  { "id": "brand_deep", "type": "color", "label": "Колір чорнила", "default": "#1B1414" }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-starburst</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-starburst" data-duration="600" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; }
+          .rfsb { position: absolute; width: 560px; height: 560px; opacity: 0; }
+          .rfsb svg { position: absolute; inset: 0; width: 100%; height: 100%; filter: drop-shadow(8px 12px 10px rgba(0,0,0,.3)); }
+          .rfsb .rfsb-pc { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); filter: drop-shadow(10px 16px 9px rgba(0,0,0,.4)); }
+          .rfsb .rfsb-sc { padding: 22px 38px 16px; background: #F3EBDD; font-family: var(--font-display, sans-serif); font-weight: 900;
+                      font-size: 150px; line-height: .95; white-space: nowrap; text-align: center; }
+          .rfsb .rfsb-sb { display: block; font-family: var(--font-body, sans-serif); font-weight: 600; font-size: 40px; margin-top: 6px; }
+        </style>
+        <div class="rfsb"><svg viewBox="-100 -100 200 200"><g class="rfsb-rays"></g></svg><div class="rfsb-pc"><div class="rfsb-sc"></div></div></div>
+        <script>
+          (function () {
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            var f = Array.isArray(v.face) ? v.face : [300, 500, 480, 600], secs = Math.max(1, +v.seconds || 3);
+            var box = document.querySelector(".rfsb"), g = box.querySelector(".rfsb-rays"), sc = box.querySelector(".rfsb-sc");
+            var c1 = v.brand_main || "#7D1520", c2 = v.brand_pop || "#E8C77A", N = 18, k;
+            for (k = 0; k < N; k++) {                       // wedges alternating the two brand colours, slightly uneven like cut paper
+              var a0 = k / N * Math.PI * 2, a1 = (k + 0.5) / N * Math.PI * 2, r = 100 + (k % 3) * 6;
+              var p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+              p.setAttribute("d", "M0 0 L" + (Math.cos(a0) * r).toFixed(1) + " " + (Math.sin(a0) * r).toFixed(1) + " L" + (Math.cos(a1) * r).toFixed(1) + " " + (Math.sin(a1) * r).toFixed(1) + " Z");
+              p.setAttribute("fill", k % 2 ? c1 : c2); g.appendChild(p);
+            }
+            sc.style.color = v.brand_deep || "#1B1414"; sc.textContent = String(v.text || "-50$");
+            if (sc.textContent.length > 5) sc.style.fontSize = Math.max(80, Math.round(150 * 5 / sc.textContent.length)) + "px";
+            if (v.sub) { var s = document.createElement("span"); s.className = "rfsb-sb"; s.textContent = v.sub; sc.appendChild(s); }
+            sc.style.clipPath = "polygon(0% 3%,12% 0%,27% 4%,41% 1%,58% 3%,73% 0%,88% 4%,100% 1%,98% 22%,100% 47%,97% 71%,100% 97%,85% 100%,69% 96%,52% 100%,36% 97%,19% 100%,3% 97%,1% 74%,3% 50%,0% 26%)";
+            // over the head, or beside it; the 560 square stays inside the frame and under the Instagram top bar
+            var cx, cy;
+            if (v.side === "right") { cx = Math.min(1080 - 250, f[0] + f[2] + 120); cy = f[1] + f[3] * 0.25; }
+            else if (v.side === "left") { cx = Math.max(250, f[0] - 120); cy = f[1] + f[3] * 0.25; }
+            else { cx = f[0] + f[2] / 2; cy = f[1] - 230; if (cy < 500) cy = Math.min(1400, f[1] + f[3] + 260); }
+            box.style.left = Math.round(Math.max(-60, Math.min(1080 - 500, cx - 280))) + "px";
+            box.style.top = Math.round(Math.max(230, cy - 280)) + "px";
+            var tl = gsap.timeline({ paused: true });
+            tl.set(box, { opacity: 1 }, 0.05);
+            tl.fromTo(box.querySelector("svg"), { scale: 0, rotation: -40 }, { scale: 1, rotation: 0, duration: 0.45, ease: "back.out(1.8)" }, 0.05);
+            tl.to(g, { rotation: 360, svgOrigin: "0 0", duration: 9, ease: "none" }, 0.05);
+            tl.fromTo(box.querySelector(".rfsb-pc"), { scale: 1.6, rotation: -8 }, { scale: 1, rotation: -3, duration: 0.24, ease: "power4.in" }, 0.25);   // slap
+            tl.fromTo(box, { x: 0 }, { keyframes: [{ x: 10, duration: 0.04 }, { x: -8, duration: 0.05 }, { x: 4, duration: 0.05 }, { x: 0, duration: 0.06 }] }, 0.49);
+            tl.to(box.querySelector(".rfsb-pc"), { scale: 1.05, duration: 0.6, ease: "sine.inOut", yoyo: true, repeat: Math.max(1, Math.floor(secs / 0.6) - 2) }, 0.8);   // pulse
+            tl.to(box, { opacity: 0, scale: 0.85, duration: 0.25, ease: "power2.in" }, Math.max(1, secs - 0.3));
+            window.__timelines = window.__timelines || {};
+            window.__timelines["rf-starburst"] = tl;
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

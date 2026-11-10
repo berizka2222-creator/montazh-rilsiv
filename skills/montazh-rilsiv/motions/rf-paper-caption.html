@@ -1,0 +1,69 @@
+<!doctype html>
+<!-- rf-paper-caption: caption style. Each phrase is a row of cut-out paper words (cream scraps, ink-dark letters, a torn edge,
+     a paper shadow); every word slaps down as it is said, the key word sits on a brand-coloured scrap with a keyline.
+     Own motion of the reel skill (ideas from vox-director, MIT). build_reel's caption_patch fills WORDS / RAW_GROUPS /
+     KEYWORDS / DURATION; cap_y (the brand's caption line) and colours come from the reel.
+     edit.json: "caption_style": "rf-paper-caption", optional "caption_vars": {"paper": "#F3EBDD", "tilt": 3} -->
+<html lang="uk" data-composition-id="rf-paper-caption" data-composition-duration="8.0" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "cap_y", "type": "number", "label": "Висота рядка субтитрів, px", "default": 1180 },
+  { "id": "paper", "type": "color", "label": "Колір паперу", "default": "#F3EBDD" },
+  { "id": "tilt", "type": "number", "label": "Нахил смужок, градусів", "default": 3 },
+  { "id": "brand_pop", "type": "color", "label": "Папір ключового слова", "default": "#E8C77A" },
+  { "id": "brand_main", "type": "color", "label": "Обводка ключового слова", "default": "#7D1520" },
+  { "id": "brand_deep", "type": "color", "label": "Колір літер", "default": "#1B1414" }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-paper-caption</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-paper-caption" data-duration="8.0" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; }
+          .rfcp { position: absolute; left: 70px; width: 940px; }
+          .rfcp .rfcp-gr { position: absolute; left: 0; right: 0; top: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px 12px; opacity: 0; }
+          .rfcp .rfcp-w { position: relative; opacity: 0; filter: drop-shadow(6px 10px 6px rgba(0,0,0,.42)); }
+          .rfcp .rfcp-w b { display: block; padding: 10px 18px 7px; font-family: var(--font-display, sans-serif); font-weight: 800; font-size: 66px;
+                       line-height: 1; white-space: nowrap; }
+          .rfcp .rfcp-w.rfcp-k b { outline: 5px solid var(--kl); outline-offset: -5px; }
+        </style>
+        <div class="rfcp"></div>
+        <script>
+          (function () {
+            var WORDS = [];
+            var RAW_GROUPS = [];
+            var KEYWORDS = new Set([]);
+            var DURATION = 8.0;
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            var paper = v.paper || "#F3EBDD", pop = v.brand_pop || "#E8C77A", ink = v.brand_deep || "#1B1414", tilt = +v.tilt || 3;
+            var box = document.querySelector(".rfcp"); box.style.top = Math.max(900, Math.min(1420, +v.cap_y || 1180)) + "px";
+            box.style.setProperty("--kl", v.brand_main || "#7D1520");
+            var groups = RAW_GROUPS.length ? RAW_GROUPS : WORDS.map(function (w, i) { return [i, i]; });
+            var seed = 11; function rnd() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
+            var EDGES = ["polygon(0% 6%,20% 0%,45% 5%,70% 0%,100% 4%,98% 50%,100% 96%,76% 100%,50% 95%,24% 100%,0% 96%,2% 50%)",
+                         "polygon(2% 0%,30% 5%,55% 0%,82% 4%,100% 0%,97% 48%,100% 100%,70% 95%,44% 100%,18% 95%,0% 100%,3% 52%)",
+                         "polygon(0% 3%,25% 0%,52% 6%,78% 1%,100% 6%,100% 52%,97% 97%,72% 100%,47% 95%,22% 100%,1% 97%,0% 48%)"];
+            var tl = gsap.timeline({ paused: true });
+            groups.forEach(function (gp, gi) {
+              var g = document.createElement("div"); g.className = "rfcp-gr"; box.appendChild(g);
+              var a = WORDS[gp[0]], z = WORDS[gp[1]];
+              if (!a || !z) return;
+              var nextStart = gi + 1 < groups.length && WORDS[groups[gi + 1][0]] ? WORDS[groups[gi + 1][0]].start : z.end + 0.5;
+              var end = Math.min(nextStart, z.end + 0.7);
+              tl.set(g, { opacity: 1 }, a.start);
+              for (var j = gp[0]; j <= gp[1]; j++) {
+                var w = WORDS[j], key = KEYWORDS.has(j);
+                var el = document.createElement("div"); el.className = "rfcp-w" + (key ? " rfcp-k" : "");
+                var b = document.createElement("b"); b.textContent = w.text; b.style.background = key ? pop : paper; b.style.color = ink;
+                b.style.clipPath = EDGES[j % 3]; el.appendChild(b); g.appendChild(el);
+                var r = (rnd() * 2 - 1) * tilt;
+                tl.fromTo(el, { opacity: 0, scale: key ? 1.7 : 1.4, rotation: r - 5 }, { opacity: 1, scale: 1, rotation: r, duration: key ? 0.2 : 0.16, ease: "power4.in" }, w.start);
+              }
+              tl.to(g, { opacity: 0, duration: 0.08 }, Math.max(a.start + 0.2, end));
+            });
+            window.__timelines = window.__timelines || {};
+            window.__timelines["rf-paper-caption"] = tl;
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>
