@@ -106,9 +106,11 @@ def manual_effects():
         for m in full["motions"]:
             if m["name"] in byname: m["no"] = byname[m["name"]]
         json.dump(full, open(cp, "w"), ensure_ascii=False, indent=1)
-    out = [{"n": m["name"], "no": m["no"], "ua": m.get("ua") or m["name"], "g": group(m), "k": "m" if m.get("status") == "manual" else "a",
+    # «t»: the tier picked by hand (catalog "tier", 2026-11-13): top = «Основні», reserve = «Запас»; a top «manual» effect is suggested too
+    out = [{"n": m["name"], "no": m["no"], "ua": m.get("ua") or m["name"], "g": group(m),
+            "k": "m" if m.get("status") == "manual" and m.get("tier") != "top" else "a", "t": "res" if m.get("tier") == "reserve" else "top",
             **({"p": pv[m["name"]]} if m["name"] in pv else {})} for m in menu]
-    return sorted(out, key=lambda x: x["no"])
+    return sorted(out, key=lambda x: (x["t"] == "res", x["no"]))
 
 def export(reel, proposal, out):
     out.mkdir(parents=True, exist_ok=True)

@@ -965,15 +965,15 @@ function bigBtn(card, open) {
 // ---------- «Тільки вручну»: catalog effects Claude never suggests on its own (reel.json "manual"), one tap puts one on this second ----------
 const manObs = new IntersectionObserver(es => { for (const e of es) { const v = e.target;   // previews load and play only while on screen
   if (e.isIntersecting) { if (!v.src) v.src = v.dataset.src; v.play().catch(() => {}); } else v.pause(); } }, { rootMargin: "200px" });
-let MENU_F = "all";
+let MENU_F = "top";   // «Основні» first (tiers picked by hand, 2026-11-13)
 function renderManual() {
   const box = $("#manlist"), all = (R && R.manual) || []; $("#manlib").hidden = !all.length; if (!all.length) return;
   const fb = $("#menufilter"); fb.textContent = "";
-  for (const [k, t] of [["all", "Усі"], ["a", "Claude пропонує"], ["m", "Тільки вручну"], ["mine", "Мій вибір"]]) {
+  for (const [k, t] of [["top", "Основні"], ["res", "Запас"], ["m", "Тільки вручну"], ["mine", "Мій вибір"], ["all", "Усі"]]) {
     const b = document.createElement("button"); b.type = "button"; b.textContent = t; b.setAttribute("aria-pressed", MENU_F === k);
     b.addEventListener("click", () => { MENU_F = k; renderManual(); }); fb.appendChild(b); }
   const picks = new Set(S.picks || []), q = ($("#mansearch").value || "").trim().toLowerCase();
-  const list = all.filter(m => (MENU_F === "all" || (MENU_F === "mine" ? picks.has(m.n) : (m.k || "m") === MENU_F))
+  const list = all.filter(m => (MENU_F === "all" || (MENU_F === "mine" ? picks.has(m.n) : (MENU_F === "top" || MENU_F === "res") ? (m.t || "top") === MENU_F : (m.k || "m") === MENU_F))
                               && (!q || (/^\d+$/.test(q) ? String(m.no) === q : (m.no + " " + m.ua + " " + m.n + " " + m.g).toLowerCase().includes(q))));
   $("#mancount").textContent = list.length === all.length ? `${all.length}` : `${list.length} з ${all.length}`;
   const bk = $("#basket"); bk.hidden = !picks.size; bk.textContent = "";
@@ -988,7 +988,8 @@ function renderManual() {
     () => mutate(() => { const p = new Set(S.picks || []); p.has(m.n) ? p.delete(m.n) : p.add(m.n); S.picks = [...p]; if (!S.picks.length) delete S.picks; }), !isPick(m.n)],
     ["⏱ На цю секунду", () => at(m)]] }));
   for (const m of list) {
-    if (m.g !== g) { g = m.g; const h = document.createElement("h4"); h.textContent = g; grid = document.createElement("div"); grid.className = "capgrid"; box.append(h, grid); }
+    const gl = (m.t === "res" && MENU_F !== "res" ? "Запас · " : "") + m.g;
+    if (gl !== g) { g = gl; const h = document.createElement("h4"); h.textContent = g; grid = document.createElement("div"); grid.className = "capgrid"; box.append(h, grid); }
     const card = document.createElement("div"); card.className = "capopt menuopt"; card.setAttribute("role", "button"); card.tabIndex = 0;
     card.setAttribute("aria-pressed", picks.has(m.n)); card.title = picks.has(m.n) ? "Прибрати з мого вибору" : "Додати в мій вибір";
     if (m.p) { const v = document.createElement("video"); v.muted = true; v.loop = true; v.playsInline = true; v.preload = "none"; v.dataset.src = m.p; manObs.observe(v); card.appendChild(v); }
