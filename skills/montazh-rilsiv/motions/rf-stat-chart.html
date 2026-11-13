@@ -1,0 +1,234 @@
+<!doctype html>
+<!-- rf-stat-chart: a dark fintech dashboard in tilted layers, a rolling counter locked to a lime line that kicks up through
+     the top of its plot while the axis rescales, then the end point keeps pulsing. Rebuilt from an ultra-skills motion prompt. -->
+<html lang="uk" data-composition-id="rf-stat-chart" data-composition-duration="600" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "company", "type": "string", "label": "Назва компанії (вигадана)", "default": "Company name" },
+  { "id": "chip", "type": "string", "label": "Плашка біля назви", "default": "demo" },
+  { "id": "label", "type": "string", "label": "Підпис метрики", "default": "Metric name (demo data)" },
+  { "id": "start_value", "type": "string", "label": "Лічильник: старт (знак і одиниця лишаються)", "default": "$0" },
+  { "id": "end_value", "type": "string", "label": "Лічильник: фінал", "default": "$10,000" },
+  { "id": "event", "type": "string", "label": "Подія в точці злету", "default": "Event name" },
+  { "id": "bg", "type": "color", "label": "Фон: верх", "default": "#141612" },
+  { "id": "bg2", "type": "color", "label": "Фон: середина", "default": "#0c0d0b" },
+  { "id": "bg3", "type": "color", "label": "Фон: низ", "default": "#070806" },
+  { "id": "surface", "type": "color", "label": "Плашки і графік", "default": "#1c1f18" },
+  { "id": "grid", "type": "color", "label": "Лінії сітки (11%)", "default": "#dcffaa" },
+  { "id": "ink", "type": "color", "label": "Основний текст", "default": "#f6f8f0" },
+  { "id": "muted", "type": "color", "label": "Другорядний текст", "default": "#aab09e" },
+  { "id": "accent", "type": "color", "label": "Акцент (лінія, знак)", "default": "#c6f432" },
+  { "id": "on_accent", "type": "color", "label": "Текст на акценті", "default": "#0b0d06" },
+  { "id": "glow", "type": "color", "label": "Світіння за графіком", "default": "#c6f432" },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 3 }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-stat-chart</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-stat-chart" data-duration="600" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; overflow: hidden; }
+          .rfsc { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden; perspective: 1800px; perspective-origin: 540px 900px;
+                  font-family: var(--font-body, "Helvetica Neue", Arial, sans-serif); color: var(--rfsc-ink); }
+          .rfsc .rfsc-sc { position: absolute; inset: 0; transform-style: preserve-3d; transform-origin: 540px 900px; }
+          .rfsc .rfsc-ly { position: absolute; inset: 0; transform-style: preserve-3d; }
+          .rfsc .rfsc-glw { position: absolute; left: 40px; top: 700px; width: 1000px; height: 860px; border-radius: 50%; opacity: .2; }
+          .rfsc .rfsc-hd { position: absolute; left: 70px; top: 228px; display: flex; align-items: center; gap: 18px; white-space: nowrap; }
+          .rfsc .rfsc-mk { width: 40px; height: 40px; border-radius: 9px; position: relative; flex: none; }
+          .rfsc .rfsc-mk i { position: absolute; left: 11px; top: 11px; width: 18px; height: 18px; border-radius: 4px; }
+          .rfsc .rfsc-co { font-weight: 700; font-size: 44px; line-height: 1; }
+          .rfsc .rfsc-ch { font-size: 22px; line-height: 1; padding: 7px 12px; border-radius: 99px; border: 1.5px solid; text-transform: lowercase; }
+          .rfsc .rfsc-lb { position: absolute; left: 70px; right: 70px; top: 318px; font-size: 36px; line-height: 1.1; white-space: nowrap; }
+          .rfsc .rfsc-num { position: absolute; left: 60px; top: 392px; display: flex; align-items: flex-start; white-space: nowrap;
+                  font-family: var(--font-display, "Helvetica Neue", Arial, sans-serif); font-weight: 900; font-size: 190px; line-height: 1; letter-spacing: -0.02em; }
+          .rfsc .rfsc-dc { display: block; position: relative; width: .62em; height: 1em; overflow: hidden; text-align: center; }
+          .rfsc .rfsc-dc b { display: block; position: absolute; left: 0; top: 0; width: 100%; font-weight: 900; }
+          .rfsc .rfsc-dc b span { display: block; height: 1em; }
+          .rfsc .rfsc-fx { display: block; height: 1em; text-align: center; }
+          .rfsc .rfsc-pl { position: absolute; left: 70px; top: 840px; width: 940px; height: 560px; border-radius: 34px; }
+          .rfsc .rfsc-sv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: visible; }
+          .rfsc .rfsc-ev { position: absolute; padding: 12px 20px; border-radius: 14px; font-size: 36px; line-height: 1; white-space: nowrap;
+                  transform-origin: 100% 100%; border: 1.5px solid; }
+        </style>
+        <div class="rfsc"><div class="rfsc-sc">
+          <div class="rfsc-ly rfsc-l0"><div class="rfsc-glw"></div><div class="rfsc-pl"></div>
+            <svg class="rfsc-sv" width="1080" height="1920" viewBox="0 0 1080 1920"><defs></defs></svg><div class="rfsc-ev"></div></div>
+          <div class="rfsc-ly rfsc-l1"><div class="rfsc-num"></div></div>
+          <div class="rfsc-ly rfsc-l2"><div class="rfsc-hd"><div class="rfsc-mk"><i></i></div><div class="rfsc-co"></div><div class="rfsc-ch"></div></div>
+            <div class="rfsc-lb"></div></div>
+        </div></div>
+        <script>
+          (function () {
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            function S(x, d) { return (x === undefined || x === null) ? d : String(x); }
+            var secs = Math.max(1, +v.seconds || 3), FPS = 30;
+            var root = document.querySelector(".rfsc"), C = {};
+            [["bg", "#141612"], ["bg2", "#0c0d0b"], ["bg3", "#070806"], ["surface", "#1c1f18"], ["grid", "#dcffaa"], ["ink", "#f6f8f0"],
+             ["muted", "#aab09e"], ["accent", "#c6f432"], ["on_accent", "#0b0d06"], ["glow", "#c6f432"]].forEach(function (c) {
+              C[c[0]] = v[c[0]] || c[1]; root.style.setProperty("--rfsc-" + c[0].replace("_", "-"), C[c[0]]); });
+            function rgba(h, a) { h = String(h).replace("#", ""); if (h.length === 3) h = h.replace(/./g, "$&$&"); var n = parseInt(h, 16);
+              return "rgba(" + (n >> 16 & 255) + "," + (n >> 8 & 255) + "," + (n & 255) + "," + a + ")"; }
+            function q(s) { return root.querySelector(s); }
+            function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a);
+              t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+            function clamp(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+            function sio(x) { return .5 - .5 * Math.cos(Math.PI * clamp(x)); }
+            var NS = "http://www.w3.org/2000/svg";
+            function el(tag, at, parent) { var e = document.createElementNS(NS, tag); for (var k in at) e.setAttribute(k, at[k]); parent.appendChild(e); return e; }
+            root.style.background = "linear-gradient(180deg," + C.bg + " 0%," + C.bg2 + " 55%," + C.bg3 + " 100%)";
+            q(".rfsc-glw").style.background = "radial-gradient(closest-side," + rgba(C.glow, .55) + "," + rgba(C.glow, 0) + ")";
+            // ---- header and label
+            var mk = q(".rfsc-mk"); mk.style.background = C.accent; mk.querySelector("i").style.background = C.on_accent;
+            var co = q(".rfsc-co"); co.textContent = S(v.company, "Company name"); co.style.color = C.ink;
+            var ch = q(".rfsc-ch"); ch.textContent = S(v.chip, "demo"); ch.style.color = C.muted; ch.style.borderColor = rgba(C.muted, .5);
+            ch.style.background = C.surface; if (!ch.textContent) ch.style.display = "none";
+            var hd = q(".rfsc-hd"); for (var fs = 44; fs > 26 && hd.scrollWidth > 940; fs -= 2) co.style.fontSize = fs + "px";
+            var lb = q(".rfsc-lb"); lb.textContent = S(v.label, "Metric name (demo data)"); lb.style.color = C.muted;
+            for (fs = 36; fs > 22 && lb.scrollWidth > 940; fs -= 2) lb.style.fontSize = fs + "px";
+            // ---- counter values: sign and unit stay fixed, the digits roll
+            function parse(s) {
+              s = String(s); var pre = (s.match(/^[^\d]*/) || [""])[0], rest = s.slice(pre.length), suf = (rest.match(/[^\d]*$/) || [""])[0];
+              var core = rest.slice(0, rest.length - suf.length), dec = 0, dsep = ".", tsep = "";
+              var m = core.match(/[.,](\d{1,2})$/);
+              if (m && !(core.replace(/[^.,]/g, "").length === 1 && m[1].length === 3)) { dec = m[1].length; dsep = core.charAt(core.length - dec - 1); core = core.slice(0, core.length - dec - 1) + "." + m[1]; }
+              var ts = core.split(".")[0].match(/[^\d]/); if (ts) tsep = ts[0];
+              return { pre: pre, suf: suf, dec: dec, dsep: dsep, tsep: tsep, n: parseFloat(core.replace(/[^\d.]/g, "")) || 0 };
+            }
+            var E = parse(S(v.end_value, "$10,000")), B = parse(S(v.start_value, "$0"));
+            var START = B.n, END = E.n, DEC = E.dec;
+            var intDigits = Math.max(String(Math.floor(Math.max(START, END))).length, 1);
+            var num = q(".rfsc-num"), cols = [];
+            function fixed(t) { var s = document.createElement("span"); s.className = "rfsc-fx"; s.textContent = t; num.appendChild(s); return s; }
+            var defs = q(".rfsc-sv defs");
+            function column(place) {
+              var c = document.createElement("span"); c.className = "rfsc-dc"; var b = document.createElement("b");
+              for (var d = 0; d <= 10; d++) { var s = document.createElement("span"); s.textContent = d % 10; b.appendChild(s); }
+              c.appendChild(b); num.appendChild(c);
+              var id = "rfsc-mb" + cols.length, fl = el("filter", { id: id, x: "-10%", y: "-40%", width: "120%", height: "180%" }, defs);
+              var g = el("feGaussianBlur", { stdDeviation: "0 0" }, fl);
+              cols.push({ el: c, strip: b, place: place, blur: g, id: id });
+            }
+            if (E.pre) fixed(E.pre);
+            for (var p = intDigits - 1; p >= 0; p--) { column(p); if (E.tsep && p > 0 && p % 3 === 0) { var sp0 = fixed(/\s/.test(E.tsep) ? "\u00a0" : E.tsep); if (/\s/.test(E.tsep)) sp0.style.width = ".24em"; } }
+            if (DEC) { fixed(E.dsep); for (p = -1; p >= -DEC; p--) column(p); }
+            if (E.suf) fixed(E.suf);
+            num.style.color = C.ink;
+            for (fs = 190; fs > 70 && num.scrollWidth > 920; fs -= 4) num.style.fontSize = fs + "px";
+            // ---- plot
+            var plate = q(".rfsc-pl"); plate.style.background = C.surface; plate.style.boxShadow = "inset 0 0 0 1.5px " + rgba(C.grid, .08);
+            var PL = 120, PR = 960, PT = 890, PB = 1340, W = PR - PL, H = PB - PT;
+            var sv = q(".rfsc-sv"), clip = el("clipPath", { id: "rfsc-clip" }, defs); el("rect", { x: PL, y: PT, width: W, height: H }, clip);
+            var gGrid = el("g", { "clip-path": "url(#rfsc-clip)" }, sv), gTicks = el("g", {}, sv), hl = [], tk = [];
+            for (var k = 0; k <= 26; k++) { hl.push(el("line", { x1: PL, x2: PR, stroke: rgba(C.grid, .11), "stroke-width": 2 }, gGrid));
+              tk.push(el("line", { x1: PL - 18, x2: PL - 6, stroke: rgba(C.grid, .3), "stroke-width": 2 }, gTicks)); }
+            for (k = 0; k <= 6; k++) el("line", { x1: PL + k * W / 6, x2: PL + k * W / 6, y1: PT, y2: PB, stroke: rgba(C.grid, .07), "stroke-width": 2 }, gGrid);
+            for (k = 0; k <= 6; k++) el("line", { x1: PL + k * W / 6, x2: PL + k * W / 6, y1: PB + 6, y2: PB + 18, stroke: rgba(C.grid, .3), "stroke-width": 2 }, sv);
+            el("line", { x1: PL, x2: PR, y1: PB, y2: PB, stroke: rgba(C.grid, .22), "stroke-width": 2 }, sv);
+            var lg = el("linearGradient", { id: "rfsc-fill", x1: 0, y1: 0, x2: 0, y2: 1 }, defs);
+            el("stop", { offset: 0, "stop-color": C.accent, "stop-opacity": .26 }, lg); el("stop", { offset: 1, "stop-color": C.accent, "stop-opacity": 0 }, lg);
+            var gb = el("filter", { id: "rfsc-gl", x: "-20%", y: "-20%", width: "140%", height: "140%" }, defs); el("feGaussianBlur", { stdDeviation: "9" }, gb);
+            var area = el("path", { fill: "url(#rfsc-fill)" }, sv);
+            var glowL = el("path", { fill: "none", stroke: C.accent, "stroke-width": 14, "stroke-opacity": .45, filter: "url(#rfsc-gl)", "stroke-linecap": "round", "stroke-linejoin": "round" }, sv);
+            var line = el("path", { fill: "none", stroke: C.accent, "stroke-width": 4, "stroke-linecap": "round", "stroke-linejoin": "round" }, sv);
+            var pinL = el("line", { stroke: rgba(C.ink, .55), "stroke-width": 1.5 }, sv), pinR = el("circle", { r: 16, fill: "none", stroke: C.accent, "stroke-width": 2 }, sv);
+            var pinD = el("circle", { r: 8, fill: C.accent }, sv);
+            var ring = el("circle", { fill: "none", stroke: C.accent, "stroke-width": 3 }, sv), dust = [], dr = mulberry32(4401);
+            for (k = 0; k < 9; k++) dust.push({ c: el("circle", { fill: C.accent }, sv), a: -Math.PI * (.05 + dr() * .9) - (dr() > .7 ? Math.PI * .6 : 0), d: 50 + dr() * 90, r: 2 + dr() * 3 });
+            var pulse = el("circle", { fill: C.accent }, sv), endG = el("circle", { fill: C.accent, filter: "url(#rfsc-gl)" }, sv), endD = el("circle", { r: 9, fill: C.ink }, sv);
+            var ev = q(".rfsc-ev"); ev.textContent = S(v.event, "Event name"); ev.style.background = C.surface; ev.style.color = C.ink; ev.style.borderColor = rgba(C.accent, .6);
+            for (fs = 36; fs > 22 && ev.offsetWidth > 600; fs -= 2) ev.style.fontSize = fs + "px";
+            // ---- data: almost flat with a small seeded wobble, then the kick
+            var wr = mulberry32(2207), wob = []; for (k = 0; k < 12; k++) wob.push(wr() - .5);
+            var KX = 0.7;
+            function flat(x) { var u = x / KX * 11, i0 = Math.floor(u), fr = u - i0, s = fr * fr * (3 - 2 * fr);
+              return 0.12 + 0.03 * x + 0.022 * (wob[i0] * (1 - s) + wob[Math.min(11, i0 + 1)] * s); }
+            var VK = flat(KX), V0 = flat(0);
+            function V(x) { return x <= KX ? flat(x) : VK + (1 - VK) * Math.pow((x - KX) / (1 - KX), 1.9); }
+            function tipX(f) { if (f < 6) return 0; if (f < 32) return KX * sio((f - 6) / 26) * 0.15 + KX * ((f - 6) / 26) * 0.85; return KX + (1 - KX) * clamp((f - 32) / 12); }
+            var S0 = H / 0.3, S1 = PB - (840 - 220);       // the tip ends 220px above the plot plate
+            function scale(f) { return S0 + (S1 - S0) * sio((f - 32) / 12); }
+            function value(f) { return START + (END - START) * clamp((V(tipX(f)) - V0) / (1 - V0)); }
+            var rnd10 = Math.pow(10, DEC);
+            function render(f) {
+              var push = 1 + 0.03 * sio(f / 90);
+              q(".rfsc-sc").style.transform = "rotateX(3deg) rotateY(-4deg) scale(" + push.toFixed(4) + ")";
+              var par = (push - 1) / 0.03;
+              q(".rfsc-l0").style.transform = "translateZ(0px)";
+              q(".rfsc-l1").style.transform = "translate3d(" + (-6 * par).toFixed(2) + "px,0,50px)";
+              q(".rfsc-l2").style.transform = "translate3d(" + (-12 * par).toFixed(2) + "px,0,90px)";
+              hd.style.opacity = clamp(f / 3); hd.style.transform = "translateY(" + (14 * (1 - clamp(f / 3))) + "px)";
+              lb.style.opacity = clamp((f - 3) / 3); lb.style.transform = "translateY(" + (14 * (1 - clamp((f - 3) / 3))) + "px)";
+              plate.style.opacity = clamp((f - 1) / 4); gGrid.style.opacity = gTicks.style.opacity = clamp((f - 2) / 4);
+              // counter
+              var vis = clamp((f - 4) / 3); num.style.opacity = vis;
+              var val = value(f), valP = value(f - 0.5);
+              if (f >= 44) val = valP = END;
+              // odometer: the lowest column rolls continuously, each higher one turns only while the one below passes 9 -> 0
+              function odo(x) { var out = [], below = null, low = -DEC;
+                for (var pl = low; pl <= intDigits - 1; pl++) {
+                  var sc = Math.pow(10, pl), p2 = pl === low ? ((x / sc) % 10 + 10) % 10 : (Math.floor(x / sc + 1e-9) % 10) + Math.max(0, below - 9);
+                  out[pl] = p2; below = p2; }
+                return out; }
+              var oN = odo(Math.round(val * rnd10) / rnd10 === val ? val : val), oP = odo(valP);
+              cols.forEach(function (c, i) {
+                var k2 = 1 + (cols.length - i) * 0.25, spin = 10 * (1 - sio((f - 4) / 8)) * k2, spinP = 10 * (1 - sio((f - 4.5) / 8)) * k2;
+                var ps = oN[c.place] + spin, pp = oP[c.place] + spinP;
+                var sp = Math.abs(ps - pp) % 10; if (sp > 5) sp = 10 - sp;
+                ps = ps % 10;
+                c.strip.style.transform = "translateY(" + (-ps).toFixed(4) + "em)";
+                var bl = Math.min(16, sp * 22); c.blur.setAttribute("stdDeviation", "0 " + bl.toFixed(2));
+                c.strip.style.filter = bl > 0.3 ? "url(#" + c.id + ")" : "none";
+                var lead = c.place > 0 && Math.floor(val) < Math.pow(10, c.place) && spin < 0.01;
+                c.el.style.opacity = lead ? .2 : 1;
+              });
+              // line
+              var tx = tipX(f), s = scale(f), pts = [];
+              for (var x = 0; x <= tx + 1e-6; x += 0.006) pts.push([PL + x * W, PB - V(x) * s]);
+              pts.push([PL + tx * W, PB - V(tx) * s]);
+              var d = pts.length > 1 ? "M" + pts.map(function (p) { return p[0].toFixed(1) + " " + p[1].toFixed(1); }).join(" L") : "";
+              line.setAttribute("d", d); glowL.setAttribute("d", d);
+              area.setAttribute("d", pts.length > 1 ? d + " L" + pts[pts.length - 1][0].toFixed(1) + " " + PB + " L" + PL + " " + PB + " Z" : "");
+              line.style.visibility = glowL.style.visibility = area.style.visibility = f >= 6 ? "inherit" : "hidden";
+              // grid rescales on the same curve
+              hl.forEach(function (ln, k2) { var y = PB - (k2 + 1) * 0.05 * s, sp = 0.05 * s, op = (k2 % 2 === 0) ? 1 : clamp((sp - 30) / 25);
+                ln.setAttribute("y1", y); ln.setAttribute("y2", y); ln.setAttribute("stroke-opacity", op);
+                tk[k2].setAttribute("y1", y); tk[k2].setAttribute("y2", y); tk[k2].style.visibility = (y >= PT - 1) ? "inherit" : "hidden";
+                tk[k2].setAttribute("stroke-opacity", op); });
+              // callout pin at the kick point, frame 32
+              var kx = PL + KX * W, ky = PB - VK * s, pop = clamp((f - 32) / 5), ps2 = pop < .6 ? pop / .6 * 1.12 : 1.12 - .12 * (pop - .6) / .4;
+              var show = f >= 32;
+              [pinL, pinR, pinD].forEach(function (e) { e.style.visibility = show ? "inherit" : "hidden"; });
+              pinD.setAttribute("cx", kx); pinD.setAttribute("cy", ky); pinD.setAttribute("r", 8 * ps2);
+              pinR.setAttribute("cx", kx); pinR.setAttribute("cy", ky); pinR.setAttribute("r", 16 * ps2);
+              var top = ky - 150; pinL.setAttribute("x1", kx); pinL.setAttribute("x2", kx); pinL.setAttribute("y1", ky - 16); pinL.setAttribute("y2", ky - 16 - 134 * clamp(pop * 2));
+              ev.style.visibility = show ? "inherit" : "hidden";
+              var ew = ev.offsetWidth, eh = ev.offsetHeight, el2 = Math.max(80, Math.min(kx + 24 - ew, 1000 - ew));
+              ev.style.left = el2 + "px"; ev.style.top = (top - eh) + "px";
+              ev.style.transform = "scale(" + ps2.toFixed(3) + ")"; ev.style.opacity = clamp(pop * 3);
+              // end point: lands at 44 with one ring and dust, then pulses every 15 frames
+              var ex = PL + tx * W, ey = PB - V(tx) * s;
+              endD.setAttribute("cx", ex); endD.setAttribute("cy", ey); endG.setAttribute("cx", ex); endG.setAttribute("cy", ey);
+              endD.style.visibility = endG.style.visibility = f >= 6 ? "inherit" : "hidden";
+              var rp = clamp((f - 44) / 14);
+              ring.setAttribute("cx", ex); ring.setAttribute("cy", ey); ring.setAttribute("r", 12 + 150 * (1 - Math.pow(1 - rp, 2.5)));
+              ring.setAttribute("stroke-opacity", f >= 44 ? (0.9 * (1 - rp)).toFixed(3) : 0);
+              dust.forEach(function (o) { var dp = clamp((f - 44) / 16), e2 = 1 - Math.pow(1 - dp, 3);
+                o.c.setAttribute("cx", ex + Math.cos(o.a) * o.d * e2); o.c.setAttribute("cy", ey + Math.sin(o.a) * o.d * e2 + 30 * dp * dp);
+                o.c.setAttribute("r", o.r * (1 - dp * .6)); o.c.setAttribute("opacity", f >= 44 ? (1 - dp).toFixed(3) : 0); });
+              var pc = f >= 44 ? ((f - 44) % 15) / 15 : 0;
+              pulse.setAttribute("cx", ex); pulse.setAttribute("cy", ey); pulse.setAttribute("r", 10 + 28 * pc);
+              pulse.setAttribute("opacity", f >= 44 ? (.45 * (1 - pc)).toFixed(3) : 0);
+              endG.setAttribute("r", f >= 44 ? 22 + 6 * Math.sin(pc * Math.PI) : 14);
+              root.style.opacity = clamp((secs * FPS - f) / (0.25 * FPS)).toFixed(3);
+            }
+            // repaint from a property setter: gsap seek() suppresses onUpdate, a tweened setter always runs
+            var fv = 0, st = {}, tl = gsap.timeline({ paused: true });
+            Object.defineProperty(st, "f", { get: function () { return fv; }, set: function (x) { fv = x; render(x); } });
+            tl.to(st, { f: secs * FPS, duration: secs, ease: "none" }, 0);
+            render(0);
+            window.__timelines = window.__timelines || {};
+            window.__timelines["rf-stat-chart"] = tl;
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

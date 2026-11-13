@@ -1,0 +1,231 @@
+<!doctype html>
+<!-- rf-day-counter: red ticks stamp a ring-bound desk calendar while a huge «DAY N» counter rolls; a rubber stamp lands the last day.
+     Rebuilt from an ultra-skills motion prompt. -->
+<html lang="uk" data-composition-id="rf-day-counter" data-composition-duration="600" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "label", "type": "string", "label": "Рядок над лічильником", "default": "ONE LINE ABOVE THE COUNTER" },
+  { "id": "word", "type": "string", "label": "Слово лічильника", "default": "DAY" },
+  { "id": "days", "type": "number", "label": "Фінальний день (3–35)", "default": 30 },
+  { "id": "caption", "type": "string", "label": "Підпис під календарем", "default": "Caption" },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 2 },
+  { "id": "bg", "type": "color", "label": "Фон (верх)", "default": "#f6f2ea" },
+  { "id": "bg2", "type": "color", "label": "Фон (середина)", "default": "#f0ebe1" },
+  { "id": "bg3", "type": "color", "label": "Фон (низ)", "default": "#e7e0d3" },
+  { "id": "sheet", "type": "color", "label": "Аркуш календаря", "default": "#fffdf8" },
+  { "id": "sheet_under", "type": "color", "label": "Аркуші під низом", "default": "#f4efe5" },
+  { "id": "ink", "type": "color", "label": "Чорнило (штамп, відмічені числа)", "default": "#17130f" },
+  { "id": "muted", "type": "color", "label": "Другорядний текст", "default": "#5e554b" },
+  { "id": "numerals", "type": "color", "label": "Числа днів", "default": "#9b9184" },
+  { "id": "accent", "type": "color", "label": "Червоний (лічильник і галочки)", "default": "#e5432d" },
+  { "id": "ring", "type": "color", "label": "Кільця", "default": "#9b9184" },
+  { "id": "shadow", "type": "color", "label": "Тінь", "default": "#2a1d10" }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-day-counter</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-day-counter" data-duration="600" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; overflow: hidden; }
+          .rfdc { position: absolute; inset: 0; overflow: hidden; }
+          .rfdc .rfdc-cam { position: absolute; inset: 0; transform-origin: 50% 50%; }
+          .rfdc .rfdc-lb { position: absolute; left: 60px; right: 60px; top: 350px; height: 50px; display: flex; align-items: center; justify-content: center;
+                           font-family: var(--font-body, sans-serif); font-weight: 600; font-size: 40px; letter-spacing: .16em; text-transform: uppercase;
+                           color: var(--rfdc-muted); white-space: nowrap; }
+          .rfdc .rfdc-ct { position: absolute; left: 0; right: 0; top: 420px; height: 260px; display: flex; align-items: center; justify-content: center; }
+          .rfdc .rfdc-ci { display: flex; align-items: center; font-family: var(--font-display, "Archivo Black", sans-serif); font-weight: 900;
+                           font-size: 220px; line-height: 1; white-space: nowrap; transform-origin: 50% 50%; }
+          .rfdc .rfdc-dg { position: relative; display: inline-block; height: 1.08em; overflow: hidden; margin-left: .22em; }
+          .rfdc .rfdc-dg span { position: absolute; left: 0; top: .04em; font-variant-numeric: tabular-nums; }
+          .rfdc .rfdc-ps { position: absolute; inset: 0; perspective: 1800px; perspective-origin: 50% 700px; }
+          .rfdc .rfdc-cal { position: absolute; left: 50px; top: 740px; width: 980px; height: 730px; transform-origin: 50% 0;
+                            transform-style: preserve-3d; }
+          .rfdc .rfdc-amb { position: absolute; left: -10px; right: -10px; top: 80px; bottom: -60px; border-radius: 40px;
+                            background: color-mix(in srgb, var(--rfdc-shadow) 22%, transparent); filter: blur(46px); }
+          .rfdc .rfdc-con { position: absolute; left: 14px; right: 14px; bottom: -26px; height: 26px; border-radius: 50%;
+                            background: color-mix(in srgb, var(--rfdc-shadow) 55%, transparent); filter: blur(9px); transform-origin: 50% 0; }
+          .rfdc .rfdc-un { position: absolute; left: 0; right: 0; top: 0; bottom: 0; border-radius: 6px; background: var(--rfdc-under);
+                           box-shadow: 0 1px 0 color-mix(in srgb, var(--rfdc-shadow) 18%, transparent); }
+          .rfdc .rfdc-sh { position: absolute; inset: 0; border-radius: 6px; background: var(--rfdc-sheet); overflow: hidden;
+                           box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--rfdc-shadow) 6%, transparent); transform-origin: 50% 0; }
+          .rfdc .rfdc-gr { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .10; mix-blend-mode: multiply; }
+          .rfdc .rfdc-hole { position: absolute; top: 18px; width: 16px; height: 16px; margin-left: -8px; border-radius: 50%; background: color-mix(in srgb, var(--rfdc-shadow) 85%, #000);
+                             box-shadow: inset 0 2px 3px rgba(0,0,0,.6); }
+          .rfdc .rfdc-ring { position: absolute; top: -20px; width: 22px; height: 50px; margin-left: -11px; border-radius: 11px;
+                             border: 6px solid var(--rfdc-ring); border-bottom-color: transparent; box-shadow: inset 0 2px 0 rgba(255,255,255,.35); }
+          .rfdc .rfdc-cell { position: absolute; width: 128px; height: 116px; box-sizing: border-box; border: 1px solid color-mix(in srgb, var(--rfdc-numerals) 22%, transparent);
+                             display: flex; align-items: center; justify-content: center; }
+          .rfdc .rfdc-num { font-family: var(--font-body, sans-serif); font-weight: 600; font-size: 40px; color: var(--rfdc-numerals); line-height: 1; }
+          .rfdc .rfdc-tk { position: absolute; left: 50%; top: 50%; width: 120px; height: 120px; margin: -60px 0 0 -60px; overflow: visible; opacity: 0; }
+          .rfdc .rfdc-cap { position: absolute; left: 40px; right: 40px; top: 672px; height: 44px; display: flex; align-items: center; justify-content: center;
+                            font-family: var(--font-body, sans-serif); font-weight: 500; font-size: 32px; color: var(--rfdc-muted); white-space: nowrap; }
+          .rfdc .rfdc-blk { position: absolute; width: 200px; height: 250px; margin: -250px 0 0 -100px; opacity: 0; transform-origin: 50% 100%; }
+          .rfdc .rfdc-bsh { position: absolute; width: 190px; height: 40px; margin: -20px 0 0 -95px; border-radius: 50%; background: color-mix(in srgb, var(--rfdc-shadow) 50%, transparent);
+                            filter: blur(14px); opacity: 0; }
+        </style>
+        <div class="rfdc">
+          <svg width="0" height="0" style="position:absolute">
+            <defs>
+              <filter id="rfdc-rough" x="-20%" y="-20%" width="140%" height="140%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="n" />
+                <feDisplacementMap in="SourceGraphic" in2="n" scale="5" xChannelSelector="R" yChannelSelector="G" />
+              </filter>
+              <filter id="rfdc-fibre"><feTurbulence type="fractalNoise" baseFrequency="0.012 0.55" numOctaves="3" seed="3" /><feColorMatrix type="saturate" values="0" /></filter>
+            </defs>
+          </svg>
+          <div class="rfdc-cam">
+            <div class="rfdc-lb"><span></span></div>
+            <div class="rfdc-ct"><div class="rfdc-ci"><span class="rfdc-w"></span><span class="rfdc-dg"><span class="rfdc-a"></span><span class="rfdc-b"></span></span></div></div>
+            <div class="rfdc-ps"><div class="rfdc-cal"></div></div>
+          </div>
+        </div>
+        <script>
+          (function () {
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            var ID = "rf-day-counter", secs = Math.max(1, +v.seconds || 2), FR = 30;
+            var N = Math.round(+v.days || 30); N = N < 3 ? 3 : N > 35 ? 35 : N;
+            var RED = v.accent || "#e5432d", INK = v.ink || "#17130f", NUM = v.numerals || "#9b9184";
+            var CV = { muted: v.muted || "#5e554b", under: v.sheet_under || "#f4efe5", sheet: v.sheet || "#fffdf8", ring: v.ring || "#9b9184",
+                       numerals: NUM, shadow: v.shadow || "#2a1d10" };
+            var R = document.querySelector(".rfdc");
+            function q(s) { return R.querySelector(s); }
+            function mk(tag, cls, par) { var e = document.createElement(tag); if (cls) e.className = cls; if (par) par.appendChild(e); return e; }
+            function mb32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+            function cl(x, a, b) { return x < a ? a : x > b ? b : x; }
+            function lin(f, a, b) { return cl((f - a) / (b - a), 0, 1); }
+            function bez(x1, y1, x2, y2) { return function (x) { if (x <= 0) return 0; if (x >= 1) return 1; var lo = 0, hi = 1, t = x;
+              for (var i = 0; i < 22; i++) { t = (lo + hi) / 2; var bx = 3 * (1 - t) * (1 - t) * t * x1 + 3 * (1 - t) * t * t * x2 + t * t * t; if (bx < x) lo = t; else hi = t; }
+              return 3 * (1 - t) * (1 - t) * t * y1 + 3 * (1 - t) * t * t * y2 + t * t * t; }; }
+            var roll = bez(0.25, 0.8, 0.25, 1);
+            function eic(p) { return p * p * p; }
+            function eoc(p) { return 1 - Math.pow(1 - p, 3); }
+            var rnd = mb32(2026);
+            for (var cvk in CV) R.style.setProperty("--rfdc-" + cvk, CV[cvk]);
+            R.style.background = "linear-gradient(180deg," + (v.bg || "#f6f2ea") + " 0%, " + (v.bg2 || "#f0ebe1") + " 55%, " + (v.bg3 || "#e7e0d3") + " 100%)";
+            // label + counter
+            var lb = q(".rfdc-lb span"); lb.textContent = String(v.label == null ? "ONE LINE ABOVE THE COUNTER" : v.label);
+            var ci = q(".rfdc-ci"); ci.style.color = RED;
+            q(".rfdc-w").textContent = String(v.word == null ? "DAY" : v.word);
+            var dA = q(".rfdc-a"), dB = q(".rfdc-b"), dg = q(".rfdc-dg");
+            // calendar
+            var cal = q(".rfdc-cal");
+            var amb = mk("div", "rfdc-amb", cal), con = mk("div", "rfdc-con", cal);
+            var unders = [];
+            for (var u = 3; u >= 1; u--) { var un = mk("div", "rfdc-un", cal); un.style.transform = "translateY(" + (u * 6) + "px)"; un.style.filter = "brightness(" + (1 - u * 0.025) + ")"; unders.push(un); }
+            var sh = mk("div", "rfdc-sh", cal);
+            sh.innerHTML = '<svg class="rfdc-gr" viewBox="0 0 980 730" preserveAspectRatio="none"><rect width="980" height="730" filter="url(#rfdc-fibre)" /></svg>';
+            var k, xs = [];
+            for (k = 0; k < 14; k++) xs.push(70 + k * (840 / 13));
+            xs.forEach(function (x) { var h = mk("div", "rfdc-hole", sh); h.style.left = x + "px"; });
+            xs.forEach(function (x) { var r = mk("div", "rfdc-ring", cal); r.style.left = x + "px"; });
+            var cells = [], ticks = [], nums = [];
+            var tickBase = [[-30, 2], [-8, 26], [34, -32]];
+            for (k = 0; k < 35; k++) {
+              var c = mk("div", "rfdc-cell", sh), col = k % 7, row = Math.floor(k / 7);
+              c.style.left = (42 + col * 128) + "px"; c.style.top = (90 + row * 116) + "px";
+              cells.push(c);
+              if (k < N) {
+                var n = mk("span", "rfdc-num", c); n.textContent = String(k + 1); nums.push(n);
+                var j = function () { return (rnd() - 0.5) * 9; };
+                var pts = tickBase.map(function (p) { return [p[0] + j(), p[1] + j()]; });
+                var mid = [(pts[1][0] + pts[2][0]) / 2 + j() * 0.6, (pts[1][1] + pts[2][1]) / 2 - 4 + j() * 0.5];
+                var d = "M" + pts[0][0] + " " + pts[0][1] + " Q" + (pts[0][0] + 9) + " " + (pts[0][1] + 10 + j() * 0.3) + " " + pts[1][0] + " " + pts[1][1] +
+                        " Q" + mid[0] + " " + mid[1] + " " + pts[2][0] + " " + pts[2][1];
+                var sw = 12 + rnd() * 3, rot = (rnd() - 0.5) * 14;
+                var t = mk("div", "rfdc-tk", c);
+                t.innerHTML = '<svg width="120" height="120" viewBox="-60 -60 120 120" style="overflow:visible"><g transform="rotate(' + rot.toFixed(1) + ')" filter="url(#rfdc-rough)">' +
+                  '<path d="' + d + '" fill="none" stroke="' + RED + '" stroke-width="' + sw.toFixed(1) + '" stroke-linecap="round" stroke-linejoin="round" /></g></svg>';
+                ticks.push(t);
+              }
+            }
+            var cap = mk("div", "rfdc-cap", sh); var capS = mk("span", "", cap); capS.textContent = String(v.caption == null ? "Caption" : v.caption);
+            // rubber stamp block over the final day
+            var fc = N - 1, fx = 50 + 42 + (fc % 7) * 128 + 64, fy = 740 + 90 + Math.floor(fc / 7) * 116 + 58;
+            var bsh = mk("div", "rfdc-bsh", q(".rfdc-cam")); bsh.style.left = fx + "px"; bsh.style.top = (fy + 6) + "px";
+            var blk = mk("div", "rfdc-blk", q(".rfdc-cam")); blk.style.left = fx + "px"; blk.style.top = (fy + 10) + "px";
+            blk.innerHTML = '<svg width="200" height="250" viewBox="0 0 200 250">' +
+              '<ellipse cx="100" cy="34" rx="44" ry="30" fill="' + INK + '" /><ellipse cx="88" cy="24" rx="16" ry="8" fill="#fff" opacity=".18" />' +
+              '<rect x="80" y="54" width="40" height="92" rx="10" fill="' + INK + '" />' +
+              '<rect x="14" y="140" width="172" height="78" rx="10" fill="' + INK + '" /><rect x="22" y="150" width="60" height="8" rx="4" fill="#fff" opacity=".14" />' +
+              '<rect x="20" y="214" width="160" height="22" rx="4" fill="' + RED + '" /></svg>';
+            // fit text
+            function fitW(el, max, base) { var s = base; el.style.fontSize = s + "px"; while (el.scrollWidth > max && s > 12) { s -= 2; el.style.fontSize = s + "px"; } }
+            var lbBox = q(".rfdc-lb");
+            function layout() {
+              lbBox.style.whiteSpace = "nowrap"; lbBox.style.height = "50px"; lbBox.style.top = "350px"; lbBox.style.lineHeight = "1.15";
+              fitW(lbBox, 960, 40);
+              if (lbBox.scrollWidth > 960 || parseFloat(lbBox.style.fontSize) < 30) {   // long line: two centred lines instead of tiny caps
+                lbBox.style.whiteSpace = "normal"; lbBox.style.textAlign = "center"; lbBox.style.height = "auto"; var z = 36;
+                lbBox.style.fontSize = z + "px"; while (lbBox.offsetHeight > 2.4 * z * 1.15 && z > 20) { z -= 2; lbBox.style.fontSize = z + "px"; }
+                lbBox.style.top = (400 - lbBox.offsetHeight) + "px";
+              }
+              dA.textContent = String(N); var w = 0;
+              for (var d = 0; d <= 9; d++) { dA.textContent = String(N).replace(/\d/g, String(d)); w = Math.max(w, dA.offsetWidth); }
+              dg.style.width = (w + 4) + "px";
+              ci.style.fontSize = "220px"; var s = 220; while (ci.scrollWidth > 960 && s > 60) { s -= 4; ci.style.fontSize = s + "px"; }
+              fitW(cap, 900, 32);
+            }
+            layout();
+            // stamp schedule: day n at frame 2 + round(34 * ((n-1)/(N-2))^0.55)
+            var stamp = []; for (k = 1; k <= N - 1; k++) stamp.push(2 + Math.round(34 * Math.pow((k - 1) / (N - 2), 0.55)));
+            var evF = [], evV = [];   // counter roll events (frame -> value)
+            stamp.forEach(function (s, i) { var n = i + 1; if (evF.length && evF[evF.length - 1] === s) evV[evV.length - 1] = n; else { evF.push(s); evV.push(n); } });
+            evF.push(44); evV.push(N);
+            function render(f) {
+              f = Math.round(f * 1000) / 1000;
+              // camera push 1.04 -> 1 over the clip
+              q(".rfdc-cam").style.transform = "scale(" + (1.04 - 0.04 * lin(f, 0, 60)) + ")";
+              // counter
+              var e = -1; for (var i = 0; i < evF.length; i++) if (evF[i] <= f) e = i;
+              var nv = e < 0 ? 1 : evV[e], ov = e <= 0 ? 1 : evV[e - 1], p = e < 0 ? 1 : roll(lin(f, evF[e], evF[e] + 2));
+              if (ov === nv) p = 1;
+              var fast = e > 0 && (evF[e] - evF[e - 1]) < 2 && e < evF.length - 1;
+              dA.textContent = String(ov); dB.textContent = String(nv);
+              dA.style.transform = "translateY(" + (-110 * p) + "%)"; dB.style.transform = "translateY(" + (110 * (1 - p)) + "%)";
+              var bl = fast ? 5 * Math.sin(Math.PI * p) : 0; dg.style.filter = bl > 0.05 ? "blur(" + bl.toFixed(2) + "px)" : "none";
+              ci.style.transform = "scale(" + (f >= 46 ? 1 + 0.03 * (1 - eoc(lin(f, 46, 50))) : 1) + ")";
+              // ticks
+              for (i = 0; i < N; i++) {
+                var tk = ticks[i], nm = nums[i];
+                if (i < N - 1) {
+                  var s0 = stamp[i], on = f >= s0, sp = lin(f, s0, s0 + 3);
+                  tk.style.opacity = on ? 1 : 0; tk.style.transform = "translate(10px,6px) scale(" + 0.85 * (1.6 - 0.6 * eoc(sp)) + ")";
+                  nm.style.color = on ? INK : NUM;
+                } else {
+                  var fon = f >= 44; tk.style.opacity = fon ? 1 : 0; tk.style.transform = "translate(10px,6px) scale(1.25)"; nm.style.color = fon ? INK : NUM;
+                }
+              }
+              // rubber stamp block: lift 36-39, fall 39-44 (ease-in cubic, scale 2.2 -> 1), leave 44-48
+              var bo = 0, by = 0, bs = 1;
+              if (f >= 36 && f < 39) { var a = lin(f, 36, 39); bo = a; bs = 2.35 - 0.15 * a; by = -40 - 60 * a; }
+              else if (f >= 39 && f < 44) { var b = eic(lin(f, 39, 44)); bo = 1; bs = 2.2 - 1.2 * b; by = -100 * (1 - b); }
+              else if (f >= 44 && f < 48) { var c2 = eoc(lin(f, 44, 48)); bo = 1 - c2; bs = 1 + 0.5 * c2; by = -760 * c2; }
+              blk.style.opacity = bo; blk.style.transform = "translateY(" + by + "px) scale(" + bs + ")";
+              var bshO = (f >= 36 && f < 44) ? 0.15 + 0.65 * lin(f, 36, 44) : (f >= 44 && f < 47 ? 0.8 * (1 - lin(f, 44, 47)) : 0);
+              bsh.style.opacity = bshO; bsh.style.transform = "scale(" + (2.2 - 1.2 * lin(f, 36, 44)) + ")";
+              // paper bounce at 44: down 14px at scale .99, stuck 2 frames, 5-frame rebound
+              var py = 0, ps = 1, press = 0;
+              if (f >= 43 && f < 44) { press = lin(f, 43, 44); }
+              else if (f >= 44 && f < 46) press = 1;
+              else if (f >= 46 && f < 51) { var r = lin(f, 46, 51); press = Math.cos(r * Math.PI * 1.5) * (1 - r) * (r < 0.34 ? 1 : 0.6); press = cl(press, -0.25, 1); }
+              py = 14 * press; ps = 1 - 0.01 * Math.max(0, press);
+              // swing 53+ : 1 degree around the rings, damped sine
+              var sw = f >= 53 ? 1 * Math.sin((f - 53) / 7 * Math.PI * 2) * Math.exp(-(f - 53) / 8) : 0;
+              cal.style.transform = "rotateX(" + (4 + sw) + "deg) translateY(" + py + "px) scale(" + ps + ")";
+              con.style.transform = "translateY(" + (-py * 0.6) + "px) scaleX(" + (1 - 0.05 * Math.max(0, press)) + ")";
+              con.style.opacity = 0.75 + 0.25 * Math.max(0, press);
+              amb.style.opacity = 1 - 0.25 * Math.max(0, press);
+              R.style.opacity = f / FR > secs - 0.25 ? cl((secs - f / FR) / 0.25, 0, 1) : 1;
+            }
+            var st = { _f: 0 };
+            Object.defineProperty(st, "f", { get: function () { return this._f; }, set: function (x) { this._f = x; render(x); } });
+            render(0);
+            if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { layout(); render(st._f); });
+            var tl = gsap.timeline({ paused: true });
+            tl.fromTo(st, { f: 0 }, { f: secs * FR, duration: secs, ease: "none", immediateRender: false }, 0);
+            window.__timelines = window.__timelines || {};
+            window.__timelines[ID] = tl;
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

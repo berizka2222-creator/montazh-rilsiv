@@ -1,0 +1,131 @@
+<!doctype html>
+<!-- rf-blueprint-draw: a house drawn on blueprint paper in one unbroken white line, then windows light up and dimensions tick in.
+     Rebuilt from an ultra-skills motion prompt. -->
+<html lang="uk" data-composition-id="rf-blueprint-draw" data-composition-duration="600" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "width_label", "type": "string", "label": "Розмір по ширині (під будинком)", "default": "width" },
+  { "id": "height_label", "type": "string", "label": "Розмір по висоті (зліва)", "default": "height" },
+  { "id": "pitch_label", "type": "string", "label": "Кут даху", "default": "pitch" },
+  { "id": "title", "type": "string", "label": "Назва креслення", "default": "Drawing title" },
+  { "id": "note", "type": "string", "label": "Примітка під назвою", "default": "Note line" },
+  { "id": "bg", "type": "color", "label": "Фон (синій аркуш)", "default": "#2f5bff" },
+  { "id": "line", "type": "color", "label": "Лінія і розміри", "default": "#ffffff" },
+  { "id": "grid", "type": "color", "label": "Сітка (прозорість 14%)", "default": "#ffffff" },
+  { "id": "glow", "type": "color", "label": "Світло у вікнах", "default": "#ffc24b" },
+  { "id": "shadow", "type": "color", "label": "Затемнення країв", "default": "#0c1a3a" },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 2 }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-blueprint-draw</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-blueprint-draw" data-duration="600" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; overflow: hidden; }
+          .rfbp { position: absolute; inset: 0; overflow: hidden; background: var(--bp-bg); }
+          .rfbp-sheet { position: absolute; inset: 0; transform-origin: 540px 960px; }
+          .rfbp-svg { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: visible; }
+          .rfbp-svg text { font-family: ui-monospace, Menlo, monospace; fill: var(--bp-line); }
+          .rfbp-fade { position: absolute; inset: 0; background: #000; opacity: 0; }
+        </style>
+        <div class="rfbp">
+          <div class="rfbp-sheet">
+            <svg class="rfbp-svg" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <pattern id="rfbp-grid" width="96" height="96" patternUnits="userSpaceOnUse" x="0" y="0">
+                  <path d="M96 0 L0 0 L0 96" fill="none" class="rfbp-gl" stroke-width="1.5" />
+                </pattern>
+                <radialGradient id="rfbp-vig" cx="50%" cy="50%" r="75%"><stop offset="55%" class="rfbp-v0" /><stop offset="100%" class="rfbp-v1" /></radialGradient>
+                <radialGradient id="rfbp-spill"><stop offset="0%" class="rfbp-s0" /><stop offset="100%" class="rfbp-s1" /></radialGradient>
+              </defs>
+              <rect x="-200" y="-200" width="1480" height="2320" fill="url(#rfbp-grid)" class="rfbp-gridrect" />
+              <rect x="-200" y="-200" width="1480" height="2320" fill="url(#rfbp-vig)" />
+              <g class="rfbp-glows"></g>
+              <path class="rfbp-path" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="6" pathLength="1" stroke-dasharray="1 2" stroke-dashoffset="1"
+                d="M0 1180 L140 1180 L140 760 L540 480 L720 606 L720 520 L800 520 L800 662 L940 760 L940 910 L870 910 L870 840 L710 840 L710 980 L870 980 L870 910 L790 910 L790 840 L790 980 L790 910 L940 910 L940 1180 L610 1180 L610 960 A70 70 0 0 0 470 960 L610 960 L470 960 L470 1180 L140 1180 L140 910 L210 910 L210 840 L370 840 L370 980 L210 980 L210 910 L290 910 L290 840 L290 980" />
+              <g class="rfbp-tip"></g>
+              <circle class="rfbp-nib" r="7.5" cx="0" cy="1180" />
+              <g class="rfbp-dims"></g>
+            </svg>
+          </div>
+          <div class="rfbp-fade"></div>
+        </div>
+        <script>
+          (function () {
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            function g(k, d) { return (v[k] === undefined || v[k] === null || v[k] === "") ? d : v[k]; }
+            var secs = Math.max(1, +g("seconds", 2)), F = 1 / 30, NS = "http://www.w3.org/2000/svg";
+            var root = document.querySelector(".rfbp"), svg = root.querySelector(".rfbp-svg");
+            var C = { bg: g("bg", "#2f5bff"), line: g("line", "#ffffff"), grid: g("grid", "#ffffff"), glow: g("glow", "#ffc24b"), shadow: g("shadow", "#0c1a3a") };
+            root.style.setProperty("--bp-bg", C.bg); root.style.setProperty("--bp-line", C.line);
+            function el(tag, at, parent) { var e = document.createElementNS(NS, tag); for (var k in at) e.setAttribute(k, at[k]); (parent || svg).appendChild(e); return e; }
+            svg.querySelector(".rfbp-gl").setAttribute("stroke", C.grid); svg.querySelector(".rfbp-gridrect").setAttribute("opacity", ".14");
+            var vs = svg.querySelectorAll("#rfbp-vig stop"); vs[0].setAttribute("stop-color", C.shadow); vs[0].setAttribute("stop-opacity", "0");
+            vs[1].setAttribute("stop-color", C.shadow); vs[1].setAttribute("stop-opacity", ".45");
+            var ss = svg.querySelectorAll("#rfbp-spill stop"); ss[0].setAttribute("stop-color", C.glow); ss[0].setAttribute("stop-opacity", ".55");
+            ss[1].setAttribute("stop-color", C.glow); ss[1].setAttribute("stop-opacity", "0");
+            var path = svg.querySelector(".rfbp-path"), LEN = path.getTotalLength(), nib = svg.querySelector(".rfbp-nib");
+            path.setAttribute("stroke", C.line); nib.setAttribute("fill", C.line);
+            // pen tip: three tapering trailing dashes + the nib exactly on the path
+            var tipG = svg.querySelector(".rfbp-tip"), D = path.getAttribute("d");
+            var tips = [[0.04, 6.4], [0.024, 8], [0.011, 9.6]].map(function (t) {
+              return { L: t[0], e: el("path", { d: D, fill: "none", stroke: C.line, "stroke-width": t[1], "stroke-linecap": "round", "stroke-linejoin": "round",
+                pathLength: "1", "stroke-dasharray": t[0] + " 3", "stroke-dashoffset": t[0] }, tipG) }; });
+            function draw(p) {
+              path.setAttribute("stroke-dashoffset", (1 - p).toFixed(5));
+              tips.forEach(function (t) { t.e.setAttribute("stroke-dashoffset", (t.L - p).toFixed(5)); });
+              var pt = path.getPointAtLength(Math.max(0, Math.min(1, p)) * LEN); nib.setAttribute("cx", pt.x.toFixed(2)); nib.setAttribute("cy", pt.y.toFixed(2));
+            }
+            var now = 0, pen = { p: function (x) { if (arguments.length) { now = +x; draw(now); } return now; } };
+            draw(0);
+            // window + fanlight glows (under the line), each with a soft spill on the wall
+            var glows = svg.querySelector(".rfbp-glows");
+            var G = [{ d: "M710 840 H870 V980 H710 Z", c: [790, 910] }, { d: "M470 960 A70 70 0 0 1 610 960 Z", c: [540, 935] }, { d: "M210 840 H370 V980 H210 Z", c: [290, 910] }]
+              .map(function (w) { var gg = el("g", { opacity: 0 }, glows);
+                el("circle", { cx: w.c[0], cy: w.c[1], r: 210, fill: "url(#rfbp-spill)" }, gg);
+                el("path", { d: w.d, fill: C.glow, "fill-opacity": ".85" }, gg); return gg; });
+            // dimensions
+            var dims = svg.querySelector(".rfbp-dims");
+            function dimLine(d) { return el("path", { d: d, fill: "none", stroke: C.line, "stroke-width": 3, "stroke-linecap": "round", pathLength: "1", "stroke-dasharray": "1 2", "stroke-dashoffset": "1" }, dims); }
+            function label(txt, x, y, rot, maxW) {
+              var gg = el("g", { opacity: 0, transform: "translate(" + x + " " + y + ") rotate(" + (rot || 0) + ")" }, dims);
+              var bg = el("rect", { fill: C.bg }, gg), t = el("text", { x: 0, y: 0, "text-anchor": "middle", "dominant-baseline": "central", "font-size": 34 }, gg);
+              t.textContent = String(txt); var fs = 34; while (t.getComputedTextLength() > maxW && fs > 18) { fs -= 1; t.setAttribute("font-size", fs); }
+              var w = t.getComputedTextLength() + 28; bg.setAttribute("x", -w / 2); bg.setAttribute("y", -fs * 0.75); bg.setAttribute("width", w); bg.setAttribute("height", fs * 1.5);
+              return gg; }
+            var dW = dimLine("M140 1224 V1256 M140 1240 H940 M940 1224 V1256");
+            var lW = label(g("width_label", "width"), 540, 1240, 0, 560);
+            var dH = dimLine("M94 480 H126 M110 480 V1180 M94 1180 H126");
+            var lH = label(g("height_label", "height"), 110, 830, -90, 560);
+            var dP = dimLine("M140 760 H280 M262 760 A122 122 0 0 0 240 690");
+            var lP = label(g("pitch_label", "pitch"), 330, 715, 0, 300);
+            // title block
+            var tb = el("g", { opacity: 0 }, dims);
+            var tbr = el("rect", { x: 540, y: 1330, width: 430, height: 120, fill: "none", stroke: C.line, "stroke-width": 1.5, pathLength: "1", "stroke-dasharray": "1 2", "stroke-dashoffset": "1" }, tb);
+            var t1 = el("text", { x: 562, y: 1378, "font-size": 34, "font-weight": 700 }, tb); t1.textContent = String(g("title", "Drawing title"));
+            var t2 = el("text", { x: 562, y: 1424, "font-size": 32, opacity: .85 }, tb); t2.textContent = String(g("note", "Note line"));
+            [[t1, 34], [t2, 32]].forEach(function (a) { var fs = a[1]; while (a[0].getComputedTextLength() > 386 && fs > 18) { fs -= 1; a[0].setAttribute("font-size", fs); } });
+            // ---------- timeline ----------
+            var tl = gsap.timeline({ paused: true });
+            tl.fromTo(pen, { p: 0 }, { p: 1, duration: 36 * F, ease: "power2.inOut", immediateRender: false }, 0);
+            tl.to(nib, { attr: { r: 0 }, opacity: 0, duration: 4 * F }, 37 * F);
+            tl.to(tipG, { opacity: 0, duration: 2 * F }, 36 * F);
+            tl.to(path, { keyframes: [{ attr: { "stroke-width": 11 }, duration: 2 * F, ease: "power2.out" }, { attr: { "stroke-width": 6 }, duration: 6 * F, ease: "power2.inOut" }] }, 36 * F);
+            G.forEach(function (gg, i) { tl.fromTo(gg, { opacity: 0 }, { opacity: 1, duration: 4 * F, ease: "power2.out" }, (38 + i * 4) * F); });
+            var breathFrom = 50 * F, breathLen = secs - breathFrom;
+            if (breathLen > 0.4) G.forEach(function (gg, i) { var legs = Math.max(1, Math.floor(breathLen / 0.8));
+              tl.to(gg, { opacity: 0.9, duration: 0.8, ease: "sine.inOut", yoyo: true, repeat: legs - 1 }, breathFrom + i * 0.07); });
+            tl.fromTo(root.querySelector(".rfbp-sheet"), { scale: 1 }, { scale: 1.10, duration: 27 * F, ease: "sine.inOut" }, 32 * F);
+            function dimIn(line, lab, f) { tl.to(line, { attr: { "stroke-dashoffset": 0 }, duration: 6 * F, ease: "power2.out" }, f * F);
+              tl.fromTo(lab, { opacity: 0 }, { opacity: 1, duration: 3 * F }, (f + 3) * F); }
+            dimIn(dW, lW, 40); dimIn(dH, lH, 44); dimIn(dP, lP, 48);
+            tl.set(tb, { opacity: 1 }, 40 * F);
+            tl.to(tbr, { attr: { "stroke-dashoffset": 0 }, duration: 6 * F, ease: "power2.out" }, 40 * F);
+            tl.fromTo([t1, t2], { opacity: 0 }, { opacity: 1, duration: 4 * F, stagger: 2 * F }, 42 * F);
+            tl.to(root.querySelector(".rfbp-fade"), { opacity: 1, duration: 0.25, ease: "power2.in" }, Math.max(0.5, secs - 0.25));
+            window.__timelines = window.__timelines || {};
+            window.__timelines["rf-blueprint-draw"] = tl;
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

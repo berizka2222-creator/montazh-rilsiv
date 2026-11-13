@@ -23,6 +23,9 @@ BRAND = json.load(open(HOME / "brand.json", encoding="utf-8")) if (HOME / "brand
 
 # a sample line for every effect: the menu clips («+ Додати») and the defaults when a card gives no text
 SAMPLE = {"lineup": "ціна|оффер|цінність", "locked-on": "ТИ", "backdrop-word": "ЦІНА", "spotlight": "ЦІНА", "the-bill": "питання|задачі|бюджет|ціна",
+          "rf-tilt-pills": "новий|драйвер", "rf-glass-flash": "реклама", "rf-anchor-word": "час", "rf-side-note": "спершу|вивчи систему|а потім|запускай",
+          "rf-quote-title": "пиши в коментар|«промт»|і я надішлю", "rf-letter-drop": "час", "rf-word-cloud": "коли|зупинити|рекламу|коли|відпочити",
+          "rf-spread-words": "тобі|це|цікаво", "rf-vertical-word": "легко", "rf-texture-title": "реклама",
           "todo": "питання|оффер|ціна", "comment-box": "ЦІНА", "pause-point": "оце я", "uninstall": "старі звички", "reel-frame": "@reels",
           "shortcut-rain": "⌘|C|V|Z", "reject-stamp": "НІ", "cover-star": "ЦІНА", "scribble": "я", "glass-widgets": "100%",
           "red-collage": "ЦІНА", "split-headline": "три питання|до ціни", "pastel-word": "ЦІНА", "check-pills": "питання|оффер|ціна",
@@ -41,6 +44,9 @@ MUST = {"locked-on": ["text"], "backdrop-word": ["text"], "the-bill": ["text"], 
         "tier-list": ["title", "item", "others"], "broll-split": ["text"], "phone-fan": ["text"], "headline-wall": ["text", "label", "total"],
         "checklist": ["text", "title"], "liquid-glass-graph": ["text", "to"], "carousel-spin": ["text"], "match-cut": ["text"],
         "apple-toggles": ["text"], "led-sign": ["text"], "comment-box": ["text"], "lineup": ["text"], "spotlight": [], "slow-push": [],
+        # own effects (rf-*): the ones that show a word need it; the others use the spoken words or draw no text
+        "rf-tilt-pills": ["text"], "rf-glass-flash": ["text"], "rf-anchor-word": ["text"], "rf-side-note": ["text"], "rf-quote-title": ["text"],
+        "rf-letter-drop": ["text"], "rf-vertical-word": ["text"], "rf-texture-title": ["text"],
         # gv-* / e9-* (vendor/gv-fx): the ones that write words need the person's
         "gv-ransom": ["text"], "gv-figma": ["text"], "gv-bignum": ["text"], "gv-spring": ["text", "title"], "gv-meme": ["image"]}
 BRAND_OPTS = {"pastel-word": ["name", "handle"], "check-pills": ["handle"], "timeline": ["handle"], "profile-wall": ["name"], "headline-wall": ["handle"],
@@ -53,8 +59,24 @@ SAMPLE_OPT = {"todo": {"title": "ЗРОБИТИ"}, "cover-star": {"issue": "ЖО
               "timeline": {"sub": "монтаж з Claude", "reply": "надіслала прайс", "chip": "3 питання"}, "profile-wall": {"label": "переглядів", "sub": "топ рілс"},
               "tier-list": {"title": "що спитати першим?", "item": "задачі", "others": "ціна|бюджет|терміни"}, "broll-split": {"text": "1 год → 5 хв"},
               "headline-wall": {"label": "з 3 рілсів"}, "checklist": {"title": "Claude монтує твій рілс"}, "liquid-glass-graph": {"to": "59%"},
-              "carousel-spin": {"text": "рілси"}, "glass-widgets": {},
+              "carousel-spin": {"text": "рілси"}, "glass-widgets": {}, "rf-tilt-pills": {"mid": "ти"}, "rf-anchor-word": {"tags": "який|заздалегідь|рахувати"},
+              "rf-word-cloud": {"accent": "рекл"}, "rf-texture-title": {"sub": "з нуля"},
               "gv-spring": {"title": "Налаштування"}, "gv-figma": {"under": [[0.6, "як"], [0.9, "у"], [1.1, "Фігмі"]]}}
+
+# «22 ефекти» (ay-*, vendor/vibha-fx/scripts/ay/, 2026-11-13): samples for the menu clips, the words that must be theirs, their handle
+SAMPLE.update({"ay-head-stack": "таргет::meta|креативи::рілс|аналітика::звіт|воронка::ліди|оффер::ціна", "ay-day-dial": "щодня",
+               "ay-orbit-ring": "ТАРГЕТ", "ay-letter-dive": "ціна.", "ay-sketch-words": "ідея", "ay-layer-explode": "шари",
+               "ay-press": "22 ЕФЕКТИ ДЛЯ РІЛС", "ay-paper-tear": "ДАЛІ", "ay-impact": "ВАЖЛИВО",
+               "ay-predict-keys": "Запускаю рекламу без зливу бюджету", "ay-voice-note": "Голосове", "ay-comment-drop": "ЕФЕКТИ",
+               "ay-liquid-glass": "ЕФЕКТИ", "ay-index": "Таргет|Креативи|Аудиторії|Бюджет|Аналітика|Воронка|Оффер"})
+MUST.update({"ay-head-stack": ["text"], "ay-day-dial": ["text"], "ay-orbit-ring": ["text"], "ay-letter-dive": ["text"], "ay-sketch-words": ["text"],
+             "ay-post-wall": ["to", "label"], "ay-layer-explode": ["text", "caption"], "ay-banknote": ["to", "sub"],
+             "ay-press": ["text", "sub", "quote"], "ay-paper-tear": [], "ay-impact": ["text"], "ay-predict-keys": ["text"],
+             "ay-voice-note": [], "ay-comment-drop": ["text", "comment"], "ay-liquid-glass": ["text", "sub"], "ay-index": ["text"]})
+BRAND_OPTS.update({k: ["handle"] for k in ("ay-banknote", "ay-press", "ay-paper-tear", "ay-comment-drop", "ay-liquid-glass")}); BRAND_OPTS.update({"ay-live-cursor": ["name"], "ay-voice-note": ["name"]})
+SAMPLE_OPT.update({"ay-post-wall": {"to": "104", "label": "ПОСТИ"}, "ay-banknote": {"to": "10 000"},
+                   "ay-layer-explode": {"caption": "так збирається|кожен *креатив*"}, "ay-index": {"now": 2, "at": "0.9,1.9"},
+                   "ay-day-dial": {"unit": "день"}, "ay-sketch-words": {"label": "скетч"}})
 
 
 def run(*a, **k): return subprocess.run([str(x) for x in a], check=True, **k)
@@ -126,8 +148,15 @@ def thumbs(reel, base):
     return d
 
 
+def spoken(reel):
+    """The cut's words with their times (master_transcript.json): own effects (rf-*) show them as they are said."""
+    f = reel / "master_transcript.json"
+    try: return [w for w in json.load(open(f, encoding="utf-8")) if str(w.get("text", "")).strip()] if f.exists() else []
+    except (ValueError, OSError): return []
+
+
 def fx_plan(cards, a0, reel, th, brand=None):
-    plan = []; brand = brand or {}
+    plan = []; brand = brand or {}; said = None
     for c in cards:
         d = {"fx": c["fx"], "start": round(c["start"] - a0, 3), "end": round(c["end"] - a0, 3)}
         t = c.get("text", SAMPLE.get(c["fx"]) if c.get("sample") else None)
@@ -143,6 +172,10 @@ def fx_plan(cards, a0, reel, th, brand=None):
             if k not in d:
                 v = ("@" + h if h else "") if (k == "handle" or c["fx"] == "reel-frame") else brand.get("name", "")
                 if v: d[k] = v
+        if c["fx"].startswith("rf-") and not c.get("sample"):   # the words said in the card's seconds, relative to the piece
+            said = spoken(reel) if said is None else said
+            d["words"] = [[round(w["start"] - c["start"], 3), round(w["end"] - c["start"], 3), w["text"]] for w in said
+                          if w["start"] >= c["start"] - 0.05 and w["start"] < c["end"]]
         miss = [k for k in MUST.get(c["fx"], []) if k not in d]
         if miss: print(f"WARNING fx {c['fx']} at {c['start']:.1f}s: {', '.join(miss)} not set: Vibha's English sample words would show. Put her words in the card.")
         plan.append(d)

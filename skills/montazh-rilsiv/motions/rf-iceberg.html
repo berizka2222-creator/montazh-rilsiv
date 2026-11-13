@@ -1,0 +1,197 @@
+<!doctype html>
+<!-- rf-iceberg: a small cute tip of ice, then the camera sinks under the waterline and pulls back onto a huge faceted mass
+     with labelled layers. Rebuilt from an ultra-skills motion prompt (3D original, here canvas 2D, seeded). -->
+<html lang="uk" data-composition-id="rf-iceberg" data-composition-duration="600" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "tip", "type": "string", "label": "Підпис верхівки (над водою)", "default": "The post" },
+  { "id": "layer1", "type": "string", "label": "Шар 1 (праворуч)", "default": "Layer one" },
+  { "id": "layer2", "type": "string", "label": "Шар 2 (ліворуч)", "default": "Layer two" },
+  { "id": "layer3", "type": "string", "label": "Шар 3 (праворуч)", "default": "Layer three" },
+  { "id": "sky_top", "type": "color", "label": "Небо вгорі", "default": "#f7f9fc" },
+  { "id": "sky_mid", "type": "color", "label": "Небо посередині", "default": "#eef2f8" },
+  { "id": "sky_low", "type": "color", "label": "Небо біля води", "default": "#e3e9f2" },
+  { "id": "ice", "type": "color", "label": "Лід (світлий)", "default": "#ffffff" },
+  { "id": "ice_shade", "type": "color", "label": "Лід у тіні", "default": "#e3e9f2" },
+  { "id": "ice_under", "type": "color", "label": "Лід під водою (підсвічений)", "default": "#f2f5ff" },
+  { "id": "water_top", "type": "color", "label": "Вода під поверхнею", "default": "#5b8cff" },
+  { "id": "water_mid", "type": "color", "label": "Вода посередині", "default": "#172036" },
+  { "id": "water_deep", "type": "color", "label": "Вода в глибині", "default": "#090d1a" },
+  { "id": "shafts", "type": "color", "label": "Промені світла і частинки", "default": "#f2f5ff" },
+  { "id": "ink", "type": "color", "label": "Текст на небі (верхівка)", "default": "#0d1324" },
+  { "id": "tip_plate", "type": "color", "label": "Плашка верхівки", "default": "#ffffff" },
+  { "id": "plate", "type": "color", "label": "Плашки шарів", "default": "#111827" },
+  { "id": "plate_ink", "type": "color", "label": "Текст плашок шарів і виноски", "default": "#f2f5ff" },
+  { "id": "seed", "type": "number", "label": "Форма айсберга (seed)", "default": 7 },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 2 }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-iceberg</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-iceberg" data-duration="600" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; overflow: hidden; }
+          .rfib { position: absolute; inset: 0; overflow: hidden; }
+          .rfib-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+          .rfib-pl { position: absolute; left: 0; top: 0; white-space: nowrap; font-family: var(--font-body, "Helvetica Neue", Arial, sans-serif);
+                     font-weight: 600; line-height: 1.15; border-radius: 10px; transform-origin: 50% 50%; opacity: 0; }
+          .rfib-tip { font-size: 60px; padding: 10px 26px; box-shadow: 0 6px 20px rgba(0,0,0,.14); }
+          .rfib-ly { font-size: 44px; padding: 12px 24px; box-shadow: 0 8px 26px rgba(0,0,0,.35); }
+          .rfib-fade { position: absolute; inset: 0; background: #000; opacity: 0; }
+        </style>
+        <div class="rfib">
+          <canvas class="rfib-cv" width="1080" height="1920"></canvas>
+          <div class="rfib-pl rfib-tip"></div>
+          <div class="rfib-pl rfib-ly" data-l="0"></div><div class="rfib-pl rfib-ly" data-l="1"></div><div class="rfib-pl rfib-ly" data-l="2"></div>
+          <div class="rfib-fade"></div>
+        </div>
+        <script>
+          (function () {
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            function g(k, d) { return (v[k] === undefined || v[k] === null || v[k] === "") ? d : v[k]; }
+            var secs = Math.max(1, +g("seconds", 2)), seed = (+g("seed", 7)) | 0;
+            var root = document.querySelector(".rfib"), cv = root.querySelector(".rfib-cv"), ctx = cv.getContext("2d");
+            function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a);
+              t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+            var R = mulberry32(seed * 7919 + 13);
+            function hex(h) { h = String(h).replace("#", ""); if (h.length === 3) h = h.replace(/(.)/g, "$1$1"); var n = parseInt(h, 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
+            function mix(a, b, k) { return [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k]; }
+            function rgb(c, al) { return "rgba(" + (c[0] | 0) + "," + (c[1] | 0) + "," + (c[2] | 0) + "," + (al === undefined ? 1 : al) + ")"; }
+            function cl(x, a, b) { return Math.max(a, Math.min(b, x)); }
+            function sstep(a, b, x) { var t = cl((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); }
+            function bz(x1, y1, x2, y2) { function c(a, b, u) { return 3 * a * u * (1 - u) * (1 - u) + 3 * b * u * u * (1 - u) + u * u * u; }
+              return function (t) { if (t <= 0) return 0; if (t >= 1) return 1; var lo = 0, hi = 1, u = t;
+                for (var i = 0; i < 26; i++) { u = (lo + hi) / 2; if (c(x1, x2, u) < t) lo = u; else hi = u; } return c(y1, y2, u); }; }
+            var MOVE = bz(0.2, 0, 0.25, 1);
+            var C = { ice: hex(g("ice", "#ffffff")), shade: hex(g("ice_shade", "#e3e9f2")), under: hex(g("ice_under", "#f2f5ff")), wtop: hex(g("water_top", "#5b8cff")),
+                      wmid: hex(g("water_mid", "#172036")), wdeep: hex(g("water_deep", "#090d1a")), sky0: hex(g("sky_top", "#f7f9fc")), sky1: hex(g("sky_mid", "#eef2f8")),
+                      sky2: hex(g("sky_low", "#e3e9f2")), ink: hex(g("ink", "#0d1324")), shaft: hex(g("shafts", "#f2f5ff")), pink: hex(g("plate_ink", "#f2f5ff")) };
+            root.style.background = rgb(C.wdeep);
+            // ---------- world (final view: world == screen) ----------
+            var WL = 400, BOT = 1480, APEX = 335, ph = R() * 6;
+            function cx(y) { var t = (y - WL) / (BOT - WL); return 540 + 34 * Math.sin(t * 3.1 + ph) * Math.sin(Math.PI * t); }
+            function hw(y) { var t = cl((y - WL) / (BOT - WL), 0, 1); return 80 * (1 - t) + 262 * Math.sin(Math.PI * Math.pow(t, 0.7)); }
+            function mesh(rows, cols, yAt, wAt, cAt, jit) {
+              var P = [];
+              for (var r = 0; r < rows; r++) { var row = [];
+                for (var c = 0; c < cols; c++) {
+                  var y0 = yAt(r), w = wAt(y0), u = -1 + 2 * c / (cols - 1);
+                  var jx = (r > 0 && r < rows - 1 && c > 0 && c < cols - 1) ? (R() - .5) * jit * w / cols * 2 : (R() - .5) * jit * 6;
+                  var jy = (r > 0 && r < rows - 1) ? (R() - .5) * jit * 40 : 0;
+                  var x = cAt(y0) + u * w + jx, y = y0 + jy;
+                  var z = Math.sqrt(Math.max(0, 1 - u * u)) * w * 0.85 + (R() - .5) * w * 0.12;
+                  row.push([x, y, z]); }
+                P.push(row); }
+              var T = [];
+              for (r = 0; r < rows - 1; r++) for (c = 0; c < cols - 1; c++) {
+                var a = P[r][c], b = P[r][c + 1], d = P[r + 1][c], e = P[r + 1][c + 1];
+                if (R() < .5) { T.push([a, b, e]); T.push([a, e, d]); } else { T.push([a, b, d]); T.push([b, e, d]); } }
+              return T;
+            }
+            var massRows = 14, mass = mesh(massRows, 9, function (r) { return WL + 2 + (BOT - WL - 2) * Math.pow(r / (massRows - 1), 1.0); }, hw, cx, 0.9);
+            var tipRows = 5, tip = mesh(tipRows, 5, function (r) { return WL - (WL - APEX) * r / (tipRows - 1) - 2; },
+              function (y) { var t = (WL - y) / (WL - APEX); return Math.max(3, 82 * Math.pow(1 - t, 0.85)); }, function (y) { return 540 + (WL - y) * 0.12; }, 0.7);
+            function nrm(t) { var a = t[0], b = t[1], c = t[2]; var u = [b[0] - a[0], b[1] - a[1], b[2] - a[2]], w = [c[0] - a[0], c[1] - a[1], c[2] - a[2]];
+              var n = [u[1] * w[2] - u[2] * w[1], u[2] * w[0] - u[0] * w[2], u[0] * w[1] - u[1] * w[0]]; var l = Math.hypot(n[0], n[1], n[2]) || 1;
+              n = [n[0] / l, n[1] / l, n[2] / l]; if (n[2] < 0) n = [-n[0], -n[1], -n[2]]; return n; }
+            function lit(n, L) { var l = Math.hypot(L[0], L[1], L[2]); return cl((n[0] * L[0] + n[1] * L[1] + n[2] * L[2]) / l, 0, 1); }
+            mass.forEach(function (t) { var n = nrm(t), y = (t[0][1] + t[1][1] + t[2][1]) / 3, k = sstep(WL, BOT, y);
+              var base = mix(C.under, C.wmid, Math.pow(k, 0.8)), b = lit(n, [0.15, -1, 0.75]);
+              t.col = rgb(mix(mix(base, C.wmid, 0.45), base, 0.35 + 0.65 * b)); t.edge = 0.10 + 0.32 * (1 - k); });
+            tip.forEach(function (t) { var n = nrm(t), b = lit(n, [-0.6, -0.8, 0.7]); t.col = rgb(mix(C.shade, C.ice, b)); });
+            var shafts = []; for (var i = 0; i < 5; i++) shafts.push({ x: 300 + i * 120 + (R() - .5) * 60, w: 40 + R() * 50, ph: R() * 6, a: 0.10 + R() * 0.06 });
+            var parts = []; for (i = 0; i < 70; i++) parts.push({ x: 180 + R() * 720, y: WL + 40 + R() * 1150, s: 18 + R() * 30, r: 1.4 + R() * 2.2, a: .25 + R() * .45, ph: R() * 6 });
+            var caus = []; for (i = 0; i < 26; i++) caus.push({ x: R() * 1080, y: WL + 12 + R() * 260, l: 40 + R() * 90, ph: R() * 6 });
+            function trace(t) { ctx.beginPath(); ctx.moveTo(t[0][0], t[0][1]); ctx.lineTo(t[1][0], t[1][1]); ctx.lineTo(t[2][0], t[2][1]); ctx.closePath(); }
+            // ---------- labels ----------
+            var tipEl = root.querySelector(".rfib-tip"), ly = [].slice.call(root.querySelectorAll(".rfib-ly"));
+            tipEl.textContent = String(g("tip", "The post"));
+            tipEl.style.background = g("tip_plate", "#ffffff"); tipEl.style.color = g("ink", "#0d1324");
+            ly.forEach(function (e) { e.style.background = g("plate", "#111827"); e.style.color = g("plate_ink", "#f2f5ff"); });
+            [g("layer1", "Layer one"), g("layer2", "Layer two"), g("layer3", "Layer three")].forEach(function (s, k) { ly[k].textContent = String(s); });
+            function fit(el, maxW, fs, mn) { var guard = 0; while (el.offsetWidth > maxW && fs > (mn || 22) && guard++ < 80) { fs -= 1; el.style.fontSize = fs + "px"; } }
+            fit(tipEl, 900, 60);
+            ly.forEach(function (e) { fit(e, 640, 44, 36); if (e.offsetWidth > 640) { e.style.whiteSpace = "normal"; e.style.width = "640px"; } });
+            var LY = [{ f: 24, y: 720, side: 1 }, { f: 32, y: 1020, side: -1 }, { f: 40, y: 1320, side: 1 }];
+            // ---------- render one frame (pure function of time) ----------
+            function render(time) {
+              var f = time * 30, P = MOVE((f - 6) / 42), breath = 1 + 0.015 * sstep(0, 6, f);
+              var s = (3 * breath) + (1 - 3 * breath) * P, ax = 540, ay = 340 + (960 - 340) * P;
+              var rot = (f > 48 ? 1 : 0) * sstep(48, Math.max(60, secs * 30), f) * Math.PI / 180;
+              function sy(wy) { return 960 + (wy - ay) * s; } function sx(wx) { return 540 + (wx - ax) * s; }
+              function wy(scy) { return ay + (scy - 960) / s; }
+              ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, 1080, 1920);
+              ctx.setTransform(1, 0, 0, 1, 540, 960); ctx.rotate(rot); ctx.scale(s, s); ctx.translate(-ax, -ay);
+              var tsec = time;
+              // sky
+              var gs = ctx.createLinearGradient(0, WL - 800, 0, WL); gs.addColorStop(0, rgb(C.sky0)); gs.addColorStop(.6, rgb(C.sky1)); gs.addColorStop(1, rgb(C.sky2));
+              ctx.fillStyle = gs; ctx.fillRect(-2000, WL - 4000, 5000, 4000);
+              // water volume
+              var gw = ctx.createLinearGradient(0, WL, 0, WL + 1400); gw.addColorStop(0, rgb(C.wtop)); gw.addColorStop(.12, rgb(mix(C.wtop, C.wmid, .55)));
+              gw.addColorStop(.45, rgb(C.wmid)); gw.addColorStop(1, rgb(C.wdeep)); ctx.fillStyle = gw; ctx.fillRect(-2000, WL, 5000, 4000);
+              // caustics near the top
+              ctx.lineCap = "round";
+              caus.forEach(function (c) { var dy = c.y - WL, al = 0.22 * (1 - dy / 280);
+                ctx.strokeStyle = rgb(C.under, al); ctx.lineWidth = 3; ctx.beginPath();
+                for (var k = 0; k <= 8; k++) { var xx = c.x + (k / 8 - .5) * c.l, yy = c.y + 6 * Math.sin(k * 0.9 + tsec * 2.2 + c.ph);
+                  if (k) ctx.lineTo(xx, yy); else ctx.moveTo(xx, yy); } ctx.stroke(); });
+              // light shafts (from frame 14)
+              var sha = sstep(14, 24, f);
+              if (sha > 0) shafts.forEach(function (sh) { var sw = Math.sin(tsec * 0.9 + sh.ph) * 0.06, top = WL, bot = WL + 1250;
+                var gr = ctx.createLinearGradient(0, top, 0, bot); gr.addColorStop(0, rgb(C.shaft, sh.a * sha)); gr.addColorStop(1, rgb(C.shaft, 0));
+                ctx.fillStyle = gr; ctx.beginPath(); ctx.moveTo(sh.x - sh.w * .3, top); ctx.lineTo(sh.x + sh.w * .3, top);
+                ctx.lineTo(sh.x + sh.w + (bot - top) * (0.18 + sw), bot); ctx.lineTo(sh.x - sh.w + (bot - top) * (0.18 + sw), bot); ctx.closePath(); ctx.fill(); });
+              // the mass below
+              mass.forEach(function (t) { trace(t); ctx.fillStyle = t.col; ctx.fill(); });
+              ctx.lineJoin = "round"; ctx.lineWidth = 1.6 / s;
+              mass.forEach(function (t) { trace(t); ctx.strokeStyle = rgb(C.under, t.edge); ctx.stroke(); });
+              // particles drifting up
+              if (sha > 0) parts.forEach(function (p) { var span = 1150, yy = WL + 40 + ((p.y - WL - 40 - p.s * tsec) % span + span) % span;
+                ctx.fillStyle = rgb(C.shaft, p.a * sha * (0.4 + 0.6 * (1 - (yy - WL) / 1300))); ctx.beginPath();
+                ctx.arc(p.x + 6 * Math.sin(tsec + p.ph), yy, p.r / Math.max(1, s * 0.6), 0, 7); ctx.fill(); });
+              // icy sea surface seen from above the water, gone once the lens is under
+              var surf = 1 - sstep(9, 19, f);
+              if (surf > 0) { var gsf = ctx.createLinearGradient(0, WL, 0, WL + 260); gsf.addColorStop(0, rgb(mix(C.sky2, C.wtop, .12), surf));
+                gsf.addColorStop(1, rgb(mix(C.sky2, C.wtop, .5), surf)); ctx.fillStyle = gsf; ctx.fillRect(-2000, WL, 5000, 4000);
+                ctx.strokeStyle = rgb(C.ice, .55 * surf); ctx.lineWidth = 2 / s;
+                for (var k = 0; k < 14; k++) { var yy2 = WL + 6 + k * k * 1.6, amp = 1 + k * .3; ctx.beginPath();
+                  for (var xq = 0; xq <= 1080; xq += 40) { var y3 = yy2 + amp * Math.sin(xq * 0.012 + k * 1.7 + tsec * 1.5); if (xq) ctx.lineTo(xq, y3); else ctx.moveTo(xq, y3); }
+                  ctx.stroke(); } }
+              // the tip above the water
+              tip.forEach(function (t) { trace(t); ctx.fillStyle = t.col; ctx.fill(); ctx.strokeStyle = rgb(C.shade, .6); ctx.lineWidth = 1 / s; ctx.stroke(); });
+              // meniscus band
+              var lip = ctx.createLinearGradient(0, WL - 2, 0, WL + 26 / s * 1.5); lip.addColorStop(0, rgb(C.under, .55)); lip.addColorStop(1, rgb(C.under, 0));
+              ctx.fillStyle = lip; ctx.fillRect(-2000, WL - 2, 5000, 26 / s * 1.5 + 2);
+              ctx.strokeStyle = rgb(C.ice, .95); ctx.lineWidth = 3.2 / s; ctx.beginPath();
+              for (var xm = -200; xm <= 1280; xm += 20) { var ym = WL + 2.2 * Math.sin(xm * 0.017 + ph + tsec * 2) + 1.2 * Math.sin(xm * 0.05 + tsec * 3.3);
+                if (xm > -200) ctx.lineTo(xm, ym); else ctx.moveTo(xm, ym); } ctx.stroke();
+              ctx.strokeStyle = rgb(C.ink, .18); ctx.lineWidth = 1.5 / s; ctx.beginPath(); ctx.moveTo(-2000, WL - 3 / s); ctx.lineTo(3000, WL - 3 / s); ctx.stroke();
+              // ---------- labels + leaders in screen space ----------
+              ctx.setTransform(1, 0, 0, 1, 0, 0);
+              var apx = sx(540 + (WL - APEX) * 0.12), apy = sy(APEX), tw = tipEl.offsetWidth, th = tipEl.offsetHeight;
+              var ptop = Math.max(230, apy - 70 - th - 60 * s / 3);
+              tipEl.style.opacity = 1; tipEl.style.transform = "translate(" + (540 - tw / 2) + "px," + ptop + "px)";
+              ctx.strokeStyle = rgb(C.ink, .8); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(540, ptop + th); ctx.lineTo(apx, apy - 8); ctx.stroke();
+              ctx.fillStyle = rgb(C.ink); ctx.beginPath(); ctx.arc(apx, apy - 8, 4, 0, 7); ctx.fill();
+              LY.forEach(function (L, k) { var el = ly[k], a = sstep(L.f, L.f + 3, f);
+                if (f < L.f) { el.style.opacity = 0; return; }
+                var pop = f < L.f + 6 ? 0.7 + 0.3 * (1 - Math.pow(1 - (f - L.f) / 6, 3)) * 1.04 : 1;
+                var w = el.offsetWidth, h = el.offsetHeight, x0 = L.side > 0 ? 1010 - w : 70;
+                el.style.opacity = a; el.style.transform = "translate(" + x0 + "px," + (L.y - h / 2) + "px) scale(" + pop.toFixed(3) + ")";
+                var wy0 = wy(L.y), from = L.side > 0 ? x0 : x0 + w, tx = sx(cx(wy0) - L.side * hw(wy0) * 0.15);
+                tx = L.side > 0 ? Math.min(from - 70, tx) : Math.max(from + 70, tx);
+                var dprog = sstep(L.f, L.f + 5, f), ex = from + (tx - from) * dprog;
+                ctx.strokeStyle = rgb(C.pink, .9); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(from, L.y); ctx.lineTo(ex, L.y); ctx.stroke();
+                if (dprog > .98) { ctx.fillStyle = rgb(C.pink); ctx.beginPath(); ctx.arc(ex, L.y, 6, 0, 7); ctx.fill(); } });
+            }
+            // the clock is a getter/setter property, so a seek redraws even with events suppressed
+            var tl = gsap.timeline({ paused: true }), now = 0, clock = { t: function (x) { if (arguments.length) { now = +x; render(now); } return now; } };
+            tl.fromTo(clock, { t: 0 }, { t: secs, duration: secs, ease: "none", immediateRender: false }, 0);
+            tl.to(root.querySelector(".rfib-fade"), { opacity: 1, duration: 0.25, ease: "power2.in" }, Math.max(0.5, secs - 0.25));
+            render(0);
+            window.__timelines = window.__timelines || {};
+            window.__timelines["rf-iceberg"] = tl;
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

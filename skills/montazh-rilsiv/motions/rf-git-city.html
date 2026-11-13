@@ -1,0 +1,258 @@
+<!doctype html>
+<!-- rf-git-city: a contribution grid tilts into 3D and grows into a night skyline with flickering windows. Rebuilt from an ultra-skills motion prompt. -->
+<html lang="uk" data-composition-id="rf-git-city" data-composition-duration="600" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "measure", "type": "string", "label": "Що міряє висота веж", "default": "commits per day" },
+  { "id": "note", "type": "string", "label": "Приписка після коми (порожньо = без неї)", "default": "demo data" },
+  { "id": "data", "type": "json", "label": "Дані: масив чисел або рядків (порожньо = згенерувати)", "default": [] },
+  { "id": "grid", "type": "number", "label": "Розмір сітки для згенерованих даних", "default": 20 },
+  { "id": "seed", "type": "number", "label": "Зерно генерації", "default": 7 },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 3 },
+  { "id": "bg_top", "type": "color", "label": "Небо згори", "default": "#0d1426" },
+  { "id": "bg", "type": "color", "label": "Небо посередині", "default": "#090d1a" },
+  { "id": "bg_bottom", "type": "color", "label": "Небо внизу", "default": "#05070e" },
+  { "id": "surface", "type": "color", "label": "Тьмяна плитка", "default": "#172036" },
+  { "id": "accent", "type": "color", "label": "Низькі вежі", "default": "#5b8cff" },
+  { "id": "accent2", "type": "color", "label": "Високі вежі", "default": "#3ee6d0" },
+  { "id": "ink", "type": "color", "label": "Вікна і текст", "default": "#f2f5ff" },
+  { "id": "glow", "type": "color", "label": "Ключове світло", "default": "#3d63ff" }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-git-city</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-git-city" data-duration="600" data-fps="30">
+        <style>
+          .rfgc { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden; background: #05070e; }
+          .rfgc .rfgc-gl { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; display: block; }
+          .rfgc .rfgc-lab { position: absolute; left: 60px; width: 960px; top: 0; text-align: center; white-space: nowrap; opacity: 0;
+                            font-family: ui-monospace, Menlo, monospace; font-weight: 700; line-height: 1.2; will-change: transform, opacity; }
+        </style>
+        <div class="rfgc">
+          <canvas class="rfgc-gl" width="1080" height="1920"></canvas>
+          <div class="rfgc-lab"></div>
+        </div>
+        <script>
+          (function () {
+            var ID = "rf-git-city";
+            var box = document.querySelector(".rfgc");
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            function S(x, d) { return (x === undefined || x === null) ? d : String(x); }
+            var secs = Math.max(1, +v.seconds || 3);
+            var C = {
+              bg_top: S(v.bg_top, "#0d1426") || "#0d1426", bg: S(v.bg, "#090d1a") || "#090d1a", bg_bottom: S(v.bg_bottom, "#05070e") || "#05070e",
+              surface: S(v.surface, "#172036") || "#172036", accent: S(v.accent, "#5b8cff") || "#5b8cff", accent2: S(v.accent2, "#3ee6d0") || "#3ee6d0",
+              ink: S(v.ink, "#f2f5ff") || "#f2f5ff", glow: S(v.glow, "#3d63ff") || "#3d63ff"
+            };
+            var measure = S(v.measure, "commits per day"), note = S(v.note, "demo data");
+            var TXT = measure + (note.trim() ? ", " + note.trim() : "");
+            var W = 1080, H = 1920;
+            box.style.background = C.bg_bottom;
+            var lab = box.querySelector(".rfgc-lab");
+            lab.textContent = TXT; lab.style.color = C.ink;
+            var mctx = document.createElement("canvas").getContext("2d"), fs = 34;
+            while (fs > 22) { mctx.font = "700 " + fs + "px ui-monospace, Menlo, monospace"; if (mctx.measureText(TXT).width <= 940) break; fs--; }
+            lab.style.fontSize = fs + "px";
+
+            window.__timelines = window.__timelines || {};
+            // seek-safe: tweened property is a setter, so draw() runs on every seek (seek() suppresses callbacks)
+            var _t = 0, st = { get t() { return _t; }, set t(x) { _t = x; draw(); } };
+            function fadeOut(t) { return Math.max(0, Math.min(1, (secs - t) / 0.25)); }
+            var draw = function () { box.style.opacity = fadeOut(Math.min(secs, Math.max(0, st.t))); };
+            var tl = gsap.timeline({ paused: true });
+            tl.to(st, { t: secs, duration: secs, ease: "none" }, 0);
+            window.__timelines[ID] = tl;
+            if (typeof THREE === "undefined") { draw(); return; }
+
+            function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+            function cl(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+            function lerp(a, b, t) { return a + (b - a) * t; }
+            function ioCubic(x) { x = cl(x); return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; }
+            function oCubic(x) { x = cl(x); return 1 - Math.pow(1 - x, 3); }
+            function col(h) { return new THREE.Color(h); }
+            function spring(tau, z, w) { if (tau <= 0) return 0; var wd = w * Math.sqrt(1 - z * z); return 1 - Math.exp(-z * w * tau) * (Math.cos(wd * tau) + z * w / wd * Math.sin(wd * tau)); }
+
+            // ---------- data ----------
+            var d = v.data, rows = null;
+            if (typeof d === "string") { try { d = JSON.parse(d); } catch (e) { d = null; } }
+            if (Array.isArray(d) && d.length) {
+              if (Array.isArray(d[0])) rows = d.map(function (r) { return r.map(function (x) { return Math.max(0, +x || 0); }); });
+              else { var n0 = Math.ceil(Math.sqrt(d.length)); rows = []; for (var r0 = 0; r0 < n0; r0++) { rows.push([]); for (var c0 = 0; c0 < n0; c0++) rows[r0].push(Math.max(0, +d[r0 * n0 + c0] || 0)); } }
+            }
+            if (!rows) {
+              var N = Math.max(4, Math.min(40, Math.round(+v.grid || 20))), rnd = mulberry32(((+v.seed || 7) * 2654435761) >>> 0);
+              var blobs = []; for (var b = 0; b < 5; b++) blobs.push([rnd() * N, rnd() * N, 1.6 + rnd() * 2.6, 0.6 + rnd() * 1.1]);
+              var rf = [], cf = []; for (var q = 0; q < N; q++) { rf.push(rnd() * 0.35); cf.push(rnd() * 0.35); }
+              rows = [];
+              for (var j = 0; j < N; j++) { rows.push([]); for (var i = 0; i < N; i++) {
+                var cv = 0.04; blobs.forEach(function (B) { cv += B[3] * Math.exp(-((i - B[0]) * (i - B[0]) + (j - B[1]) * (j - B[1])) / (2 * B[2] * B[2])); });
+                var val = cv * (0.35 + 0.65 * rnd()) + 0.25 * (rf[j] + cf[i]) * rnd();
+                if (rnd() > 0.955) val += 0.5 + rnd() * 0.9;
+                rows[j].push(Math.pow(val, 1.6));
+              } }
+            }
+            var NZ = rows.length, NX = 0; rows.forEach(function (r) { NX = Math.max(NX, r.length); });
+            var vmax = 0; rows.forEach(function (r) { r.forEach(function (x) { vmax = Math.max(vmax, x); }); }); vmax = vmax || 1;
+            var PIT = 1.14, EXT = Math.max(NX, NZ) * PIT, KS = EXT / 22.8, HMAX = 7.5 * KS;
+            var cells = [];
+            for (var jj = 0; jj < NZ; jj++) for (var ii = 0; ii < NX; ii++) {
+              var vn = (rows[jj][ii] || 0) / vmax;
+              // wave from the near-left corner (x min, z max) to the far-right corner
+              var dly = (ii / Math.max(1, NX - 1) + (NZ - 1 - jj) / Math.max(1, NZ - 1)) / 2;
+              cells.push({ x: (ii - (NX - 1) / 2) * PIT, z: (jj - (NZ - 1) / 2) * PIT, vn: vn, h: 0.06 + Math.pow(vn, 0.7) * HMAX, dly: dly });
+            }
+            var CNT = cells.length;
+
+            // ---------- renderer ----------
+            var canvas = box.querySelector(".rfgc-gl");
+            var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, preserveDrawingBuffer: true, alpha: false });
+            renderer.setPixelRatio(1); renderer.setSize(W, H, false);
+            var scene = new THREE.Scene();
+            var sky = document.createElement("canvas"); sky.width = 4; sky.height = 512;
+            var sx = sky.getContext("2d"), sg = sx.createLinearGradient(0, 0, 0, 512);
+            sg.addColorStop(0, C.bg_top); sg.addColorStop(0.55, C.bg); sg.addColorStop(1, C.bg_bottom);
+            sx.fillStyle = sg; sx.fillRect(0, 0, 4, 512);
+            scene.background = new THREE.CanvasTexture(sky);
+            var camera = new THREE.PerspectiveCamera(40, W / H, 0.5, 600);
+
+            var geo = new THREE.BoxGeometry(1, 1, 1); geo.translate(0, 0.5, 0);
+            var aVal = new Float32Array(CNT), aGrow = new Float32Array(CNT), aSeed = new Float32Array(CNT);
+            var srnd = mulberry32(99);
+            cells.forEach(function (c, n) { aVal[n] = c.vn; aSeed[n] = Math.floor(srnd() * 997) + n; });
+            geo.setAttribute("aVal", new THREE.InstancedBufferAttribute(aVal, 1));
+            var growAttr = new THREE.InstancedBufferAttribute(aGrow, 1); growAttr.setUsage(THREE.DynamicDrawUsage); geo.setAttribute("aGrow", growAttr);
+            geo.setAttribute("aSeed", new THREE.InstancedBufferAttribute(aSeed, 1));
+
+            var VS = [
+              "attribute float aVal; attribute float aGrow; attribute float aSeed;",
+              "varying vec3 vN; varying vec3 vLocal; varying vec3 vWorld; varying float vVal; varying float vGrow; varying float vSeed; varying float vH;",
+              "void main(){",
+              "  vec4 wp = modelMatrix * instanceMatrix * vec4(position, 1.0);",
+              "  vWorld = wp.xyz; vLocal = position; vVal = aVal; vGrow = aGrow; vSeed = aSeed; vH = instanceMatrix[1][1];",
+              "  vN = normalize(mat3(modelMatrix) * mat3(instanceMatrix) * normal);",
+              "  gl_Position = projectionMatrix * viewMatrix * wp;",
+              "}"].join("\n");
+            var FS = [
+              "uniform vec3 uDim; uniform vec3 uLow; uniform vec3 uTall; uniform vec3 uWin; uniform vec3 uKey;",
+              "uniform float uFrame; uniform float uWinOn; uniform float uRefl;",
+              "varying vec3 vN; varying vec3 vLocal; varying vec3 vWorld; varying float vVal; varying float vGrow; varying float vSeed; varying float vH;",
+              "float h1(float n){ return fract(sin(n) * 43758.5453123); }",
+              "void main(){",
+              "  vec3 n = normalize(vN);",
+              "  float g = clamp(vGrow, 0.0, 1.0);",
+              "  vec3 dim = uDim * (0.7 + 0.9 * vVal);",
+              "  float k = clamp(vVal * g, 0.0, 1.0);",
+              "  vec3 grade = mix(uLow, uTall, smoothstep(0.12, 0.8, k)) * (0.22 + 1.0 * sqrt(k));",
+              "  vec3 c = mix(dim, grade, smoothstep(0.0, 0.3, g));",
+              "  vec3 L = normalize(vec3(-0.55, 0.75, 0.4));",
+              "  float d = max(dot(n, L), 0.0);",
+              "  float top = step(0.5, abs(n.y));",
+              "  vec3 lit = c * (0.5 + 0.5 * d) + uKey * 0.22 * d * g;",
+              "  lit += top * c * (0.25 + 0.9 * k * k) * g;",
+              "  if (top < 0.5 && uWinOn > 0.0 && vH > 0.7) {",
+              "    float hu = abs(n.x) > 0.5 ? vLocal.z : vLocal.x;",
+              "    float cx = floor((hu + 0.5) * 4.0), fx = fract((hu + 0.5) * 4.0);",
+              "    float yy = abs(vWorld.y) / 0.34, cy = floor(yy), fy = fract(yy);",
+              "    float inW = step(0.28, fx) * step(fx, 0.72) * step(0.3, fy) * step(fy, 0.72);",
+              "    float face = n.x > 0.5 ? 1.0 : (n.x < -0.5 ? 2.0 : (n.z > 0.5 ? 3.0 : 4.0));",
+              "    float id = h1(vSeed * 1.37 + face * 17.3 + cx * 3.71 + cy * 11.9);",
+              "    float per = 8.0 + floor(h1(id * 91.7) * 46.0);",
+              "    float slot = floor((uFrame + h1(id * 7.3) * per) / per);",
+              "    float on = step(0.5, h1(id * 53.1 + slot * 1.618));",
+              "    on *= step(cy + 1.4, (vH - 0.1) / 0.34);",
+              "    lit = mix(lit, uWin * (0.75 + 0.45 * vVal), inW * on * uWinOn);",
+              "  }",
+              "  float a = 1.0;",
+              "  if (uRefl > 0.0) { a = uRefl * exp(-abs(vWorld.y) * 0.45); }",
+              "  gl_FragColor = vec4(lit, a);",
+              "}"].join("\n");
+            function towerMat(refl) {
+              return new THREE.ShaderMaterial({
+                uniforms: { uDim: { value: col(C.surface) }, uLow: { value: col(C.accent) }, uTall: { value: col(C.accent2) }, uWin: { value: col(C.ink) },
+                  uKey: { value: col(C.glow) }, uFrame: { value: 0 }, uWinOn: { value: 0 }, uRefl: { value: refl } },
+                vertexShader: VS, fragmentShader: FS, transparent: refl > 0, depthWrite: refl === 0
+              });
+            }
+            var mat = towerMat(0), rmat = towerMat(0.3);
+            var towers = new THREE.InstancedMesh(geo, mat, CNT); towers.frustumCulled = false; scene.add(towers);
+            var reflGroup = new THREE.Group(); reflGroup.scale.y = -1; scene.add(reflGroup);
+            var refl = new THREE.InstancedMesh(geo, rmat, CNT); refl.instanceMatrix = towers.instanceMatrix; refl.frustumCulled = false; refl.renderOrder = 1;
+            reflGroup.add(refl);
+            // dark glossy floor over the reflection, fading out radially into the sky
+            var floorMat = new THREE.ShaderMaterial({
+              uniforms: { uCol: { value: col(C.bg_bottom) }, uA: { value: 0 }, uR: { value: EXT * 0.95 } },
+              vertexShader: "varying vec2 vP; void main(){ vP = position.xy; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }",
+              fragmentShader: "uniform vec3 uCol; uniform float uA; uniform float uR; varying vec2 vP; void main(){ float r = length(vP); gl_FragColor = vec4(uCol, uA * (0.78 * (1.0 - smoothstep(uR * 0.55, uR, r)))); }",
+              transparent: true, depthWrite: false
+            });
+            var floor = new THREE.Mesh(new THREE.PlaneGeometry(EXT * 2.4, EXT * 2.4), floorMat);
+            floor.rotation.x = -Math.PI / 2; floor.renderOrder = 2; scene.add(floor);
+
+            // ---------- poor man's bloom: low-res render -> threshold + H blur -> V blur added on top ----------
+            var BW = 270, BH = 480;
+            var rtA = new THREE.WebGLRenderTarget(BW, BH), rtB = new THREE.WebGLRenderTarget(BW, BH);
+            var qScene = new THREE.Scene(), qCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+            var QV = "varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }";
+            function blurMat(thr, additive) {
+              return new THREE.ShaderMaterial({
+                uniforms: { tex: { value: null }, dir: { value: new THREE.Vector2() }, thr: { value: thr }, gain: { value: 1 } },
+                vertexShader: QV,
+                fragmentShader: [
+                  "uniform sampler2D tex; uniform vec2 dir; uniform float thr; uniform float gain; varying vec2 vUv;",
+                  "vec3 tap(vec2 uv){ vec3 c = texture2D(tex, uv).rgb; if (thr > 0.0) { float l = max(c.r, max(c.g, c.b)); c *= smoothstep(thr, thr + 0.2, l); } return c; }",
+                  "void main(){ vec3 s = tap(vUv) * 0.2270;",
+                  "  s += (tap(vUv + dir * 1.385) + tap(vUv - dir * 1.385)) * 0.3162;",
+                  "  s += (tap(vUv + dir * 3.231) + tap(vUv - dir * 3.231)) * 0.0703;",
+                  "  gl_FragColor = vec4(s * gain, 1.0); }"].join("\n"),
+                depthTest: false, depthWrite: false, transparent: additive, blending: additive ? THREE.AdditiveBlending : THREE.NoBlending
+              });
+            }
+            var bH = blurMat(0.62, false), bV = blurMat(0, true);
+            bH.uniforms.dir.value.set(1.6 / BW, 0); bV.uniforms.dir.value.set(0, 1.6 / BH); bV.uniforms.gain.value = 0.9;
+            var quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), bH); quad.frustumCulled = false; qScene.add(quad);
+
+            // ---------- camera ----------
+            var D2R = Math.PI / 180, FOVT = Math.tan(20 * D2R) * 2 * (W / H);
+            var D0 = EXT / 0.86 / FOVT, D1 = EXT * 2.6, F89 = 89 / 30;
+            function camAt(t) {
+              var f = t * 30, e = ioCubic((f - 2) / 16), o = oCubic((f - 14) / 75);
+              var th = 55 * e, ph = 150 * o + (t > F89 ? 1.2 * (t - F89) : 0);
+              var dist = lerp(D0, D1, e) * (1 + 0.12 * o), ty = lerp(0, 1.7 * KS, e);
+              return { th: th * D2R, ph: ph * D2R, d: dist, ty: ty };
+            }
+            var mtx = new THREE.Matrix4();
+            draw = function () {
+              var t = Math.min(secs, Math.max(0, st.t)), f = t * 30;
+              var c = camAt(t), sT = Math.sin(c.th), cT = Math.cos(c.th), sP = Math.sin(c.ph), cP = Math.cos(c.ph);
+              camera.position.set(c.d * sT * sP, c.ty + c.d * cT, c.d * sT * cP);
+              camera.up.set(-sP, 0, -cP); camera.lookAt(0, c.ty, 0); camera.updateMatrixWorld();
+              // extrusion wave frames 10-34, each tower on its own spring delayed by distance
+              for (var n = 0; n < CNT; n++) {
+                var ce = cells[n], tau = t - (10 / 30 + ce.dly * 0.45);
+                var g = ce.vn > 0 ? spring(tau, 0.42, 17) : 0;
+                var hh = Math.max(0.06, 0.06 + (ce.h - 0.06) * g);
+                mtx.makeScale(1, hh, 1); mtx.setPosition(ce.x, 0.02, ce.z); towers.setMatrixAt(n, mtx);
+                aGrow[n] = tau > 0 ? Math.min(1.3, g) : 0;
+              }
+              towers.instanceMatrix.needsUpdate = true; growAttr.needsUpdate = true;
+              var won = cl((f - 32) / 6);
+              [mat, rmat].forEach(function (m) { m.uniforms.uFrame.value = Math.floor(f); m.uniforms.uWinOn.value = won; });
+              rmat.uniforms.uRefl.value = 0.3 * cl((f - 10) / 14);
+              refl.visible = f > 10;
+              floorMat.uniforms.uA.value = cl((f - 2) / 18);
+              // bloom passes
+              renderer.setRenderTarget(rtA); renderer.render(scene, camera);
+              quad.material = bH; bH.uniforms.tex.value = rtA.texture; renderer.setRenderTarget(rtB); renderer.render(qScene, qCam);
+              renderer.setRenderTarget(null); renderer.render(scene, camera);
+              quad.material = bV; bV.uniforms.tex.value = rtB.texture; renderer.autoClear = false; renderer.render(qScene, qCam); renderer.autoClear = true;
+              // label at frame 28, rising 12px as it fades in
+              var k = cl((f - 28) / 12), e2 = 1 - Math.pow(1 - k, 3);
+              lab.style.opacity = e2;
+              lab.style.transform = "translateY(" + (240 - fs * 0.6 + 12 * (1 - e2)).toFixed(1) + "px)";
+              box.style.opacity = fadeOut(t);
+            };
+            draw();
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

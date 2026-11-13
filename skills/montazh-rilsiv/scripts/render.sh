@@ -12,6 +12,9 @@ S="$(cd "$(dirname "$0")" && pwd)"
 BRAND="${REELS_HOME:-$HOME/reels}/brand.json"
 RES="$(python3 -c "import json;r=json.load(open('$BRAND')).get('resolution',[1080,1920]);print('portrait-4k' if r[0]>=2160 else 'portrait')")"
 [ "$FINAL" = 1 ] || RES=portrait                 # previews at 1080p: a quarter of the pixels of 4K
+# REEL_4K=1: cut, effects and render at 2160x3840 whatever the brand says. Only on request: on an 8 GB Mac the 4K
+# capture stalled and restarted for 20+ min. The 1080 final stays smooth thanks to PNG source frames + lanczos + light grain (cut.py).
+if [ "${REEL_4K:-}" = 1 ]; then FINAL=1; RES=portrait-4k; export REEL_FX_WIDTH=2160; fi
 stamp() { echo "$(date +%s) $1" >> "$REEL/timings.log"; }
 # low priority, but never past 19: the renderer sets its own setup worker to 19, and a shell that already runs jobs niced
 # (zsh puts background jobs at +5) plus nice 15 = 20 makes that a priority raise macOS refuses (uv_os_setpriority EACCES)
@@ -22,6 +25,7 @@ CUR_NICE="$( (ps -o nice= -p $$ 2>/dev/null || true) | tr -d ' ')"; case "$CUR_N
 if [ "$FINAL" = 1 ] || [ -z "${REEL_DRAFT:-}" ]; then   # the real render needs a full-quality master: a draft cut (540p) is re-cut first
   WANT="$(python3 -c "import json;print(json.load(open('$BRAND')).get('resolution',[1080,1920])[1])")"
   [ "$FINAL" = 1 ] || WANT=1920
+  [ "${REEL_4K:-}" = 1 ] && WANT=3840
   HAVE="$(ffprobe -v error -select_streams v:0 -show_entries stream=height -of csv=p=0 "$REEL/master.mp4")"
   if [ "$HAVE" -lt "$WANT" ]; then echo "master.mp4 is ${HAVE}p, re-cutting at ${WANT}p for the final"; env -u REEL_PREVIEW -u REEL_DRAFT python3 "$S/cut.py" "$REEL"; python3 "$S/precheck.py" "$REEL" | tail -3; fi
 fi
@@ -39,11 +43,11 @@ if [ -n "${REEL_DRAFT:-}" ]; then   # fast review draft at 540x960 (build_reel.p
   nice -n "$NI" npx -y hyperframes@0.8.145 render "$REEL/proj" --workers "${REEL_DRAFT_WORKERS:-$([ "$MEM_GB" -le 8 ] && echo 2 || echo 3)}" --no-low-memory-mode --gpu -o "$REEL/draft.mp4" --quality draft --quiet
   stamp "render:end"; echo "draft: $REEL/draft.mp4"; exit 0
 fi
-if ! nice -n "$NI" npx -y hyperframes@0.8.145 render "$REEL/proj" --workers "$WORKERS" -o "$REEL/final.mp4" --resolution "$RES" --quality delivery --crf "${REEL_CRF:-14}" --quiet; then   # CRF 14: graphics and skin stay clean through Instagram's own re-encode
+if ! nice -n "$NI" npx -y hyperframes@0.8.145 render "$REEL/proj" --workers "${REEL_WORKERS:-2}" --no-low-memory-mode -o "$REEL/final.mp4" --resolution "$RES" --quality delivery --video-frame-format png --crf "${REEL_CRF:-14}" --quiet; then   # 2 parallel workers from the start (2026-11-13: with PNG source frames the 1-worker capture stalled every time and lost ~4 min before the retry). CRF 14: graphics and skin stay clean through Instagram's own re-encode
   # 2026-10-26: on an 8 GB Mac the one-worker (low-memory, sequential) capture stalled at the same frames 8 times in a row;
   # two parallel workers got through (frames they miss are retried on one worker). Same path the drafts take.
   echo "final render failed: retrying with 2 parallel workers"
-  nice -n "$NI" npx -y hyperframes@0.8.145 render "$REEL/proj" --workers 2 --no-low-memory-mode -o "$REEL/final.mp4" --resolution "$RES" --quality delivery --crf "${REEL_CRF:-14}" --quiet
+  nice -n "$NI" npx -y hyperframes@0.8.145 render "$REEL/proj" --workers 2 --no-low-memory-mode -o "$REEL/final.mp4" --resolution "$RES" --quality delivery --video-frame-format png --crf "${REEL_CRF:-14}" --quiet
 fi
 stamp "render:end"
 # Final mix. Optional music bed (brand.json "music": path) sits ~18 dB under the voice and ducks further while she talks.

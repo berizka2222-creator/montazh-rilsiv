@@ -23,6 +23,11 @@ with what each one is for, its moment and its tested placement, is `references/m
   at most a third and never two in a row. Add 1-2 catalog transitions (`use: transition`) where the topic changes.
 - Own motions `rf-*` (2026-10-29, from a reference reel; files in `motions/`, copied into the engine by setup_engine.sh): `rf-stopwatch`, `rf-step-tag`, `rf-emoji-caption` (caption style), `rf-file-upload`, `rf-pause-cut`; usage in `references/split-screen.md`.
 - Own paper-collage motions (2026-11-10, ideas from vox-director, MIT): `rf-paper-cutout`, `rf-starburst`, `rf-paper-caption` (caption style), `rf-scrapbook` (full frame, their images); usage, retro palettes and Vox AI-insert prompts in `references/paper-collage.md`.
+- Own full-frame motions «Свої: 30 моушн-ефектів» (2026-11-10, rebuilt from 30 motion-graphics prompts, code our own): 27 scenes of 2-3 s, each on its own background:
+  2D / CSS 3D: `rf-day-counter`, `rf-split-flap`, `rf-type-slam`, `rf-terminal-bloom`, `rf-receipt`, `rf-iceberg`, `rf-headline`, `rf-swiss-grid`, `rf-blueprint-draw`, `rf-globe-arcs`, `rf-neon-silhouette`, `rf-laptop-reveal`, `rf-iso-flow`, `rf-money-stack`, `rf-paper-desk`, `rf-ink-wash`, `rf-stat-chart`, `rf-agent-swarm`, `rf-ink-doodle`, `rf-creator-life`;
+  WebGL (three.js, build_reel loads engine/three.min.js by itself): `rf-deep-time`, `rf-map-route`, `rf-git-city`, `rf-contour-map`, `rf-teardown`, `rf-hologram`, `rf-turntable`.
+  Card: `{"type":"motion","name":"rf-split-flap","layout":"full","start","end","vars":{...}}`. EVERY word and number on screen is a variable (catalog `text_vars` + `note` say which): always fill them with the person's words and their real numbers, never leave the English defaults. Each one plays its beats (2-3 s) and holds its last frame to the card end: a card 0.5-1 s longer than the animation is right.
+  Colours: they keep their own palette by default (`keep_ui`). Every colour is a variable named by role (`bg`, `surface`, `accent`, `accent2`, `ink`, `muted`, `glow`...): set any of them in `vars` when the person asks («табло в бордовому з золотом»), or put `"colors": "brand"` on the card to repaint it in their brand (build_reel `brand_palette`: accents → pop / soft, darks → main / deep, lights → light, mid tones stay; colours set in `vars` win).
 - `push` and `steps` are rare: at most one of them per reel unless the person asked, none when the previous reel had one. `split` is a regular tool for step-by-step moments: `references/split-screen.md`.
 - A motion still has to show what that exact line says. «ideas» suggests, it doesn't decide.
 
@@ -70,6 +75,47 @@ Two effect packs (`vendor/gv-fx/NOTICE.md`): `scripts/fx12.py` (Олексій �
   `e9-dust` and `e9-freeze` need a still camera (the clean background is taken from the whole clip).
 - A piece where a Vibha effect and a gv / e9 effect overlap goes through Vibha's engine first, then gv-fx on top.
 - `motions.py ideas` marks vertigo, camzoom, zoomblur, lens, bignum, doodle, wave `[просте]` (accents); the rest are scenes.
+
+## Свої ефекти з рілс-референсу (15, `vendor/vibha-fx/scripts/rf_fx.py`)
+
+From instagram.com/reel/De6rKILOEaN (2026-11-06), built on the same engine as Vibha's (face tracking + MediaPipe cut-out),
+catalog `fx-rf-*` (№357-371, group «Свої (з рілс-референсу)»), card `{"type": "fx", "fx": "rf-…", "start", "end", "text"?, "opt"?}`.
+- **Decor, captions stay** (`FX_KEEP_CAPS` in build_reel): `rf-neon-trace` (lime line loops behind the head, in front of the
+  chest, 1-1.5 s), `rf-outline` (1 px white line along their outline), `rf-glow` (0.6-0.8 s flash around the silhouette, on one
+  word), `rf-track-dots` (tracking marks on the clothes, AI / analytics talk), `rf-color-wash` (0.6-0.9 s cream flash → pink
+  wash between two thoughts).
+- **Her words:** `rf-tilt-pills` (`text` = "два|слова", `opt.mid`), `rf-glass-flash` (one stressed word), `rf-anchor-word`
+  (`text` big word, `opt.tags` = "a|b|c" small labels, or the spoken words), `rf-side-note` (`text` = 3-4 lines "a|b|c"),
+  `rf-quote-title` (lines "a|«b»|c", a line in «» is the small accent one; CTA), `rf-letter-drop` (one short word),
+  `rf-vertical-word` (one word on its side by the head), `rf-texture-title` (one word ≤9 letters behind her, `opt.sub`).
+- **Spoken words by themselves:** `rf-word-cloud` (words float past at different depths, `opt.accent` = part of a word in
+  pink) and `rf-spread-words` (up to 4 small words far apart): without `text` fx_pass gives them the words said in the
+  card's seconds (`words`), each shows when it is said, so they replace the captions there.
+- Colours: lime = brand `soft`, pink = `pop`, white text with a soft dark halo (readable on light clothes). Fonts: brand head /
+  body / accent. Nothing covers the face (`guard`); big words behind their (`behind`). Scenes for the 2/3 rule: tilt-pills,
+  anchor-word, quote-title, letter-drop, word-cloud, texture-title (use `fx`); the rest count as simple.
+
+## «22 ефекти» (23, `vendor/vibha-fx/scripts/ay/`, 2026-11-13)
+
+From instagram.com/reel/Dfqx2tSOA_6 («22 video effects in 25 seconds»), rebuilt from scratch in the person's brand on
+Vibha's engine (face tracking + MediaPipe cut-out): catalog `fx-ay-*` (№393-415, group «22 ефекти (рілс 13.11)»), card
+`{"type": "fx", "fx": "ay-…", "start", "end", "text"?, "opt"?}`. Shared brand helpers in `ay_fx.py` (palette, Gilroy / Nyght
+italic / Playfair / IBM Plex Mono, all Cyrillic), effects grouped in `ay/ay_ui.py`, `ay_print.py`, `ay_type.py`, `ay_cam.py`,
+`ay_stack.py`. Every option, default and duration is in the catalog entry (`text_vars`, `note`). Check one on a clip:
+`vendor/vibha-fx/.venv/bin/python vendor/vibha-fx/scripts/ay_check.py ay-<name> [--opt '{…}'] [--video]`.
+- **Full-frame takeovers (captions hide):** `ay-banknote` (`to` = their REAL number, never the 10 000 sample), `ay-press` →
+  `ay-paper-tear` (put them back to back with the same text options: one continuous move), `ay-impact` (one word, 0.6-0.8 s),
+  `ay-code-body`, `ay-letter-dive` (short word 4-6 letters, works as a transition), `ay-layer-explode`, `ay-day-dial`, `ay-sketch-words`.
+  Count them as the reel's 1-2 full-screen breaks.
+- **Over the video:** `ay-head-stack` («слово::підпис|…»), `ay-orbit-ring` (one word ≤8 letters), `ay-post-wall` (`to`, `label`
+  their real count), `ay-clone-row`, `ay-blade-slice`, `ay-blow-away` (1.6 s with return), `ay-live-cursor`.
+- **Instagram / phone UI (native feel, tinted in the brand's greens):** `ay-predict-keys` (the phrase they type, 2.6-3.2 s, under the chin),
+  `ay-voice-note`, `ay-comment-drop` (CTA code word + `comment`), `ay-liquid-glass` (the CTA ending, last 4-4.6 s; `text` = the code
+  word, `sub` = what they send).
+- **Captions stay** (build_reel `FX_KEEP_CAPS`): `ay-index` (long card over a list section: `text` = items, `now`, `at` = local
+  seconds where the pill moves, `total`), `ay-rack-focus`, `ay-dolly-zoom`.
+- Already in ottheir packs, so not duplicated: Comment box (`comment-box`), Figma word (`gv-figma`), Vertigo (`gv-vertigo`),
+  Clones (`e9-clones`), Lens (`gv-lens`): the `ay-*` versions look different and both may be used, never in the same reel.
 
 ## Vertical frame and Ukrainian text (checked 2026-10-21 on all 86, big-face framing)
 

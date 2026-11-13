@@ -1,0 +1,369 @@
+<!doctype html>
+<!-- rf-map-route: white clay riverside district in 3D, a glowing route draws itself from a pulsing pin to a destination. Rebuilt from an ultra-skills motion prompt. -->
+<html lang="uk" data-composition-id="rf-map-route" data-composition-duration="600" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "street", "type": "string", "label": "Назва вулиці (підпис на маршруті)", "default": "Street name" },
+  { "id": "destination", "type": "string", "label": "Пункт призначення", "default": "Destination" },
+  { "id": "distance", "type": "string", "label": "Відстань з одиницею", "default": "2.4 km" },
+  { "id": "chip_note", "type": "string", "label": "Підпис після відстані", "default": "route, demo map" },
+  { "id": "seed", "type": "number", "label": "Зерно міста (інша забудова)", "default": 11 },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 3 },
+  { "id": "bg", "type": "color", "label": "Земля / фон", "default": "#f3f6fb" },
+  { "id": "surface", "type": "color", "label": "Будинки (глина)", "default": "#ffffff" },
+  { "id": "shade", "type": "color", "label": "Тінь на гранях", "default": "#e3e9f2" },
+  { "id": "ink", "type": "color", "label": "Текст", "default": "#0d1324" },
+  { "id": "muted", "type": "color", "label": "Другорядний текст", "default": "#4c566e" },
+  { "id": "accent", "type": "color", "label": "Маршрут і пін", "default": "#2f5bff" },
+  { "id": "river", "type": "color", "label": "Річка (відтінок 18%)", "default": "#2f5bff" },
+  { "id": "park", "type": "color", "label": "Парки (відтінок 30%)", "default": "#00b39a" },
+  { "id": "shadow", "type": "color", "label": "Колір тіней", "default": "#0c1a3a" }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-map-route</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-map-route" data-duration="600" data-fps="30">
+        <style>
+          .rfmr { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden; background: #f3f6fb; }
+          .rfmr .rfmr-gl { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; display: block; }
+          .rfmr .rfmr-lab { position: absolute; left: 0; top: 0; white-space: nowrap; opacity: 0; line-height: 1.15;
+                            font-family: var(--font-body, Helvetica, Arial, sans-serif); will-change: transform, opacity; }
+          .rfmr .rfmr-street { font-weight: 600; transform-origin: 50% 100%; }
+          .rfmr .rfmr-dest { font-weight: 700; background: #fff; border-radius: 16px; padding: 10px 20px;
+                             box-shadow: 0 8px 26px rgba(12,26,58,.16); transform-origin: 0% 50%; }
+          .rfmr .rfmr-chip { font-weight: 600; background: #fff; border-radius: 999px; padding: 12px 26px 12px 22px;
+                             box-shadow: 0 6px 20px rgba(12,26,58,.12); display: flex; align-items: center; gap: 14px; transform-origin: 50% 50%; }
+          .rfmr .rfmr-chip i { display: block; width: 18px; height: 18px; border-radius: 50%; flex: none; }
+        </style>
+        <div class="rfmr">
+          <canvas class="rfmr-gl" width="1080" height="1920"></canvas>
+          <div class="rfmr-lab rfmr-street"></div>
+          <div class="rfmr-lab rfmr-dest"></div>
+          <div class="rfmr-lab rfmr-chip"><i></i><span></span></div>
+        </div>
+        <script>
+          (function () {
+            var ID = "rf-map-route";
+            var box = document.querySelector(".rfmr");
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            function S(x, d) { return (x === undefined || x === null || x === "") ? d : String(x); }
+            var secs = Math.max(1, +v.seconds || 3);
+            var TXT_STREET = S(v.street, "Street name"), TXT_DEST = S(v.destination, "Destination");
+            var TXT_CHIP = (S(v.distance, "2.4 km") + " " + S(v.chip_note, "route, demo map")).trim();
+            var C = {
+              bg: S(v.bg, "#f3f6fb"), surface: S(v.surface, "#ffffff"), shade: S(v.shade, "#e3e9f2"), ink: S(v.ink, "#0d1324"),
+              muted: S(v.muted, "#4c566e"), accent: S(v.accent, "#2f5bff"), river: S(v.river, "#2f5bff"), park: S(v.park, "#00b39a"),
+              shadow: S(v.shadow, "#0c1a3a")
+            };
+            var W = 1080, H = 1920;
+            box.style.background = C.bg;
+            var elStreet = box.querySelector(".rfmr-street"), elDest = box.querySelector(".rfmr-dest"), elChip = box.querySelector(".rfmr-chip");
+            elStreet.textContent = TXT_STREET; elStreet.style.color = C.ink;
+            elStreet.style.textShadow = "0 0 8px " + C.bg + ", 0 0 3px " + C.bg;
+            elDest.textContent = TXT_DEST; elDest.style.color = C.ink; elDest.style.background = C.surface;
+            elChip.querySelector("span").textContent = TXT_CHIP; elChip.style.color = C.muted; elChip.style.background = C.surface;
+            elChip.querySelector("i").style.background = C.accent;
+
+            // shrink-to-fit via canvas text metrics (works even before layout)
+            var mctx = document.createElement("canvas").getContext("2d");
+            var fam = getComputedStyle(elStreet).fontFamily || "Helvetica, Arial, sans-serif";
+            function fit(el, text, weight, size, min, maxW) {
+              while (size > min) { mctx.font = weight + " " + size + "px " + fam; if (mctx.measureText(text).width <= maxW) break; size -= 1; }
+              el.style.fontSize = size + "px"; mctx.font = weight + " " + size + "px " + fam;
+              return { s: size, w: mctx.measureText(text).width };
+            }
+            var mStreet = fit(elStreet, TXT_STREET, 600, 34, 24, 620);
+            var mDest = fit(elDest, TXT_DEST, 700, 44, 26, 440);
+            var mChip = fit(elChip, TXT_CHIP, 600, 34, 22, 820);
+            var wStreet = mStreet.w, hStreet = mStreet.s * 1.15;
+            var wDest = mDest.w + 40, hDest = mDest.s * 1.15 + 20;
+            var wChip = mChip.w + 22 + 26 + 18 + 14;
+
+            window.__timelines = window.__timelines || {};
+            // seek-safe: the tweened property is a setter, so draw() runs on every seek (seek() suppresses callbacks)
+            var _t = 0, st = { get t() { return _t; }, set t(x) { _t = x; draw(); } };
+            var draw = function () { var t = Math.min(secs, Math.max(0, st.t)); box.style.opacity = fadeOut(t); };
+            var tl = gsap.timeline({ paused: true });
+            tl.to(st, { t: secs, duration: secs, ease: "none" }, 0);
+            window.__timelines[ID] = tl;
+            function fadeOut(t) { return Math.max(0, Math.min(1, (secs - t) / 0.25)); }
+            if (typeof THREE === "undefined") { draw(); return; }
+
+            // ---------- helpers ----------
+            function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+            function cl(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+            function lerp(a, b, t) { return a + (b - a) * t; }
+            function ioCubic(x) { x = cl(x); return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; }
+            function ioSine(x) { x = cl(x); return -(Math.cos(Math.PI * x) - 1) / 2; }
+            function backOut(x, s) { x = cl(x); var c = s + 1; return 1 + c * Math.pow(x - 1, 3) + s * Math.pow(x - 1, 2); }
+            function col(h) { return new THREE.Color(h); }
+            function mix(a, b, t) { return col(a).lerp(col(b), t); }
+            var rnd = mulberry32(((+v.seed || 11) * 2654435761) >>> 0);
+
+            // ---------- renderer / scene ----------
+            var canvas = box.querySelector(".rfmr-gl");
+            var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, preserveDrawingBuffer: true, alpha: false });
+            renderer.setPixelRatio(1); renderer.setSize(W, H, false);
+            renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            var scene = new THREE.Scene();
+            scene.background = col(C.bg);
+            scene.fog = new THREE.Fog(col(C.bg), 70, 150);
+            var camera = new THREE.PerspectiveCamera(32, W / H, 0.5, 400);
+
+            var hemi = new THREE.HemisphereLight(col(C.surface), mix(C.shade, C.shadow, 0.12), 0.78); scene.add(hemi);
+            var key = new THREE.DirectionalLight(col(C.surface), 0.34);
+            key.position.set(-14, 22, 4); key.target.position.set(0, 0, 0); scene.add(key); scene.add(key.target);
+            key.castShadow = true; key.shadow.mapSize.set(1024, 1024);
+            var sc = key.shadow.camera; sc.left = -17; sc.right = 17; sc.top = 17; sc.bottom = -17; sc.near = 1; sc.far = 70;
+            key.shadow.bias = -0.0006; key.shadow.normalBias = 0.02;
+
+            // ground (exact colour) + shadow catcher in the palette shadow colour
+            var ground = new THREE.Mesh(new THREE.PlaneGeometry(500, 500), new THREE.MeshBasicMaterial({ color: col(C.bg) }));
+            ground.rotation.x = -Math.PI / 2; scene.add(ground);
+            var catcher = new THREE.Mesh(new THREE.PlaneGeometry(500, 500), new THREE.ShadowMaterial({ color: col(C.shadow), opacity: 0.2 }));
+            catcher.rotation.x = -Math.PI / 2; catcher.position.y = 0.012; catcher.receiveShadow = true; scene.add(catcher);
+
+            // ---------- city layout ----------
+            var PITCH = 3.1, COLS = 5, ROWS = 8, BLK = 2.2;
+            function riverZ(x) { return 0.55 + 1.25 * Math.sin(x * 0.32 + 0.5); }
+            var BRIDGE_X = -4.65, BRIDGE_Z = riverZ(BRIDGE_X);
+            var parks = { "0,2": 1, "3,1": 1, "1,6": 1, "4,5": 1 };
+            var blockMat = new THREE.MeshLambertMaterial({ color: col(C.surface) });
+            var HB = [0.4, 0.6, 0.85, 1.15, 1.5, 1.95];
+            function bevelBox(h) {
+              var b = 0.08, s = 0.5 - b, sh = new THREE.Shape();
+              sh.moveTo(-s, -s); sh.lineTo(s, -s); sh.lineTo(s, s); sh.lineTo(-s, s); sh.lineTo(-s, -s);
+              var g = new THREE.ExtrudeGeometry(sh, { depth: Math.max(0.01, h - 2 * b), bevelEnabled: true, bevelThickness: b, bevelSize: b, bevelSegments: 3, curveSegments: 1 });
+              g.rotateX(-Math.PI / 2); g.translate(0, b, 0); return g;
+            }
+            var lots = HB.map(function () { return []; });
+            var treeList = [], parkMat = new THREE.MeshBasicMaterial({ color: mix(C.bg, C.park, 0.3) });
+            for (var i = 0; i < COLS; i++) for (var j = 0; j < ROWS; j++) {
+              var cx = (i - 2) * PITCH, cz = (j - 3.5) * PITCH;
+              if (parks[i + "," + j]) {
+                var pg = new THREE.Mesh(new THREE.PlaneGeometry(BLK, BLK), parkMat);
+                pg.rotation.x = -Math.PI / 2; pg.position.set(cx, 0.006, cz); scene.add(pg);
+                var nt = 5 + Math.floor(rnd() * 3);
+                for (var k = 0; k < nt; k++) treeList.push([cx + (rnd() - 0.5) * 1.6, cz + (rnd() - 0.5) * 1.6, 0.22 + rnd() * 0.16]);
+                continue;
+              }
+              for (var a = -1; a <= 1; a += 2) for (var b2 = -1; b2 <= 1; b2 += 2) {
+                var lx = cx + a * 0.6, lz = cz + b2 * 0.6;
+                var hgt = 0.35 + Math.pow(rnd(), 1.8) * 1.7, fx = 0.82 + rnd() * 0.18, fz = 0.82 + rnd() * 0.18;
+                if (Math.abs(lz - riverZ(lx)) < 1.05) continue;
+                var bi = 0, bd = 9; HB.forEach(function (hb, q) { if (Math.abs(hb - hgt) < bd) { bd = Math.abs(hb - hgt); bi = q; } });
+                lots[bi].push([lx, lz, fx, fz]);
+              }
+            }
+            var mtx = new THREE.Matrix4();
+            HB.forEach(function (hb, q) {
+              if (!lots[q].length) return;
+              var im = new THREE.InstancedMesh(bevelBox(hb), blockMat, lots[q].length);
+              lots[q].forEach(function (L, n) { mtx.makeScale(L[2], 1, L[3]); mtx.setPosition(L[0], 0, L[1]); im.setMatrixAt(n, mtx); });
+              im.castShadow = true; im.receiveShadow = true; scene.add(im);
+            });
+            if (treeList.length) {
+              var trees = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 16, 12), blockMat, treeList.length);
+              treeList.forEach(function (T, n) { mtx.makeScale(T[2], T[2], T[2]); mtx.setPosition(T[0], T[2] * 0.95, T[1]); trees.setMatrixAt(n, mtx); });
+              trees.castShadow = true; trees.receiveShadow = true; scene.add(trees);
+            }
+            // river ribbon
+            (function () {
+              var pos = [], idx = [], n = 90, x0 = -11, x1 = 11, hw = 0.45;
+              for (var s = 0; s <= n; s++) {
+                var x = lerp(x0, x1, s / n), z = riverZ(x), dz = 1.25 * 0.32 * Math.cos(x * 0.32 + 0.5);
+                var len = Math.sqrt(1 + dz * dz), nx = -dz / len, nz = 1 / len;
+                pos.push(x + nx * hw, 0.004, z + nz * hw, x - nx * hw, 0.004, z - nz * hw);
+                if (s < n) { var o = s * 2; idx.push(o, o + 2, o + 1, o + 1, o + 2, o + 3); }
+              }
+              var g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx);
+              scene.add(new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: mix(C.bg, C.river, 0.18), side: THREE.DoubleSide })));
+            })();
+            // tiny bridge
+            var bridge = new THREE.Mesh(new THREE.BoxGeometry(0.95, 0.1, 1.6), blockMat);
+            bridge.position.set(BRIDGE_X, 0.07, BRIDGE_Z); bridge.castShadow = true; bridge.receiveShadow = true; scene.add(bridge);
+            [-1, 1].forEach(function (sd) {
+              var r = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.12, 1.6), blockMat);
+              r.position.set(BRIDGE_X + sd * 0.45, 0.18, BRIDGE_Z); r.castShadow = true; scene.add(r);
+            });
+
+            // ---------- route ----------
+            var PTS = [[-4.65, 11.2], [-4.65, -3.1], [1.55, -3.1], [1.55, -8.6]], RC = 0.7, dense = [], corners = [];
+            for (var s1 = 0; s1 < PTS.length - 1; s1++) {
+              var A = PTS[s1], B = PTS[s1 + 1], dx = B[0] - A[0], dz = B[1] - A[1], L = Math.hypot(dx, dz); dx /= L; dz /= L;
+              var a0 = s1 > 0 ? RC : 0, b0 = s1 < PTS.length - 2 ? RC : 0, steps = Math.ceil((L - a0 - b0) / 0.05);
+              for (var q = 0; q <= steps; q++) { var u = a0 + (L - a0 - b0) * q / steps; dense.push([A[0] + dx * u, A[1] + dz * u]); }
+              if (s1 < PTS.length - 2) {
+                var Cn = PTS[s1 + 2], ex = Cn[0] - B[0], ez = Cn[1] - B[1], EL = Math.hypot(ex, ez); ex /= EL; ez /= EL;
+                var p0 = [B[0] - dx * RC, B[1] - dz * RC], p2 = [B[0] + ex * RC, B[1] + ez * RC];
+                for (var q2 = 1; q2 < 14; q2++) {
+                  var tt = q2 / 14, m0 = (1 - tt) * (1 - tt), m1 = 2 * tt * (1 - tt), m2 = tt * tt;
+                  dense.push([m0 * p0[0] + m1 * B[0] + m2 * p2[0], m0 * p0[1] + m1 * B[1] + m2 * p2[1]]);
+                  if (q2 === 7) corners.push(dense.length - 1);
+                }
+              }
+            }
+            var dl = [0]; for (var d1 = 1; d1 < dense.length; d1++) dl.push(dl[d1 - 1] + Math.hypot(dense[d1][0] - dense[d1 - 1][0], dense[d1][1] - dense[d1 - 1][1]));
+            var TOTAL = dl[dl.length - 1], NS = 520, path = [];
+            var cornerS = corners.map(function (ci) { return dl[ci]; });
+            for (var r1 = 0, di = 0; r1 <= NS; r1++) {
+              var sv = TOTAL * r1 / NS; while (di < dl.length - 2 && dl[di + 1] < sv) di++;
+              var fr = (sv - dl[di]) / Math.max(1e-6, dl[di + 1] - dl[di]);
+              path.push([lerp(dense[di][0], dense[di + 1][0], fr), lerp(dense[di][1], dense[di + 1][1], fr), sv]);
+            }
+            function yAt(x, z) { if (Math.abs(x - BRIDGE_X) > 0.6) return 0; var e = cl(1 - (Math.abs(z - BRIDGE_Z) - 0.6) / 0.7); return 0.12 * e * e * (3 - 2 * e); }
+            // time warp: ~15% slower through each corner
+            var tw = [0];
+            for (var w1 = 1; w1 <= NS; w1++) {
+              var sm = path[w1][2], vv = 1;
+              cornerS.forEach(function (cs) { vv -= 0.15 * Math.exp(-Math.pow((sm - cs) / 1.1, 2)); });
+              tw.push(tw[w1 - 1] + (path[w1][2] - path[w1 - 1][2]) / vv);
+            }
+            for (var w2 = 0; w2 <= NS; w2++) tw[w2] /= tw[NS];
+            function routeIndex(t) {
+              var tau = ioCubic((t * 30 - 30) / 42); if (tau <= 0) return 0; if (tau >= 1) return NS;
+              var lo = 0, hi = NS; while (hi - lo > 1) { var md = (lo + hi) >> 1; if (tw[md] < tau) lo = md; else hi = md; }
+              return lo + (tau - tw[lo]) / Math.max(1e-9, tw[hi] - tw[lo]);
+            }
+            // raised ribbon (top + two walls)
+            var RW = 0.14, RT = 0.07, rp = [], rc = [], ri = [], cTop = col(C.accent), cSide = col(C.accent).multiplyScalar(0.72);
+            for (var g1 = 0; g1 <= NS; g1++) {
+              var pa = path[Math.max(0, g1 - 1)], pb = path[Math.min(NS, g1 + 1)], tx = pb[0] - pa[0], tz = pb[1] - pa[1], tl2 = Math.hypot(tx, tz) || 1;
+              var nx = -tz / tl2 * RW, nz = tx / tl2 * RW, P = path[g1], y0 = 0.012 + yAt(P[0], P[1]);
+              rp.push(P[0] + nx, y0 + RT, P[1] + nz, P[0] - nx, y0 + RT, P[1] - nz, P[0] + nx, y0, P[1] + nz, P[0] - nx, y0, P[1] - nz);
+              rc.push(cTop.r, cTop.g, cTop.b, cTop.r, cTop.g, cTop.b, cSide.r, cSide.g, cSide.b, cSide.r, cSide.g, cSide.b);
+              if (g1 < NS) { var o = g1 * 4, n4 = o + 4; ri.push(o, n4, o + 1, o + 1, n4, n4 + 1, o + 2, n4 + 2, o, o, n4 + 2, n4, o + 1, n4 + 1, o + 3, o + 3, n4 + 1, n4 + 3); }
+            }
+            var ribGeo = new THREE.BufferGeometry();
+            ribGeo.setAttribute("position", new THREE.Float32BufferAttribute(rp, 3)); ribGeo.setAttribute("color", new THREE.Float32BufferAttribute(rc, 3)); ribGeo.setIndex(ri);
+            var ribbon = new THREE.Mesh(ribGeo, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide }));
+            ribbon.castShadow = true; scene.add(ribbon);
+            // soft glow strip under the ribbon (alpha across width)
+            var gp = [], gc = [], gi = [], ca = col(C.accent), GW = 0.62;
+            for (var g2 = 0; g2 <= NS; g2++) {
+              var qa = path[Math.max(0, g2 - 1)], qb = path[Math.min(NS, g2 + 1)], ux = qb[0] - qa[0], uz = qb[1] - qa[1], ul = Math.hypot(ux, uz) || 1;
+              var mx = -uz / ul * GW, mz = ux / ul * GW, Q = path[g2], yy = 0.016 + yAt(Q[0], Q[1]);
+              gp.push(Q[0] + mx, yy, Q[1] + mz, Q[0], yy, Q[1], Q[0] - mx, yy, Q[1] - mz);
+              gc.push(ca.r, ca.g, ca.b, 0, ca.r, ca.g, ca.b, 0.42, ca.r, ca.g, ca.b, 0);
+              if (g2 < NS) { var o3 = g2 * 3; gi.push(o3, o3 + 3, o3 + 1, o3 + 1, o3 + 3, o3 + 4, o3 + 1, o3 + 4, o3 + 2, o3 + 2, o3 + 4, o3 + 5); }
+            }
+            var glowGeo = new THREE.BufferGeometry();
+            glowGeo.setAttribute("position", new THREE.Float32BufferAttribute(gp, 3)); glowGeo.setAttribute("color", new THREE.Float32BufferAttribute(gc, 4)); glowGeo.setIndex(gi);
+            var glow = new THREE.Mesh(glowGeo, new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false, side: THREE.DoubleSide }));
+            scene.add(glow);
+            // moving head: bright core + halo sprite
+            function radialTex(inner) {
+              var c2 = document.createElement("canvas"); c2.width = c2.height = 128; var x = c2.getContext("2d");
+              var gr = x.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(inner, "rgba(255,255,255,.55)"); gr.addColorStop(1, "rgba(255,255,255,0)");
+              x.fillStyle = gr; x.fillRect(0, 0, 128, 128); var tx3 = new THREE.CanvasTexture(c2); return tx3;
+            }
+            var head = new THREE.Mesh(new THREE.SphereGeometry(0.17, 18, 12), new THREE.MeshBasicMaterial({ color: mix(C.accent, C.surface, 0.75) }));
+            scene.add(head);
+            var halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: radialTex(0.25), color: col(C.accent), transparent: true, depthWrite: false, opacity: 0.85 }));
+            halo.scale.set(1.5, 1.5, 1); scene.add(halo);
+
+            // origin pin + two pulsing rings
+            var O = PTS[0];
+            var disc = new THREE.Mesh(new THREE.CircleGeometry(0.36, 40), new THREE.MeshBasicMaterial({ color: col(C.accent) }));
+            disc.rotation.x = -Math.PI / 2; disc.position.set(O[0], 0.1, O[1]); scene.add(disc);
+            var dot = new THREE.Mesh(new THREE.CircleGeometry(0.13, 28), new THREE.MeshBasicMaterial({ color: col(C.surface) }));
+            dot.rotation.x = -Math.PI / 2; dot.position.set(O[0], 0.11, O[1]); scene.add(dot);
+            function ring() {
+              var m = new THREE.Mesh(new THREE.RingGeometry(0.86, 1, 56), new THREE.MeshBasicMaterial({ color: col(C.accent), transparent: true, depthWrite: false, side: THREE.DoubleSide }));
+              m.rotation.x = -Math.PI / 2; scene.add(m); return m;
+            }
+            var ringA = ring(), ringB = ring(), ringD = ring();
+            ringA.position.set(O[0], 0.09, O[1]); ringB.position.set(O[0], 0.09, O[1]);
+
+            // destination pin
+            var DP = PTS[PTS.length - 1];
+            var pinMat = new THREE.MeshLambertMaterial({ color: col(C.accent) });
+            var pin = new THREE.Group();
+            var pHead = new THREE.Mesh(new THREE.SphereGeometry(0.36, 24, 16), pinMat); pHead.position.y = 1.1; pin.add(pHead);
+            var pCone = new THREE.Mesh(new THREE.ConeGeometry(0.24, 0.95, 24), pinMat); pCone.rotation.x = Math.PI; pCone.position.y = 0.55; pin.add(pCone);
+            var pDot = new THREE.Mesh(new THREE.SphereGeometry(0.13, 16, 10), new THREE.MeshBasicMaterial({ color: col(C.surface) })); pDot.position.y = 1.1; pDot.position.z = 0.27; pin.add(pDot);
+            pHead.castShadow = pCone.castShadow = true; pin.position.set(DP[0], 0, DP[1]); scene.add(pin);
+            ringD.position.set(DP[0], 0.09, DP[1]);
+
+            // ---------- camera path ----------
+            var D2R = Math.PI / 180, F89 = 89 / 30;
+            var K0 = { tx: -3.3, tz: 8.6, d: 11.5, el: 21, az: -34 }, K1 = { tx: -3.6, tz: 2.0, d: 21, el: 48, az: -20 }, K2 = { tx: -0.6, tz: -0.4, d: 60, el: 60, az: -10 };
+            function camAt(t) {
+              var f = t * 30, e1 = backOut((f - 30) / 32, 0.9), e2 = ioSine((f - 56) / 22), r = {};
+              for (var k in K0) { var k0 = k === "d" ? lerp(11.5, 10.6, cl(f / 30)) : K0[k]; r[k] = lerp(lerp(k0, K1[k], e1), K2[k], e2); }
+              // during the tilt the look-at point rides just ahead of the route head, so the drawing stays in frame
+              var wh = ioSine((f - 30) / 14) * (1 - e2);
+              if (wh > 0) { var hp0 = headAt(Math.min(NS, routeIndex(t) + 40)); r.tx = lerp(r.tx, hp0[0], wh * 0.8); r.tz = lerp(r.tz, hp0[1], wh * 0.8); }
+              r.az += 1.5 * ioSine((f - 78) / 11) + (t > F89 ? 0.35 * (t - F89) : 0);
+              return r;
+            }
+            function headAt(ix) { var i0 = Math.floor(ix), i1 = Math.min(NS, i0 + 1), fr = ix - i0; return [lerp(path[i0][0], path[i1][0], fr), lerp(path[i0][1], path[i1][1], fr)]; }
+            var vP = new THREE.Vector3();
+            function proj(x, y, z) { vP.set(x, y, z).project(camera); return [(vP.x + 1) / 2 * W, (1 - vP.y) / 2 * H, vP.z]; }
+            function clampX(x, w) { return Math.max(60, Math.min(1020 - w, x)); }
+            function clampY(y, h) { return Math.max(220, Math.min(1536 - h, y)); }
+
+            draw = function () {
+              var t = Math.min(secs, Math.max(0, st.t)), f = t * 30;
+              var c = camAt(t), el = c.el * D2R, az = c.az * D2R;
+              camera.position.set(c.tx + c.d * Math.cos(el) * Math.sin(az), c.d * Math.sin(el), c.tz + c.d * Math.cos(el) * Math.cos(az));
+              camera.lookAt(c.tx, 0, c.tz); camera.updateMatrixWorld();
+              // route progress
+              var ri2 = routeIndex(t), seg = Math.floor(ri2);
+              ribGeo.setDrawRange(0, seg * 18); glowGeo.setDrawRange(0, seg * 12);
+              var pa = path[Math.min(NS, seg)], pb = path[Math.min(NS, seg + 1)], fr2 = ri2 - seg;
+              var hx = lerp(pa[0], pb[0], fr2), hz = lerp(pa[1], pb[1], fr2), hy = 0.012 + yAt(hx, hz) + 0.08;
+              var showHead = f >= 30;
+              head.visible = halo.visible = showHead;
+              head.position.set(hx, hy, hz); halo.position.set(hx, hy + 0.02, hz);
+              halo.material.opacity = 0.85 * (f >= 72 ? Math.max(0.35, 1 - (f - 72) / 10) : 1);
+              // origin rings: pulse every 18 frames
+              [[ringA, 0], [ringB, 5]].forEach(function (R) {
+                var ph = (((f - R[1]) % 18) + 18) % 18 / 18; var sc2 = 0.42 + ph * 1.7;
+                R[0].scale.set(sc2, sc2, sc2); R[0].material.opacity = 0.6 * Math.pow(1 - ph, 1.6) * (f >= R[1] ? 1 : 0);
+              });
+              // destination pin: drop at frame 72 (120px ~ 2 units), one ring, small settle
+              var td = (f - 72) / 30;
+              if (td < 0) { pin.visible = false; ringD.visible = false; }
+              else {
+                pin.visible = true; var yoff;
+                if (td < 0.2) { var u2 = td / 0.2; yoff = 2.1 * (1 - u2 * u2); pin.scale.set(1, 1, 1); }
+                else { var tb = td - 0.2; yoff = 0.2 * Math.exp(-9 * tb) * Math.abs(Math.sin(16 * tb)); var sq = 1 - 0.12 * Math.exp(-14 * tb) * Math.cos(24 * tb); pin.scale.set(1 / Math.sqrt(sq), sq, 1 / Math.sqrt(sq)); }
+                pin.position.y = yoff;
+                var tr = td - 0.2; ringD.visible = tr > 0;
+                if (tr > 0) { var ph2 = cl(tr / 0.6), s3 = 0.4 + ph2 * 2.3; ringD.scale.set(s3, s3, s3); ringD.material.opacity = 0.65 * Math.pow(1 - ph2, 1.4); }
+              }
+              renderer.render(scene, camera);
+
+              // ---- labels projected from 3D points ----
+              var ts = (f - 56) / 30;
+              if (ts <= 0) elStreet.style.opacity = 0;
+              else {
+                var k1 = cl(ts / 0.4), sp = proj(-1.2, 0.09, -3.1);
+                var sx = clampX(sp[0] - wStreet / 2, wStreet), sy = clampY(sp[1] - hStreet - 14, hStreet);
+                elStreet.style.opacity = cl(k1 * 2.5);
+                elStreet.style.transform = "translate(" + sx.toFixed(1) + "px," + sy.toFixed(1) + "px) perspective(700px) rotateX(" + (88 * (1 - backOut(k1, 1.3))).toFixed(2) + "deg)";
+              }
+              var tdl = (f - 75) / 30;
+              if (tdl <= 0) elDest.style.opacity = 0;
+              else {
+                var k2 = cl(tdl / 0.3), hp = proj(DP[0], 1.1 + pin.position.y, DP[1]);
+                var lx2 = hp[0] + 48; if (lx2 + wDest > 1020) lx2 = hp[0] - 48 - wDest;
+                lx2 = clampX(lx2, wDest); var ly2 = clampY(hp[1] - hDest / 2, hDest);
+                elDest.style.opacity = cl(k2 * 3);
+                elDest.style.transform = "translate(" + lx2.toFixed(1) + "px," + ly2.toFixed(1) + "px) scale(" + (0.4 + 0.6 * backOut(k2, 2.2)).toFixed(3) + ")";
+              }
+              var tc = (f - 74) / 30;
+              if (tc <= 0) elChip.style.opacity = 0;
+              else {
+                var k3 = cl(tc / 0.35);
+                elChip.style.opacity = cl(k3 * 2);
+                elChip.style.transform = "translate(" + ((W - wChip) / 2).toFixed(1) + "px," + (232 + 14 * (1 - ioCubic(k3))).toFixed(1) + "px) scale(" + (0.9 + 0.1 * backOut(k3, 1.6)).toFixed(3) + ")";
+              }
+              box.style.opacity = fadeOut(t);
+            };
+            draw();
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

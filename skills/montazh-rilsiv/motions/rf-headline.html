@@ -1,0 +1,138 @@
+<!doctype html>
+<!-- rf-headline: a tilted newsprint page sets its own front page like a press run: masthead, headline, two columns, marked pull line.
+     Rebuilt from an ultra-skills motion prompt. -->
+<html lang="uk" data-composition-id="rf-headline" data-composition-duration="600" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "paper_name", "type": "string", "label": "Назва газети", "default": "Paper name" },
+  { "id": "edition", "type": "string", "label": "Рядок під назвою", "default": "Demo edition, fictional paper" },
+  { "id": "headline", "type": "string", "label": "Заголовок", "default": "Your headline sentence" },
+  { "id": "body", "type": "string", "label": "Текст у дві колонки (2 короткі речення)", "default": "Two short sentences that expand the headline." },
+  { "id": "pull", "type": "string", "label": "Виділене речення (маркером)", "default": "Pull sentence" },
+  { "id": "bg", "type": "color", "label": "Фон (темні аркуші)", "default": "#0e0f11" },
+  { "id": "edge", "type": "color", "label": "Краї темних аркушів", "default": "#1e2024" },
+  { "id": "surface", "type": "color", "label": "Папір сторінки", "default": "#fffdf8" },
+  { "id": "shadow", "type": "color", "label": "Тінь сторінки", "default": "#2a1d10" },
+  { "id": "ink", "type": "color", "label": "Чорнило", "default": "#17130f" },
+  { "id": "muted", "type": "color", "label": "Чорнило другорядне", "default": "#5e554b" },
+  { "id": "accent", "type": "color", "label": "Маркер", "default": "#c6f432" },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 3 }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-headline</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-headline" data-duration="600" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; overflow: hidden; }
+          .rfhl { position: absolute; inset: 0; overflow: hidden; background: color-mix(in srgb, var(--hl-bg) 70%, #000); perspective: 1800px; perspective-origin: 50% 45%; }
+          .rfhl-sh { position: absolute; width: 900px; height: 1300px; background: var(--hl-bg); border: 6px solid var(--hl-edge); filter: blur(11px); border-radius: 4px; }
+          .rfhl-page { position: absolute; left: 110px; top: 330px; width: 860px; height: 1240px; background: var(--hl-surface); color: var(--hl-ink);
+                       box-shadow: 0 50px 90px color-mix(in srgb, var(--hl-shadow) 75%, transparent), 0 10px 24px color-mix(in srgb, var(--hl-shadow) 55%, transparent);
+                       transform-origin: 50% 50%; overflow: hidden; }
+          .rfhl-grain { position: absolute; inset: 0; opacity: .5; pointer-events: none; mix-blend-mode: multiply;
+                        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9 .06' numOctaves='3' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E"); }
+          .rfhl-in { position: absolute; left: 56px; right: 56px; top: 40px; bottom: 50px; }
+          .rfhl-rule { height: 2px; background: var(--hl-ink); transform-origin: 0 50%; }
+          .rfhl-mast { margin-top: 26px; text-align: center; font-family: Georgia, "Times New Roman", serif; font-weight: 900; font-size: 84px; line-height: 1;
+                       letter-spacing: -0.01em; white-space: nowrap; transform-origin: 50% 60%; }
+          .rfhl-ed { margin-top: 12px; text-align: center; font-family: Georgia, "Times New Roman", serif; font-style: italic; font-size: 32px; color: var(--hl-muted); }
+          .rfhl-dbl { margin-top: 18px; height: 8px; border-top: 3px solid var(--hl-ink); border-bottom: 1px solid var(--hl-ink); }
+          .rfhl-head { margin-top: 30px; font-family: Georgia, "Times New Roman", serif; font-weight: 700; font-size: 76px; line-height: 1.06; letter-spacing: -0.015em; }
+          .rfhl-head span { display: inline-block; opacity: 0; }
+          .rfhl-bd { margin-top: 30px; column-count: 2; column-gap: 40px; column-rule: 1px solid color-mix(in srgb, var(--hl-muted) 50%, transparent);
+                     font-family: Georgia, "Times New Roman", serif; font-size: 34px; line-height: 1.32; text-align: left; hyphens: auto; }
+          .rfhl-pull { margin-top: 30px; padding-top: 18px; border-top: 1px solid var(--hl-ink); font-family: Georgia, "Times New Roman", serif;
+                       font-style: italic; font-weight: 700; font-size: 40px; line-height: 1.35; }
+          .rfhl-w { opacity: 0; position: relative; z-index: 1; }
+          .rfhl-caret { position: absolute; left: 0; top: 0; width: 18px; height: 40px; background: var(--hl-ink); opacity: 0; z-index: 3; }
+          .rfhl-mk { position: absolute; overflow: hidden; width: 0; z-index: 2; mix-blend-mode: multiply; }
+          .rfhl-mk i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--hl-accent);
+                       clip-path: polygon(0 18%, 3% 4%, 7% 12%, 12% 2%, 88% 6%, 95% 0, 98% 14%, 100% 40%, 97% 62%, 100% 86%, 94% 100%, 60% 94%, 8% 98%, 3% 90%, 0 72%, 2% 44%); }
+          .rfhl-band { position: absolute; top: -200px; bottom: -200px; width: 420px; left: -500px; transform: rotate(14deg); pointer-events: none; z-index: 4;
+                       background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.42), rgba(255,255,255,0)); }
+          .rfhl-fade { position: absolute; inset: 0; background: #000; opacity: 0; z-index: 9; }
+        </style>
+        <div class="rfhl">
+          <div class="rfhl-sh" style="left:-210px;top:120px;transform:rotate(-14deg)"></div>
+          <div class="rfhl-sh" style="left:330px;top:640px;transform:rotate(9deg)"></div>
+          <div class="rfhl-sh" style="left:-60px;top:900px;transform:rotate(-4deg)"></div>
+          <div class="rfhl-page">
+            <div class="rfhl-grain"></div>
+            <div class="rfhl-in">
+              <div class="rfhl-rule"></div>
+              <div class="rfhl-mast"></div>
+              <div class="rfhl-ed"></div>
+              <div class="rfhl-dbl"></div>
+              <div class="rfhl-head"></div>
+              <div class="rfhl-bd"></div>
+              <div class="rfhl-pull"></div>
+              <div class="rfhl-caret"></div>
+            </div>
+            <div class="rfhl-band"></div>
+          </div>
+          <div class="rfhl-fade"></div>
+        </div>
+        <script>
+          (function () {
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            function g(k, d) { return (v[k] === undefined || v[k] === null || v[k] === "") ? d : v[k]; }
+            var secs = Math.max(1, +g("seconds", 3)), F = 1 / 30;
+            var root = document.querySelector(".rfhl"), page = root.querySelector(".rfhl-page"), inner = root.querySelector(".rfhl-in");
+            [["bg", "#0e0f11"], ["edge", "#1e2024"], ["surface", "#fffdf8"], ["shadow", "#2a1d10"], ["ink", "#17130f"], ["muted", "#5e554b"], ["accent", "#c6f432"]]
+              .forEach(function (c) { root.style.setProperty("--hl-" + c[0], String(g(c[0], c[1]))); });
+            var mast = root.querySelector(".rfhl-mast"), ed = root.querySelector(".rfhl-ed"), head = root.querySelector(".rfhl-head");
+            var bd = root.querySelector(".rfhl-bd"), pull = root.querySelector(".rfhl-pull"), caret = root.querySelector(".rfhl-caret");
+            function words(el, s, cls) { el.innerHTML = ""; String(s).split(/\s+/).filter(Boolean).forEach(function (w, i, a) {
+              var sp = document.createElement("span"); sp.className = cls; sp.textContent = w; el.appendChild(sp); if (i < a.length - 1) el.appendChild(document.createTextNode(" ")); });
+              return [].slice.call(el.querySelectorAll("span")); }
+            mast.textContent = String(g("paper_name", "Paper name")); ed.textContent = String(g("edition", "Demo edition, fictional paper"));
+            var IW = 748;
+            var fs = 84; while (mast.scrollWidth > IW && fs > 40) { fs -= 2; mast.style.fontSize = fs + "px"; }
+            fs = 32; ed.style.whiteSpace = "nowrap"; while (ed.scrollWidth > IW && fs > 24) { fs -= 1; ed.style.fontSize = fs + "px"; } ed.style.whiteSpace = "normal";
+            var hw = words(head, g("headline", "Your headline sentence"), "");
+            fs = 76; while (head.offsetHeight > 330 && fs > 44) { fs -= 2; head.style.fontSize = fs + "px"; }
+            var bw = words(bd, g("body", "Two short sentences that expand the headline."), "rfhl-w");
+            var pw = words(pull, g("pull", "Pull sentence"), "rfhl-w");
+            // keep body + pull inside the page (text never under 32px; past that the columns get a fixed height)
+            var room = 1150 - (pull.offsetTop + pull.offsetHeight);
+            fs = 34; while (room < 0 && fs > 32) { fs -= 1; bd.style.fontSize = fs + "px"; room = 1150 - (pull.offsetTop + pull.offsetHeight); }
+            if (room > 0) {   // short copy: spread the stack over the page instead of leaving the bottom empty
+              head.style.marginTop = (30 + room * 0.38) + "px"; bd.style.marginTop = (30 + room * 0.22) + "px"; pull.style.marginTop = (30 + room * 0.22) + "px"; }
+            if (room < 0) { bd.style.height = Math.max(120, bd.offsetHeight + room) + "px"; bd.style.overflow = "hidden"; bd.style.columnFill = "auto"; }
+            var tl = gsap.timeline({ paused: true });
+            // page tilt: one curve over the whole run
+            tl.fromTo(page, { rotationX: 8, rotationY: -12 }, { rotationX: 5, rotationY: -7, duration: 89 * F, ease: "sine.inOut" }, 0);
+            tl.fromTo(root.querySelector(".rfhl-rule"), { scaleX: 0 }, { scaleX: 1, duration: 3 * F, ease: "power2.out" }, 0);
+            tl.fromTo(mast, { scale: 1.06, opacity: 0 }, { keyframes: [{ scale: 0.992, opacity: 1, duration: 3 * F, ease: "power3.in" }, { scale: 1, duration: 2 * F, ease: "power1.out" }] }, 3 * F);
+            tl.fromTo([ed, root.querySelector(".rfhl-dbl")], { opacity: 0 }, { opacity: 1, duration: F }, 6 * F);
+            var st = hw.length > 1 ? Math.min(2, 8 / (hw.length - 1)) : 0;
+            hw.forEach(function (w, i) { tl.fromTo(w, { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 4 * F, ease: "power3.out" }, (8 + i * st) * F); });
+            // body + pull fill line by line from the top, a block caret leading
+            function lines(ws, splitCols) { var L = [], key = {}, half = IW / 2;
+              ws.forEach(function (w) { var col = splitCols && w.offsetLeft > half ? 1 : 0, k = col + ":" + w.offsetTop;
+                if (!(k in key)) { key[k] = L.length; L.push({ col: col, top: w.offsetTop, ws: [] }); } L[key[k]].ws.push(w); });
+              L.sort(function (a, b) { return a.col - b.col || a.top - b.top; }); return L; }
+            var all = lines(bw, true).concat(lines(pw, false)).filter(function (l) { return l.ws[0].offsetTop < bd.offsetTop + (bd.style.height ? parseFloat(bd.style.height) : 1e9) || l.ws[0].parentNode === pull; });
+            var per = 12 / Math.max(1, all.length);
+            all.forEach(function (l, i) { var t0 = 20 + i * per;
+              l.ws.forEach(function (w, j) { var t = (t0 + per * j / l.ws.length) * F;
+                tl.set(w, { opacity: 1 }, t);
+                tl.set(caret, { opacity: 1, x: w.offsetLeft + w.offsetWidth + 6, y: w.offsetTop + w.offsetHeight * 0.14, height: w.offsetHeight * 0.74 }, t); }); });
+            tl.set(caret, { opacity: 0 }, 32 * F);
+            // lime marker sweeps behind the pull sentence in one loaded stroke
+            var pl = lines(pw, false), tot = pl.reduce(function (a, l) { var last = l.ws[l.ws.length - 1]; return a + (last.offsetLeft + last.offsetWidth - l.ws[0].offsetLeft); }, 0), at = 32;
+            pl.forEach(function (l) { var a = l.ws[0], b = l.ws[l.ws.length - 1], w = b.offsetLeft + b.offsetWidth - a.offsetLeft + 24;
+              var mk = document.createElement("div"); mk.className = "rfhl-mk"; mk.innerHTML = "<i></i>"; inner.appendChild(mk);
+              mk.style.left = (a.offsetLeft - 12) + "px"; mk.style.top = (a.offsetTop + a.offsetHeight * 0.12) + "px"; mk.style.height = (a.offsetHeight * 0.8) + "px";
+              mk.firstChild.style.width = w + "px";
+              var d = 12 * (w - 24) / Math.max(1, tot);
+              tl.fromTo(mk, { width: 0 }, { width: w, duration: d * F, ease: "power1.inOut" }, at * F); at += d; });
+            // one soft light band rolls across the page
+            tl.fromTo(root.querySelector(".rfhl-band"), { x: 0 }, { x: 1500, duration: 15 * F, ease: "sine.inOut" }, 44 * F);
+            tl.to(root.querySelector(".rfhl-fade"), { opacity: 1, duration: 0.25, ease: "power2.in" }, Math.max(0.5, secs - 0.25));
+            window.__timelines = window.__timelines || {};
+            window.__timelines["rf-headline"] = tl;
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

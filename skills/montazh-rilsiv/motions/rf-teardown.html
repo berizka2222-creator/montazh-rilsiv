@@ -1,0 +1,322 @@
+<!doctype html>
+<!-- rf-teardown: a cloud of silver points assembles a mechanical watch that opens into five labelled layers (three.js). Rebuilt from an ultra-skills motion prompt. -->
+<html lang="uk" data-composition-id="rf-teardown" data-composition-duration="600" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "label_1", "type": "string", "label": "Шар 1 (верхній)", "default": "Crystal" },
+  { "id": "label_2", "type": "string", "label": "Шар 2", "default": "Dial" },
+  { "id": "label_3", "type": "string", "label": "Шар 3", "default": "Gear train" },
+  { "id": "label_4", "type": "string", "label": "Шар 4", "default": "Mainspring" },
+  { "id": "label_5", "type": "string", "label": "Шар 5 (нижній)", "default": "Case" },
+  { "id": "numbered", "type": "enum", "label": "Номери 01–05", "default": "yes", "options": [{ "value": "yes", "label": "показувати" }, { "value": "no", "label": "без номерів" }] },
+  { "id": "bg", "type": "color", "label": "Фон: центр студії", "default": "#17181b" },
+  { "id": "bg2", "type": "color", "label": "Фон: середина", "default": "#0e0f11" },
+  { "id": "bg3", "type": "color", "label": "Фон: краї", "default": "#08080a" },
+  { "id": "ink", "type": "color", "label": "Текст (назви шарів)", "default": "#f4f4f2" },
+  { "id": "muted", "type": "color", "label": "Другорядний (лінії-виноски)", "default": "#a3a5ab" },
+  { "id": "accent", "type": "color", "label": "Латунь (номери, шестерні)", "default": "#e4c58a" },
+  { "id": "steel", "type": "color", "label": "Сталь і точки", "default": "#c8ccd6" },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 3 }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-teardown</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-teardown" data-duration="600" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; }
+          .rftd { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden; }
+          .rftd .rftd-gl, .rftd .rftd-glow, .rftd .rftd-svg { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+          .rftd .rftd-glow { mix-blend-mode: screen; opacity: .42; }
+          .rftd .rftd-lab { position: absolute; left: 660px; width: 360px; display: flex; align-items: baseline; gap: 16px; opacity: 0; will-change: transform, opacity; }
+          .rftd .rftd-num { flex: none; font-family: ui-monospace, Menlo, monospace; font-size: 40px; line-height: 1; letter-spacing: .02em; }
+          .rftd .rftd-name { flex: 1 1 auto; min-width: 0; font-family: var(--font-body, "Inter", "Helvetica Neue", Arial, sans-serif); font-weight: 700; font-size: 44px; line-height: 1.04; overflow-wrap: normal; }
+        </style>
+        <div class="rftd">
+          <canvas class="rftd-gl" width="1080" height="1920"></canvas>
+          <canvas class="rftd-glow" width="270" height="480"></canvas>
+          <svg class="rftd-svg" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+        <script>
+          (function () {
+            var ID = "rf-teardown";
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            var secs = Math.max(1, +v.seconds || 3);
+            var INK = v.ink || "#f4f4f2", BRASS = v.accent || "#e4c58a", INK2 = v.muted || "#a3a5ab", STEEL = v.steel || "#c8ccd6";
+            var BG1 = v.bg || "#17181b", BG2 = v.bg2 || "#0e0f11", BG3 = v.bg3 || "#08080a";
+            var NAMES = [v.label_1, v.label_2, v.label_3, v.label_4, v.label_5];
+            var DEF = ["Crystal", "Dial", "Gear train", "Mainspring", "Case"];
+            for (var q = 0; q < 5; q++) NAMES[q] = (NAMES[q] == null || NAMES[q] === "") ? DEF[q] : String(NAMES[q]);
+            var numbered = v.numbered !== "no";
+            var box = document.querySelector(".rftd");
+            var tl = gsap.timeline({ paused: true });
+            window.__timelines = window.__timelines || {};
+            window.__timelines[ID] = tl;
+            if (!box || !window.THREE) { tl.to({}, { duration: secs }); return; }
+            var T = window.THREE, PI = Math.PI;
+
+            function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+            function clamp(x, a, b) { return x < a ? a : x > b ? b : x; }
+            function seg(f, a, b) { return clamp((f - a) / (b - a), 0, 1); }
+            function oCub(p) { return 1 - Math.pow(1 - p, 3); }
+            function ioSine(p) { return -(Math.cos(PI * p) - 1) / 2; }
+            // spring, damping 15 / stiffness 120 / mass 1 (closed form), t in seconds
+            var K = 120, C = 15, W0 = Math.sqrt(K), Z = C / (2 * W0), WD = W0 * Math.sqrt(1 - Z * Z);
+            function spring(ts) { if (ts <= 0) return 0; return 1 - Math.exp(-Z * W0 * ts) * (Math.cos(WD * ts) + (Z * W0 / WD) * Math.sin(WD * ts)); }
+
+            // ---------- renderer / scene ----------
+            var cv = box.querySelector(".rftd-gl"), glowCv = box.querySelector(".rftd-glow"), gctx = glowCv.getContext("2d");
+            var svg = box.querySelector(".rftd-svg");
+            var R = new T.WebGLRenderer({ canvas: cv, antialias: true, preserveDrawingBuffer: true, alpha: false });
+            R.setPixelRatio(1); R.setSize(1080, 1920, false);
+            var scene = new T.Scene();
+            function canvasTex(w, h, paint) { var c = document.createElement("canvas"); c.width = w; c.height = h; paint(c.getContext("2d"), w, h); return new T.CanvasTexture(c); }
+            var bgTex = canvasTex(540, 960, function (g, w, h) {
+              var gr = g.createRadialGradient(w * .5, h * .42, 20, w * .5, h * .5, h * .62);
+              gr.addColorStop(0, BG1); gr.addColorStop(.55, BG2); gr.addColorStop(1, BG3);
+              g.fillStyle = gr; g.fillRect(0, 0, w, h);
+            });
+            scene.background = bgTex;
+            var envTex = canvasTex(1024, 512, function (g, w, h) {
+              g.fillStyle = BG3; g.fillRect(0, 0, w, h);
+              g.filter = "blur(14px)";
+              g.fillStyle = "#ffffff"; g.fillRect(0, 0, w, 70);
+              g.fillStyle = STEEL; g.fillRect(140, 150, 90, 200); g.fillRect(640, 120, 70, 230);
+              g.fillStyle = INK2; g.globalAlpha = .5; g.fillRect(380, 180, 160, 90); g.globalAlpha = 1;
+              g.fillStyle = BG1; g.fillRect(0, 380, w, 132);
+            });
+            envTex.mapping = T.EquirectangularReflectionMapping;
+            var pm = new T.PMREMGenerator(R);
+            scene.environment = pm.fromEquirectangular(envTex).texture;
+            scene.add(new T.AmbientLight(0xffffff, .12));
+            var key = new T.DirectionalLight(0xffffff, 1.5); key.position.set(-4, 9, 6); scene.add(key);
+            var fill = new T.DirectionalLight(new T.Color(STEEL), .5); fill.position.set(6, 3, 4); scene.add(fill);
+            var rim = new T.DirectionalLight(0xffffff, .8); rim.position.set(0, 4, -8); scene.add(rim);
+
+            var camera = new T.PerspectiveCamera(30, 1080 / 1920, .1, 200);
+            camera.setViewOffset(1080, 1920, 240, 80, 1080, 1920); // object centre lands at x 300, y 880
+
+            // ---------- materials ----------
+            var MATS = [];
+            function mat(m) { MATS.push({ m: m, o: m.opacity }); m.transparent = true; return m; }
+            var cSteel = new T.Color(STEEL);
+            var steel = mat(new T.MeshStandardMaterial({ color: cSteel, metalness: 1, roughness: .2 }));
+            var steelD = mat(new T.MeshStandardMaterial({ color: cSteel.clone().multiplyScalar(.78), metalness: 1, roughness: .38 }));
+            var blued = mat(new T.MeshStandardMaterial({ color: cSteel.clone().multiplyScalar(.88), metalness: 1, roughness: .3, side: T.DoubleSide }));
+            var brassM = mat(new T.MeshStandardMaterial({ color: new T.Color(BRASS), metalness: 1, roughness: .28, emissive: new T.Color(BRASS).multiplyScalar(.08), side: T.DoubleSide }));
+            var inkM = mat(new T.MeshStandardMaterial({ color: new T.Color(INK), metalness: .5, roughness: .3 }));
+            var sunTex = canvasTex(512, 512, function (g, w, h) {
+              var rnd = mulberry32(77), cs0 = new T.Color(BG1), cs1 = new T.Color(STEEL);
+              g.fillStyle = "#" + cs0.clone().lerp(cs1, .1).getHexString(); g.fillRect(0, 0, w, h);
+              for (var i = 0; i < 360; i++) {
+                var a0 = i / 360 * PI * 2, a1 = (i + 1.2) / 360 * PI * 2;
+                g.fillStyle = "#" + cs0.clone().lerp(cs1, .08 + rnd() * .14).getHexString();
+                g.beginPath(); g.moveTo(w / 2, h / 2); g.arc(w / 2, h / 2, w * .72, a0, a1); g.closePath(); g.fill();
+              }
+              var vg = g.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2);
+              vg.addColorStop(0, "rgba(255,255,255,.10)"); vg.addColorStop(.7, "rgba(0,0,0,0)"); vg.addColorStop(1, "rgba(0,0,0,.35)");
+              g.fillStyle = vg; g.fillRect(0, 0, w, h);
+            });
+            var dialTop = mat(new T.MeshStandardMaterial({ map: sunTex, metalness: .65, roughness: .32 }));
+            var crystalM = mat(new T.MeshStandardMaterial({ color: 0xffffff, metalness: 0, roughness: .04, opacity: .16, envMapIntensity: 2.2, depthWrite: false, side: T.DoubleSide }));
+            var shTex = canvasTex(128, 128, function (g) { var gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, "rgba(0,0,0,1)"); gr.addColorStop(.55, "rgba(0,0,0,.6)"); gr.addColorStop(1, "rgba(0,0,0,0)"); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); });
+
+            function flat(geo) { geo.rotateX(-PI / 2); return geo; }
+            function gearGeo(N, rp, depth, holes) {
+              var m = 2 * rp / N, ra = rp + m, rd = rp - 1.2 * m, st = PI * 2 / N, s = new T.Shape();
+              var prof = [[rd, 0], [rd, .12], [ra, .34], [ra, .62], [rd, .84]];
+              for (var i = 0; i < N; i++) for (var k = 0; k < prof.length; k++) {
+                var a = (i + prof[k][1]) * st, r = prof[k][0], x = Math.cos(a) * r, y = Math.sin(a) * r;
+                if (i === 0 && k === 0) s.moveTo(x, y); else s.lineTo(x, y);
+              }
+              s.closePath();
+              var ax = new T.Path(); ax.absarc(0, 0, Math.min(.035, rp * .2), 0, PI * 2, true); s.holes.push(ax);
+              if (holes) for (var j = 0; j < 4; j++) { var h = new T.Path(), aa = j / 4 * PI * 2 + PI / 4; h.absarc(Math.cos(aa) * rp * .55, Math.sin(aa) * rp * .55, rp * .24, 0, PI * 2, true); s.holes.push(h); }
+              var g = new T.ExtrudeGeometry(s, { depth: depth, bevelEnabled: false, curveSegments: 8 });
+              g.rotateX(-PI / 2); return g;
+            }
+            function spiralRibbon(r0, r1, turns, hgt, n) {
+              var pos = [], idx = [];
+              for (var i = 0; i <= n; i++) { var p = i / n, a = p * turns * PI * 2, r = r0 + (r1 - r0) * p, x = Math.cos(a) * r, z = Math.sin(a) * r; pos.push(x, -hgt / 2, z, x, hgt / 2, z); if (i < n) { var b = i * 2; idx.push(b, b + 1, b + 2, b + 1, b + 3, b + 2); } }
+              var g = new T.BufferGeometry(); g.setAttribute("position", new T.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals(); return g;
+            }
+            function mesh(geo, m, parent, x, y, z) { var o = new T.Mesh(geo, m); o.position.set(x || 0, y || 0, z || 0); parent.add(o); return o; }
+
+            // ---------- layers (0 case ... 4 crystal) ----------
+            var L = [], i;
+            for (i = 0; i < 5; i++) { L.push(new T.Group()); scene.add(L[i]); }
+            var BASE = [0, .05, .12, .19, .225], OUT = [-2.1, -.95, .22, 1.4, 2.6], TOPY = [.14, .08, .06, .02, .2], EDGE = [1.1, .5, .62, .92, .95];
+            // case: polished ring with lugs, crown and caseback
+            var prof = [[.92, -.14], [1.04, -.14], [1.09, -.08], [1.1, 0], [1.09, .08], [1.04, .14], [.92, .14], [.92, -.14]].map(function (p) { return new T.Vector2(p[0], p[1]); });
+            mesh(new T.LatheGeometry(prof, 72), steel, L[0]);
+            mesh(flat(new T.CircleGeometry(.95, 64)), steelD, L[0], 0, -.12, 0).rotation.x = PI;
+            var back = mesh(new T.CylinderGeometry(.96, .9, .07, 64), steelD, L[0], 0, -.16, 0);
+            mesh(new T.TorusGeometry(.6, .008, 6, 64), steel, L[0], 0, -.12, 0).rotation.x = PI / 2;
+            [[-.34, 1], [.34, 1], [-.34, -1], [.34, -1]].forEach(function (p) { var lug = mesh(new T.BoxGeometry(.16, .14, .42), steel, L[0], p[0], -.01, p[1] * 1.12); lug.rotation.x = p[1] * .12; });
+            var crown = mesh(new T.CylinderGeometry(.09, .09, .14, 18), steel, L[0], 1.17, 0, 0); crown.rotation.z = PI / 2;
+            // mainspring: barrel with a coiled ribbon
+            var barrel = new T.Group(); L[1].add(barrel);
+            mesh(gearGeo(40, .48, .03, false), brassM, barrel, 0, -.07, 0);
+            mesh(new T.CylinderGeometry(.46, .46, .13, 56, 1, true), brassM, barrel, 0, 0, 0);
+            mesh(spiralRibbon(.07, .42, 7, .1, 420), blued, barrel, 0, .0, 0);
+            mesh(new T.CylinderGeometry(.06, .06, .18, 16), steel, barrel, 0, 0, 0);
+            // gear train: three meshing brass gears + balance wheel with hairspring
+            var GA = { n: 30, r: .42, x: -.2, z: -.2 }, GB = { n: 12, r: .168 }, GC = { n: 20, r: .28 };
+            GB.x = GA.x + (GA.r + GB.r); GB.z = GA.z;
+            GC.x = GB.x + Math.cos(110 * PI / 180) * (GB.r + GC.r); GC.z = GB.z + Math.sin(110 * PI / 180) * (GB.r + GC.r);
+            var gears = [GA, GB, GC].map(function (G, k) {
+              var g = new T.Group(); g.position.set(G.x, -.03, G.z); L[2].add(g);
+              mesh(gearGeo(G.n, G.r, .035, G.r > .25), brassM, g);
+              mesh(new T.CylinderGeometry(.03, .03, .12, 12), steel, g, 0, .02, 0);
+              G.g = g; return G;
+            });
+            var bal = new T.Group(); bal.position.set(-.45, .02, .5); L[2].add(bal);
+            mesh(new T.TorusGeometry(.24, .018, 8, 56), brassM, bal).rotation.x = PI / 2;
+            for (i = 0; i < 3; i++) { var sp = mesh(new T.BoxGeometry(.46, .012, .02), brassM, bal); sp.rotation.y = i / 3 * PI; }
+            mesh(new T.CylinderGeometry(.03, .03, .1, 12), steel, bal);
+            var hsPts = []; for (i = 0; i <= 260; i++) { var hp = i / 260, ha = hp * 6 * PI * 2, hr = .04 + .15 * hp; hsPts.push(new T.Vector3(Math.cos(ha) * hr, .03, Math.sin(ha) * hr)); }
+            var hair = mesh(new T.TubeGeometry(new T.CatmullRomCurve3(hsPts), 520, .0045, 3, false), steel, bal);
+            // dial: sunray disc, markers, hands
+            mesh(new T.CylinderGeometry(.92, .92, .03, 72), [steelD, dialTop, steelD], L[3]);
+            for (i = 0; i < 12; i++) { var ma = i / 12 * PI * 2, big = i % 3 === 0; var mk = mesh(new T.BoxGeometry(big ? .05 : .03, .02, big ? .16 : .1), inkM, L[3], Math.sin(ma) * .74, .025, -Math.cos(ma) * .74); mk.rotation.y = -ma; }
+            var hourH = new T.Group(), minH = new T.Group(), secH = new T.Group(); [hourH, minH, secH].forEach(function (g, k) { g.position.y = .035 + k * .012; L[3].add(g); });
+            mesh(new T.BoxGeometry(.05, .012, .42), inkM, hourH, 0, 0, -.17);
+            mesh(new T.BoxGeometry(.035, .012, .66), inkM, minH, 0, 0, -.28);
+            mesh(new T.BoxGeometry(.012, .01, .78), brassM, secH, 0, 0, -.27);
+            mesh(new T.CylinderGeometry(.045, .045, .04, 16), brassM, secH, 0, .005, 0);
+            // crystal: thin transparent dome
+            var SR = 2.2, th = Math.asin(.95 / SR);
+            var dome = mesh(new T.SphereGeometry(SR, 64, 10, 0, PI * 2, 0, th), crystalM, L[4], 0, -SR * Math.cos(th), 0); dome.renderOrder = 5;
+            mesh(new T.TorusGeometry(.95, .012, 6, 72), mat(new T.MeshStandardMaterial({ color: 0xffffff, metalness: .2, roughness: .1, opacity: .35, depthWrite: false })), L[4]).rotation.x = PI / 2;
+            // blurred contact shadows: each layer onto the one below
+            var SH = [];
+            for (i = 1; i < 5; i++) { var s = mesh(flat(new T.PlaneGeometry(1, 1)), new T.MeshBasicMaterial({ map: shTex, transparent: true, depthWrite: false, opacity: 0, polygonOffset: true, polygonOffsetFactor: -2 }), scene); s.renderOrder = 2; SH.push(s); }
+            // brass bloom pass (layer 1)
+            scene.traverse(function (o) { if (o.isMesh && o.material === brassM) o.layers.enable(1); });
+
+            // ---------- point cloud ----------
+            var NP = 4000, rnd = mulberry32(20261110);
+            function layout(f) {
+              for (var k = 0; k < 5; k++) { var s0 = 35 + 5 * (4 - k); L[k].position.y = BASE[k] + (OUT[k] - BASE[k]) * spring((f - s0) / 30); }
+              var az = (32 + 8 * ioSine(seg(f, 29, 89))) * PI / 180, el = 31 * PI / 180, D = 17.9, tgt = new T.Vector3(0, .25, 0);
+              camera.position.set(tgt.x + D * Math.cos(el) * Math.sin(az), tgt.y + D * Math.sin(el), tgt.z + D * Math.cos(el) * Math.cos(az));
+              camera.lookAt(tgt); camera.updateMatrixWorld(); camera.updateProjectionMatrix();
+            }
+            layout(0); scene.updateMatrixWorld(true);
+            var tris = [], acc = [], tot = 0;
+            for (i = 0; i < 5; i++) L[i].traverse(function (o) {
+              if (!o.isMesh || o.material === crystalM) return;
+              var g = o.geometry, p = g.attributes.position, ix = g.index, n = ix ? ix.count : p.count;
+              for (var t = 0; t < n; t += 3) {
+                var a = new T.Vector3().fromBufferAttribute(p, ix ? ix.getX(t) : t).applyMatrix4(o.matrixWorld);
+                var b = new T.Vector3().fromBufferAttribute(p, ix ? ix.getX(t + 1) : t + 1).applyMatrix4(o.matrixWorld);
+                var c = new T.Vector3().fromBufferAttribute(p, ix ? ix.getX(t + 2) : t + 2).applyMatrix4(o.matrixWorld);
+                var ar = new T.Vector3().subVectors(b, a).cross(new T.Vector3().subVectors(c, a)).length() * .5;
+                if (ar <= 0) continue; tot += ar; tris.push([a, b, c]); acc.push(tot);
+              }
+            });
+            var PS = new Float32Array(NP * 3), PT = new Float32Array(NP * 3), PD = new Float32Array(NP), PP = new Float32Array(NP * 3);
+            for (i = 0; i < NP; i++) {
+              var u = rnd() * tot, lo = 0, hi = acc.length - 1; while (lo < hi) { var mid = (lo + hi) >> 1; if (acc[mid] < u) lo = mid + 1; else hi = mid; }
+              var tr = tris[lo], r1 = rnd(), r2 = rnd(); if (r1 + r2 > 1) { r1 = 1 - r1; r2 = 1 - r2; }
+              PT[i * 3] = tr[0].x + (tr[1].x - tr[0].x) * r1 + (tr[2].x - tr[0].x) * r2;
+              PT[i * 3 + 1] = tr[0].y + (tr[1].y - tr[0].y) * r1 + (tr[2].y - tr[0].y) * r2;
+              PT[i * 3 + 2] = tr[0].z + (tr[1].z - tr[0].z) * r1 + (tr[2].z - tr[0].z) * r2;
+              var th2 = rnd() * PI * 2, ph = Math.acos(2 * rnd() - 1), rr = 1.5 + rnd() * 1.1;
+              PS[i * 3] = Math.sin(ph) * Math.cos(th2) * rr; PS[i * 3 + 1] = .1 + Math.cos(ph) * rr; PS[i * 3 + 2] = Math.sin(ph) * Math.sin(th2) * rr;
+              PD[i] = rnd() * 3;
+            }
+            var dotTex = canvasTex(32, 32, function (g) { var gr = g.createRadialGradient(16, 16, 0, 16, 16, 16); gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(.5, "rgba(255,255,255,.8)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(0, 0, 32, 32); });
+            var pgeo = new T.BufferGeometry(); pgeo.setAttribute("position", new T.BufferAttribute(PP, 3));
+            var pmat = new T.PointsMaterial({ color: cSteel, size: 3.2, sizeAttenuation: false, map: dotTex, transparent: true, depthWrite: false });
+            var cloud = new T.Points(pgeo, pmat); cloud.frustumCulled = false; scene.add(cloud);
+
+            // ---------- labels + leaders ----------
+            var NS = "http://www.w3.org/2000/svg", LAB = [];
+            function fitName(el) {
+              var s = 44; el.style.fontSize = s + "px";
+              while (s > 28 && (el.scrollWidth > el.clientWidth + 1 || el.offsetHeight > s * 1.04 * 2 + 2)) { s -= 2; el.style.fontSize = s + "px"; }
+            }
+            layout(89); scene.updateMatrixWorld(true);
+            var right = new T.Vector3();
+            function anchor(k, out) {
+              right.setFromMatrixColumn(camera.matrixWorld, 0); right.y = 0; right.normalize();
+              var c = new T.Vector3(0, L[k].position.y + (k === 4 ? .02 : 0), 0).addScaledVector(right, EDGE[k]);
+              if (k === 1) c.y += 0; c.project(camera);
+              out.x = (c.x + 1) / 2 * 1080; out.y = (1 - c.y) / 2 * 1920; return out;
+            }
+            for (var j = 0; j < 5; j++) {
+              var k = 4 - j, fin = anchor(k, {});
+              var el = document.createElement("div"); el.className = "rftd-lab";
+              var nm = document.createElement("span"); nm.className = "rftd-num"; nm.style.color = BRASS; nm.textContent = "0" + (j + 1);
+              var tx = document.createElement("span"); tx.className = "rftd-name"; tx.style.color = INK; tx.textContent = NAMES[j];
+              if (numbered) el.appendChild(nm); el.appendChild(tx); box.appendChild(el); fitName(tx);
+              var line = document.createElementNS(NS, "line"); line.setAttribute("stroke", INK2); line.setAttribute("stroke-width", "2"); line.setAttribute("stroke-linecap", "round");
+              var dot = document.createElementNS(NS, "circle"); dot.setAttribute("r", "5"); dot.setAttribute("fill", INK);
+              svg.appendChild(line); svg.appendChild(dot);
+              LAB.push({ k: k, el: el, line: line, dot: dot, y: fin.y, h: el.offsetHeight, s: 41 + 6 * j });
+            }
+            for (j = 1; j < 5; j++) if (LAB[j].y - LAB[j - 1].y < LAB[j - 1].h / 2 + LAB[j].h / 2 + 14) LAB[j].y = LAB[j - 1].y + LAB[j - 1].h / 2 + LAB[j].h / 2 + 14;
+            for (j = 0; j < 5; j++) LAB[j].y = Math.min(LAB[j].y, 1520 - LAB[j].h / 2 - (4 - j) * 70);
+
+            // ---------- frame ----------
+            var A = {};
+            function draw(t) {
+              var f = t * 30, k;
+              layout(f);
+              // gears: consistent tooth ratios, turning to the last frame
+              var wA = .9 * t;
+              GA.g.rotation.y = wA; GB.g.rotation.y = -wA * GA.n / GB.n + PI / GB.n; GC.g.rotation.y = wA * GA.n / GC.n;
+              barrel.rotation.y = -wA * .25;
+              var sw = 1.35 * Math.sin(t * PI * 2 * 2.5); bal.rotation.y = sw; hair.rotation.y = -sw * .35;
+              secH.rotation.y = -(t * PI * 2 / 60 + 1.2); minH.rotation.y = -(1.95 + t * .002); hourH.rotation.y = -(5.2 + t * .0002);
+              // points -> meshes
+              var mo = seg(f, 27, 31), po = 1 - mo, spin = .012 * Math.min(f, 29);
+              for (k = 0; k < MATS.length; k++) { var M = MATS[k]; M.m.opacity = M.o * mo; M.m.depthWrite = mo > .99 && M.m !== crystalM; }
+              L.forEach(function (g) { g.visible = mo > 0; });
+              cloud.visible = po > 0;
+              if (po > 0) {
+                pmat.opacity = po; var cs = Math.cos(spin), sn = Math.sin(spin);
+                for (var i = 0; i < NP; i++) {
+                  var e = seg(f, 15 + PD[i], 29); e = e * e * e;
+                  var x = PS[i * 3], y = PS[i * 3 + 1] + .05 * Math.sin(f * .07 + i), z = PS[i * 3 + 2];
+                  var rx = x * cs - z * sn, rz = x * sn + z * cs;
+                  PP[i * 3] = rx + (PT[i * 3] - rx) * e; PP[i * 3 + 1] = y + (PT[i * 3 + 1] - y) * e; PP[i * 3 + 2] = rz + (PT[i * 3 + 2] - rz) * e;
+                }
+                pgeo.attributes.position.needsUpdate = true;
+              }
+              // shadows of each layer on the one below
+              for (k = 1; k < 5; k++) {
+                var s = SH[k - 1], gap = L[k].position.y - (L[k - 1].position.y + TOPY[k - 1]);
+                s.position.set(0, L[k - 1].position.y + TOPY[k - 1] + .004, 0);
+                var sc = (EDGE[k] * 2.1) * (1 + Math.max(0, gap) * .1); s.scale.set(sc, 1, sc);
+                s.material.opacity = mo * .5 * seg(gap, .08, .5) / (1 + Math.max(0, gap) * .35);
+              }
+              // brass bloom: quarter-res pass of brass only, blurred, screen-blended on top
+              var bg = scene.background; scene.background = null; camera.layers.set(1);
+              R.setViewport(0, 0, 270, 480); R.setClearColor(0x000000, 1); R.clear(); R.render(scene, camera);
+              gctx.clearRect(0, 0, 270, 480); gctx.filter = "blur(4px)"; gctx.globalAlpha = mo; gctx.drawImage(cv, 0, 1440, 270, 480, 0, 0, 270, 480); gctx.globalAlpha = 1;
+              scene.background = bg; camera.layers.set(0); R.setViewport(0, 0, 1080, 1920);
+              R.render(scene, camera);
+              // labels: leader draws in 8 frames, label rises over 12
+              for (k = 0; k < 5; k++) {
+                var Lb = LAB[k], p1 = oCub(seg(f, Lb.s, Lb.s + 8)), p2 = oCub(seg(f, Lb.s + 8, Lb.s + 20));
+                anchor(Lb.k, A);
+                var ex = 644, ey = Lb.y;
+                Lb.line.setAttribute("x1", A.x); Lb.line.setAttribute("y1", A.y);
+                Lb.line.setAttribute("x2", A.x + (ex - A.x) * p1); Lb.line.setAttribute("y2", A.y + (ey - A.y) * p1);
+                Lb.line.setAttribute("opacity", p1 > 0 ? 1 : 0);
+                Lb.dot.setAttribute("cx", A.x); Lb.dot.setAttribute("cy", A.y); Lb.dot.setAttribute("opacity", p1 > 0 ? 1 : 0);
+                Lb.el.style.top = (Lb.y - Lb.h / 2) + "px";
+                Lb.el.style.opacity = p2; Lb.el.style.transform = "translateY(" + (26 * (1 - p2)) + "px)";
+              }
+              box.style.opacity = clamp((secs - t) / .25, 0, 1);
+            }
+            var st = {}, _t = 0;
+            Object.defineProperty(st, "t", { get: function () { return _t; }, set: function (x) { _t = x; draw(x); } });
+            tl.to(st, { t: secs, duration: secs, ease: "none" }, 0);
+            try { R.compile(scene, camera); } catch (e) {}
+            draw(0);
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

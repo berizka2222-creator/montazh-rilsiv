@@ -1,0 +1,209 @@
+<!doctype html>
+<!-- rf-neon-silhouette: a hooded figure at a desk against a purple-dusk skyline window, an amber lamp over a flip clock that rolls
+     23:58 → 23:59 → 00:00, the lamp dips, one far window goes dark. Rebuilt from an ultra-skills motion prompt (SVG + CSS 3D, no WebGL). -->
+<html lang="uk" data-composition-id="rf-neon-silhouette" data-composition-duration="600" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "time_start", "type": "string", "label": "Час на початку (ГГ:ХХ)", "default": "23:58" },
+  { "id": "time_mid", "type": "string", "label": "Час після першого перегортання", "default": "23:59" },
+  { "id": "time_end", "type": "string", "label": "Фінальний час (хвиля справа наліво)", "default": "00:00" },
+  { "id": "label", "type": "string", "label": "Підпис під годинником", "default": "Label" },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 2 },
+  { "id": "bg", "type": "color", "label": "Небо: верх (сутінки)", "default": "#140d24" },
+  { "id": "sky_mid", "type": "color", "label": "Небо: середина і контурне світло", "default": "#8b5cf6" },
+  { "id": "horizon", "type": "color", "label": "Горизонт і неон на дахах", "default": "#f472b6" },
+  { "id": "eyes", "type": "color", "label": "Очі", "default": "#f472b6" },
+  { "id": "silhouette", "type": "color", "label": "Силует (стіна, фігура, стіл)", "default": "#030108" },
+  { "id": "card_top", "type": "color", "label": "Картка годинника: верх", "default": "#1e1733" },
+  { "id": "card_bottom", "type": "color", "label": "Картка годинника: низ", "default": "#151024" },
+  { "id": "digits", "type": "color", "label": "Цифри", "default": "#f7f2ff" },
+  { "id": "muted", "type": "color", "label": "Підпис під годинником", "default": "#b9acd6" },
+  { "id": "lamp", "type": "color", "label": "Світло лампи і вікна", "default": "#ffc24b" }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-neon-silhouette</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-neon-silhouette" data-duration="600" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; overflow: hidden; }
+          .rfns { position: absolute; inset: 0; overflow: hidden; }
+          .rfns svg { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: visible; }
+          .rfns .rfns-clock { position: absolute; left: 200px; top: 1270px; width: 680px; height: 200px; }
+          .rfns .rfns-card { position: absolute; top: 0; width: 150px; height: 200px; perspective: 700px; border-radius: 12px;
+                             box-shadow: 0 10px 24px rgba(0,0,0,.7); }
+          .rfns .rfns-h { position: absolute; left: 0; width: 150px; height: 100px; overflow: hidden; backface-visibility: hidden; }
+          .rfns .rfns-h b { position: absolute; left: 0; width: 150px; height: 200px; line-height: 200px; text-align: center;
+                            font-family: var(--font-display, sans-serif); font-weight: 700; font-size: 150px; color: var(--dig);
+                            font-variant-numeric: tabular-nums; }
+          .rfns .rfns-t { top: 0; background: var(--ct); border-radius: 12px 12px 0 0; transform-origin: 50% 100%; }
+          .rfns .rfns-t b { top: 0; }
+          .rfns .rfns-b { top: 100px; background: var(--cb); border-radius: 0 0 12px 12px; transform-origin: 50% 0%; }
+          .rfns .rfns-b b { top: -100px; }
+          .rfns .rfns-h i { position: absolute; inset: 0; background: #000; opacity: 0; }
+          .rfns .rfns-hinge { position: absolute; left: 0; right: 0; top: 99px; height: 3px; background: var(--sil); z-index: 5; }
+          .rfns .rfns-colon { position: absolute; left: 310px; top: 0; width: 60px; height: 200px; }
+          .rfns .rfns-colon s { position: absolute; left: 21px; width: 18px; height: 18px; border-radius: 4px; background: var(--dig); }
+          .rfns .rfns-label { position: absolute; left: 190px; width: 700px; top: 1480px; height: 44px; text-align: center;
+                              font-family: var(--font-body, sans-serif); font-size: 34px; line-height: 44px; color: var(--mut); white-space: nowrap; }
+        </style>
+        <div class="rfns">
+          <svg class="rfns-bg" viewBox="0 0 1080 1920"></svg>
+          <svg class="rfns-fg" viewBox="0 0 1080 1920"></svg>
+          <div class="rfns-clock"></div>
+          <div class="rfns-label"></div>
+          <svg class="rfns-fx" viewBox="0 0 1080 1920"></svg>
+        </div>
+        <script>
+          (function () {
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            var secs = Math.max(1, +v.seconds || 2), END = secs * 30;
+            var SKY = v.bg || "#140d24", MID = v.sky_mid || "#8b5cf6", PINK = v.horizon || "#f472b6", EYES = v.eyes || "#f472b6", LAMP = v.lamp || "#ffc24b", SIL = v.silhouette || "#030108";
+            var CT = v.card_top || "#1e1733", CB = v.card_bottom || "#151024", DIG = v.digits || "#f7f2ff", MUT = v.muted || "#b9acd6";
+            function mix(a, b, t) { function p(h) { h = String(h).replace("#", ""); if (h.length === 3) h = h.replace(/./g, "$&$&"); var n = parseInt(h.slice(0, 6), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
+              var x = p(a), y = p(b); return "rgb(" + [0, 1, 2].map(function (i) { return Math.round(x[i] + (y[i] - x[i]) * t); }).join(",") + ")"; }
+            var NS = "http://www.w3.org/2000/svg", root = document.querySelector(".rfns");
+            function clamp(x, a, b) { return Math.max(a, Math.min(b, x)); }
+            function lin(f, a, b) { return clamp((f - a) / (b - a), 0, 1); }
+            function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a);
+              t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+            function el(tag, attrs, parent) { var e = document.createElementNS(NS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+            var rnd = mulberry32(813);
+            root.style.background = SIL; [["--ct", CT], ["--cb", CB], ["--dig", DIG], ["--sil", SIL], ["--mut", MUT]].forEach(function (c) { root.style.setProperty(c[0], c[1]); });
+
+            // ---------- background: sky, clouds, three skyline layers, window frame ----------
+            var bg = root.querySelector(".rfns-bg"), defs = el("defs", {}, bg);
+            defs.innerHTML = '<linearGradient id="rfns-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + SKY + '"/><stop offset=".5" stop-color="' + MID + '"/><stop offset=".86" stop-color="' + PINK + '"/></linearGradient>' +
+              '<clipPath id="rfns-win"><rect x="70" y="200" width="940" height="920"/></clipPath>' +
+              '<filter id="rfns-blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="22"/></filter>' +
+              '<filter id="rfns-haze" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="3"/></filter>' +
+              '<filter id="rfns-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
+            var win = el("g", { "clip-path": "url(#rfns-win)" }, bg);
+            el("rect", { x: 0, y: 180, width: 1080, height: 960, fill: "url(#rfns-sky)" }, win);
+            var clouds = el("g", { filter: "url(#rfns-blur)", opacity: 0.55 }, win);
+            [[300, 330, 360, 26, mix(SKY, MID, .25)], [760, 420, 420, 30, mix(SKY, MID, .4)], [420, 560, 520, 34, mix(MID, PINK, .25)], [860, 700, 380, 28, mix(MID, PINK, .6)], [200, 820, 460, 30, mix(MID, PINK, .85)]]
+              .forEach(function (c) { el("ellipse", { cx: c[0], cy: c[1], rx: c[2], ry: c[3], fill: c[4] }, clouds); });
+            function skyline(base, minH, maxH, wMin, wMax, fill) { var g = el("g", {}, win), x = -160, bs = [];
+              while (x < 1240) { var w = wMin + rnd() * (wMax - wMin), h = minH + rnd() * (maxH - minH);
+                el("rect", { x: x.toFixed(1), y: (base - h).toFixed(1), width: (w + 1).toFixed(1), height: (h + 40).toFixed(1), fill: fill }, g);
+                bs.push([x, base - h, w, h]); x += w; } return { g: g, bs: bs }; }
+            var far = skyline(1120, 160, 420, 50, 120, mix(MID, SKY, .3)); far.g.setAttribute("opacity", 0.45); far.g.setAttribute("filter", "url(#rfns-haze)");
+            var mid = skyline(1120, 120, 330, 70, 150, mix(SIL, MID, .14));
+            var lit = [];
+            mid.bs.forEach(function (b, bi) { // seeded lit windows in the lamp colour
+              for (var yy = b[1] + 18; yy < 1100; yy += 26) for (var xx = b[0] + 10; xx < b[0] + b[2] - 16; xx += 20)
+                if (rnd() < 0.13) lit.push(el("rect", { x: xx.toFixed(1), y: yy.toFixed(1), width: 9, height: 13, fill: LAMP, opacity: (0.55 + rnd() * 0.45).toFixed(2) }, mid.g));
+              if (bi % 3 === 1) el("polyline", { points: b[0] + "," + (b[1] + 40) + " " + b[0] + "," + b[1] + " " + (b[0] + b[2]) + "," + b[1] + " " + (b[0] + b[2]) + "," + (b[1] + 24),
+                fill: "none", stroke: PINK, "stroke-width": 3, filter: "url(#rfns-glow)" }, mid.g); });
+            // the one window that switches off at frame 52: a lit one near the middle of the visible skyline
+            var off = lit.filter(function (r) { var x = +r.getAttribute("x"), y = +r.getAttribute("y"); return x > 640 && x < 900 && y > 900 && y < 1060; })[0] || lit[0];
+            if (off) { off.setAttribute("opacity", 1); off.setAttribute("width", 11); }
+            var near = el("g", {}, win);
+            el("path", { d: "M-200,1120 L-200,1072 L180,1072 L180,1056 L420,1056 L420,1078 L1280,1078 L1280,1120 Z", fill: SIL }, near);
+            el("rect", { x: 300, y: 1030, width: 8, height: 30, fill: SIL }, near);
+            // wall with the window hole + frame and cross mullions
+            el("path", { d: "M0,0 H1080 V1920 H0 Z M70,200 V1120 H1010 V200 Z", fill: SIL, "fill-rule": "evenodd" }, bg);
+            el("rect", { x: 527, y: 200, width: 26, height: 920, fill: SIL }, bg);
+            el("rect", { x: 70, y: 600, width: 940, height: 22, fill: SIL }, bg);
+            el("rect", { x: 70, y: 200, width: 940, height: 920, fill: "none", stroke: mix(SIL, MID, .08), "stroke-width": 4 }, bg);
+
+            // ---------- foreground silhouettes: figure, desk, arm lamp, clock housing ----------
+            var fg = root.querySelector(".rfns-fg"), fdefs = el("defs", {}, fg);
+            fdefs.innerHTML = '<linearGradient id="rfns-rim" x1="0" y1="0" x2="0.4" y2="1"><stop offset="0" stop-color="' + MID + '" stop-opacity=".95"/><stop offset=".45" stop-color="' + MID + '" stop-opacity=".25"/><stop offset=".7" stop-color="' + MID + '" stop-opacity="0"/></linearGradient>' +
+              '<filter id="rfns-eye" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>';
+            var HOOD = "M540,640 C626,640 676,700 684,790 C690,850 680,905 664,950 C760,990 860,1060 896,1250 L184,1250 C220,1060 320,990 416,950 C400,905 390,850 396,790 C404,700 454,640 540,640 Z";
+            el("path", { d: HOOD, fill: SIL }, fg);
+            el("path", { d: HOOD, fill: "none", stroke: "url(#rfns-rim)", "stroke-width": 3 }, fg);
+            el("path", { d: "M440,820 C450,760 500,735 540,735 C580,735 630,760 640,820 C636,880 600,920 540,925 C480,920 444,880 440,820 Z", fill: "#000" }, fg); // face hollow
+            var eyes = el("g", { filter: "url(#rfns-eye)" }, fg);
+            var eyeL = el("ellipse", { cx: 508, cy: 832, rx: 7, ry: 6, fill: EYES }, eyes), eyeR = el("ellipse", { cx: 572, cy: 832, rx: 7, ry: 6, fill: EYES }, eyes);
+            // desk
+            el("rect", { x: 80, y: 1236, width: 920, height: 28, rx: 4, fill: SIL }, fg);
+            el("rect", { x: 80, y: 1236, width: 920, height: 2, fill: MID, opacity: 0.55 }, fg);
+            el("rect", { x: 118, y: 1262, width: 30, height: 700, fill: SIL }, fg);
+            el("rect", { x: 932, y: 1262, width: 30, height: 700, fill: SIL }, fg);
+            // arm lamp: base, two arms, joint, shade
+            var lampG = el("g", {}, fg);
+            el("ellipse", { cx: 930, cy: 1234, rx: 62, ry: 12, fill: SIL }, lampG);
+            el("line", { x1: 930, y1: 1230, x2: 960, y2: 980, stroke: SIL, "stroke-width": 16, "stroke-linecap": "round" }, lampG);
+            el("line", { x1: 960, y1: 980, x2: 820, y2: 900, stroke: SIL, "stroke-width": 14, "stroke-linecap": "round" }, lampG);
+            el("circle", { cx: 960, cy: 980, r: 13, fill: SIL }, lampG);
+            el("path", { d: "M778,872 L850,906 L846,980 L712,918 Z", fill: SIL }, lampG);
+            el("path", { d: "M960,980 L820,900 M778,872 L850,906", stroke: MID, "stroke-width": 2, opacity: 0.55, fill: "none" }, lampG);
+            // clock housing on the desk
+            el("rect", { x: 172, y: 1250, width: 736, height: 296, rx: 26, fill: mix(SIL, CB, .5) }, fg);
+            el("rect", { x: 172, y: 1250, width: 736, height: 296, rx: 26, fill: "none", stroke: MID, "stroke-opacity": 0.35, "stroke-width": 2 }, fg);
+
+            // ---------- light: cone + dust (drawn over everything, additive look) ----------
+            var fx = root.querySelector(".rfns-fx"), xdefs = el("defs", {}, fx);
+            xdefs.innerHTML = '<linearGradient id="rfns-cone" x1="0.15" y1="0" x2="0.5" y2="1"><stop offset="0" stop-color="' + LAMP + '" stop-opacity=".75"/><stop offset=".55" stop-color="' + LAMP + '" stop-opacity=".22"/><stop offset="1" stop-color="' + LAMP + '" stop-opacity="0"/></linearGradient>' +
+              '<radialGradient id="rfns-pool" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="' + LAMP + '" stop-opacity=".35"/><stop offset="1" stop-color="' + LAMP + '" stop-opacity="0"/></radialGradient>' +
+              '<filter id="rfns-soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="14"/></filter>';
+            var cone = el("g", { style: "mix-blend-mode: screen" }, fx);
+            el("path", { d: "M714,920 L846,982 L1000,1560 L230,1560 Z", fill: "url(#rfns-cone)", filter: "url(#rfns-soft)" }, cone);
+            el("ellipse", { cx: 600, cy: 1300, rx: 430, ry: 120, fill: "url(#rfns-pool)" }, cone);
+            el("ellipse", { cx: 780, cy: 948, rx: 54, ry: 16, fill: LAMP, opacity: 0.9, transform: "rotate(25 780 948)", filter: "url(#rfns-soft)" }, cone);
+            var motes = [];
+            for (var i = 0; i < 30; i++) { var t = rnd(), u = rnd();
+              var y0 = 960 + t * 520, half = 60 + t * 330, cxm = 780 - t * 165;
+              motes.push({ e: el("circle", { r: (1.2 + rnd() * 2.2).toFixed(2), fill: mix(LAMP, "#ffffff", .6) }, cone), x: cxm + (u - .5) * 2 * half * .8, y: y0, ph: rnd() * 6.28, sp: 0.4 + rnd() * 0.8, a: 0.35 + rnd() * 0.6 }); }
+
+            // ---------- flip clock ----------
+            function digits(s, fb) { var d = String(s == null ? fb : s).replace(/[^0-9]/g, ""); while (d.length < 4) d = "0" + d; return d.slice(-4).split(""); }
+            var A = digits(v.time_start, "23:58"), B = digits(v.time_mid, "23:59"), C = digits(v.time_end, "00:00");
+            var clock = root.querySelector(".rfns-clock"), XS = [0, 160, 370, 530], cards = [];
+            var colon = document.createElement("div"); colon.className = "rfns-colon"; colon.innerHTML = '<s style="top:62px"></s><s style="top:120px"></s>'; clock.appendChild(colon);
+            XS.forEach(function (x, k) { var c = document.createElement("div"); c.className = "rfns-card"; c.style.left = x + "px";
+              c.innerHTML = '<div class="rfns-h rfns-t st"><b></b></div><div class="rfns-h rfns-b sb"><b></b></div>' +
+                '<div class="rfns-h rfns-t ft"><b></b><i></i></div><div class="rfns-h rfns-b fb"><b></b><i></i></div><div class="rfns-hinge"></div>';
+              clock.appendChild(c);
+              var flips = [];
+              if (A[k] !== B[k]) flips.push({ s: 4, a: A[k], b: B[k] });
+              if (B[k] !== C[k]) flips.push({ s: 24 + 2 * (3 - k), a: B[k], b: C[k] });
+              cards.push({ q: function (sel) { return c.querySelector(sel); }, flips: flips, first: A[k] }); });
+            var labEl = root.querySelector(".rfns-label"); labEl.textContent = v.label != null ? String(v.label) : "Label";
+            (function () { var s = 34; while (labEl.scrollWidth > 700 && s > 16) { s--; labEl.style.fontSize = s + "px"; } })();
+
+            function renderCard(cd, f) {
+              var cur = cd.first, nxt = cd.first, p = -1;
+              cd.flips.forEach(function (fl) { if (f >= fl.s + 14) { cur = fl.b; nxt = fl.b; } else if (f >= fl.s) { cur = fl.a; nxt = fl.b; p = f - fl.s; } });
+              var st = cd.q(".st b"), sb = cd.q(".sb b"), ft = cd.q(".ft"), fb = cd.q(".fb");
+              st.textContent = nxt; sb.textContent = cur; ft.firstChild.textContent = cur; fb.firstChild.textContent = nxt;
+              var angT = 0, angB = 90;
+              if (p < 0) { ft.style.visibility = "hidden"; fb.style.visibility = "hidden"; st.textContent = cur; return; }
+              ft.style.visibility = "inherit"; fb.style.visibility = "inherit";
+              if (p < 4) angT = 9 * Math.sin(Math.PI * p / 4);                    // 4-frame anticipation: the flap leans back and returns
+              else { var q = clamp((p - 4) / 10, 0, 1), k = 1.2, T = 180 * (1 + (k + 1) * Math.pow(q - 1, 3) + k * Math.pow(q - 1, 2)); // 10-frame flip, small overshoot
+                angT = -Math.min(T, 90); angB = T >= 90 ? 180 - T : 90; }
+              ft.style.transform = "rotateX(" + angT.toFixed(2) + "deg)"; fb.style.transform = "rotateX(" + angB.toFixed(2) + "deg)";
+              ft.querySelector("i").style.opacity = (0.55 * Math.sin(Math.min(90, Math.abs(angT)) * Math.PI / 180)).toFixed(3);
+              fb.querySelector("i").style.opacity = (0.55 * Math.sin(Math.min(90, Math.abs(angB)) * Math.PI / 180)).toFixed(3);
+              if (angT <= -90) ft.style.visibility = "hidden"; if (angB >= 90) fb.style.visibility = "hidden";
+            }
+
+            function render(f) {
+              var drift = 40 * f / 60;                                             // one slow drift, never stops
+              far.g.setAttribute("transform", "translate(" + (-drift * 0.35).toFixed(2) + ",0)");
+              mid.g.setAttribute("transform", "translate(" + (-drift * 0.7).toFixed(2) + ",0)");
+              near.setAttribute("transform", "translate(" + (-drift * 1.4).toFixed(2) + ",0)");
+              clouds.setAttribute("transform", "translate(" + (-drift * 0.2).toFixed(2) + ",0)");
+              var bl = f >= 14 && f < 20 ? Math.sin(Math.PI * (f - 14) / 6) : 0;   // one 6-frame blink
+              [eyeL, eyeR].forEach(function (e) { e.setAttribute("ry", (6 * (1 - 0.9 * bl)).toFixed(2)); });
+              var dip = f >= 44 && f <= 50 ? (f < 47 ? 1 - 0.65 * (f - 44) / 3 : 0.35 + 0.65 * (f - 47) / 3) : 1;
+              cone.setAttribute("opacity", dip.toFixed(3));
+              if (off) off.setAttribute("opacity", (1 - lin(f, 52, 54)).toFixed(3));
+              motes.forEach(function (m) { m.e.setAttribute("cx", (m.x + 8 * Math.sin(m.ph + f * 0.05 * m.sp)).toFixed(1));
+                m.e.setAttribute("cy", (m.y - f * 0.35 * m.sp + 6 * Math.cos(m.ph + f * 0.04)).toFixed(1));
+                m.e.setAttribute("opacity", (m.a * (0.6 + 0.4 * Math.sin(m.ph + f * 0.09))).toFixed(3)); });
+              cards.forEach(function (cd) { renderCard(cd, f); });
+              root.style.opacity = f > END - 7.5 ? clamp((END - f) / 7.5, 0, 1) : 1;
+            }
+
+            var cur = 0, st = { get f() { return cur; }, set f(x) { cur = x; render(x); } }, tl = gsap.timeline({ paused: true });
+            tl.fromTo(st, { f: 0 }, { f: END, duration: secs, ease: "none", immediateRender: false }, 0);
+            render(0);
+            window.__timelines = window.__timelines || {};
+            window.__timelines["rf-neon-silhouette"] = tl;
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

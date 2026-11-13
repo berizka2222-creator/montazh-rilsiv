@@ -1,0 +1,293 @@
+<!doctype html>
+<!-- rf-contour-map: a paper survey map lifts into a 3D mountain while a surveyor tape counts up to a target number; a flag lands on the summit. Rebuilt from an ultra-skills motion prompt. -->
+<html lang="uk" data-composition-id="rf-contour-map" data-composition-duration="600" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "value", "type": "number", "label": "Цільове число на стрічці", "default": 100 },
+  { "id": "suffix", "type": "string", "label": "Суфікс числа (K, %, тис.)", "default": "K" },
+  { "id": "unit", "type": "string", "label": "Що рахуємо (під числом)", "default": "followers" },
+  { "id": "seed", "type": "number", "label": "Зерно рельєфу", "default": 5 },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 2 },
+  { "id": "bg", "type": "color", "label": "Папір", "default": "#efe6da" },
+  { "id": "bg_low", "type": "color", "label": "Папір по краях / фон", "default": "#ddd0bd" },
+  { "id": "surface", "type": "color", "label": "Стрічка (поверхня)", "default": "#fbf6ef" },
+  { "id": "line", "type": "color", "label": "Горизонталі", "default": "#6d5d4c" },
+  { "id": "line_faint", "type": "color", "label": "Слабкі горизонталі і сітка", "default": "#a4927d" },
+  { "id": "ink", "type": "color", "label": "Текст", "default": "#221a12" },
+  { "id": "muted", "type": "color", "label": "Другорядний текст", "default": "#6d5d4c" },
+  { "id": "accent", "type": "color", "label": "Прапорець", "default": "#c4552d" },
+  { "id": "shadow", "type": "color", "label": "Тіні рельєфу", "default": "#3a2410" }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-contour-map</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-contour-map" data-duration="600" data-fps="30">
+        <style>
+          .rfcm { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden; background: #ddd0bd; }
+          .rfcm .rfcm-gl, .rfcm .rfcm-tape { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; display: block; }
+          .rfcm .rfcm-font { position: absolute; left: -9999px; top: 0; font-family: var(--font-body, Helvetica, Arial, sans-serif); }
+          .rfcm .rfcm-fontd { position: absolute; left: -9999px; top: 0; font-family: var(--font-display, var(--font-body, Helvetica, Arial, sans-serif)); }
+        </style>
+        <div class="rfcm">
+          <canvas class="rfcm-gl" width="1080" height="1920"></canvas>
+          <canvas class="rfcm-tape" width="1080" height="1920"></canvas>
+          <span class="rfcm-font">a</span><span class="rfcm-fontd">a</span>
+        </div>
+        <script>
+          (function () {
+            var ID = "rf-contour-map";
+            var box = document.querySelector(".rfcm");
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            function S(x, d) { return (x === undefined || x === null || x === "") ? d : String(x); }
+            var secs = Math.max(1, +v.seconds || 2);
+            var TV = +v.value; if (!(TV > 0)) TV = 100;
+            var SUF = S(v.suffix, "K"); if (v.suffix === "") SUF = "";
+            var UNIT = S(v.unit, "followers");
+            var C = {
+              bg: S(v.bg, "#efe6da"), bg_low: S(v.bg_low, "#ddd0bd"), surface: S(v.surface, "#fbf6ef"), line: S(v.line, "#6d5d4c"),
+              line_faint: S(v.line_faint, "#a4927d"), ink: S(v.ink, "#221a12"), muted: S(v.muted, "#6d5d4c"), accent: S(v.accent, "#c4552d"),
+              shadow: S(v.shadow, "#3a2410")
+            };
+            var W = 1080, H = 1920;
+            box.style.background = C.bg_low;
+            var famB = getComputedStyle(box.querySelector(".rfcm-font")).fontFamily || "Helvetica, Arial, sans-serif";
+            var famD = getComputedStyle(box.querySelector(".rfcm-fontd")).fontFamily || famB;
+            var tape = box.querySelector(".rfcm-tape"), tx = tape.getContext("2d");
+
+            window.__timelines = window.__timelines || {};
+            // seek-safe: tweened property is a setter, so draw() runs on every seek (seek() suppresses callbacks)
+            var _t = 0, st = { get t() { return _t; }, set t(x) { _t = x; draw(); } };
+            function fadeOut(t) { return Math.max(0, Math.min(1, (secs - t) / 0.25)); }
+            function cl(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+            function lerp(a, b, t) { return a + (b - a) * t; }
+            function ioCubic(x) { x = cl(x); return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; }
+            function ioSine(x) { x = cl(x); return -(Math.cos(Math.PI * x) - 1) / 2; }
+            function spring(tau, z, w) { if (tau <= 0) return 0; var wd = w * Math.sqrt(1 - z * z); return 1 - Math.exp(-z * w * tau) * (Math.cos(wd * tau) + z * w / wd * Math.sin(wd * tau)); }
+
+            // ---------- tape value (fraction of target) ----------
+            function frac(f) {
+              if (f <= 22) return 0.18 * ioSine(f / 22);                       // slow creep to ~18%
+              if (f <= 26) return 0.18 - 0.05 * ioSine((f - 22) / 4);          // pre-pull back 5 units
+              if (f <= 40) { var u = (f - 26) / 14; return 0.13 + 0.82 * Math.pow(u, 1.5); }   // sprint
+              if (f < 44) {                                                    // spring brake onto the target
+                var tau = (f - 40) / 30, e0 = -0.05, v0 = 0.82 * 1.5 / 14 * 30, z = 0.7, w = 40, wd = w * Math.sqrt(1 - z * z);
+                return 1 + Math.exp(-z * w * tau) * (e0 * Math.cos(wd * tau) + (v0 + z * w * e0) / wd * Math.sin(wd * tau));
+              }
+              return 1;
+            }
+            function fmt(x) {
+              var r = TV >= 20 ? Math.round(x) : Math.round(x * 10) / 10;
+              return String(r).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + SUF;
+            }
+            function fitFont(text, weight, size, min, maxW, fam) {
+              while (size > min) { tx.font = weight + " " + size + "px " + fam; if (tx.measureText(text).width <= maxW) break; size--; }
+              tx.font = weight + " " + size + "px " + fam; return size;
+            }
+            var STEP = TV / 20, PXU = 60 / STEP, TY = 830, TX0 = 860, TX1 = 1040, TT = 300, TB = 1360;
+            var unitSize = fitFont(UNIT, 500, 34, 26, 440, famB), unitW = tx.measureText(UNIT).width;
+            var valSize = fitFont(fmt(TV), 800, 60, 40, 440, famD), valW = tx.measureText(fmt(TV)).width;
+            // plate is x 700-1040 per the layout; it only grows to the left when the text is longer
+            var PL = Math.min(700, TX0 - 24 - Math.max(unitW, valW));
+            function drawTape(t) {
+              var f = t * 30, cur = frac(f) * TV;
+              var vel = Math.abs(frac(f + 0.5) - frac(f - 0.5)) * TV * PXU;   // px per frame
+              tx.clearRect(0, 0, W, H);
+              // strip
+              tx.save();
+              tx.shadowColor = "rgba(58,36,16,.18)"; tx.shadowBlur = 18; tx.shadowOffsetY = 6;
+              tx.fillStyle = C.surface; tx.fillRect(TX0, TT, TX1 - TX0, TB - TT);
+              tx.restore();
+              tx.save(); tx.beginPath(); tx.rect(TX0, TT, TX1 - TX0, TB - TT); tx.clip();
+              var blur = f > 26 && f < 44 ? Math.min(70, vel * 0.7) : 0, K = blur > 2 ? 7 : 1;
+              tx.globalAlpha = K > 1 ? 1.8 / K : 1;
+              var lsz = fitFont(fmt(TV), 500, 36, 20, 120, famB);
+              for (var k = 0; k < K; k++) {
+                var off = K > 1 ? blur * (k / (K - 1) - 0.5) : 0;
+                var lo = Math.floor((cur - 10 * STEP) / STEP), hi = Math.ceil((cur + 10 * STEP) / STEP);
+                for (var i = Math.max(0, lo); i <= Math.min(25, hi); i++) {
+                  var u = i * STEP, y = TY - (u - cur) * PXU + off;
+                  var major = i % 5 === 0;
+                  tx.strokeStyle = major ? C.line : C.line_faint; tx.lineWidth = major ? 3 : 2;
+                  tx.beginPath(); tx.moveTo(TX0, y); tx.lineTo(TX0 + (major ? 42 : 22), y); tx.stroke();
+                  if (major && i > 0 && u <= TV * 1.0001) {
+                    tx.fillStyle = C.ink; tx.font = "500 " + lsz + "px " + famB; tx.textBaseline = "middle"; tx.textAlign = "left";
+                    tx.fillText(fmt(u), TX0 + 52, y);
+                  }
+                }
+              }
+              tx.restore();
+              tx.globalAlpha = 1;
+              tx.strokeStyle = C.line; tx.lineWidth = 1.5; tx.strokeRect(TX0 + 0.75, TT + 0.75, TX1 - TX0 - 1.5, TB - TT - 1.5);
+              // reading plate x 700-1040 with a window over the tape
+              var PT = TY - 78, PB = TY + 78;
+              tx.save(); tx.shadowColor = "rgba(58,36,16,.22)"; tx.shadowBlur = 20; tx.shadowOffsetY = 6;
+              tx.fillStyle = C.surface; tx.fillRect(PL, PT, TX0 - PL, PB - PT); tx.restore();
+              tx.strokeStyle = C.line; tx.lineWidth = 1.5; tx.strokeRect(PL + 0.75, PT + 0.75, 1040 - PL - 1.5, PB - PT - 1.5);
+              tx.lineWidth = 3; tx.strokeRect(TX0, PT + 18, TX1 - TX0, PB - PT - 36);
+              tx.strokeStyle = C.accent; tx.lineWidth = 3; tx.beginPath(); tx.moveTo(TX0, TY); tx.lineTo(TX0 + 46, TY); tx.stroke();
+              tx.fillStyle = C.accent; tx.beginPath(); tx.moveTo(TX0 - 2, TY - 12); tx.lineTo(TX0 + 16, TY); tx.lineTo(TX0 - 2, TY + 12); tx.closePath(); tx.fill();
+              var txt = fmt(cur), vs = valSize;
+              tx.fillStyle = C.ink; tx.font = "800 " + vs + "px " + famD; tx.textAlign = "right"; tx.textBaseline = "alphabetic";
+              tx.fillText(txt, TX0 - 12, TY + 8);
+              tx.fillStyle = C.muted; tx.font = "500 " + unitSize + "px " + famB; tx.textBaseline = "alphabetic";
+              tx.fillText(UNIT, TX0 - 12, TY + 52);
+            }
+
+            var draw = function () { var t = Math.min(secs, Math.max(0, st.t)); drawTape(t); box.style.opacity = fadeOut(t); };
+            var tl = gsap.timeline({ paused: true });
+            tl.to(st, { t: secs, duration: secs, ease: "none" }, 0);
+            window.__timelines[ID] = tl;
+            if (typeof THREE === "undefined") { draw(); return; }
+
+            function col(h) { return new THREE.Color(h); }
+            // ---------- terrain heights (seeded value noise + gaussian summit + ridge) ----------
+            var seed = (+v.seed || 5) | 0;
+            function hsh(i, j) { var n = (i * 374761393 + j * 668265263 + seed * 1442695041) | 0; n = Math.imul(n ^ (n >>> 13), 1274126177); n = n ^ (n >>> 16); return ((n >>> 0) / 4294967296) * 2 - 1; }
+            function vnoise(x, y) {
+              var xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi, u = xf * xf * (3 - 2 * xf), w = yf * yf * (3 - 2 * yf);
+              return lerp(lerp(hsh(xi, yi), hsh(xi + 1, yi), u), lerp(hsh(xi, yi + 1), hsh(xi + 1, yi + 1), u), w);
+            }
+            function fbm(x, y) { var s = 0, a = 0.5, fq = 1; for (var o = 0; o < 4; o++) { s += a * vnoise(x * fq + o * 17.1, y * fq - o * 9.3); a *= 0.5; fq *= 2.03; } return s; }
+            var SW = 18, SD = 32, NX = 120, NZ = 214, SX = -1.4, SZ = -4.2, RX = 3.0, RZ = 6.5;
+            function hRaw(x, z) {
+              var dx = x - SX, dz = z - SZ, g = Math.exp(-(dx * dx + dz * dz) / (2 * 3.9 * 3.9));
+              var lx = RX - SX, lz = RZ - SZ, ll = lx * lx + lz * lz, a = cl((dx * lx + dz * lz) / ll);
+              var px = SX + lx * a - x, pz = SZ + lz * a - z, ridge = Math.exp(-(px * px + pz * pz) / (2 * 1.3 * 1.3)) * (1 - 0.7 * a);
+              var hh = 4.8 * g + 2.2 * ridge + 1.3 * fbm(x * 0.2, z * 0.2) * (0.6 + 0.4 * (1 - g)) + 0.35 * fbm(x * 0.6, z * 0.6);
+              var ed = Math.min(x + SW / 2, SW / 2 - x, z + SD / 2, SD / 2 - z), m = cl(ed / 3); m = m * m * (3 - 2 * m);
+              return hh * (0.3 + 0.7 * m);
+            }
+            var VX = NX + 1, VZ = NZ + 1, HG = new Float32Array(VX * VZ);
+            for (var j = 0; j < VZ; j++) for (var i = 0; i < VX; i++) HG[j * VX + i] = hRaw(-SW / 2 + SW * i / NX, -SD / 2 + SD * j / NZ);
+            function hAt(x, z) {
+              var fi = (x + SW / 2) / SW * NX, fj = (z + SD / 2) / SD * NZ;
+              if (fi < 0 || fj < 0 || fi > NX || fj > NZ) return 0;
+              var i0 = Math.min(NX - 1, Math.floor(fi)), j0 = Math.min(NZ - 1, Math.floor(fj)), u = fi - i0, w = fj - j0;
+              return lerp(lerp(HG[j0 * VX + i0], HG[j0 * VX + i0 + 1], u), lerp(HG[(j0 + 1) * VX + i0], HG[(j0 + 1) * VX + i0 + 1], u), w);
+            }
+            var geo = new THREE.PlaneGeometry(SW, SD, NX, NZ); geo.rotateX(-Math.PI / 2);
+            var P = geo.attributes.position, NV = P.count, aH = new Float32Array(NV), aG = new Float32Array(NV * 2), aSh = new Float32Array(NV);
+            var LD = new THREE.Vector3(-0.62, 0.42, -0.5).normalize(), lh = Math.hypot(LD.x, LD.z), ldx = LD.x / lh, ldz = LD.z / lh, slope = LD.y / lh;
+            var peak = { h: -1, x: 0, z: 0 };
+            for (var n = 0; n < NV; n++) {
+              var x = P.getX(n), z = P.getZ(n), h0 = hAt(x, z);
+              aH[n] = h0;
+              aG[n * 2] = (hAt(x + 0.1, z) - hAt(x - 0.1, z)) / 0.2; aG[n * 2 + 1] = (hAt(x, z + 0.1) - hAt(x, z - 0.1)) / 0.2;
+              var occ = 0; for (var k = 1; k <= 36; k++) { var dd = k * 0.28; occ = Math.max(occ, hAt(x + ldx * dd, z + ldz * dd) - (h0 + dd * slope)); }
+              aSh[n] = 1 - cl(occ / 0.7);
+              if (h0 > peak.h) peak = { h: h0, x: x, z: z };
+            }
+            geo.setAttribute("aH", new THREE.BufferAttribute(aH, 1)); geo.setAttribute("aG", new THREE.BufferAttribute(aG, 2)); geo.setAttribute("aSh", new THREE.BufferAttribute(aSh, 1));
+
+            var uni = {
+              uLift: { value: 0 }, uPaper: { value: col(C.bg) }, uPaperLow: { value: col(C.bg_low) }, uContour: { value: col(C.line) },
+              uFaint: { value: col(C.line_faint) }, uShadow: { value: col(C.shadow) }, uFlag: { value: col(C.accent) }, uL: { value: LD },
+              uSum: { value: new THREE.Vector2(peak.x, peak.z) }, uHalf: { value: new THREE.Vector2(SW / 2, SD / 2) },
+              uW1: { value: 0 }, uW2: { value: 0 }, uWA: { value: 0 }, uPR: { value: 0 }, uPA: { value: 0 }, uN: { value: 4.0 }
+            };
+            var mat = new THREE.ShaderMaterial({
+              uniforms: uni,
+              vertexShader: [
+                "attribute float aH; attribute vec2 aG; attribute float aSh; uniform float uLift;",
+                "varying float vH; varying vec3 vN; varying vec2 vXZ; varying float vSh;",
+                "void main(){ vec3 p = position; p.y += aH * uLift; vH = aH; vXZ = position.xz;",
+                "  vN = normalize(vec3(-uLift * aG.x, 1.0, -uLift * aG.y)); vSh = mix(1.0, aSh, clamp(uLift, 0.0, 1.0));",
+                "  gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0); }"].join("\n"),
+              fragmentShader: [
+                "uniform vec3 uPaper, uPaperLow, uContour, uFaint, uShadow, uFlag, uL; uniform vec2 uSum, uHalf;",
+                "uniform float uW1, uW2, uWA, uPR, uPA, uN;",
+                "varying float vH; varying vec3 vN; varying vec2 vXZ; varying float vSh;",
+                "float lineAA(float v, float w){ float fw = max(fwidth(v), 1e-5); float d = abs(fract(v - 0.5) - 0.5) / fw; return (1.0 - smoothstep(w - 0.6, w + 0.6, d)) * smoothstep(1e-5, 1e-4, fwidth(v)); }",
+                "void main(){",
+                "  float ed = min(min(vXZ.x + uHalf.x, uHalf.x - vXZ.x), min(vXZ.y + uHalf.y, uHalf.y - vXZ.y));",
+                "  float edge = smoothstep(0.0, 3.2, ed);",
+                "  vec3 paper = mix(uPaperLow, uPaper, edge);",
+                "  float fold = 0.0;",
+                "  for (int i = 0; i < 2; i++) { float s = vXZ.x - (float(i) * 6.0 - 3.0); fold += sign(s) * exp(-abs(s) * 4.0) * 0.035; }",
+                "  for (int i = 0; i < 3; i++) { float s = vXZ.y - (float(i) * 8.0 - 8.0); fold += sign(s) * exp(-abs(s) * 4.0) * 0.03; }",
+                "  paper *= 1.0 + fold;",
+                "  float d = max(dot(normalize(vN), uL), 0.0);",
+                "  float k = min(1.12, 0.5 + 0.5 * d / max(uL.y, 0.01)) * mix(0.66, 1.0, vSh);",
+                "  vec3 c = k < 1.0 ? mix(uShadow, paper, 0.42 + 0.58 * k) : paper + (k - 1.0) * 0.35;",
+                "  float gx = lineAA(vXZ.x / 2.0, 0.5), gz = lineAA(vXZ.y / 2.0, 0.5);",
+                "  c = mix(c, uFaint, max(gx, gz) * 0.16 * edge);",
+                "  float r = length(vXZ - uSum);",
+                "  float wave = uWA * (exp(-pow((r - uW1) / 1.0, 2.0)) + 0.6 * exp(-pow((r - uW2) / 1.0, 2.0)));",
+                "  float pulse = uPA * exp(-pow((r - uPR) / 0.55, 2.0));",
+                "  float hc = vH * uN, idx = floor(hc + 0.5);",
+                "  float heavy = step(abs(mod(idx, 5.0)), 0.5);",
+                "  float w = mix(0.55, 1.15, heavy) * (1.0 + 2.4 * wave + 2.0 * pulse);",
+                "  float ln = lineAA(hc, w) * step(0.5, idx) * edge;",
+                "  vec3 lc = mix(uFaint, uContour, heavy);",
+                "  lc = mix(lc, uFlag, clamp(pulse * 1.2, 0.0, 0.85));",
+                "  c = mix(c, lc * (0.7 + 0.3 * clamp(k, 0.0, 1.0)), ln * mix(0.75, 0.95, heavy));",
+                "  gl_FragColor = vec4(c, 1.0);",
+                "}"].join("\n")
+            });
+            mat.extensions = { derivatives: true };
+            var canvas = box.querySelector(".rfcm-gl");
+            var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, preserveDrawingBuffer: true, alpha: false });
+            renderer.setPixelRatio(1); renderer.setSize(W, H, false);
+            var scene = new THREE.Scene(); scene.background = col(C.bg_low);
+            scene.add(new THREE.Mesh(geo, mat));
+            var camera = new THREE.PerspectiveCamera(35, W / H, 0.3, 300);
+
+            // flag: thin pole + fluttering cloth
+            var flag = new THREE.Group();
+            var pole = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.75, 8), new THREE.MeshBasicMaterial({ color: col(C.ink) }));
+            pole.position.y = 0.375; flag.add(pole);
+            var clothGeo = new THREE.PlaneGeometry(0.44, 0.27, 10, 4); clothGeo.translate(0.22, 0.6, 0);
+            var clothBase = clothGeo.attributes.position.array.slice();
+            var cloth = new THREE.Mesh(clothGeo, new THREE.MeshBasicMaterial({ color: col(C.accent), side: THREE.DoubleSide }));
+            flag.add(cloth); scene.add(flag);
+
+            // ---------- camera ----------
+            var D2R = Math.PI / 180, F50 = 50 / 30, F59 = 59 / 30;
+            var tgt = new THREE.Vector3(), vP = new THREE.Vector3();
+            function setCam(th, ph, d, tgx, tgy, tgz) {
+              var sT = Math.sin(th), cT = Math.cos(th), sP = Math.sin(ph), cP = Math.cos(ph);
+              camera.position.set(tgx + d * sT * sP, tgy + d * cT, tgz + d * sT * cP);
+              camera.up.set(-sP, 0, -cP); camera.lookAt(tgx, tgy, tgz); camera.updateMatrixWorld();
+            }
+            function base(t) {
+              var f = t * 30, p = spring((f - 14) / 30, 0.72, 9.05), q = ioCubic((f - 38) / 12);
+              var th = lerp(lerp(0, 58, p), 54, q) * D2R;
+              var dr = 0; if (f > 50) dr = 1.5 * ioSine((f - 50) / 9) + (t > F59 ? 0.4 * (t - F59) : 0);
+              var ph = (lerp(0, -8, q) + dr) * D2R;
+              var d = lerp(lerp(46, 32, p), 24, q);
+              var tg = [lerp(lerp(0, -0.6, p), peak.x, q), lerp(lerp(0, 1.4, p), peak.h * 0.72, q), lerp(lerp(0, -0.5, p), peak.z + 0.6, q)];
+              return { p: p, q: q, th: th, ph: ph, d: d, tg: tg };
+            }
+            // lens shift so the summit ends near x 470, y 700
+            var ce = base(F50);
+            setCam(ce.th, ce.ph, ce.d, ce.tg[0], ce.tg[1], ce.tg[2]);
+            vP.set(peak.x, peak.h, peak.z).project(camera);
+            var OX = (vP.x + 1) / 2 * W - 470, OY = (1 - vP.y) / 2 * H - 700;
+
+            draw = function () {
+              var t = Math.min(secs, Math.max(0, st.t)), f = t * 30, b = base(t);
+              uni.uLift.value = b.p;
+              setCam(b.th, b.ph, b.d, b.tg[0], b.tg[1], b.tg[2]);
+              camera.setViewOffset(W, H, OX * b.q, OY * b.q, W, H);
+              // ripple rings frames 0-16, fading by ~frame 24
+              uni.uW1.value = t * 26; uni.uW2.value = (t - 0.22) * 26; uni.uWA.value = 1 - cl((f - 16) / 8);
+              // frame 44: flag drops ~80px into the summit, one ring pulses out
+              var tf = (f - 44) / 30;
+              uni.uPR.value = Math.max(0, tf) * 9; uni.uPA.value = tf > 0 ? Math.exp(-tf * 2.4) * cl(tf / 0.05) : 0;
+              flag.visible = tf > -0.001;
+              var sum = hAt(peak.x, peak.z) * b.p, yoff = 0;
+              if (tf < 0.13) yoff = 0.5 * (1 - Math.pow(cl(tf / 0.13), 2)); else { var tb = tf - 0.13; yoff = -0.05 * Math.exp(-10 * tb) * Math.sin(20 * tb); }
+              flag.position.set(peak.x, sum - 0.04 + yoff, peak.z);
+              flag.rotation.y = -0.6;
+              var pa = clothGeo.attributes.position.array;
+              for (var i = 0; i < pa.length; i += 3) { var xx = clothBase[i], am = xx / 0.44; pa[i + 2] = Math.sin(xx * 14 - t * 16) * 0.05 * am; pa[i + 1] = clothBase[i + 1] - 0.03 * am * am; }
+              clothGeo.attributes.position.needsUpdate = true;
+              renderer.render(scene, camera);
+              drawTape(t);
+              box.style.opacity = fadeOut(t);
+            };
+            draw();
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

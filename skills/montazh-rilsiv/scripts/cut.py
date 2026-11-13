@@ -16,6 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from pacing import pacing
 speed = pacing(brand)["speed"]
 w, h = brand.get("resolution", [1080, 1920])
+if os.environ.get("REEL_4K") == "1": w, h = 2160, 3840                  # «найкраща якість»: the whole reel at the camera's 4K
 if os.environ.get("REEL_PREVIEW"): w, h = 1080, 1920          # previews cut at 1080p: a quarter of the work
 DRAFT = bool(os.environ.get("REEL_DRAFT"))                      # fast review draft: 540x960, colour without the slow clarity/sharpen
 if DRAFT: w, h = 540, 960
@@ -31,7 +32,8 @@ for k, (a, b) in enumerate(spans):
     ap.append(f"[{2 * k + 1}:a]asetpts=PTS-STARTPTS,atrim=duration={b - a:.4f},asetpts=PTS-STARTPTS,"
               f"afade=t=in:d={FADE},afade=t=out:st={max(b - a - FADE, 0):.3f}:d={FADE}[a{k}]")
 n = len(spans)
-post = [f"setpts=PTS/{speed}", f"scale={w}:{h}:force_original_aspect_ratio=increase", f"crop={w}:{h}", "fps=30"]
+post = [f"setpts=PTS/{speed}", f"scale={w}:{h}:force_original_aspect_ratio=increase:flags=lanczos", f"crop={w}:{h}", "fps=30"]
+if not DRAFT: post.append("noise=alls=3:allf=t")   # 2026-11-13: faint moving grain keeps flat walls/ceilings from breaking into colour bands after Instagram's re-encode
 if grade:
     if edl.get("grade_from") is not None:   # grade switches on at this reel second (a "before/after" moment)
         # shortcut: splits filters on commas, so a filter option containing a comma breaks; quote-aware split if one ever does

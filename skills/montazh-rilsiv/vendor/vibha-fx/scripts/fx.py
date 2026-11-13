@@ -2031,5 +2031,14 @@ def main():
     if enc: enc.stdin.close(); enc.wait(); print('Done:', dst)
 
 
+
+# reel skill: its own effects (rf-*) from reference reels, in a separate file (vendor/vibha-fx/NOTICE.md)
+_rf = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'rf_fx.py')
+if os.path.exists(_rf): exec(compile(open(_rf, encoding='utf-8').read(), _rf, 'exec'))
+# reel skill: «22 ефекти» (ay-*) from the 2026-11-13 reference reel, in the person's brand: ay_fx.py + scripts/ay/*.py
+_ay = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ay_fx.py')
+if os.path.exists(_ay): exec(compile(open(_ay, encoding='utf-8').read(), _ay, 'exec'))
+
+
 if __name__ == '__main__':
     main()

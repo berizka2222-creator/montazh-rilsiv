@@ -1,0 +1,264 @@
+<!doctype html>
+<!-- rf-deep-time: a star spirals into a black hole, its gas winds into the tilted accretion disk, one flare runs around it,
+     while an odometer races to a number. Rebuilt from an ultra-skills motion prompt (three.js shader). -->
+<html lang="uk" data-composition-id="rf-deep-time" data-composition-duration="600" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "end_number", "type": "number", "label": "Кінцеве число лічильника", "default": 10000000 },
+  { "id": "unit", "type": "string", "label": "Підпис під числом (одиниця часу)", "default": "years" },
+  { "id": "space", "type": "color", "label": "Колір космосу (фон)", "default": "#070403" },
+  { "id": "space_top", "type": "color", "label": "Колір космосу вгорі (градієнт)", "default": "#1c100a" },
+  { "id": "hole", "type": "color", "label": "Колір чорної діри", "default": "#050100" },
+  { "id": "disk", "type": "color", "label": "Диск: зовнішній (помаранчевий)", "default": "#ff6b2c" },
+  { "id": "amber", "type": "color", "label": "Диск: внутрішній (бурштин)", "default": "#ffc24b" },
+  { "id": "ink", "type": "color", "label": "Колір зірки і цифр", "default": "#fff5ee" },
+  { "id": "ink2", "type": "color", "label": "Другорядний текст", "default": "#d4b6a4" },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 2 }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-deep-time</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-deep-time" data-duration="600" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; overflow: hidden; }
+          .rfdt { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden; background: #070403; }
+          .rfdt .rfdt-cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; display: block; }
+          .rfdt .rfdt-odo { position: absolute; left: 60px; top: 200px; width: 560px; height: 130px; }
+          .rfdt .rfdt-num { position: absolute; left: 0; top: 0; display: flex; align-items: flex-start; white-space: nowrap;
+                            font-family: var(--font-display, sans-serif); font-weight: 700; line-height: 1; color: #fff5ee;
+                            font-variant-numeric: tabular-nums; }
+          .rfdt .rfdt-col { position: relative; display: block; height: 1em; width: .62em; overflow: hidden; }
+          .rfdt .rfdt-strip { position: absolute; left: 0; top: 0; width: 100%; }
+          .rfdt .rfdt-strip span { display: block; height: 1em; line-height: 1em; text-align: center; }
+          .rfdt .rfdt-sep { display: block; width: .22em; height: 1em; }
+          .rfdt .rfdt-unit { position: absolute; left: 0; white-space: nowrap; font-family: var(--font-body, sans-serif);
+                             font-weight: 400; line-height: 1.1; color: #d4b6a4; }
+        </style>
+        <div class="rfdt">
+          <canvas class="rfdt-cv" width="1080" height="1920"></canvas>
+          <svg width="0" height="0" style="position:absolute"><defs class="rfdt-defs"></defs></svg>
+          <div class="rfdt-odo"><div class="rfdt-num"></div><div class="rfdt-unit"></div></div>
+        </div>
+        <script>
+          (function () {
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            function S(x, d) { return (x === undefined || x === null || x === "") ? d : String(x); }
+            var secs = Math.max(1, +v.seconds || 2), FPS = 30;
+            var END = Math.max(0, Math.round(Math.abs(+v.end_number))); if (!isFinite(END) || (v.end_number === undefined)) END = 10000000;
+            var COL = { space: S(v.space, "#070403"), spaceTop: S(v.space_top, "#1c100a"), hole: S(v.hole, "#050100"), disk: S(v.disk, "#ff6b2c"), amber: S(v.amber, "#ffc24b"), ink: S(v.ink, "#fff5ee"), ink2: S(v.ink2, "#d4b6a4") };
+            var root = document.querySelector(".rfdt"); function q(s) { return root.querySelector(s); }
+            root.style.background = COL.space;
+            function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a);
+              t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+            function cl(x, a, b) { return Math.max(a, Math.min(b, x)); }
+            // ---- time remap: slope 3 (0-28), 0.35 (28-36), 1 after
+            function clock(f) { return f < 28 ? 3 * f : (f < 36 ? 84 + 0.35 * (f - 28) : 86.8 + (f - 36)); }
+            // ---- geometry (pixels, y down)
+            var CX = 540, CY = 900, RH = 130, RIN = 165, ROUT = 420, SI = Math.sin(18 * Math.PI / 180), TH0 = -0.45;
+            function disk2scr(r, th) { return [CX + r * Math.cos(th), CY + r * SI * Math.sin(th)]; }
+            var E = disk2scr(ROUT, TH0);
+            var a0 = Math.atan2(380 - CY, 880 - CX), r0 = Math.hypot(880 - CX, 380 - CY);
+            var aE = Math.atan2(E[1] - CY, E[0] - CX), rE = Math.hypot(E[0] - CX, E[1] - CY);
+            function approach(e) { var a = a0 + (aE - a0) * e, r = r0 + (rE - r0) * e; return [CX + r * Math.cos(a), CY + r * Math.sin(a)]; }
+            // path: star approach (part 1) then an inward spiral in the disk plane (part 2); arc-length table
+            var P = [], NA = 48, NB = 200;
+            for (var i = 0; i <= NA; i++) { var pt = approach(i / NA); P.push({ x: pt[0], y: pt[1], back: 0 }); }
+            for (i = 1; i <= NB; i++) { var al = i / NB * 1.8 * Math.PI, rr = ROUT * Math.exp(-al * 0.141), th = TH0 + al, sp = disk2scr(rr, th);
+              P.push({ x: sp[0], y: sp[1], back: Math.sin(th) < 0 ? 1 : 0 }); }
+            P[0].s = 0; for (i = 1; i < P.length; i++) P[i].s = P[i - 1].s + Math.hypot(P[i].x - P[i - 1].x, P[i].y - P[i - 1].y);
+            var LTOT = P[P.length - 1].s, SIGE = P[NA].s;
+            function at(s) { s = cl(s, 0, LTOT); var lo = 0, hi = P.length - 1; while (hi - lo > 1) { var m = (lo + hi) >> 1; if (P[m].s <= s) lo = m; else hi = m; }
+              var A = P[lo], B = P[hi], k = (s - A.s) / Math.max(1e-6, B.s - A.s);
+              return { x: A.x + (B.x - A.x) * k, y: A.y + (B.y - A.y) * k, tx: (B.x - A.x), ty: (B.y - A.y), back: k < .5 ? A.back : B.back }; }
+            function starEase(f) { var u = cl(f / 28, 0, 1); return Math.pow(u, 1.5); }
+            function starSigma(f) { if (f <= 28) { var e = starEase(f); return SIGE * 0 + arcOfApproach(e); } return SIGE + (f - 28) / 8 * 170; }
+            function arcOfApproach(e) { var x = e * NA, k = Math.floor(x); if (k >= NA) return SIGE; return P[k].s + (P[k + 1].s - P[k].s) * (x - k); }
+
+            // ---- odometer (DOM)
+            var digits = String(END).length, nEl = q(".rfdt-num"), uEl = q(".rfdt-unit"), defs = q(".rfdt-defs"), cols = [];
+            var nSep = Math.floor((digits - 1) / 3), fs = Math.min(72, Math.floor(560 / (digits * 0.62 + nSep * 0.22)));
+            nEl.style.fontSize = fs + "px"; nEl.style.color = COL.ink;
+            for (i = digits - 1; i >= 0; i--) {
+              var c = document.createElement("div"); c.className = "rfdt-col";
+              var stp = document.createElement("div"); stp.className = "rfdt-strip";
+              for (var dd = 0; dd <= 10; dd++) { var sp2 = document.createElement("span"); sp2.textContent = String(dd % 10); stp.appendChild(sp2); }
+              c.appendChild(stp); nEl.appendChild(c);
+              var fid = "rfdt-blur-" + i;
+              defs.insertAdjacentHTML("beforeend", '<filter id="' + fid + '" x="-20%" y="-60%" width="140%" height="220%"><feGaussianBlur stdDeviation="0 0"/></filter>');
+              cols.push({ place: i, el: c, strip: stp, blur: defs.lastChild.firstChild, fid: fid, filt: "" });
+              if (i > 0 && i % 3 === 0) { var s3 = document.createElement("div"); s3.className = "rfdt-sep"; nEl.appendChild(s3); }
+            }
+            uEl.textContent = S(v.unit, "years"); uEl.style.color = COL.ink2;
+            var ufs = 36; uEl.style.fontSize = ufs + "px"; while (ufs > 26 && uEl.scrollWidth > 560) { ufs -= 2; uEl.style.fontSize = ufs + "px"; }
+            if (uEl.scrollWidth > 560) { uEl.style.whiteSpace = "normal"; uEl.style.width = "560px"; }
+            uEl.style.top = Math.round(fs * 1.12) + "px";
+            function odoP(f) { if (f <= 28) return 0.9 * f / 28; if (f >= 44) return 1; var x = (f - 28) / 16; return 0.9 + 0.1 * (1 - Math.pow(1 - x, 3)); }
+            function odo(f) {
+              var V = END * odoP(f), V2 = END * odoP(Math.max(0, f - 1)), dV = Math.abs(V - V2), mag = V < 1 ? 1 : Math.floor(Math.log10(V)) + 1;
+              for (var k = 0; k < cols.length; k++) {
+                var c = cols[k], p10 = Math.pow(10, c.place), pos;
+                if (c.place === 0) pos = V % 10;
+                else { var lower = (V % p10) / p10; pos = Math.floor(V / p10) % 10 + Math.max(0, lower - 0.9) * 10; }
+                if (f >= 44) pos = Math.floor(END / p10) % 10;
+                c.strip.style.transform = "translateY(" + (-pos).toFixed(4) + "em)";
+                var speed = dV / p10, bl = f >= 44 ? 0 : Math.min(fs * 0.12, speed * fs * 0.05);
+                c.blur.setAttribute("stdDeviation", "0 " + bl.toFixed(2));
+                var want = bl > 0.15 ? "url(#" + c.fid + ")" : "none";
+                if (want !== c.filt) { c.el.style.filter = want; c.filt = want; }
+                c.el.style.color = (c.place >= mag && f < 44) ? COL.ink2 : COL.ink;
+                c.el.style.opacity = (c.place >= mag && f < 44) ? 0.35 : 1;
+              }
+            }
+
+            // ---- three.js scene
+            var cv = q(".rfdt-cv"), R = null, scene, cam, quadU, star, ribbon, sparks, ribGeo, ribN = 160, spN = 80, spData = [];
+            function col3(h) { return new THREE.Color(h); }
+            if (window.THREE) {
+              R = new THREE.WebGLRenderer({ canvas: cv, antialias: true, preserveDrawingBuffer: true, alpha: false });
+              R.setPixelRatio(1); R.setSize(1080, 1920, false);
+              scene = new THREE.Scene(); cam = new THREE.OrthographicCamera(0, 1080, 0, -1920, -10, 10);
+              var base = new THREE.Color(COL.space), spT = new THREE.Color(COL.spaceTop);
+              quadU = { uClock: { value: 0 }, uFlareP: { value: 0 }, uHalo: { value: 0 }, uFeed: { value: 1 },
+                cSpace: { value: base }, cSpaceTop: { value: spT }, cHole: { value: col3(COL.hole) },
+                cOrange: { value: col3(COL.disk) }, cAmber: { value: col3(COL.amber) }, cInk: { value: col3(COL.ink) }, cInk2: { value: col3(COL.ink2) } };
+              var FS = [
+                "precision highp float; varying vec2 vUv;",
+                "uniform float uClock, uFlareP, uHalo, uFeed; uniform vec3 cSpace, cSpaceTop, cHole, cOrange, cAmber, cInk, cInk2;",
+                "const vec2 C = vec2(540.0, 900.0); const float RH = 130.0, RIN = 165.0, ROUT = 420.0, SI = 0.30902, TH0 = -0.45, TAU = 6.2831853;",
+                "float h21(vec2 p){ p = fract(p*vec2(123.34, 456.21)); p += dot(p, p+45.32); return fract(p.x*p.y); }",
+                "float vnp(vec2 p, float per){ vec2 i = floor(p), f = fract(p); vec2 u = f*f*(3.0-2.0*f);",
+                "  float y0 = mod(i.y, per), y1 = mod(i.y+1.0, per);",
+                "  return mix(mix(h21(vec2(i.x,y0)), h21(vec2(i.x+1.0,y0)), u.x), mix(h21(vec2(i.x,y1)), h21(vec2(i.x+1.0,y1)), u.x), u.y); }",
+                "float fbp(vec2 p, float per){ float s = 0.0, a = 0.5; for (int k = 0; k < 3; k++){ s += a*vnp(p, per); p *= 2.0; per *= 2.0; a *= 0.5; } return s; }",
+                "vec3 stars(vec2 p, float cell, float prob, float amp){ vec2 ci = floor(p/cell); vec2 f = p - ci*cell; float h = h21(ci);",
+                "  if (h > prob) return vec3(0.0); vec2 sp = vec2(h21(ci+7.1), h21(ci+3.3))*(cell-14.0)+7.0; float sz = 0.8 + 1.5*h21(ci+1.9);",
+                "  float d = length(f-sp); float b = exp(-d*d/(sz*sz)) * amp * (0.3 + 0.7*h21(ci+5.5)); return mix(cInk, cInk2, h21(ci+9.0)) * b; }",
+                "vec3 disk(float r, float th){",
+                "  if (r < RIN-12.0 || r > ROUT+8.0) return vec3(0.0);",
+                "  float w = 0.03 * pow(RIN/r, 1.5); float a = (th - uClock*w)/TAU;",
+                "  float warp = fbp(vec2(r*0.012, a*6.0), 6.0) - 0.5;",
+                "  float n = fbp(vec2(r*0.055 + warp*2.0, (a + warp*0.05)*20.0), 20.0);",
+                "  float edge = smoothstep(RIN-10.0, RIN+16.0, r) * (1.0 - smoothstep(ROUT-120.0, ROUT+6.0, r));",
+                "  float t = clamp((r-RIN)/(ROUT-RIN), 0.0, 1.0);",
+                "  vec3 col = mix(cAmber*1.2, cOrange, smoothstep(0.0, 0.75, t));",
+                "  float inten = edge * (0.25 + 1.25*n*n) * mix(1.45, 0.55, t);",
+                "  float dop = 1.0 + 0.6*cos(th);",
+                "  float fl = 0.0;",
+                "  if (uFlareP > 0.0 && uFlareP < 1.0){ float front = TH0 + TAU*uFlareP; float behind = mod(front - th, TAU);",
+                "    if (behind <= TAU*uFlareP) fl = exp(-behind*2.0) * smoothstep(0.0, 0.35, behind) * 2.6 * (1.0 - uFlareP*0.6); }",
+                "  return col * inten * dop * uFeed * (1.0 + fl); }",
+                "void main(){",
+                "  vec2 p = vec2(vUv.x*1080.0, (1.0-vUv.y)*1920.0); vec2 d = p - C; float rho = max(length(d), 0.5);",
+                "  vec3 col = mix(cSpaceTop, cSpace, smoothstep(0.0, 1150.0, p.y));",
+                "  vec2 ps = p - d/rho * min(RH*RH*1.15/rho, rho);",
+                "  col += stars(ps + vec2(uClock*0.55, -uClock*0.14), 80.0, 0.6, 0.9);",
+                "  col += stars(ps + vec2(uClock*0.25, -uClock*0.06) + 517.0, 56.0, 0.33, 0.55);",
+                "  vec3 add = vec3(0.0), front = vec3(0.0);",
+                "  if (abs(d.x) < ROUT+30.0 && d.y > -RH-180.0 && d.y < RH+150.0){",
+                "    float x = d.x, z = d.y/SI, r = length(vec2(x, z)), th = atan(z, x);",
+                "    if (rho > RH){",
+                "      float up = smoothstep(0.02, 0.7, -d.y/rho), dn = smoothstep(0.25, 0.95, d.y/rho), al = atan(d.y, d.x);",
+                "      float b1 = (rho - RH - 5.0)/80.0; if (up > 0.0 && b1 < 1.05) add += disk(RIN + b1*(ROUT-RIN)*0.85, al) * up * 0.75;",
+                "      float b2 = (rho - RH - 3.0)/36.0; if (dn > 0.0 && b2 < 1.0) add += disk(RIN + b2*(ROUT-RIN)*0.45, -al) * dn * 0.4;",
+                "    }",
+                "    vec3 dk = disk(r, th);",
+                "    if (z < 0.0) { if (rho >= RH) add += dk; } else front = dk;",
+                "  }",
+                "  float out1 = step(RH, rho);",
+                "  add += cAmber * 0.22 * exp(-max(rho-RH, 0.0)/70.0) * out1 * uFeed;",
+                "  add += cOrange * 0.16 * exp(-abs(d.y)/60.0) * (1.0 - smoothstep(ROUT-140.0, ROUT+170.0, abs(d.x))) * uFeed;",
+                "  add += cAmber * uHalo * 0.55 * exp(-max(rho-RH, 0.0)/140.0) * out1;",
+                "  col = col*out1 + cHole*(1.0-out1) + add;",
+                "  float ring = exp(-pow((rho - RH - 1.5)/1.6, 2.0));",
+                "  col += mix(cAmber, cInk, 0.5) * ring * 0.8 * uFeed;",
+                "  col += front;",
+                "  col = 1.0 - exp(-col*1.05);",
+                "  gl_FragColor = vec4(col, 1.0); }"].join("\n");
+              var VS = "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }";
+              var quad = new THREE.Mesh(new THREE.PlaneGeometry(1080, 1920), new THREE.ShaderMaterial({ uniforms: quadU, vertexShader: VS, fragmentShader: FS, depthTest: false, depthWrite: false }));
+              quad.position.set(540, -960, 0); quad.renderOrder = 0; scene.add(quad);
+              // gas ribbon: triangle strip, additive, back half hidden by the shadow
+              ribGeo = new THREE.BufferGeometry();
+              ribGeo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(ribN * 2 * 3), 3));
+              ribGeo.setAttribute("aS", new THREE.BufferAttribute(new Float32Array(ribN * 2), 1));
+              ribGeo.setAttribute("aSide", new THREE.BufferAttribute(new Float32Array(ribN * 2), 1));
+              ribGeo.setAttribute("aBack", new THREE.BufferAttribute(new Float32Array(ribN * 2), 1));
+              var idx = []; for (i = 0; i < ribN - 1; i++) { var a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); } ribGeo.setIndex(idx);
+              var ribU = { uA: { value: 0 }, uHot: { value: 0 }, cAmber: quadU.cAmber, cOrange: quadU.cOrange, cInk: quadU.cInk };
+              ribbon = new THREE.Mesh(ribGeo, new THREE.ShaderMaterial({ uniforms: ribU, transparent: true, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending,
+                vertexShader: "attribute float aS, aSide, aBack; varying float vS, vSide, vBack; varying vec2 vP; void main(){ vS = aS; vSide = aSide; vBack = aBack; vP = vec2(position.x, -position.y); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
+                fragmentShader: "precision highp float; uniform float uA, uHot; uniform vec3 cAmber, cOrange, cInk; varying float vS, vSide, vBack; varying vec2 vP; void main(){ if (vBack > 0.5 && length(vP - vec2(540.0, 900.0)) < 131.0) discard; float core = exp(-vSide*vSide*28.0), glow = exp(-vSide*vSide*3.5)*0.22; float tip = smoothstep(1.0, 0.82, vS) * smoothstep(0.0, 0.02, vS); vec3 c = mix(cAmber, cOrange, smoothstep(0.0, 0.9, vS)); float hot = uHot * exp(-vS*9.0); c = mix(c, cInk, hot); gl_FragColor = vec4(c * (core*1.1 + glow) * tip * uA * (1.0 + hot*1.5), 1.0); }" }));
+              ribbon.renderOrder = 1; ribbon.frustumCulled = false; scene.add(ribbon);
+              // debris sparks
+              var rng = mulberry32(606);
+              var spGeo = new THREE.BufferGeometry();
+              spGeo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(spN * 3), 3));
+              spGeo.setAttribute("aSize", new THREE.BufferAttribute(new Float32Array(spN), 1));
+              spGeo.setAttribute("aBack", new THREE.BufferAttribute(new Float32Array(spN), 1));
+              spGeo.setAttribute("aMix", new THREE.BufferAttribute(new Float32Array(spN), 1));
+              for (i = 0; i < spN; i++) { var sr = RIN + 25 + rng() * (ROUT - RIN - 40); spData.push({ r: sr, th: rng() * Math.PI * 2, w: 0.03 * Math.pow(RIN / sr, 1.5) * (0.9 + rng() * 0.2), size: 4 + rng() * 7 });
+                spGeo.attributes.aSize.array[i] = spData[i].size; spGeo.attributes.aMix.array[i] = rng(); }
+              var spU = { uA: { value: 0 }, cAmber: quadU.cAmber, cInk: quadU.cInk };
+              sparks = new THREE.Points(spGeo, new THREE.ShaderMaterial({ uniforms: spU, transparent: true, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending,
+                vertexShader: "attribute float aSize, aBack, aMix; varying float vBack, vMix; varying vec2 vP; void main(){ vBack = aBack; vMix = aMix; vP = vec2(position.x, -position.y); gl_PointSize = aSize; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
+                fragmentShader: "precision highp float; uniform float uA; uniform vec3 cAmber, cInk; varying float vBack, vMix; varying vec2 vP; void main(){ if (vBack > 0.5 && length(vP - vec2(540.0, 900.0)) < 131.0) discard; float d = length(gl_PointCoord - 0.5)*2.0; float a = exp(-d*d*4.0); gl_FragColor = vec4(mix(cAmber, cInk, vMix) * a * uA * 1.2, 1.0); }" }));
+              sparks.renderOrder = 2; sparks.frustumCulled = false; scene.add(sparks);
+              // the star: an elliptical glow quad, stretched along the stream when it tears
+              var stU = { uI: { value: 1 }, uE: { value: 1 }, cInk: quadU.cInk, cAmber: quadU.cAmber };
+              star = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.ShaderMaterial({ uniforms: stU, transparent: true, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending,
+                vertexShader: VS,
+                fragmentShader: "precision highp float; uniform float uI, uE; uniform vec3 cInk, cAmber; varying vec2 vUv; void main(){ vec2 q = (vUv - 0.5)*2.0; float e = length(q); float core = exp(-e*e*uE*60.0); float halo = exp(-e*5.0)*0.55*(1.0 - smoothstep(0.85, 1.0, e)); gl_FragColor = vec4((cInk*core*1.6 + cAmber*halo) * uI, 1.0); }" }));
+              star.renderOrder = 3; star.frustumCulled = false; scene.add(star);
+            }
+            function draw(f) {
+              var ck = clock(f);
+              odo(f);
+              if (R) {
+                quadU.uClock.value = ck;
+                quadU.uFlareP.value = (f > 36 && f < 46) ? (f - 36) / 10 : 0;
+                quadU.uHalo.value = f < 36 ? 0 : (f < 38 ? (f - 36) / 2 : Math.max(0, 1 - (f - 38) / 8));
+                quadU.uFeed.value = 1 + 0.2 * cl((f - 36) / 10, 0, 1);
+                // star
+                var sg = starSigma(f), sp;
+                if (f <= 28) { sp = approach(starEase(f)); star.visible = true; star.position.set(sp[0], -sp[1], 0); star.rotation.z = 0;
+                  star.scale.set(150, 150, 1); star.material.uniforms.uI.value = cl(f / 3, 0.35, 1); star.material.uniforms.uE.value = 1;
+                } else if (f < 36) { var k = (f - 28) / 8, L = 150 + 420 * k, W = 150 * (1 - k) + 10, mid = at(sg + L * 0.35);
+                  star.visible = true; star.position.set(mid.x, -mid.y, 0); star.rotation.z = -Math.atan2(mid.ty, mid.tx);
+                  star.scale.set(L, W, 1); star.material.uniforms.uI.value = 1 - k * 0.9; star.material.uniforms.uE.value = 1 + k * 0.5;
+                } else star.visible = false;
+                // ribbon: from the star along the path, length grows with the clock
+                var rl = f < 12 ? 0 : 30 * (ck - 36), ra = f < 12 ? 0 : cl((f - 12) / 3, 0, 1) * (f > 36 ? Math.max(0, 1 - (f - 36) / 7) : 1);
+                ribbon.visible = ra > 0.001 && rl > 2; ribbon.material.uniforms.uA.value = ra;
+                ribbon.material.uniforms.uHot.value = f < 28 ? 0 : (f < 36 ? (1 - (f - 28) / 8) * 0.8 : 0);
+                if (ribbon.visible) {
+                  var pos = ribGeo.attributes.position.array, aS = ribGeo.attributes.aS.array, aSide = ribGeo.attributes.aSide.array, aBack = ribGeo.attributes.aBack.array;
+                  var s0 = sg, s1 = Math.min(LTOT, sg + rl);
+                  for (var j = 0; j < ribN; j++) {
+                    var u = j / (ribN - 1), pp = at(s0 + (s1 - s0) * u), tl2 = Math.hypot(pp.tx, pp.ty) || 1, nx = -pp.ty / tl2, ny = pp.tx / tl2;
+                    var hw = (13 - 7 * u) * (f > 28 ? 1 + (f - 28) / 8 * 0.6 : 1);
+                    for (var sd = 0; sd < 2; sd++) { var o = j * 2 + sd, sgn = sd ? 1 : -1;
+                      pos[o * 3] = pp.x + nx * hw * sgn; pos[o * 3 + 1] = -(pp.y + ny * hw * sgn); pos[o * 3 + 2] = 0;
+                      aS[o] = u; aSide[o] = sgn; aBack[o] = pp.back; }
+                  }
+                  ribGeo.attributes.position.needsUpdate = ribGeo.attributes.aS.needsUpdate = ribGeo.attributes.aSide.needsUpdate = ribGeo.attributes.aBack.needsUpdate = true;
+                }
+                // sparks
+                var spA = cl((f - 40) / 6, 0, 1); sparks.visible = spA > 0; sparks.material.uniforms.uA.value = spA;
+                if (sparks.visible) { var spp = sparks.geometry.attributes.position.array, spb = sparks.geometry.attributes.aBack.array;
+                  for (j = 0; j < spN; j++) { var dsp = spData[j], th2 = dsp.th + ck * dsp.w, s2 = disk2scr(dsp.r, th2);
+                    spp[j * 3] = s2[0]; spp[j * 3 + 1] = -s2[1]; spp[j * 3 + 2] = 0; spb[j] = Math.sin(th2) < 0 ? 1 : 0; }
+                  sparks.geometry.attributes.position.needsUpdate = sparks.geometry.attributes.aBack.needsUpdate = true; }
+                R.render(scene, cam);
+              }
+              root.style.opacity = cl((secs * FPS - f) / (0.25 * FPS), 0, 1);
+            }
+            // st.f is an accessor: every value GSAP writes (seek with or without events) redraws the frame
+            var st = { _f: 0, get f() { return this._f; }, set f(x) { this._f = x; draw(x); } }, tl = gsap.timeline({ paused: true });
+            tl.to(st, { f: secs * FPS, duration: secs, ease: "none", lazy: false }, 0);
+            draw(0);
+            window.__timelines = window.__timelines || {};
+            window.__timelines["rf-deep-time"] = tl;
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

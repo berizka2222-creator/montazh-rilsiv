@@ -1,0 +1,168 @@
+<!doctype html>
+<!-- rf-agent-swarm: one glowing point splits into twenty lights that fan out on curved trails, tick green one after another,
+     rush home along their curves and a finished page snaps in where the point began. Rebuilt from an ultra-skills motion prompt. -->
+<html lang="uk" data-composition-id="rf-agent-swarm" data-composition-duration="600" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "role1", "type": "string", "label": "Роль 1 (перша колонка точок)", "default": "Role one" },
+  { "id": "role2", "type": "string", "label": "Роль 2 (друга колонка)", "default": "Role two" },
+  { "id": "role3", "type": "string", "label": "Роль 3 (третя колонка)", "default": "Role three" },
+  { "id": "role4", "type": "string", "label": "Роль 4 (четверта колонка)", "default": "Role four" },
+  { "id": "page_title", "type": "string", "label": "Заголовок готової сторінки", "default": "Page title" },
+  { "id": "caption", "type": "string", "label": "Підпис на сторінці", "default": "Caption" },
+  { "id": "bg", "type": "color", "label": "Фон: центр", "default": "#17181b" },
+  { "id": "bg2", "type": "color", "label": "Фон: середина", "default": "#0e0f11" },
+  { "id": "bg3", "type": "color", "label": "Фон: краї", "default": "#08080a" },
+  { "id": "node", "type": "color", "label": "Точки-агенти", "default": "#ffffff" },
+  { "id": "surface", "type": "color", "label": "Сторінка", "default": "#16171a" },
+  { "id": "surface2", "type": "color", "label": "Блок на сторінці", "default": "#1e2024" },
+  { "id": "line", "type": "color", "label": "Сліди і контур (9%)", "default": "#ffffff" },
+  { "id": "ink", "type": "color", "label": "Основний текст", "default": "#f4f4f2" },
+  { "id": "muted", "type": "color", "label": "Другорядний текст (ролі, підпис)", "default": "#a3a5ab" },
+  { "id": "accent", "type": "color", "label": "Зелена галочка", "default": "#22c55e" },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 2 }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-agent-swarm</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-agent-swarm" data-duration="600" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; overflow: hidden; }
+          .rfas { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden;
+                  font-family: var(--font-body, "Helvetica Neue", Arial, sans-serif); }
+          .rfas .rfas-st { position: absolute; inset: 0; transform-origin: 540px 960px; }
+          .rfas .rfas-sv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: visible; }
+          .rfas .rfas-lb { position: absolute; width: 270px; margin-left: -135px; text-align: center; font-size: 32px; line-height: 1; white-space: nowrap; opacity: 0; }
+          .rfas .rfas-pg { position: absolute; left: 220px; top: 530px; width: 640px; height: 860px; border-radius: 28px; overflow: hidden; visibility: hidden;
+                  transform-origin: 50% 50%; }
+          .rfas .rfas-pg > div { position: absolute; left: 48px; right: 48px; opacity: 0; }
+          .rfas .rfas-bs { left: 0 !important; right: 0 !important; top: 0; height: 64px; display: flex; align-items: center; gap: 10px; padding: 0 26px; box-sizing: border-box; }
+          .rfas .rfas-bs i { width: 13px; height: 13px; border-radius: 50%; flex: none; }
+          .rfas .rfas-bs b { flex: 1; height: 26px; border-radius: 13px; margin-left: 18px; }
+          .rfas .rfas-hb { top: 100px; height: 330px; border-radius: 20px; }
+          .rfas .rfas-pt { top: 470px; font-family: var(--font-display, "Helvetica Neue", Arial, sans-serif); font-weight: 900; font-size: 60px; line-height: 1.05; letter-spacing: -0.01em; }
+          .rfas .rfas-pc { font-size: 34px; line-height: 1.25; }
+          .rfas .rfas-tk { width: 56px; height: 56px; }
+        </style>
+        <div class="rfas"><div class="rfas-st">
+          <svg class="rfas-sv" width="1080" height="1920" viewBox="0 0 1080 1920"><defs></defs></svg>
+          <div class="rfas-lbs"></div>
+          <div class="rfas-pg"><div class="rfas-bs"><i></i><i></i><i></i><b></b></div><div class="rfas-hb"></div>
+            <div class="rfas-pt"></div><div class="rfas-pc"></div>
+            <div class="rfas-tk"><svg width="56" height="56" viewBox="0 0 56 56"><circle cx="28" cy="28" r="26" /><path d="M16 29 L24.5 37 L40 20" fill="none" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" /></svg></div>
+          </div>
+        </div></div>
+        <script>
+          (function () {
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            function S(x, d) { return (x === undefined || x === null) ? d : String(x); }
+            var secs = Math.max(1, +v.seconds || 2), FPS = 30;
+            var root = document.querySelector(".rfas"), C = {};
+            [["bg", "#17181b"], ["bg2", "#0e0f11"], ["bg3", "#08080a"], ["node", "#ffffff"], ["surface", "#16171a"], ["surface2", "#1e2024"],
+             ["line", "#ffffff"], ["ink", "#f4f4f2"], ["muted", "#a3a5ab"], ["accent", "#22c55e"]].forEach(function (c) { C[c[0]] = v[c[0]] || c[1]; });
+            function rgba(h, a) { h = String(h).replace("#", ""); if (h.length === 3) h = h.replace(/./g, "$&$&"); var n = parseInt(h, 16);
+              return "rgba(" + (n >> 16 & 255) + "," + (n >> 8 & 255) + "," + (n & 255) + "," + a + ")"; }
+            function q(s) { return root.querySelector(s); }
+            function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a);
+              t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+            function clamp(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+            var NS = "http://www.w3.org/2000/svg";
+            function el(tag, at, parent) { var e = document.createElementNS(NS, tag); for (var k in at) e.setAttribute(k, at[k]); parent.appendChild(e); return e; }
+            root.style.background = "radial-gradient(ellipse 80% 60% at 50% 50%," + C.bg + " 0%," + C.bg2 + " 55%," + C.bg3 + " 100%)";
+            var sv = q(".rfas-sv"), defs = sv.querySelector("defs");
+            var gl = el("filter", { id: "rfas-gl", x: "-150%", y: "-150%", width: "400%", height: "400%" }, defs); el("feGaussianBlur", { stdDeviation: "10" }, gl);
+            var CX = 540, CY = 960, rnd = mulberry32(2323);
+            // ---- 20 stations on a 4x5 grid with seeded jitter, curved flights alternating left / right bends
+            var gTr = el("g", {}, sv), gDot = el("g", {}, sv), dots = [], ROLES = [S(v.role1, "Role one"), S(v.role2, "Role two"), S(v.role3, "Role three"), S(v.role4, "Role four")];
+            var lbs = q(".rfas-lbs");
+            for (var i = 0; i < 20; i++) {
+              var c = i % 4, r = Math.floor(i / 4);
+              var sx = 110 + c * (860 / 3) + (rnd() - .5) * 48, sy = 400 + r * 260 + (rnd() - .5) * 48;
+              var dx = sx - CX, dy = sy - CY, L = Math.hypot(dx, dy) || 1, nx = -dy / L, ny = dx / L, side = i % 2 ? 1 : -1, bend = side * (150 + rnd() * 140);
+              var P = [[CX, CY], [CX + dx * .2 + nx * bend, CY + dy * .2 + ny * bend], [CX + dx * .7 + nx * bend * .55, CY + dy * .7 + ny * bend * .55], [sx, sy]];
+              var lb = document.createElement("div"); lb.className = "rfas-lb"; lb.textContent = ROLES[c]; lb.style.color = C.muted;
+              lb.style.left = sx + "px"; lb.style.top = (sy + 26) + "px"; lbs.appendChild(lb);
+              dots.push({ P: P, t0: 8 + i * 0.3, lb: lb,
+                tr: el("path", { fill: "none", stroke: C.line, "stroke-opacity": .09, "stroke-width": 2, "stroke-linecap": "round" }, gTr),
+                gw: el("circle", { r: 0, fill: C.accent, filter: "url(#rfas-gl)", opacity: 0 }, gDot),
+                dt: el("ellipse", { rx: 14, ry: 14, fill: C.node }, gDot),
+                tk: el("path", { d: "M-6.5 0.5 L-2 5 L6.5 -4.5", fill: "none", stroke: C.bg3, "stroke-width": 3, "stroke-linecap": "round", "stroke-linejoin": "round", opacity: 0 }, gDot) });
+            }
+            // fit each label to its column
+            dots.forEach(function (d) { for (var fs = 32; fs > 18 && d.lb.scrollWidth > 268; fs -= 2) d.lb.style.fontSize = fs + "px"; });
+            var order = dots.map(function (d, k) { return k; }), sr = mulberry32(77);
+            for (i = order.length - 1; i > 0; i--) { var j = Math.floor(sr() * (i + 1)), t = order[i]; order[i] = order[j]; order[j] = t; }
+            order.forEach(function (k, n) { dots[k].tick = 20 + n * 0.6; });
+            function bz(P, t) { var u = 1 - t; return [u * u * u * P[0][0] + 3 * u * u * t * P[1][0] + 3 * u * t * t * P[2][0] + t * t * t * P[3][0],
+              u * u * u * P[0][1] + 3 * u * u * t * P[1][1] + 3 * u * t * t * P[2][1] + t * t * t * P[3][1]]; }
+            function trail(P, t) { if (t <= 0.001) return ""; var s = "M" + CX + " " + CY; for (var k = 1; k <= 30; k++) { var p = bz(P, t * k / 30); s += " L" + p[0].toFixed(1) + " " + p[1].toFixed(1); } return s; }
+            function spring(u) { if (u <= 0) return 0; if (u >= 1.4) return 1; return 1 - Math.exp(-7 * u) * Math.cos(7 * u); }   // damping 15, light overshoot
+            // ---- centre node and split ring
+            var nGlow = el("circle", { cx: CX, cy: CY, r: 30, fill: C.node, "fill-opacity": .5, filter: "url(#rfas-gl)" }, sv);
+            var node = el("circle", { cx: CX, cy: CY, r: 18, fill: C.node }, sv);
+            var ring = el("circle", { cx: CX, cy: CY, r: 18, fill: "none", stroke: C.node, "stroke-width": 1.5 }, sv);
+            // ---- finished page
+            var pg = q(".rfas-pg"); pg.style.background = C.surface;
+            pg.querySelectorAll(".rfas-bs i").forEach(function (e) { e.style.background = rgba(C.line, .16); });
+            q(".rfas-bs").style.borderBottom = "1.5px solid " + rgba(C.line, .09); q(".rfas-bs b").style.background = C.surface2;
+            q(".rfas-hb").style.background = C.surface2;
+            var pt = q(".rfas-pt"); pt.textContent = S(v.page_title, "Page title"); pt.style.color = C.ink;
+            for (var fs = 60; fs > 36 && pt.scrollHeight > 130; fs -= 2) pt.style.fontSize = fs + "px";
+            var pc = q(".rfas-pc"); pc.textContent = S(v.caption, "Caption"); pc.style.color = C.muted; pc.style.top = (470 + pt.offsetHeight + 24) + "px";
+            for (fs = 34; fs > 22 && pc.scrollHeight > 130; fs -= 2) pc.style.fontSize = fs + "px";
+            var tkb = q(".rfas-tk"); tkb.style.top = Math.min(764, pc.offsetTop + pc.offsetHeight + 34) + "px"; tkb.querySelector("circle").setAttribute("fill", C.accent); tkb.querySelector("path").setAttribute("stroke", C.bg3);
+            var items = [q(".rfas-bs"), q(".rfas-hb"), pt, pc, tkb];
+            function render(f) {
+              // node breathes through two pulses, splits at frame 8
+              var br = f < 8 ? Math.pow(Math.sin(Math.PI * f / 4), 2) : 0;
+              node.setAttribute("r", (18 * (1 + .25 * br)).toFixed(2)); nGlow.setAttribute("r", (30 * (1 + .35 * br)).toFixed(2));
+              node.style.visibility = nGlow.style.visibility = f < 8 ? "inherit" : "hidden";
+              var rp = clamp((f - 8) / 9); ring.setAttribute("r", (18 + 160 * (1 - Math.pow(1 - rp, 2))).toFixed(1));
+              ring.setAttribute("stroke-opacity", f >= 8 ? (.8 * (1 - rp)).toFixed(3) : 0);
+              var back = clamp((f - 32) / 10), be = back * back * back * back;       // one strong ease-in home
+              dots.forEach(function (d) {
+                var pos, size = 28, show = f >= d.t0 && f < 42, stretch = 0, ang = 0;
+                if (f < 32) { pos = spring((f - d.t0) / 8); }
+                else { pos = 1 - be; var tr2 = be; size = tr2 < .75 ? 28 - 18 * tr2 / .75 : 10 * (1 - (tr2 - .75) / .25);
+                  var b2 = clamp((f - 0.5 - 32) / 10), be2 = b2 * b2 * b2 * b2, p0 = bz(d.P, 1 - be2), p1 = bz(d.P, pos);
+                  stretch = Math.min(46, Math.hypot(p1[0] - p0[0], p1[1] - p0[1]) * 0.6); ang = Math.atan2(p1[1] - p0[1], p1[0] - p0[0]) * 180 / Math.PI; }
+                var p = bz(d.P, pos), tv = Math.min(1, Math.max(0, pos));
+                d.tr.setAttribute("d", f >= d.t0 && f < 42 ? trail(d.P, tv) : "");
+                // tick to green
+                var tp = clamp((f - d.tick) / 3), pop = f >= d.tick && f < 32 ? 1 + .25 * Math.sin(Math.PI * tp) : 1, green = f >= d.tick;
+                var rad = size / 2 * pop;
+                d.dt.setAttribute("rx", (rad + stretch / 2).toFixed(2)); d.dt.setAttribute("ry", rad.toFixed(2));
+                d.dt.setAttribute("transform", "translate(" + p[0].toFixed(1) + " " + p[1].toFixed(1) + ") rotate(" + ang.toFixed(1) + ")");
+                d.dt.setAttribute("fill", green ? C.accent : C.node);
+                d.dt.style.visibility = show && size > 0.2 ? "inherit" : "hidden";
+                d.tk.setAttribute("transform", "translate(" + p[0].toFixed(1) + " " + p[1].toFixed(1) + ") scale(" + pop.toFixed(3) + ")");
+                d.tk.setAttribute("opacity", green && f < 32 ? clamp((f - d.tick) / 1.5) : 0);
+                d.gw.setAttribute("cx", p[0]); d.gw.setAttribute("cy", p[1]); d.gw.setAttribute("r", 20 * pop);
+                d.gw.setAttribute("opacity", green && f < 34 ? (.35 + .4 * (1 - tp)) * (1 - back) : 0);
+                // label rises on arrival, fades 32-36
+                var la = clamp((f - d.t0 - 8) / 4), lo = la * (1 - clamp((f - 32) / 4));
+                d.lb.style.opacity = lo.toFixed(3); d.lb.style.transform = "translateY(" + (14 * (1 - la)).toFixed(1) + "px)";
+              });
+              // page snaps in at 42
+              var pf = f - 42; pg.style.visibility = pf >= 0 ? "inherit" : "hidden";
+              var ps = pf >= 0 && pf < 6 ? 1 + .06 * Math.sin(Math.PI * pf / 6) : 1, gd = pf >= 0 ? clamp(1 - pf / 14) : 0;
+              pg.style.transform = "scale(" + ps.toFixed(4) + ")";
+              pg.style.boxShadow = "inset 0 0 0 1.5px " + rgba(C.line, .09) + ", 0 0 0 " + (2 * gd).toFixed(2) + "px " + rgba(C.accent, gd) + ", 0 0 " + (60 * gd).toFixed(1) + "px " + rgba(C.accent, .55 * gd) + ", 0 40px 120px rgba(0,0,0,.55)";
+              items.forEach(function (e, k) { var a = clamp((pf - k * 3) / 5); e.style.opacity = pf >= 0 ? a.toFixed(3) : 0;
+                e.style.transform = "translateY(" + (26 * (1 - a) * (1 - a)).toFixed(1) + "px)"; });
+              // slow push 45-59, then hold
+              var pu = clamp((f - 45) / 15), pe = .5 - .5 * Math.cos(Math.PI * pu);
+              q(".rfas-st").style.transform = "scale(" + (1 + .02 * pe).toFixed(4) + ")";
+              root.style.opacity = clamp((secs * FPS - f) / (0.25 * FPS)).toFixed(3);
+            }
+            // repaint from a property setter: gsap seek() suppresses onUpdate, a tweened setter always runs
+            var fv = 0, st = {}, tl = gsap.timeline({ paused: true });
+            Object.defineProperty(st, "f", { get: function () { return fv; }, set: function (x) { fv = x; render(x); } });
+            tl.to(st, { f: secs * FPS, duration: secs, ease: "none" }, 0);
+            render(0);
+            window.__timelines = window.__timelines || {};
+            window.__timelines["rf-agent-swarm"] = tl;
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

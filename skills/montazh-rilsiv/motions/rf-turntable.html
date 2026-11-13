@@ -1,0 +1,211 @@
+<!doctype html>
+<!-- rf-turntable: a matte cylindrical speaker turns on a brass-ringed platter, three spec callouts draw out, a rim light sweeps the silhouette under the wordmark (three.js). Rebuilt from an ultra-skills motion prompt. -->
+<html lang="uk" data-composition-id="rf-turntable" data-composition-duration="600" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "spec_1", "type": "string", "label": "Характеристика 1 (праворуч, вгорі)", "default": "Spec one" },
+  { "id": "spec_2", "type": "string", "label": "Характеристика 2 (ліворуч)", "default": "Spec two" },
+  { "id": "spec_3", "type": "string", "label": "Характеристика 3 (праворуч, внизу)", "default": "Spec three" },
+  { "id": "product_name", "type": "string", "label": "Назва продукту (великий напис)", "default": "Product name" },
+  { "id": "caption", "type": "string", "label": "Підпис під назвою", "default": "Caption" },
+  { "id": "bg", "type": "color", "label": "Студія: світліший тон", "default": "#17181b" },
+  { "id": "bg2", "type": "color", "label": "Студія: середній тон", "default": "#0e0f11" },
+  { "id": "bg3", "type": "color", "label": "Студія: темний край", "default": "#08080a" },
+  { "id": "body", "type": "color", "label": "Корпус продукту", "default": "#16171a" },
+  { "id": "surface", "type": "color", "label": "Платформа і кришка", "default": "#1e2024" },
+  { "id": "accent", "type": "color", "label": "Латунь (кільце, лінії)", "default": "#e4c58a" },
+  { "id": "key", "type": "color", "label": "Верхнє світло", "default": "#c8ccd6" },
+  { "id": "glow", "type": "color", "label": "Контурне світло", "default": "#ffffff" },
+  { "id": "ink", "type": "color", "label": "Текст", "default": "#f4f4f2" },
+  { "id": "muted", "type": "color", "label": "Другорядний текст (підпис)", "default": "#a3a5ab" },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 2 }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-turntable</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-turntable" data-duration="600" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; }
+          .rftt { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden; }
+          .rftt .rftt-gl, .rftt .rftt-svg { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+          .rftt .rftt-spec { position: absolute; font-family: var(--font-body, "Inter", "Helvetica Neue", Arial, sans-serif); font-weight: 500; font-size: 44px; line-height: 1.06; opacity: 0; }
+          .rftt .rftt-word { position: absolute; left: 60px; width: 960px; top: 340px; height: 130px; display: flex; align-items: center; justify-content: center; white-space: nowrap;
+                             font-family: var(--font-display, "Inter", "Helvetica Neue", Arial, sans-serif); font-weight: 900; font-size: 120px; letter-spacing: -.02em; line-height: 1; opacity: 0; }
+          .rftt .rftt-cap { position: absolute; left: 60px; width: 960px; top: 480px; text-align: center; white-space: nowrap;
+                            font-family: var(--font-body, "Inter", "Helvetica Neue", Arial, sans-serif); font-weight: 400; font-size: 32px; line-height: 1.2; opacity: 0; }
+        </style>
+        <div class="rftt">
+          <canvas class="rftt-gl" width="1080" height="1920"></canvas>
+          <svg class="rftt-svg" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg"></svg>
+          <div class="rftt-word"></div>
+          <div class="rftt-cap"></div>
+        </div>
+        <script>
+          (function () {
+            var ID = "rf-turntable";
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            function sv(x, d) { return (x == null || x === "") ? d : String(x); }
+            var secs = Math.max(1, +v.seconds || 2);
+            var BG1 = v.bg || "#17181b", BG2 = v.bg2 || "#0e0f11", BG3 = v.bg3 || "#08080a", BODY = v.body || "#16171a", SURF = v.surface || "#1e2024";
+            var BRASS = v.accent || "#e4c58a", KEY = v.key || "#c8ccd6", RIM = v.glow || "#ffffff", INK = v.ink || "#f4f4f2", MUTED = v.muted || "#a3a5ab";
+            var box = document.querySelector(".rftt");
+            var tl = gsap.timeline({ paused: true });
+            window.__timelines = window.__timelines || {};
+            window.__timelines[ID] = tl;
+            if (!box || !window.THREE) { tl.to({}, { duration: secs }); return; }
+            var T = window.THREE, PI = Math.PI;
+            box.style.background = BG3;
+            function clamp(x, a, b) { return x < a ? a : x > b ? b : x; }
+            function seg(f, a, b) { return clamp((f - a) / (b - a), 0, 1); }
+            function oCub(p) { return 1 - Math.pow(1 - p, 3); }
+            function ioSine(p) { return -(Math.cos(PI * p) - 1) / 2; }
+            function canvasTex(w, h, paint) { var c = document.createElement("canvas"); c.width = w; c.height = h; paint(c.getContext("2d"), w, h); return new T.CanvasTexture(c); }
+
+            var cv = box.querySelector(".rftt-gl"), svg = box.querySelector(".rftt-svg");
+            var R = new T.WebGLRenderer({ canvas: cv, antialias: true, preserveDrawingBuffer: true, alpha: false });
+            R.setPixelRatio(1); R.setSize(1080, 1920, false);
+            var scene = new T.Scene();
+            scene.background = canvasTex(4, 512, function (g, w, h) { var gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, BG3); gr.addColorStop(.3, BG2); gr.addColorStop(.52, BG1); gr.addColorStop(.8, BG2); gr.addColorStop(1, BG3); g.fillStyle = gr; g.fillRect(0, 0, w, h); });
+            var env = canvasTex(1024, 512, function (g, w, h) {
+              g.fillStyle = BG3; g.fillRect(0, 0, w, h); g.filter = "blur(16px)";
+              g.fillStyle = KEY; g.fillRect(0, 0, w, 80); g.globalAlpha = .55; g.fillRect(120, 160, 120, 180); g.fillRect(660, 140, 90, 200); g.globalAlpha = 1;
+              g.fillStyle = BG1; g.fillRect(0, 380, w, 132);
+            });
+            env.mapping = T.EquirectangularReflectionMapping;
+            scene.environment = new T.PMREMGenerator(R).fromEquirectangular(env).texture;
+            scene.add(new T.AmbientLight(new T.Color(KEY), .06));
+            var keyL = new T.DirectionalLight(new T.Color(KEY), 1.6); keyL.position.set(-1, 12, 3); scene.add(keyL);
+            var sideL = new T.DirectionalLight(new T.Color(KEY), .9); sideL.position.set(-7, 5, 6); scene.add(sideL);
+            var camera = new T.PerspectiveCamera(28, 1080 / 1920, 1, 200);
+            camera.setViewOffset(1080, 1920, 0, 20, 1080, 1920);
+
+            // fabric grille normal map (woven)
+            var grille = canvasTex(256, 256, function (g, w, h) {
+              var im = g.createImageData(w, h), d = im.data;
+              function H(x, y) { var a = Math.sin(x * PI * 2 / 16), b = Math.sin(y * PI * 2 / 16); var over = ((Math.floor(x / 16) + Math.floor(y / 16)) % 2) ? a * a : b * b; return .6 * over + .25 * Math.abs(Math.sin((x + y) * PI / 4)); }
+              for (var y = 0; y < h; y++) for (var x = 0; x < w; x++) {
+                var dx = H(x + 1, y) - H(x - 1, y), dy = H(x, y + 1) - H(x, y - 1), nx = -dx * 1.6, ny = -dy * 1.6, nz = 1, l = Math.sqrt(nx * nx + ny * ny + 1), o = (y * w + x) * 4;
+                d[o] = (nx / l * .5 + .5) * 255; d[o + 1] = (ny / l * .5 + .5) * 255; d[o + 2] = (nz / l * .5 + .5) * 255; d[o + 3] = 255;
+              }
+              g.putImageData(im, 0, 0);
+            });
+            grille.wrapS = grille.wrapT = T.RepeatWrapping; grille.repeat.set(40, 28);
+
+            // ---------- product + platter ----------
+            var PH = .18, SR = 2.1, SH = 7.0;
+            var turn = new T.Group(); scene.add(turn);
+            var platterTop = new T.MeshStandardMaterial({ color: new T.Color(SURF), roughness: .35, metalness: .3, transparent: true, opacity: .9 });
+            var platterSide = new T.MeshStandardMaterial({ color: new T.Color(SURF), roughness: .45, metalness: .3 });
+            var platter = new T.Mesh(new T.CylinderGeometry(3.0, 3.0, PH, 96), [platterSide, platterTop, platterSide]); platter.position.y = PH / 2; turn.add(platter);
+            var brassM = new T.MeshStandardMaterial({ color: new T.Color(BRASS), metalness: 1, roughness: .25, emissive: new T.Color(BRASS).multiplyScalar(.12) });
+            var ring = new T.Mesh(new T.TorusGeometry(3.0, .032, 8, 128), brassM); ring.rotation.x = PI / 2; ring.position.y = PH; turn.add(ring);
+            var shTex = canvasTex(128, 128, function (g) { var gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, "rgba(0,0,0,.95)"); gr.addColorStop(.6, "rgba(0,0,0,.6)"); gr.addColorStop(1, "rgba(0,0,0,0)"); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); });
+            var shadow = new T.Mesh(new T.PlaneGeometry(5.6, 5.6), new T.MeshBasicMaterial({ map: shTex, transparent: true, depthWrite: false })); shadow.rotation.x = -PI / 2; shadow.position.y = PH + .004; shadow.renderOrder = 3; turn.add(shadow);
+            var spk = new T.Group(); spk.position.y = PH; turn.add(spk);
+            var pr = [new T.Vector2(0, 0), new T.Vector2(1.85, 0)], k;
+            for (k = 1; k <= 6; k++) { var a = -PI / 2 + k / 6 * PI / 2; pr.push(new T.Vector2(1.85 + Math.cos(a) * .25, .25 + Math.sin(a) * .25)); }
+            for (k = 1; k <= 8; k++) pr.push(new T.Vector2(SR, .25 + k / 8 * (6.6 - .25)));
+            for (k = 1; k <= 5; k++) { var b = k / 5 * PI / 2; pr.push(new T.Vector2(1.95 + Math.cos(b) * .15, 6.6 + Math.sin(b) * .15)); }
+            pr.push(new T.Vector2(0, 6.75));
+            var bodyM = new T.MeshStandardMaterial({ color: new T.Color(BODY), roughness: .92, metalness: 0, normalMap: grille, normalScale: new T.Vector2(2.2, 2.2) });
+            spk.add(new T.Mesh(new T.LatheGeometry(pr, 96), bodyM));
+            var capM = new T.MeshStandardMaterial({ color: new T.Color(SURF), roughness: .45, metalness: .25 });
+            var cap = new T.Mesh(new T.CylinderGeometry(1.9, 1.93, .24, 96), capM); cap.position.y = 6.75 + .02 + .12; spk.add(cap);
+            var markM = new T.MeshStandardMaterial({ color: new T.Color(BODY).lerp(new T.Color(MUTED), .18), roughness: .5, metalness: .2 });
+            var mark = new T.Mesh(new T.BoxGeometry(.62, .16, .08), markM); mark.position.set(0, 1.25, SR + .01); spk.add(mark);
+            var dot = new T.Mesh(new T.CylinderGeometry(.09, .09, .08, 20), markM); dot.rotation.x = PI / 2; dot.position.set(-.48, 1.25, SR + .01); spk.add(dot);
+            var mirror = spk.clone(); mirror.scale.y = -1; mirror.position.y = PH; turn.add(mirror);
+            var floor = new T.Mesh(new T.PlaneGeometry(220, 220), new T.MeshBasicMaterial({ map: canvasTex(256, 256, function (g) { var gr = g.createRadialGradient(128, 128, 0, 128, 128, 128); var c1 = new T.Color(BG1), c2 = new T.Color(BG3); function rg(c, a) { return "rgba(" + Math.round(c.r * 255) + "," + Math.round(c.g * 255) + "," + Math.round(c.b * 255) + "," + a + ")"; } gr.addColorStop(0, rg(c1, 1)); gr.addColorStop(.12, rg(c2, .9)); gr.addColorStop(1, rg(c2, 0)); g.fillStyle = gr; g.fillRect(0, 0, 256, 256); }), transparent: true, depthWrite: false }));
+            floor.rotation.x = -PI / 2; floor.position.y = -.001; scene.add(floor);
+
+            // ---------- overlays ----------
+            var NS = "http://www.w3.org/2000/svg";
+            function el(tag, attrs, parent) { var e = document.createElementNS(NS, tag); for (var q in attrs) e.setAttribute(q, attrs[q]); (parent || svg).appendChild(e); return e; }
+            var defs = el("defs", {});
+            [10, 5, 2].forEach(function (s, i) { var f = el("filter", { id: "rftt-b" + i, x: "-50%", y: "-50%", width: "200%", height: "200%" }, defs); el("feGaussianBlur", { stdDeviation: s }, f); });
+            var clip = el("clipPath", { id: "rftt-clip" }, defs), clipPoly = el("path", {}, clip);
+            var rimG = el("g", { "clip-path": "url(#rftt-clip)" });
+            var RIMS = [[40, .28, 0], [20, .5, 1], [9, .8, 2], [2.5, 1, -1]].map(function (r) { var a = { fill: "none", stroke: RIM, "stroke-width": r[0], opacity: r[1], "stroke-linecap": "round" }; if (r[2] >= 0) a.filter = "url(#rftt-b" + r[2] + ")"; return el("path", a, rimG); });
+            var SPECS = [{ y: 680, side: 1, f0: 6, txt: sv(v.spec_1, "Spec one") }, { y: 900, side: -1, f0: 16, txt: sv(v.spec_2, "Spec two") }, { y: 1120, side: 1, f0: 26, txt: sv(v.spec_3, "Spec three") }];
+            SPECS.forEach(function (S) {
+              S.line = el("line", { stroke: BRASS, "stroke-width": 2, "stroke-linecap": "round" });
+              S.pen = el("circle", { r: 6, fill: RIM }); S.penG = el("circle", { r: 16, fill: BRASS, opacity: .35, filter: "url(#rftt-b2)" });
+              S.dot = el("circle", { r: 5, fill: BRASS });
+              var d = document.createElement("div"); d.className = "rftt-spec"; d.style.color = INK; d.textContent = S.txt; box.appendChild(d); S.el = d;
+            });
+            var word = box.querySelector(".rftt-word"), capt = box.querySelector(".rftt-cap");
+            word.textContent = sv(v.product_name, "Product name"); word.style.color = INK; capt.textContent = sv(v.caption, "Caption"); capt.style.color = MUTED;
+            function fitW(e, max, min, w) { var s = max; e.style.fontSize = s + "px"; while (s > min && e.scrollWidth > w + 1) { s -= 2; e.style.fontSize = s + "px"; } }
+            fitW(word, 120, 48, 960); fitW(capt, 32, 20, 960);
+
+            var tmp = new T.Vector3(), rightV = new T.Vector3(), fwdV = new T.Vector3();
+            function P(x, y, z) { tmp.set(x, y, z).project(camera); return [(tmp.x + 1) / 2 * 1080, (1 - tmp.y) / 2 * 1920]; }
+            function layoutCam(f) {
+              var el8 = 8 * PI / 180, D = 38.5, ty = PH + SH / 2;
+              camera.position.set(0, ty + D * Math.sin(el8), D * Math.cos(el8)); camera.lookAt(0, ty, 0);
+              camera.zoom = 1 + .02 * ioSine(seg(f, 0, 60)); camera.updateProjectionMatrix(); camera.updateMatrixWorld();
+              rightV.setFromMatrixColumn(camera.matrixWorld, 0); rightV.y = 0; rightV.normalize(); fwdV.set(-rightV.z, 0, rightV.x);
+              if (fwdV.dot(camera.position) > 0) fwdV.negate();
+            }
+            function silhouette() {
+              var L = [], Rt = [], arc = [], h, a;
+              for (h = .3; h <= 6.61; h += .79) { L.push(P(-rightV.x * SR, PH + h, -rightV.z * SR)); Rt.push(P(rightV.x * SR, PH + h, rightV.z * SR)); }
+              for (k = 0; k <= 24; k++) { a = PI - k / 24 * PI; var cx = Math.cos(a) * 1.94, cz = Math.sin(a) * 1.94; arc.push(P(rightV.x * cx + fwdV.x * cz, PH + 7.0, rightV.z * cx + fwdV.z * cz)); }
+              var pts = L.concat(arc, Rt.reverse());
+              return pts;
+            }
+            function dstr(pts) { return "M" + pts.map(function (p) { return p[0].toFixed(1) + "," + p[1].toFixed(1); }).join(" L"); }
+            layoutCam(0); var SIL0 = silhouette(), CX = (SIL0[0][0] + SIL0[SIL0.length - 1][0]) / 2, HW = (SIL0[SIL0.length - 1][0] - SIL0[0][0]) / 2;
+            SPECS.forEach(function (S) {
+              S.ax = CX + S.side * HW * .55;
+              var w = S.side > 0 ? 1020 - (CX + HW + 56) : (CX - HW - 56) - 60;
+              S.el.style.width = w + "px"; S.el.style.textAlign = S.side > 0 ? "left" : "right";
+              if (S.side > 0) S.el.style.left = (CX + HW + 56) + "px"; else S.el.style.left = "60px";
+              var s = 44; S.el.style.fontSize = s + "px";
+              while (s > 28 && (S.el.scrollWidth > w + 1 || S.el.offsetHeight > s * 1.06 * 3 + 2)) { s -= 2; S.el.style.fontSize = s + "px"; }
+              S.h = S.el.offsetHeight; S.ex = S.side > 0 ? CX + HW + 40 : CX - HW - 40;
+            });
+
+            // ---------- frame ----------
+            function draw(t) {
+              var f = t * 30;
+              turn.rotation.y = (f + 50) * 2.4 * PI / 180;
+              layoutCam(f);
+              R.render(scene, camera);
+              // callouts: brass hairline drawn by a pen head over 9 frames, label rises 8px over 6
+              SPECS.forEach(function (S) {
+                var p = ioSine(seg(f, S.f0, S.f0 + 9)), q = oCub(seg(f, S.f0 + 9, S.f0 + 15)), on = f >= S.f0 ? 1 : 0;
+                var x2 = S.ax + (S.ex - S.ax) * p;
+                S.line.setAttribute("x1", S.ax); S.line.setAttribute("y1", S.y); S.line.setAttribute("x2", x2); S.line.setAttribute("y2", S.y); S.line.setAttribute("opacity", on);
+                S.dot.setAttribute("cx", S.ax); S.dot.setAttribute("cy", S.y); S.dot.setAttribute("opacity", on);
+                var po = on * (p < 1 ? 1 : 1 - seg(f, S.f0 + 9, S.f0 + 13));
+                [S.pen, S.penG].forEach(function (c) { c.setAttribute("cx", x2); c.setAttribute("cy", S.y); c.setAttribute("opacity", c === S.pen ? po : po * .35); });
+                S.el.style.top = (S.y - S.h / 2) + "px"; S.el.style.opacity = q; S.el.style.transform = "translateY(" + (8 * (1 - q)).toFixed(1) + "px)";
+              });
+              // payoff rim light: once round the silhouette at linear speed (then repeats with a pause while the card holds)
+              var sil = silhouette(), d = dstr(sil);
+              clipPoly.setAttribute("d", d + " Z");
+              RIMS.forEach(function (r) { r.setAttribute("d", d); });
+              var len = RIMS[3].getTotalLength(), SEG = 300, period = 1.5, tt = t - 32 / 30, cyc = tt >= 0 ? (tt % period) / (27 / 30) : -1;
+              var s = (cyc >= 0 && cyc <= 1) ? cyc * (len + SEG) : -1;
+              RIMS.forEach(function (r) {
+                if (s < 0) { r.setAttribute("opacity", 0); return; }
+                r.setAttribute("stroke-dasharray", SEG + " " + (len * 3)); r.setAttribute("stroke-dashoffset", (SEG - s).toFixed(1)); r.removeAttribute("opacity");
+              });
+              // wordmark + caption
+              var w = oCub(seg(f, 36, 48)), c = oCub(seg(f, 39, 51));
+              word.style.opacity = w; word.style.transform = "translateY(" + (26 * (1 - w)).toFixed(1) + "px)";
+              capt.style.opacity = c; capt.style.transform = "translateY(" + (16 * (1 - c)).toFixed(1) + "px)";
+              box.style.opacity = clamp((secs - t) / .25, 0, 1);
+            }
+            var RIM_OP = [.28, .5, .8, 1];
+            var _draw = draw; draw = function (t) { _draw(t); RIMS.forEach(function (r, i) { if (r.getAttribute("opacity") !== "0") r.setAttribute("opacity", RIM_OP[i]); }); };
+            var st = {}, _t = 0;
+            Object.defineProperty(st, "t", { get: function () { return _t; }, set: function (x) { _t = x; draw(x); } });
+            tl.to(st, { t: secs, duration: secs, ease: "none" }, 0);
+            try { R.compile(scene, camera); } catch (e) {}
+            draw(0);
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

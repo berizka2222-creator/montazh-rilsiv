@@ -1,0 +1,167 @@
+<!doctype html>
+<!-- rf-receipt: a thermal printer on a dark warm table prints a receipt line by line, tears it off and lifts it to the lens.
+     Rebuilt from an ultra-skills motion prompt (3D original, here CSS 3D + gradients). -->
+<html lang="uk" data-composition-id="rf-receipt" data-composition-duration="600" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "store", "type": "string", "label": "Назва магазину", "default": "Store name" },
+  { "id": "subtitle", "type": "string", "label": "Підзаголовок", "default": "Subtitle" },
+  { "id": "title", "type": "string", "label": "Назва чека", "default": "Receipt title" },
+  { "id": "item1", "type": "string", "label": "Позиція 1", "default": "Item" },
+  { "id": "price1", "type": "string", "label": "Ціна 1", "default": "12.00" },
+  { "id": "item2", "type": "string", "label": "Позиція 2", "default": "Item" },
+  { "id": "price2", "type": "string", "label": "Ціна 2", "default": "8.50" },
+  { "id": "item3", "type": "string", "label": "Позиція 3", "default": "Item" },
+  { "id": "price3", "type": "string", "label": "Ціна 3", "default": "4.50" },
+  { "id": "free_item", "type": "string", "label": "Безкоштовна позиція (ціна 0)", "default": "Item" },
+  { "id": "total_label", "type": "string", "label": "Підпис суми", "default": "Total cost" },
+  { "id": "total", "type": "string", "label": "Сума (порожньо = сума цін)", "default": "" },
+  { "id": "currency", "type": "string", "label": "Валюта (знак перед ціною)", "default": "$" },
+  { "id": "currency_after", "type": "string", "label": "Валюта після ціни (напр. грн)", "default": "" },
+  { "id": "bg", "type": "color", "label": "Фон (сцена, світліше)", "default": "#1c100a" },
+  { "id": "bg2", "type": "color", "label": "Фон (сцена, середній)", "default": "#100906" },
+  { "id": "bg3", "type": "color", "label": "Фон (сцена, найтемніший)", "default": "#070403" },
+  { "id": "table", "type": "color", "label": "Стіл", "default": "#1a120e" },
+  { "id": "printer", "type": "color", "label": "Корпус принтера", "default": "#070403" },
+  { "id": "printer_edge", "type": "color", "label": "Грань принтера", "default": "#251913" },
+  { "id": "glow", "type": "color", "label": "Лампочка (LED)", "default": "#ffc24b" },
+  { "id": "key", "type": "color", "label": "Тепле світло зліва", "default": "#ff6a2a" },
+  { "id": "surface", "type": "color", "label": "Папір чека", "default": "#fffdf8" },
+  { "id": "ink", "type": "color", "label": "Друк (основний)", "default": "#17130f" },
+  { "id": "muted", "type": "color", "label": "Друк (другорядний)", "default": "#5e554b" },
+  { "id": "accent", "type": "color", "label": "Підкреслення суми", "default": "#e5432d" },
+  { "id": "shadow", "type": "color", "label": "Тінь", "default": "#050100" },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 2 }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-receipt</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-receipt" data-duration="600" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; overflow: hidden; }
+          .rfrc { position: absolute; inset: 0; overflow: hidden; background: var(--rc-bg3); perspective: 1800px; perspective-origin: 50% 30%; }
+          .rfrc-back { position: absolute; inset: -40px; }
+          .rfrc-stage { position: absolute; inset: 0; background: radial-gradient(120% 70% at 50% 0%, var(--rc-bg) 0%, var(--rc-bg2) 55%, var(--rc-bg3) 100%); }
+          .rfrc-table { position: absolute; left: 0; right: 0; top: 520px; bottom: 0;
+                        background: linear-gradient(180deg, color-mix(in srgb, var(--rc-table) 0%, transparent) 0%, var(--rc-table) 18%, var(--rc-table) 60%, var(--rc-bg2) 100%); }
+          .rfrc-key { position: absolute; inset: 0; z-index: 6; mix-blend-mode: screen;
+                      background: radial-gradient(70% 45% at 8% 22%, color-mix(in srgb, var(--rc-key) 30%, transparent) 0%, color-mix(in srgb, var(--rc-key) 8%, transparent) 45%, transparent 75%); }
+          .rfrc-grain { position: absolute; inset: 0; opacity: .5; mix-blend-mode: overlay;
+                        background-image: repeating-linear-gradient(91deg, rgba(255,255,255,.02) 0 2px, rgba(0,0,0,.05) 2px 5px); }
+          .rfrc-printer { position: absolute; z-index: 2; left: 170px; top: 340px; width: 740px; height: 280px; border-radius: 38px;
+                          background: linear-gradient(180deg, var(--rc-edge) 0%, color-mix(in srgb, var(--rc-edge) 40%, var(--rc-printer)) 9%, var(--rc-printer) 45%, color-mix(in srgb, var(--rc-edge) 12%, var(--rc-printer)) 100%);
+                          box-shadow: inset 0 3px 0 color-mix(in srgb, var(--rc-edge) 75%, #fff 25%), inset 0 0 0 2px var(--rc-edge), inset 0 -6px 14px rgba(0,0,0,.9),
+                                      0 40px 60px color-mix(in srgb, var(--rc-shadow) 85%, transparent), 0 8px 18px color-mix(in srgb, var(--rc-shadow) 90%, transparent); }
+          .rfrc-printer::before { content: ""; position: absolute; left: 24px; right: 24px; top: 18px; height: 90px; border-radius: 26px;
+                          background: linear-gradient(180deg, color-mix(in srgb, var(--rc-edge) 70%, var(--rc-printer)), var(--rc-printer)); box-shadow: inset 0 2px 0 var(--rc-edge); }
+          .rfrc-slot { position: absolute; left: 70px; right: 70px; top: 236px; height: 16px; border-radius: 8px; background: #000;
+                       box-shadow: inset 0 3px 6px rgba(0,0,0,1), 0 1px 0 var(--rc-edge); }
+          .rfrc-bar { position: absolute; left: 60px; right: 60px; top: 254px; height: 14px;
+                      background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--rc-edge) 80%, #fff 20%) 0 6px, var(--rc-printer) 6px 12px);
+                      clip-path: polygon(0 0, 100% 0, 100% 40%, 0 40%); }
+          .rfrc-led { position: absolute; right: 70px; top: 52px; width: 18px; height: 18px; border-radius: 50%; background: var(--rc-glow); opacity: .22; }
+          .rfrc-ledglow { position: absolute; right: 49px; top: 31px; width: 60px; height: 60px; border-radius: 50%; opacity: 0;
+                          background: radial-gradient(circle, color-mix(in srgb, var(--rc-glow) 90%, transparent) 0 14%, color-mix(in srgb, var(--rc-glow) 35%, transparent) 30%, transparent 70%); }
+          .rfrc-shadow { position: absolute; left: 216px; top: 600px; width: 660px; height: 0; background: color-mix(in srgb, var(--rc-shadow) 85%, transparent); border-radius: 6px; }
+          .rfrc-rwrap { position: absolute; z-index: 1; left: 210px; top: 588px; width: 660px; transform-origin: 50% 70%; transform-style: preserve-3d; }
+          .rfrc-clip { position: relative; width: 660px; height: 0; overflow: hidden; }
+          .rfrc-paper { position: relative; width: 660px; background: var(--rc-surface); color: var(--rc-ink); padding: 34px 44px 46px; box-sizing: border-box;
+                        font-family: ui-monospace, Menlo, monospace;
+                        box-shadow: inset 0 -30px 40px -30px color-mix(in srgb, var(--rc-muted) 25%, transparent), inset 18px 0 30px -26px color-mix(in srgb, var(--rc-muted) 30%, transparent), inset -18px 0 30px -26px color-mix(in srgb, var(--rc-muted) 30%, transparent);
+                        background-image: linear-gradient(90deg, rgba(0,0,0,.04), rgba(0,0,0,0) 12%, rgba(0,0,0,0) 88%, rgba(0,0,0,.05)); }
+          .rfrc-ln { display: flex; align-items: center; white-space: nowrap; line-height: 1.2; }
+          .rfrc-c { justify-content: center; text-align: center; }
+          .rfrc-s { color: var(--rc-muted); }
+          .rfrc-j { justify-content: space-between; }
+          .rfrc-j span, .rfrc-j b { flex-shrink: 0; }
+          .rfrc-rule { border-top: 3px dashed var(--rc-muted); height: 0; margin: 22px 0; }
+          .rfrc-tot { font-weight: 800; }
+          .rfrc-tot b { font-weight: 800; border-bottom: 6px solid var(--rc-accent); padding-bottom: 2px; }
+          .rfrc-tear { position: absolute; left: 0; right: 0; top: -1px; height: 16px; opacity: 0;
+                       background: var(--rc-bg3); clip-path: polygon(0 0,100% 0,100% 30%,97% 70%,94% 25%,91% 80%,88% 30%,85% 65%,82% 20%,79% 75%,76% 35%,73% 70%,70% 25%,67% 85%,64% 30%,61% 70%,58% 20%,55% 75%,52% 35%,49% 80%,46% 25%,43% 65%,40% 30%,37% 75%,34% 20%,31% 70%,28% 35%,25% 80%,22% 25%,19% 70%,16% 30%,13% 75%,10% 20%,7% 65%,4% 30%,0 70%); }
+          .rfrc-curl { position: absolute; right: 0; top: 0; width: 0; height: 0; opacity: 0; box-shadow: -4px 4px 8px rgba(0,0,0,.25);
+                       background: linear-gradient(225deg, var(--rc-bg3) 0 50%, color-mix(in srgb, var(--rc-surface) 90%, var(--rc-muted)) 50%, var(--rc-surface) 62%, color-mix(in srgb, var(--rc-surface) 78%, var(--rc-muted)) 100%); }
+          .rfrc-fade { position: absolute; inset: 0; z-index: 7; background: #000; opacity: 0; pointer-events: none; }
+        </style>
+        <div class="rfrc">
+          <div class="rfrc-back">
+            <div class="rfrc-stage"></div><div class="rfrc-table"></div><div class="rfrc-grain"></div>
+            <div class="rfrc-shadow"></div>
+          </div>
+          <div class="rfrc-printer"><div class="rfrc-slot"></div><div class="rfrc-bar"></div><div class="rfrc-led"></div><div class="rfrc-ledglow"></div></div>
+          <div class="rfrc-rwrap"><div class="rfrc-clip"><div class="rfrc-paper"></div><div class="rfrc-tear"></div><div class="rfrc-curl"></div></div></div>
+          <div class="rfrc-key"></div><div class="rfrc-fade"></div>
+        </div>
+        <script>
+          (function () {
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            function g(k, d) { return (v[k] === undefined || v[k] === null) ? d : v[k]; }
+            var secs = Math.max(1, +g("seconds", 2)), F = 1 / 30;
+            var root = document.querySelector(".rfrc"), paper = root.querySelector(".rfrc-paper"), clip = root.querySelector(".rfrc-clip");
+            var wrap = root.querySelector(".rfrc-rwrap"), back = root.querySelector(".rfrc-back"), printer = root.querySelector(".rfrc-printer");
+            var PAL = { bg: "#1c100a", bg2: "#100906", bg3: "#070403", table: "#1a120e", printer: "#070403", edge: ["printer_edge", "#251913"], glow: "#ffc24b",
+                        key: "#ff6a2a", surface: "#fffdf8", ink: "#17130f", muted: "#5e554b", accent: "#e5432d", shadow: "#050100" };
+            Object.keys(PAL).forEach(function (k) { var d = PAL[k], id = Array.isArray(d) ? d[0] : k, def = Array.isArray(d) ? d[1] : d;
+              root.style.setProperty("--rc-" + k, String(g(id, def) || def)); });
+            var cur = String(g("currency", "$")), curA = String(g("currency_after", ""));
+            function num(s) { var n = parseFloat(String(s).replace(",", ".").replace(/[^0-9.\-]/g, "")); return isNaN(n) ? 0 : n; }
+            function money(n) { return cur + (typeof n === "number" ? n.toFixed(2) : String(n)) + (curA ? " " + curA : ""); }
+            var items = [[g("item1", "Item"), g("price1", "12.00")], [g("item2", "Item"), g("price2", "8.50")], [g("item3", "Item"), g("price3", "4.50")]];
+            var sum = items.reduce(function (a, it) { return a + num(it[1]); }, 0);
+            var totalTxt = String(g("total", "")).trim() ? money(String(g("total", "")).trim()) : money(sum);
+            var esc = function (s) { return String(s).replace(/[&<>]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]; }); };
+            // the 8 printed lines (each one is one printer step)
+            var L = [
+              '<div class="rfrc-ln rfrc-c" style="font-size:48px;font-weight:800;padding:22px 0 10px">' + esc(g("store", "Store name")) + '</div>',
+              '<div class="rfrc-ln rfrc-c rfrc-s" style="font-size:32px;padding:6px 0 40px">' + esc(g("subtitle", "Subtitle")) + '</div>',
+              '<div><div class="rfrc-ln rfrc-c" style="font-size:36px;font-weight:700;padding:6px 0 10px">' + esc(g("title", "Receipt title")) + '</div><div class="rfrc-rule"></div></div>'
+            ];
+            items.forEach(function (it) { L.push('<div class="rfrc-ln rfrc-j" style="font-size:38px;padding:20px 0"><span>' + esc(it[0]) + '</span><span>&nbsp;' + esc(money(num(it[1]))) + '</span></div>'); });
+            L.push('<div class="rfrc-ln rfrc-j rfrc-s" style="font-size:38px;padding:20px 0"><span>' + esc(g("free_item", "Item")) + '</span><span>&nbsp;' + esc(money(0)) + '</span></div>');
+            L.push('<div><div class="rfrc-rule"></div><div class="rfrc-ln rfrc-j rfrc-tot" style="font-size:64px;padding:30px 0 10px"><span>' + esc(g("total_label", "Total cost")) + '</span><b style="margin-left:18px">' + esc(totalTxt) + '</b></div></div>');
+            paper.innerHTML = L.map(function (h) { return '<div class="rfrc-step">' + h + '</div>'; }).join("");
+                        // shrink any line that does not fit the 572px print width
+            paper.querySelectorAll(".rfrc-ln").forEach(function (ln) {
+              var fs = parseFloat(ln.style.fontSize), guard = 0;
+              while (ln.scrollWidth > 573 && fs > 18 && guard++ < 60) { fs -= 1; ln.style.fontSize = fs + "px"; }
+            });
+            // cumulative heights: the paper feeds one printed line per step
+            var steps = paper.querySelectorAll(".rfrc-step"), H = [], acc = 34;
+            steps.forEach(function (s, i) { acc += s.offsetHeight; H.push(i === steps.length - 1 ? acc + 70 : acc); });
+            var fullH = H[H.length - 1];
+            var tl = gsap.timeline({ paused: true });
+            var at = [2, 7, 12, 17, 22, 27, 32, 34], led = root.querySelector(".rfrc-ledglow"), ledDot = root.querySelector(".rfrc-led");
+            var shadow = root.querySelector(".rfrc-shadow");
+            tl.set(clip, { height: 0 }, 0); tl.set(shadow, { height: 0 }, 0);
+            at.forEach(function (f, i) {
+              var d = (i === at.length - 1) ? 2 : 3;
+              tl.to(clip, { height: H[i], duration: d * F, ease: "power2.inOut" }, (f - 1) * F);
+              tl.to(shadow, { height: H[i] - 10, duration: d * F, ease: "power2.inOut" }, (f - 1) * F);
+              tl.set(led, { opacity: 1 }, (f - 1) * F); tl.set(ledDot, { opacity: 1 }, (f - 1) * F);
+              tl.set(led, { opacity: 0 }, (f + 1) * F); tl.set(ledDot, { opacity: .22 }, (f + 1) * F);
+              tl.fromTo(wrap, { y: 0 }, { keyframes: [{ y: 2, duration: F }, { y: 0, duration: F }] }, (f + d - 1) * F);
+            });
+            // frame 38: tear (jolt, jagged top edge, one curled corner)
+            tl.to(wrap, { keyframes: [{ x: 6, y: -6, duration: F, ease: "none" }, { x: 0, y: 0, duration: F, ease: "power2.out" }] }, 38 * F);
+            tl.set(root.querySelector(".rfrc-tear"), { opacity: 1 }, 39 * F);
+            tl.fromTo(root.querySelector(".rfrc-curl"), { width: 0, height: 0, opacity: 1 }, { width: 46, height: 46, opacity: 1, duration: 3 * F, ease: "power2.out" }, 39 * F);
+            // frames 40-52: lift toward the lens, shadow stays on the table, depth of field on the total
+            var tot = paper.querySelector('.rfrc-tot'), totC = tot.offsetTop + tot.offsetHeight / 2, oY = fullH * 0.7;
+            var liftY = 1240 - 588 - oY - (totC - oY) * 1.08;   // total line lands near y 1240     // total line lands near y 1240
+            var lift = { duration: 12 * F, ease: "power3.out" };
+            tl.to(wrap, Object.assign({ y: Math.min(0, liftY), scale: 1.08, rotationX: 14, z: 60 }, lift), 40 * F);
+            tl.to(wrap, { zIndex: 5, duration: 0 }, 40 * F);
+            tl.to(shadow, Object.assign({ x: 50, y: 60, scaleX: 1.12, scaleY: 1.06, opacity: .55, filter: "blur(28px)" }, lift), 40 * F);
+            tl.to([back, printer], Object.assign({ filter: "blur(12px)" }, lift), 40 * F);
+            // frames 52-59: drift 1 degree, LED pulses once; then a slow idle drift
+            tl.to(wrap, { rotation: 1, duration: 7 * F, ease: "sine.inOut" }, 52 * F);
+            tl.fromTo(led, { opacity: 0 }, { keyframes: [{ opacity: 1, duration: 3 * F }, { opacity: 0, duration: 4 * F }] }, 52 * F);
+            tl.fromTo(ledDot, { opacity: .22 }, { keyframes: [{ opacity: 1, duration: 3 * F }, { opacity: .22, duration: 4 * F }] }, 52 * F);
+            if (secs > 2.4) tl.to(wrap, { rotation: -0.4, y: "-=8", duration: secs - 59 * F, ease: "sine.inOut" }, 59 * F);
+            tl.to(root.querySelector(".rfrc-fade"), { opacity: 1, duration: 0.25, ease: "power2.in" }, Math.max(1.0, secs - 0.25));
+            window.__timelines = window.__timelines || {};
+            window.__timelines["rf-receipt"] = tl;
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

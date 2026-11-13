@@ -1,0 +1,176 @@
+<!doctype html>
+<!-- rf-split-flap: a black station departure board; rows of hinged flaps cascade through random letters into the sentence, the last row lands
+     and flips amber -> green as a lamp comes on. Rebuilt from an ultra-skills motion prompt. -->
+<html lang="uk" data-composition-id="rf-split-flap" data-composition-duration="600" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "lines", "type": "string", "label": "Рядки табло (через /, до 13 знаків у рядку)", "default": "LINE 1/LINE 2/LINE 3/LINE 4" },
+  { "id": "last", "type": "string", "label": "Останній рядок (стає зеленим, до 12 знаків)", "default": "NOW BOARDING" },
+  { "id": "plate", "type": "string", "label": "Табличка над табло", "default": "DEPARTURES" },
+  { "id": "align", "type": "enum", "label": "Вирівнювання рядків", "default": "left", "options": [{ "value": "left", "label": "ліворуч" }, { "value": "center", "label": "по центру" }] },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 3 },
+  { "id": "bg", "type": "color", "label": "Табло (фон)", "default": "#070403" },
+  { "id": "surface", "type": "color", "label": "Пластинки (флапи)", "default": "#1a120e" },
+  { "id": "muted", "type": "color", "label": "Тьмяний напис таблички", "default": "#7d6455" },
+  { "id": "accent", "type": "color", "label": "Літери (бурштин) і світло зверху", "default": "#ffc24b" },
+  { "id": "accent2", "type": "color", "label": "Останній рядок і лампа (зелений)", "default": "#22c55e" }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-split-flap</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-split-flap" data-duration="600" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; overflow: hidden; }
+          .rfsf { position: absolute; inset: 0; overflow: hidden; perspective: 2000px; perspective-origin: 50% 45%; }
+          .rfsf .rfsf-pl { position: absolute; left: -60px; top: -60px; width: 1200px; height: 2040px; transform-style: preserve-3d; transform-origin: 50% 45%; }
+          .rfsf .rfsf-in { position: absolute; left: 60px; top: 60px; width: 1080px; height: 1920px; }
+          .rfsf .rfsf-lt { position: absolute; inset: 0; pointer-events: none; }
+          .rfsf .rfsf-plate { position: absolute; left: 60px; right: 60px; top: 318px; height: 44px; display: flex; align-items: center;
+                              font-family: ui-monospace, Menlo, monospace; font-weight: 700; font-size: 36px; letter-spacing: .32em; color: var(--rfsf-muted); white-space: nowrap; }
+          .rfsf .rfsf-c { position: absolute; width: 66px; height: 112px; }
+          .rfsf .rfsf-h { position: absolute; left: 0; width: 66px; height: 55px; overflow: hidden; border-radius: 5px 5px 1px 1px; background: var(--rfsf-face);
+                          backface-visibility: hidden; }
+          .rfsf .rfsf-h.rfsf-b { top: 57px; border-radius: 1px 1px 5px 5px; background: color-mix(in srgb, var(--rfsf-face) 88%, #000); }
+          .rfsf .rfsf-h.rfsf-t { top: 0; }
+          .rfsf .rfsf-tl { transform-origin: 50% 100%; }
+          .rfsf .rfsf-bl { transform-origin: 50% 0; }
+          .rfsf .rfsf-g { position: absolute; left: 0; width: 66px; height: 112px; line-height: 112px; text-align: center;
+                          font-family: ui-monospace, Menlo, monospace; font-weight: 800; font-size: 72px; color: var(--rfsf-amber); }
+          .rfsf .rfsf-b .rfsf-g { top: -57px; }
+          .rfsf .rfsf-t .rfsf-g { top: 0; }
+          .rfsf .rfsf-sd { position: absolute; inset: 0; background: #000; opacity: 0; }
+          .rfsf .rfsf-hg { position: absolute; left: 0; right: 0; top: 55px; height: 2px; background: color-mix(in srgb, var(--rfsf-board) 70%, #000); }
+          .rfsf .rfsf-e { position: absolute; width: 66px; height: 112px; border-radius: 5px;
+                          background: linear-gradient(180deg, var(--rfsf-face) 0 49%, color-mix(in srgb, var(--rfsf-board) 70%, #000) 49% 51%, color-mix(in srgb, var(--rfsf-face) 88%, #000) 51% 100%); opacity: .55; }
+          .rfsf .rfsf-lamp { position: absolute; width: 26px; height: 26px; border-radius: 50%; background: color-mix(in srgb, var(--rfsf-green) 18%, var(--rfsf-board)); box-shadow: inset 0 2px 4px rgba(0,0,0,.7); }
+        </style>
+        <div class="rfsf"><div class="rfsf-pl"><div class="rfsf-in"><div class="rfsf-plate"></div></div><div class="rfsf-lt"></div></div></div>
+        <script>
+          (function () {
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            var ID = "rf-split-flap", secs = Math.max(1, +v.seconds || 3), FR = 30;
+            var BOARD = v.bg || "#070403", AMB = v.accent || "#ffc24b", GRN = v.accent2 || "#22c55e";
+            var CV = { board: BOARD, face: v.surface || "#1a120e", muted: v.muted || "#7d6455", amber: AMB, green: GRN };
+            var R = document.querySelector(".rfsf"), PL = R.querySelector(".rfsf-pl"), IN = R.querySelector(".rfsf-in");
+            function mk(tag, cls, par) { var e = document.createElement(tag); if (cls) e.className = cls; if (par) par.appendChild(e); return e; }
+            function mb32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+            function cl(x, a, b) { return x < a ? a : x > b ? b : x; }
+            for (var cvk in CV) R.style.setProperty("--rfsf-" + cvk, CV[cvk]);
+            R.style.background = BOARD;
+            R.querySelector(".rfsf-lt").style.background = "radial-gradient(ellipse 900px 700px at 50% -120px, color-mix(in srgb, " + AMB + " 15%, transparent), transparent 70%)";
+            IN.querySelector(".rfsf-plate").textContent = String(v.plate == null ? "DEPARTURES" : v.plate).toUpperCase();
+            // rows: "/" separated, wrapped to 13 cells, max 6 rows
+            var COLS = 13, raw = String(v.lines == null ? "LINE 1/LINE 2/LINE 3/LINE 4" : v.lines).toUpperCase().split("/"), rows = [];
+            raw.forEach(function (seg) {
+              seg = seg.replace(/\s+/g, " ").trim(); if (!seg) return;
+              var cur = "";
+              seg.split(" ").forEach(function (w) {
+                while (w.length > COLS) { if (cur) { rows.push(cur); cur = ""; } rows.push(w.slice(0, COLS)); w = w.slice(COLS); }
+                if (!w) return;
+                if (!cur) cur = w; else if ((cur + " " + w).length <= COLS) cur += " " + w; else { rows.push(cur); cur = w; }
+              });
+              if (cur) rows.push(cur);
+            });
+            rows = rows.slice(0, 6); if (!rows.length) rows = [""];
+            var last = String(v.last == null ? "NOW BOARDING" : v.last).toUpperCase().replace(/\s+/g, " ").trim().slice(0, 12);
+            var center = v.align === "center";
+            function pad(s, n) { var l = center ? Math.floor((n - s.length) / 2) : 0; var o = ""; for (var i = 0; i < n; i++) o += (i >= l && i - l < s.length) ? s[i - l] : " "; return o; }
+            // geometry
+            var CW = 66, CH = 112, GAP = 5, X0 = (1080 - (COLS * CW + (COLS - 1) * GAP)) / 2, PITCH = CH + 14;
+            var NR = rows.length, blockH = NR * PITCH + 40 + CH, Y0 = 420;
+            if (Y0 + blockH > 1460) Y0 = Math.max(400, 1460 - blockH);
+            var plate = IN.querySelector(".rfsf-plate"); plate.style.top = (Y0 - 92) + "px"; plate.style.left = X0 + "px";
+            var rowY = []; for (var r = 0; r < NR; r++) rowY.push(Y0 + r * PITCH); var lastY = Y0 + NR * PITCH + 40 - 14;
+            // decorative empty flaps so the board fills the frame
+            var used = rowY.concat([lastY]);
+            for (var yy = lastY + PITCH + 26; yy < 2000; yy += PITCH) used.push(yy);
+            for (yy = Y0 - 92 - 30 - CH; yy > -140; yy -= PITCH) used.push(yy);
+            used.forEach(function (y, i) {
+              if (i <= NR) return;
+              for (var c = 0; c < COLS; c++) { var e = mk("div", "rfsf-e", IN); e.style.left = (X0 + c * (CW + GAP)) + "px"; e.style.top = y + "px"; }
+            });
+            var CYR = "АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЮЯІЄ", LAT = "ABCDEFGHJKLMNOPRSTUVWXYZ", DIG = "0123456789#&?";
+            var all = rows.join("") + last, hasCyr = /[А-ЯЁІЇЄҐ]/.test(all), CHARS = (hasCyr ? CYR : LAT) + DIG;
+            var cells = [];
+            function build(text, y, rowIdx, isLast) {
+              var s = isLast ? (pad(text, 12) + " ") : pad(text, COLS);
+              for (var c = 0; c < COLS; c++) {
+                var x = X0 + c * (CW + GAP);
+                if (isLast && c === 12) { var lp = mk("div", "rfsf-lamp", IN); lp.style.left = (x + (CW - 26) / 2) + "px"; lp.style.top = (y + (CH - 26) / 2) + "px"; cells.lamp = lp; continue; }
+                var ch = s[c], el = mk("div", "rfsf-c", IN); el.style.left = x + "px"; el.style.top = y + "px";
+                var parts = {};
+                ["ts", "bs", "tl", "bl"].forEach(function (k) {
+                  var h = mk("div", "rfsf-h " + (k[0] === "t" ? "rfsf-t" : "rfsf-b") + (k[1] === "l" ? " rfsf-" + k : ""), el);
+                  var g = mk("div", "rfsf-g", h); var sd = mk("div", "rfsf-sd", h); parts[k] = { h: h, g: g, sd: sd, ch: null, col: null };
+                });
+                mk("div", "rfsf-hg", el);
+                // events
+                var rnd = mb32(1000 + rowIdx * 97 + c * 13), ev = [];
+                if (ch !== " ") {
+                  var a, L;
+                  if (!isLast) { var S = 4 + rowIdx * STEP; a = S + c; L = S + 6 + c + Math.floor(rnd() * 2); }
+                  else { a = 14 + c; L = 34 + c * 0.6; }
+                  for (var t = a; t <= L - 3; t += 3) ev.push({ t: t, ch: CHARS[Math.floor(rnd() * CHARS.length)], col: AMB });
+                  ev.push({ t: L - 2, ch: CHARS[Math.floor(rnd() * CHARS.length)], col: AMB });
+                  ev.push({ t: L - 1, ch: CHARS[Math.floor(rnd() * CHARS.length)], col: AMB });
+                  ev.push({ t: L, ch: ch, col: AMB, fin: 1 });
+                  if (isLast) ev.push({ t: 44 + c * (5 / 11), ch: ch, col: GRN, fin: 1 });
+                  ev.sort(function (p, q) { return p.t - q.t; });
+                  for (var i = 0; i < ev.length; i++) ev[i].d = i < ev.length - 1 ? Math.min(2, ev[i + 1].t - ev[i].t) : 2;
+                }
+                cells.push({ p: parts, ev: ev });
+              }
+            }
+            var STEP = NR > 1 ? Math.min(8, 24 / (NR - 1)) : 8;
+            rows.forEach(function (t, i) { build(t, rowY[i], i, false); });
+            build(last, lastY, NR, true);
+            function setH(part, ch, col) {
+              if (part.ch !== ch) { part.g.textContent = ch; part.ch = ch; }
+              if (part.col !== col) { part.g.style.color = col; part.col = col; }
+            }
+            function render(f) {
+              f = Math.round(f * 1000) / 1000;
+              PL.style.transform = "rotateY(-5deg) rotateX(2deg) scale(" + (1 + 0.05 * cl(f / 90, 0, 1)) + ")";
+              for (var i = 0; i < cells.length; i++) {
+                var C = cells[i], P = C.p, ev = C.ev, k = -1;
+                for (var j = 0; j < ev.length; j++) if (ev[j].t <= f) k = j;
+                var prev = k <= 0 ? { ch: " ", col: AMB } : ev[k - 1], cur = k < 0 ? { ch: " ", col: AMB } : ev[k];
+                var p = k < 0 ? 1 : cl((f - cur.t) / cur.d, 0, 1);
+                setH(P.ts, cur.ch, cur.col); setH(P.bs, p >= 1 ? cur.ch : prev.ch, p >= 1 ? cur.col : prev.col);
+                if (p < 0.5) {
+                  var a1 = 180 * p; setH(P.tl, prev.ch, prev.col);
+                  P.tl.h.style.visibility = "inherit"; P.tl.h.style.transform = "rotateX(" + (-a1) + "deg)"; P.tl.sd.style.opacity = (0.55 * Math.sin(a1 * Math.PI / 180)).toFixed(3);
+                  P.bl.h.style.visibility = "hidden";
+                } else if (p < 1) {
+                  var a2 = 180 * (1 - p); setH(P.bl, cur.ch, cur.col);
+                  P.tl.h.style.visibility = "hidden";
+                  P.bl.h.style.visibility = "inherit"; P.bl.h.style.transform = "rotateX(" + a2 + "deg)"; P.bl.sd.style.opacity = (0.55 * Math.sin(a2 * Math.PI / 180)).toFixed(3);
+                } else {
+                  P.tl.h.style.visibility = "hidden";
+                  // 1-frame overshoot and settle after the final flip
+                  var q = k >= 0 && cur.fin ? (f - cur.t - cur.d) / 1.5 : 2;
+                  if (q >= 0 && q < 1) { var a3 = 14 * Math.sin(Math.PI * q) * (1 - q * 0.5); setH(P.bl, cur.ch, cur.col);
+                    P.bl.h.style.visibility = "inherit"; P.bl.h.style.transform = "rotateX(" + a3 + "deg)"; P.bl.sd.style.opacity = (0.4 * Math.sin(a3 * Math.PI / 180)).toFixed(3); }
+                  else P.bl.h.style.visibility = "hidden";
+                }
+              }
+              var lp = cells.lamp;
+              if (lp) {
+                if (f >= 49) { var pu = 0.5 + 0.5 * Math.cos(2 * Math.PI * (f - 49) / 12), on = cl((f - 49) / 1.5, 0, 1);
+                  lp.style.background = GRN; lp.style.opacity = 0.35 + 0.65 * on;
+                  lp.style.boxShadow = "0 0 " + (14 + 18 * pu) * on + "px " + (4 + 6 * pu) * on + "px " + GRN + ", inset 0 -3px 5px rgba(0,0,0,.35)"; }
+                else { lp.style.background = "color-mix(in srgb, var(--rfsf-green) 18%, var(--rfsf-board))"; lp.style.opacity = 1; lp.style.boxShadow = "inset 0 2px 4px rgba(0,0,0,.7)"; }
+              }
+              R.style.opacity = f / FR > secs - 0.25 ? cl((secs - f / FR) / 0.25, 0, 1) : 1;
+            }
+            var st = { _f: 0 };
+            Object.defineProperty(st, "f", { get: function () { return this._f; }, set: function (x) { this._f = x; render(x); } });
+            render(0);
+            var tl = gsap.timeline({ paused: true });
+            tl.fromTo(st, { f: 0 }, { f: secs * FR, duration: secs, ease: "none", immediateRender: false }, 0);
+            window.__timelines = window.__timelines || {};
+            window.__timelines[ID] = tl;
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

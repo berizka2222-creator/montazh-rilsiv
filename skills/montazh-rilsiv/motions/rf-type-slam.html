@@ -1,0 +1,138 @@
+<!doctype html>
+<!-- rf-type-slam: three huge words slam into the frame with 2-frame negative hits, the third fills the frame edge to edge on a solid floor,
+     then orange rises through the letters like a level meter. Rebuilt from an ultra-skills motion prompt. -->
+<html lang="uk" data-composition-id="rf-type-slam" data-composition-duration="600" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "word1", "type": "string", "label": "Слово 1", "default": "WORD ONE" },
+  { "id": "word2", "type": "string", "label": "Слово 2", "default": "WORD TWO" },
+  { "id": "word3", "type": "string", "label": "Слово 3 (велике, на весь кадр)", "default": "WORD THREE" },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 2 },
+  { "id": "bg", "type": "color", "label": "Фон (центр)", "default": "#17181b" },
+  { "id": "bg2", "type": "color", "label": "Фон (середина)", "default": "#0e0f11" },
+  { "id": "bg3", "type": "color", "label": "Фон (краї)", "default": "#08080a" },
+  { "id": "ink", "type": "color", "label": "Колір літер", "default": "#f4f4f2" },
+  { "id": "inv_bg", "type": "color", "label": "Фон у негативі (удар)", "default": "#f4f4f2" },
+  { "id": "inv_ink", "type": "color", "label": "Літери в негативі (удар)", "default": "#0e0f11" },
+  { "id": "accent", "type": "color", "label": "Колір заливки", "default": "#ff6b2c" }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-type-slam</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-type-slam" data-duration="600" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; overflow: hidden; }
+          .rfts { position: absolute; inset: 0; overflow: hidden; }
+          .rfts .rfts-gr { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; opacity: .09; pointer-events: none; }
+          .rfts .rfts-fx { position: absolute; inset: 0; }
+          .rfts .rfts-w { position: absolute; left: 0; width: 1080px; text-align: center; white-space: nowrap; line-height: 1;
+                          font-family: var(--font-display, "Archivo Black", sans-serif); font-weight: 900; text-transform: uppercase; letter-spacing: -0.02em;
+                          transform-origin: 50% 50%; will-change: transform, filter; }
+          .rfts .rfts-3 { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 540px 960px; }
+          .rfts .rfts-3 svg { position: absolute; left: 0; top: 0; overflow: visible; }
+          .rfts .rfts-3 text { font-family: var(--font-display, "Archivo Black", sans-serif); font-weight: 900; }
+        </style>
+        <div class="rfts">
+          <div class="rfts-fx">
+            <div class="rfts-w rfts-w1"></div>
+            <div class="rfts-w rfts-w2"></div>
+            <div class="rfts-3">
+              <svg class="rfts-s1" width="1080" height="1920" viewBox="0 0 1080 1920"><g><text x="0" y="0" font-size="400"></text><rect x="-60" y="1530" width="1200" height="460" /></g></svg>
+              <svg class="rfts-s2" width="1080" height="1920" viewBox="0 0 1080 1920"><g><text x="0" y="0" font-size="400"></text><rect x="-60" y="1530" width="1200" height="460" /></g></svg>
+            </div>
+          </div>
+          <canvas class="rfts-gr" width="540" height="960"></canvas>
+        </div>
+        <script>
+          (function () {
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            var ID = "rf-type-slam", secs = Math.max(1, +v.seconds || 2), FR = 30;
+            var STAGE = v.bg || "#17181b", BG2 = v.bg2 || "#0e0f11", BG3 = v.bg3 || "#08080a", TYPE = v.ink || "#f4f4f2", CHG = v.accent || "#ff6b2c",
+                INVG = v.inv_bg || "#f4f4f2", INVT = v.inv_ink || "#0e0f11";
+            var R = document.querySelector(".rfts");
+            function q(s) { return R.querySelector(s); }
+            function mb32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+            function cl(x, a, b) { return x < a ? a : x > b ? b : x; }
+            function lin(f, a, b) { return cl((f - a) / (b - a), 0, 1); }
+            function eiq(p) { return p * p; }
+            function eio(p) { return p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2; }
+            function spr(df, damping) { if (df <= 0) return 0; var w = 10, z = damping / 20, s = df / 30, wd = w * Math.sqrt(1 - z * z);
+              return 1 - Math.exp(-z * w * s) * (Math.cos(wd * s) + z * w / wd * Math.sin(wd * s)); }
+            var W1 = String(v.word1 == null ? "WORD ONE" : v.word1).toUpperCase(), W2 = String(v.word2 == null ? "WORD TWO" : v.word2).toUpperCase(),
+                W3 = String(v.word3 == null ? "WORD THREE" : v.word3).toUpperCase().trim() || " ";
+            var w1 = q(".rfts-w1"), w2 = q(".rfts-w2"), g3 = q(".rfts-3");
+            w1.textContent = W1; w2.textContent = W2;
+            var t1 = q(".rfts-s1 text"), t2 = q(".rfts-s2 text"), r1 = q(".rfts-s1 rect"), r2 = q(".rfts-s2 rect"), s2 = q(".rfts-s2");
+            t1.textContent = W3; t2.textContent = W3; t2.setAttribute("fill", CHG); r2.setAttribute("fill", CHG);
+            // static grain from a fixed seed
+            (function () { var c = q(".rfts-gr"), x = c.getContext("2d"), im = x.createImageData(540, 960), d = im.data, r = mb32(1729);
+              for (var i = 0; i < d.length; i += 4) { var b = r() < 0.5 ? 0 : 255; d[i] = d[i + 1] = d[i + 2] = b; d[i + 3] = Math.floor(r() * 140); }
+              x.putImageData(im, 0, 0); })();
+            var y1 = 760, y2 = 960;
+            function layout() {
+              // words 1 and 2: as big as fits 940px, max 230px, stacked around the centre
+              [w1, w2].forEach(function (w) { var s = 230; w.style.fontSize = s + "px"; w.style.width = "auto"; w.style.display = "inline-block";
+                while (w.offsetWidth > 940 && s > 40) { s -= 4; w.style.fontSize = s + "px"; } w.style.display = "block"; w.style.width = "1080px"; w._s = s; });
+              var h1 = w1._s, h2 = w2._s, gap = Math.min(h1, h2) * 0.12, tot = h1 + gap + h2, top = 900 - tot / 2;
+              w1.style.top = top + "px"; w2.style.top = (top + h1 + gap) + "px";
+              // word 3: non-uniform scale so the glyphs span x 0..1080 and cap height y 0..1536 (+8px overscan left, right, top)
+              var fam = getComputedStyle(t1).fontFamily, cx = document.createElement("canvas").getContext("2d");
+              cx.font = "900 400px " + fam; var m = cx.measureText(W3);
+              var L = m.actualBoundingBoxLeft || 0, Rr = m.actualBoundingBoxRight || m.width, A = m.actualBoundingBoxAscent || 290;
+              var sx = 1096 / Math.max(1, L + Rr), sy = 1544 / Math.max(1, A), tx = -8 + L * sx;
+              var tr = "translate(" + tx.toFixed(2) + " 1536) scale(" + sx.toFixed(4) + " " + sy.toFixed(4) + ")";
+              t1.setAttribute("transform", tr); t2.setAttribute("transform", tr);
+            }
+            layout();
+            var HITS = [5, 18, 32];
+            function render(f) {
+              f = Math.round(f * 1000) / 1000;
+              var fi = Math.floor(f + 0.02);   // integer frame, robust to float seek times
+              // whole-frame negative: frames 5-6, 18-19, 32-34
+              var inv = (fi >= 5 && fi <= 6) || (fi >= 18 && fi <= 19) || (fi >= 32 && fi <= 34);
+              var bgc = inv ? INVG : STAGE, tc = inv ? INVT : TYPE;
+              R.style.background = inv ? INVG : "radial-gradient(ellipse 120% 80% at 50% 45%, " + STAGE + " 0%, " + BG2 + " 60%, " + BG3 + " 100%)";
+              w1.style.color = tc; w2.style.color = tc; t1.setAttribute("fill", tc); r1.setAttribute("fill", tc);
+              // shake on the effect layer: 18px mostly vertical, exponential decay over 5 frames
+              var sx = 0, sy = 0;
+              HITS.forEach(function (h) { var d = f - h; if (d >= 0 && d < 6) { var a = 18 * Math.exp(-d / 1.3); sy += a * Math.cos(d * 2.7); sx += a * 0.28 * Math.sin(d * 3.3 + 1); } });
+              q(".rfts-fx").style.transform = "translate(" + sx.toFixed(2) + "px," + sy.toFixed(2) + "px)";
+              // word 1
+              var sc, bl, op, yy = 0;
+              if (f < 5) { var e = eiq(lin(f, 0, 5)); sc = 2.6 + (0.965 - 2.6) * e; bl = 10 * (1 - e); op = 0.6 + 0.4 * e; }
+              else { sc = 0.965 + 0.035 * spr(f - 5, 14); bl = 0; op = 1; }
+              if (f >= 18 && f < 26) { var p = (f - 18) / 8; yy = -12 * Math.exp(-3 * p) * Math.cos(p * Math.PI * 1.6) * (1 - p); }
+              w1.style.visibility = f < 32 ? "inherit" : "hidden";
+              w1.style.transform = "translateY(" + yy.toFixed(2) + "px) scale(" + sc.toFixed(4) + ")"; w1.style.filter = bl > 0.05 ? "blur(" + bl.toFixed(2) + "px)" : "none"; w1.style.opacity = op;
+              // word 2
+              w2.style.visibility = (f >= 12 && f < 32) ? "inherit" : "hidden";
+              if (f < 13) { sc = 2.75 - 0.15 * lin(f, 12, 13); bl = 10; op = 0.6; }
+              else if (f < 18) { var e2 = eiq(lin(f, 13, 18)); sc = 2.6 + (0.965 - 2.6) * e2; bl = 10 * (1 - e2); op = 0.6 + 0.4 * e2; }
+              else { sc = 0.965 + 0.035 * spr(f - 18, 14); bl = 0; op = 1; }
+              w2.style.transform = "scale(" + sc.toFixed(4) + ")"; w2.style.filter = bl > 0.05 ? "blur(" + bl.toFixed(2) + "px)" : "none"; w2.style.opacity = op;
+              // word 3 + floor
+              g3.style.visibility = f >= 22 ? "inherit" : "hidden";
+              if (f < 26) { sc = 2.75 - 0.15 * lin(f, 22, 26); bl = 10; op = 0.6; }
+              else if (f < 32) { var e3 = eiq(lin(f, 26, 32)); sc = 2.6 + (0.965 - 2.6) * e3; bl = 10 * (1 - e3); op = 0.6 + 0.4 * e3; }
+              else { sc = 0.965 + 0.035 * spr(f - 32, 14); bl = 0; op = 1; }
+              if (f >= 34) sc *= 1 + 0.012 * lin(f, 34, 59);
+              g3.style.transform = "scale(" + sc.toFixed(4) + ")"; g3.style.filter = bl > 0.05 ? "blur(" + bl.toFixed(2) + "px)" : "none"; g3.style.opacity = op;
+              // charge: frames 40-56, from the bottom edge up, soft 40px edge
+              if (f >= 40) { var H = -40 + 2000 * eio(lin(f, 40, 56)); s2.style.visibility = "inherit";
+                var mk = "linear-gradient(to top, #000 " + H.toFixed(1) + "px, transparent " + (H + 40).toFixed(1) + "px)";
+                s2.style.webkitMaskImage = mk; s2.style.maskImage = mk; }
+              else s2.style.visibility = "hidden";
+              R.style.opacity = f / FR > secs - 0.25 ? cl((secs - f / FR) / 0.25, 0, 1) : 1;
+            }
+            var st = { _f: 0 };
+            Object.defineProperty(st, "f", { get: function () { return this._f; }, set: function (x) { this._f = x; render(x); } });
+            render(0);
+            if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { layout(); render(st._f); });
+            var tl = gsap.timeline({ paused: true });
+            tl.fromTo(st, { f: 0 }, { f: secs * FR, duration: secs, ease: "none", immediateRender: false }, 0);
+            window.__timelines = window.__timelines || {};
+            window.__timelines[ID] = tl;
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

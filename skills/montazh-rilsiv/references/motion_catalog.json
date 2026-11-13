@@ -11123,6 +11123,1885 @@
    "group": "Свої: паперовий колаж (Vox)",
    "note": "На весь кадр 3.5-6 с: {\"type\":\"motion\",\"name\":\"rf-scrapbook\",\"layout\":\"full\",\"images\":[2-6 їхніх фото/скрінів],\"vars\":{\"text\":\"ОСЬ ЩО / ВИЙШЛО\"}}. Тільки їхні картинки, без них не ставити. Добре як фінальна картка перед CTA.",
    "no": 396
+  },
+  {
+   "name": "rf-globe-arcs",
+   "ua": "Глобус з дугами",
+   "moments": [
+    "цифра",
+    "ріст / падіння",
+    "відгук / доказ"
+   ],
+   "status": "full_only",
+   "card": {
+    "layout": "full",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": true
+   },
+   "keep_ui": true,
+   "text": "vars.lead",
+   "text_vars": [
+    "lead",
+    "unit",
+    "total",
+    "origin",
+    "cities"
+   ],
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: 30 моушн-ефектів",
+   "note": "Охоплення: «звідки → скільки». lead = рядок над числом, total = фінальне число, unit = що рахуємо, origin = [місто, довгота, широта], cities = 5 підписаних міст з координатами (бажано в межах ~70° від старту). Картка 2–3 с.",
+   "no": 397
+  },
+  {
+   "name": "rf-neon-silhouette",
+   "ua": "Неоновий силует і годинник",
+   "moments": [
+    "проблема / тиск",
+    "перехід",
+    "хук / ключова фраза"
+   ],
+   "status": "full_only",
+   "card": {
+    "layout": "full",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": true
+   },
+   "keep_ui": true,
+   "text": "vars.label",
+   "text_vars": [
+    "label",
+    "time_start",
+    "time_mid",
+    "time_end"
+   ],
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: 30 моушн-ефектів",
+   "note": "label = підпис під годинником (коротко), time_start/time_mid/time_end у форматі ГГ:ХХ. Картка 2–3 с.",
+   "no": 398
+  },
+  {
+   "name": "rf-laptop-reveal",
+   "ua": "Ноутбук відкривається в сайт",
+   "moments": [
+    "картинки / приклади",
+    "заклик (CTA)",
+    "успіх / готово"
+   ],
+   "status": "full_only",
+   "card": {
+    "layout": "full",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": true
+   },
+   "keep_ui": true,
+   "text": "vars.word1",
+   "text_vars": [
+    "brand",
+    "word1",
+    "word2",
+    "button",
+    "caption"
+   ],
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: 30 моушн-ефектів",
+   "note": "brand = вордмарк, word1+word2 = заголовок у 2 рядки (по 1–2 слова), button = дія, caption = підпис. accent і page_bg перефарбовують сторінку. Картка 2–3 с.",
+   "no": 399
+  },
+  {
+   "name": "rf-iso-flow",
+   "ua": "Ізометрична дорога з пінами",
+   "moments": [
+    "список / кроки",
+    "до / після",
+    "успіх / готово"
+   ],
+   "status": "full_only",
+   "card": {
+    "layout": "full",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": true
+   },
+   "keep_ui": true,
+   "text": "vars.heading",
+   "text_vars": [
+    "heading",
+    "step1",
+    "step2",
+    "step3"
+   ],
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: 30 моушн-ефектів",
+   "note": "Шлях у 3 кроки. heading = заголовок, step1..3 = короткі підписи пінів (до ~20 знаків). Картка 2–3 с.",
+   "no": 400
+  },
+  {
+   "name": "rf-money-stack",
+   "ua": "Стос грошей і лічильник",
+   "moments": [
+    "цифра",
+    "ріст / падіння",
+    "відгук / доказ"
+   ],
+   "status": "full_only",
+   "card": {
+    "layout": "full",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": true
+   },
+   "keep_ui": true,
+   "text": "vars.headline",
+   "text_vars": [
+    "headline",
+    "total",
+    "prefix",
+    "suffix",
+    "sep",
+    "caption"
+   ],
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: 30 моушн-ефектів",
+   "note": "headline = заголовок, total = число, prefix/suffix = валюта («$» або suffix « грн»), sep = роздільник тисяч (« » для UA), caption = підпис. Тільки реальні цифри. Картка 2–3 с.",
+   "no": 401
+  },
+  {
+   "name": "rf-receipt",
+   "ua": "Чек з принтера",
+   "moments": [
+    "цифра",
+    "список / кроки",
+    "успіх / готово"
+   ],
+   "status": "full_only",
+   "card": {
+    "layout": "full",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": true
+   },
+   "keep_ui": true,
+   "text": "vars.store",
+   "text_vars": [
+    "store",
+    "subtitle",
+    "title",
+    "item1",
+    "price1",
+    "item2",
+    "price2",
+    "item3",
+    "price3",
+    "free_item",
+    "total_label",
+    "total",
+    "currency",
+    "currency_after"
+   ],
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: 30 моушн-ефектів",
+   "note": "Чек друкується по рядку, відривається й підлітає до камери з сумою. Заповни store, title, 3 позиції з цінами, free_item (позиція за 0) і total_label. Сума рахується сама, або вкажи total. Для гривні: currency порожньо, currency_after «грн». Картка 2,5–4 с.",
+   "no": 402
+  },
+  {
+   "name": "rf-iceberg",
+   "ua": "Айсберг",
+   "moments": [
+    "проблема / тиск",
+    "список / кроки",
+    "хук / ключова фраза"
+   ],
+   "status": "full_only",
+   "card": {
+    "layout": "full",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": true
+   },
+   "keep_ui": true,
+   "text": "vars.tip",
+   "text_vars": [
+    "tip",
+    "layer1",
+    "layer2",
+    "layer3"
+   ],
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: 30 моушн-ефектів",
+   "note": "Маленька верхівка (tip), потім камера йде під воду до величезної брили з трьома шарами layer1–3. Підписи короткі, до 4 слів. seed змінює форму брили. Картка 3–4 с.",
+   "no": 403
+  },
+  {
+   "name": "rf-headline",
+   "ua": "Газетна шпальта",
+   "moments": [
+    "хук / ключова фраза",
+    "відгук / доказ",
+    "успіх / готово"
+   ],
+   "status": "full_only",
+   "card": {
+    "layout": "full",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": true
+   },
+   "keep_ui": true,
+   "text": "vars.headline",
+   "text_vars": [
+    "paper_name",
+    "edition",
+    "headline",
+    "body",
+    "pull"
+   ],
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: 30 моушн-ефектів",
+   "note": "Газетна сторінка сама верстає себе: назва, заголовок, 2 речення в колонках і речення під маркером. headline: до 10 слів, body: 2 короткі речення, pull: висновок. Картка 3–4 с.",
+   "no": 404
+  },
+  {
+   "name": "rf-swiss-grid",
+   "ua": "Швейцарський постер",
+   "moments": [
+    "хук / ключова фраза",
+    "заклик (CTA)",
+    "перехід"
+   ],
+   "status": "full_only",
+   "card": {
+    "layout": "full",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": true
+   },
+   "keep_ui": true,
+   "text": "vars.word1",
+   "text_vars": [
+    "word1",
+    "word2",
+    "word3"
+   ],
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: 30 моушн-ефектів",
+   "note": "Три великі слова стрибають по сітці між червоними блоками й складаються в стовпчик. По одному короткому слову в word1–3. Довгі слова зменшуються всі разом. Картка 2–3 с.",
+   "no": 405
+  },
+  {
+   "name": "rf-blueprint-draw",
+   "ua": "Креслення одним штрихом",
+   "moments": [
+    "список / кроки",
+    "успіх / готово",
+    "ім'я / хто я"
+   ],
+   "status": "full_only",
+   "card": {
+    "layout": "full",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": true
+   },
+   "keep_ui": true,
+   "text": "vars.title",
+   "text_vars": [
+    "title",
+    "note",
+    "width_label",
+    "height_label",
+    "pitch_label"
+   ],
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: 30 моушн-ефектів",
+   "note": "Будинок малюється однією лінією, вікна загоряються, з'являються розміри й штамп. title і note у штампі; width_label, height_label, pitch_label: короткі підписи розмірів (3–8 символів). Картка 2,5–4 с.",
+   "no": 406
+  },
+  {
+   "name": "rf-paper-desk",
+   "ua": "Папір на килимку + червоний маркер",
+   "moments": [
+    "проблема / тиск",
+    "ріст / падіння",
+    "цифра",
+    "відгук / доказ"
+   ],
+   "status": "full_only",
+   "card": {
+    "layout": "full",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": true
+   },
+   "keep_ui": true,
+   "text": "vars.slip_text",
+   "text_vars": [
+    "slip_text",
+    "title",
+    "y_label",
+    "x_label",
+    "drop_label",
+    "source_tag",
+    "log_label",
+    "advice",
+    "marker_words"
+   ],
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: 30 моушн-ефектів",
+   "note": "slip_text: короткий заголовок до 14 символів. title: про що графік. drop_label: момент падіння. advice: один рядок. marker_words: 2–4 слова. Порожній source_tag ховає табличку. Картка 2–3 с.",
+   "no": 407
+  },
+  {
+   "name": "rf-ink-wash",
+   "ua": "Гори тушшю, сонце і вертикальний заголовок",
+   "moments": [
+    "хук / ключова фраза",
+    "перехід",
+    "ім'я / хто я"
+   ],
+   "status": "full_only",
+   "card": {
+    "layout": "full",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": true
+   },
+   "keep_ui": true,
+   "text": "vars.title",
+   "text_vars": [
+    "title"
+   ],
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: 30 моушн-ефектів",
+   "note": "title: коротка фраза до 5 слів, вертикально праворуч (довга переноситься в другу колонку). Картка 2–3 с.",
+   "no": 408
+  },
+  {
+   "name": "rf-stat-chart",
+   "ua": "Лічильник і графік, що пробиває стелю",
+   "moments": [
+    "цифра",
+    "ріст / падіння",
+    "успіх / готово",
+    "відгук / доказ"
+   ],
+   "status": "full_only",
+   "card": {
+    "layout": "full",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": true
+   },
+   "keep_ui": true,
+   "text": "vars.end_value",
+   "text_vars": [
+    "company",
+    "chip",
+    "label",
+    "start_value",
+    "end_value",
+    "event"
+   ],
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: 30 моушн-ефектів",
+   "note": "start_value і end_value: текст зі знаком, напр. «₴12 400» → «₴1 284 900». event: що сталося в точці злету. label: назва метрики. Цифри тільки справжні. Картка 3 с.",
+   "no": 409
+  },
+  {
+   "name": "rf-agent-swarm",
+   "ua": "Рій агентів збирає готову сторінку",
+   "moments": [
+    "питання / ШІ",
+    "список / кроки",
+    "успіх / готово",
+    "картинки / приклади"
+   ],
+   "status": "full_only",
+   "card": {
+    "layout": "full",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": true
+   },
+   "keep_ui": true,
+   "text": "vars.page_title",
+   "text_vars": [
+    "role1",
+    "role2",
+    "role3",
+    "role4",
+    "page_title",
+    "caption"
+   ],
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: 30 моушн-ефектів",
+   "note": "role1–role4: 4 ролі по 1–2 слова. page_title: що вийшло (до 2 рядків). caption: підпис. Картка 2–3 с.",
+   "no": 410
+  },
+  {
+   "name": "rf-day-counter",
+   "ua": "Лічильник днів з календарем",
+   "moments": [
+    "цифра",
+    "ріст / падіння",
+    "успіх / готово",
+    "хук / ключова фраза"
+   ],
+   "status": "full_only",
+   "card": {
+    "layout": "full",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": true
+   },
+   "keep_ui": true,
+   "text": "vars.label",
+   "text_vars": [
+    "label",
+    "word",
+    "days",
+    "caption"
+   ],
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: 30 моушн-ефектів",
+   "note": "Червоні галочки на календарі, лічильник «DAY N» прокручується до фінального дня, штамп ставить останній. label: рядок над лічильником; word: слово (ДЕНЬ); days: 3–35; caption: підпис під календарем. Картка 2.5–3 с.",
+   "no": 411
+  },
+  {
+   "name": "rf-split-flap",
+   "ua": "Табло відправлень (split-flap)",
+   "moments": [
+    "хук / ключова фраза",
+    "список / кроки",
+    "заклик (CTA)",
+    "перехід"
+   ],
+   "status": "full_only",
+   "card": {
+    "layout": "full",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": true
+   },
+   "keep_ui": true,
+   "text": "vars.lines",
+   "text_vars": [
+    "lines",
+    "last",
+    "plate"
+   ],
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: 30 моушн-ефектів",
+   "note": "Табло перебирає літери у фразу, останній рядок стає зеленим і вмикається лампа. lines: рядки через «/», до 13 знаків (довші переносяться, макс. 6); last: фінальний рядок до 12 знаків; plate: табличка; align: left/center. Картка 3–4 с.",
+   "no": 412
+  },
+  {
+   "name": "rf-type-slam",
+   "ua": "Удар слів з негативом і заливкою",
+   "moments": [
+    "хук / ключова фраза",
+    "проблема / тиск",
+    "до / після",
+    "заклик (CTA)"
+   ],
+   "status": "full_only",
+   "card": {
+    "layout": "full",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": true
+   },
+   "keep_ui": true,
+   "text": "vars.word3",
+   "text_vars": [
+    "word1",
+    "word2",
+    "word3"
+   ],
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: 30 моушн-ефектів",
+   "note": "Два короткі слова б'ють у кадр зі спалахом-негативом і трясінням, третє розтягується на весь кадр і заливається кольором акценту. word1, word2: по 1 короткому слову; word3: головне, 1–2 короткі слова. Картка 2.5–3 с.",
+   "no": 413
+  },
+  {
+   "name": "rf-terminal-bloom",
+   "ua": "Команда в терміналі розквітає в лендинг",
+   "moments": [
+    "питання / ШІ",
+    "картинки / приклади",
+    "до / після",
+    "успіх / готово"
+   ],
+   "status": "full_only",
+   "card": {
+    "layout": "full",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": true
+   },
+   "keep_ui": true,
+   "text": "vars.headline",
+   "text_vars": [
+    "command",
+    "product",
+    "headline",
+    "disclaimer",
+    "subline",
+    "button1",
+    "button2",
+    "card1",
+    "card2",
+    "card3"
+   ],
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: 30 моушн-ефектів",
+   "note": "Набрана команда розлітається літерами й збирається в лендинг. command: команда; product: логотип; headline: заголовок (до 2 рядків); subline; button1/button2; card1–3; disclaimer: дрібний напис. Картка 2.5–3 с.",
+   "no": 414
+  },
+  {
+   "name": "rf-deep-time",
+   "ua": "Глибокий час: чорна діра і лічильник",
+   "moments": [
+    "цифра",
+    "ріст / падіння",
+    "хук / ключова фраза",
+    "перехід"
+   ],
+   "status": "full_only",
+   "card": {
+    "layout": "full",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": true
+   },
+   "keep_ui": true,
+   "text": "vars.end_number",
+   "text_vars": [
+    "end_number",
+    "unit"
+   ],
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: 30 моушн-ефектів",
+   "note": "3D-шейдер (three.js). end_number = число, до якого докручується одометр, unit = підпис під ним. Картка 2–3 с.",
+   "no": 415
+  },
+  {
+   "name": "rf-ink-doodle",
+   "ua": "Чорнильний дудл: паперовий шторм і помилка",
+   "moments": [
+    "проблема / тиск",
+    "хук / ключова фраза",
+    "до / після",
+    "перехід"
+   ],
+   "status": "full_only",
+   "card": {
+    "layout": "full",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": true
+   },
+   "keep_ui": true,
+   "text": "vars.sign_line1",
+   "text_vars": [
+    "sign_line1",
+    "sign_line2",
+    "typo"
+   ],
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: 30 моушн-ефектів",
+   "note": "Фігурка за машинкою, табличка з двох рядків (sign_line1, sign_line2, коротко), у камеру влітає аркуш зі словом typo, яке перекреслює червона ручка. Картка 2–3 с.",
+   "no": 416
+  },
+  {
+   "name": "rf-creator-life",
+   "ua": "Життя креатора, намальоване погано",
+   "moments": [
+    "проблема / тиск",
+    "хук / ключова фраза",
+    "ріст / падіння",
+    "перехід"
+   ],
+   "status": "full_only",
+   "card": {
+    "layout": "full",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": true
+   },
+   "keep_ui": true,
+   "text": "vars.title",
+   "text_vars": [
+    "title",
+    "days"
+   ],
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: 30 моушн-ефектів",
+   "note": "Рукописний заголовок title, days = 7 підписів календарних аркушів (напр. [\"ПН\",…,\"НД\"]). Вежі з аркушів і кави ростуть і обвалюються. Картка 2–3 с.",
+   "no": 417
+  },
+  {
+   "name": "rf-map-route",
+   "ua": "3D-мапа: маршрут малюється до точки",
+   "moments": [
+    "список / кроки",
+    "до / після",
+    "перехід",
+    "успіх / готово"
+   ],
+   "text": "vars.destination",
+   "text_vars": [
+    "street",
+    "destination",
+    "distance",
+    "chip_note"
+   ],
+   "note": "Біле глиняне 3D-місто, маршрут від піна до цілі. destination = куди веде шлях, street = назва етапу/дороги, distance + chip_note = чип зверху. Картка 3–4 с. accent перефарбовує маршрут.",
+   "status": "full_only",
+   "card": {
+    "layout": "full",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": true
+   },
+   "keep_ui": true,
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: 30 моушн-ефектів",
+   "no": 418
+  },
+  {
+   "name": "rf-git-city",
+   "ua": "3D-місто з графіка внесків",
+   "moments": [
+    "цифра",
+    "ріст / падіння",
+    "відгук / доказ",
+    "успіх / готово"
+   ],
+   "text": "vars.measure",
+   "text_vars": [
+    "measure",
+    "note"
+   ],
+   "note": "Нічне місто, висота веж = значення за день. measure = що міряємо, note = «демо-дані» або порожньо, якщо дані реальні. data = масив рядків чисел (реальна статистика); без нього місто генерується. Картка 3–4 с.",
+   "status": "full_only",
+   "card": {
+    "layout": "full",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": true
+   },
+   "keep_ui": true,
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: 30 моушн-ефектів",
+   "no": 419
+  },
+  {
+   "name": "rf-contour-map",
+   "ua": "Паперова мапа стає горою + лічильник до цілі",
+   "moments": [
+    "цифра",
+    "ріст / падіння",
+    "успіх / готово",
+    "хук / ключова фраза"
+   ],
+   "text": "vars.unit",
+   "text_vars": [
+    "value",
+    "suffix",
+    "unit"
+   ],
+   "note": "Мапа піднімається в гору, стрічка-лічильник гальмує на value, на вершину падає прапорець. value = реальне число, suffix = K/% або порожньо, unit = що рахуємо. Картка 2–3 с.",
+   "status": "full_only",
+   "card": {
+    "layout": "full",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": true
+   },
+   "keep_ui": true,
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: 30 моушн-ефектів",
+   "no": 420
+  },
+  {
+   "name": "rf-teardown",
+   "ua": "Розбір на шари (3D годинник)",
+   "moments": [
+    "список / кроки",
+    "картинки / приклади",
+    "хук / ключова фраза"
+   ],
+   "text": "vars.label_1",
+   "text_vars": [
+    "label_1",
+    "label_2",
+    "label_3",
+    "label_4",
+    "label_5"
+   ],
+   "note": "3D: точки збираються в годинник, він розкривається на 5 шарів з підписами 01–05. label_1..label_5 згори вниз, по 1–3 слова. numbered=no прибирає номери. Картка 3.5–4 с.",
+   "status": "full_only",
+   "card": {
+    "layout": "full",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": true
+   },
+   "keep_ui": true,
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: 30 моушн-ефектів",
+   "no": 421
+  },
+  {
+   "name": "rf-hologram",
+   "ua": "Голограма з наведенням",
+   "moments": [
+    "питання / ШІ",
+    "картинки / приклади",
+    "хук / ключова фраза"
+   ],
+   "text": "vars.object_name",
+   "text_vars": [
+    "object_name",
+    "part_1",
+    "part_2"
+   ],
+   "note": "3D: голограма дрона в промені, дві рамки захоплюють частини з мітками. object_name = назва вгорі (до ~25 знаків), part_1 / part_2 = короткі мітки. Картка 2.5–3 с.",
+   "status": "full_only",
+   "card": {
+    "layout": "full",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": true
+   },
+   "keep_ui": true,
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: 30 моушн-ефектів",
+   "no": 422
+  },
+  {
+   "name": "rf-turntable",
+   "ua": "Продукт на поворотному столі",
+   "moments": [
+    "список / кроки",
+    "ім'я / хто я",
+    "заклик (CTA)",
+    "картинки / приклади"
+   ],
+   "text": "vars.product_name",
+   "text_vars": [
+    "product_name",
+    "caption",
+    "spec_1",
+    "spec_2",
+    "spec_3"
+   ],
+   "note": "3D: колонка крутиться, виносками з'являються 3 характеристики, потім великий напис. product_name до ~16 знаків, caption = підпис, spec_1..3 по 1–3 слова. Картка 2.5–3 с.",
+   "status": "full_only",
+   "card": {
+    "layout": "full",
+    "tone": "clear",
+    "box": [
+     0,
+     0,
+     1080,
+     1920
+    ],
+    "keep_fonts": true
+   },
+   "keep_ui": true,
+   "rank": 2,
+   "use": "overlay",
+   "quality": 4,
+   "group": "Свої: 30 моушн-ефектів",
+   "no": 423
+  },
+  {
+   "name": "fx-rf-neon-trace",
+   "fx": "rf-neon-trace",
+   "engine": "fx",
+   "ua": "Тонка неонова лінія обвиває тебе: за головою і перед грудьми",
+   "moments": [
+    "хук / ключова фраза",
+    "перехід"
+   ],
+   "status": "ready",
+   "use": "overlay",
+   "quality": 4,
+   "rank": 2,
+   "group": "Свої (з рілс-референсу)",
+   "text": "fx",
+   "text_vars": [
+    "color",
+    "speed (с, 1.3)",
+    "tilt"
+   ],
+   "no": 424,
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-neon-trace\", \"start\", \"end\", \"text\"?, \"opt\"?}. Декор: субтитри лишаються. Картка 1-1.5 с, на початку думки. Колір за замовч. лайм бренду."
+  },
+  {
+   "name": "fx-rf-outline",
+   "fx": "rf-outline",
+   "engine": "fx",
+   "ua": "Тонка біла лінія точно по твоєму контуру, як виділення в редакторі",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "use": "overlay",
+   "quality": 4,
+   "rank": 2,
+   "group": "Свої (з рілс-референсу)",
+   "text": "fx",
+   "text_vars": [
+    "color",
+    "speed"
+   ],
+   "no": 425,
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-outline\", \"start\", \"end\", \"text\"?, \"opt\"?}. Декор: субтитри лишаються. 1-2 с на ключовій фразі."
+  },
+  {
+   "name": "fx-rf-glow",
+   "fx": "rf-glow",
+   "engine": "fx",
+   "ua": "Короткий спалах світіння навколо всього силуету",
+   "moments": [
+    "хук / ключова фраза",
+    "успіх / готово"
+   ],
+   "status": "ready",
+   "use": "overlay",
+   "quality": 4,
+   "rank": 2,
+   "group": "Свої (з рілс-референсу)",
+   "text": "fx",
+   "text_vars": [
+    "color",
+    "fade (с, 0.55)"
+   ],
+   "no": 426,
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-glow\", \"start\", \"end\", \"text\"?, \"opt\"?}. Декор: субтитри лишаються. Акцент на одному слові: картка 0.6-0.8 с, start = початок слова."
+  },
+  {
+   "name": "fx-rf-track-dots",
+   "fx": "rf-track-dots",
+   "engine": "fx",
+   "ua": "Дрібні мітки трекінгу на одязі, ніби програма стежить за тобою",
+   "moments": [
+    "питання / ШІ"
+   ],
+   "status": "ready",
+   "use": "overlay",
+   "quality": 4,
+   "rank": 2,
+   "group": "Свої (з рілс-референсу)",
+   "text": "fx",
+   "text_vars": [
+    "color"
+   ],
+   "no": 427,
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-track-dots\", \"start\", \"end\", \"text\"?, \"opt\"?}. Декор: субтитри лишаються. Коли мова про ШІ, аналітику, трекінг; 2-4 с, часто разом з rf-outline."
+  },
+  {
+   "name": "fx-rf-tilt-pills",
+   "fx": "rf-tilt-pills",
+   "engine": "fx",
+   "ua": "Дві нахилені плашки по боках від слова під підборіддям",
+   "moments": [
+    "хук / ключова фраза",
+    "список / кроки"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "Свої (з рілс-референсу)",
+   "text": "fx",
+   "text_vars": [
+    "text (два слова через |)",
+    "mid (слово між ними)",
+    "color"
+   ],
+   "no": 428,
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-tilt-pills\", \"start\", \"end\", \"text\"?, \"opt\"?}. text = \"новий|драйвер\" (твої слова), mid необов'язково. 2-4 с."
+  },
+  {
+   "name": "fx-rf-glass-flash",
+   "fx": "rf-glass-flash",
+   "engine": "fx",
+   "ua": "Слово на мить вкривається кольоровим склом з глітчем і знову чисте",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "use": "overlay",
+   "quality": 4,
+   "rank": 2,
+   "group": "Свої (з рілс-референсу)",
+   "text": "fx",
+   "text_vars": [
+    "text",
+    "color",
+    "hold"
+   ],
+   "no": 429,
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-glass-flash\", \"start\", \"end\", \"text\"?, \"opt\"?}. text = одне слово, яке вона наголошує. 1-1.5 с."
+  },
+  {
+   "name": "fx-rf-anchor-word",
+   "fx": "rf-anchor-word",
+   "engine": "fx",
+   "ua": "Велике слово на грудях, над ним по черзі змінюються дрібні [підписи]",
+   "moments": [
+    "хук / ключова фраза",
+    "список / кроки"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "Свої (з рілс-референсу)",
+   "text": "fx",
+   "text_vars": [
+    "text (велике слово)",
+    "tags (через |)"
+   ],
+   "no": 430,
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-anchor-word\", \"start\", \"end\", \"text\"?, \"opt\"?}. text = головне слово, tags = 3-4 твої слова з фрази (без tags беруться сказані слова). 2-4 с."
+  },
+  {
+   "name": "fx-rf-side-note",
+   "fx": "rf-side-note",
+   "engine": "fx",
+   "ua": "3-4 дрібні рядки збоку, як примітка на полях",
+   "moments": [
+    "список / кроки",
+    "відгук / доказ"
+   ],
+   "status": "ready",
+   "use": "overlay",
+   "quality": 4,
+   "rank": 2,
+   "group": "Свої (з рілс-референсу)",
+   "text": "fx",
+   "text_vars": [
+    "text (рядки через |)",
+    "side (left/right)"
+   ],
+   "no": 431,
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-side-note\", \"start\", \"end\", \"text\"?, \"opt\"?}. Рядки = твої слова, 2-3 слова в рядку. 2-4 с."
+  },
+  {
+   "name": "fx-rf-quote-title",
+   "fx": "rf-quote-title",
+   "engine": "fx",
+   "ua": "Жирний вузький заголовок з дрібним «словом у лапках» між рядками",
+   "moments": [
+    "заклик (CTA)",
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "Свої (з рілс-референсу)",
+   "text": "fx",
+   "text_vars": [
+    "text (рядки через |, рядок у «» = дрібний)"
+   ],
+   "no": 432,
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-quote-title\", \"start\", \"end\", \"text\"?, \"opt\"?}. Для CTA: \"пиши в коментар|«промт»|і я надішлю\". 2-4 с."
+  },
+  {
+   "name": "fx-rf-letter-drop",
+   "fx": "rf-letter-drop",
+   "engine": "fx",
+   "ua": "Слово падає по літерах з різних висот і складається",
+   "moments": [
+    "хук / ключова фраза",
+    "цифра"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "Свої (з рілс-референсу)",
+   "text": "fx",
+   "text_vars": [
+    "text",
+    "color"
+   ],
+   "no": 433,
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-letter-drop\", \"start\", \"end\", \"text\"?, \"opt\"?}. text = одне коротке слово (до 8 літер). 1.5-3 с."
+  },
+  {
+   "name": "fx-rf-word-cloud",
+   "fx": "rf-word-cloud",
+   "engine": "fx",
+   "ua": "Сказані слова пропливають повз тебе на різній глибині, одна літера кольорова",
+   "moments": [
+    "хук / ключова фраза",
+    "проблема / тиск"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "Свої (з рілс-референсу)",
+   "text": "fx",
+   "text_vars": [
+    "text (необов'язково)",
+    "accent (частина слова в кольорі)",
+    "life"
+   ],
+   "no": 434,
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-word-cloud\", \"start\", \"end\", \"text\"?, \"opt\"?}. Без text бере сказані слова з розшифровки, кожне у свою мить: замінює субтитри на 2-4 с."
+  },
+  {
+   "name": "fx-rf-spread-words",
+   "fx": "rf-spread-words",
+   "engine": "fx",
+   "ua": "Три дрібні слова далеко одне від одного по ширині кадру",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "use": "overlay",
+   "quality": 4,
+   "rank": 2,
+   "group": "Свої (з рілс-референсу)",
+   "text": "fx",
+   "text_vars": [
+    "text (необов'язково)",
+    "y"
+   ],
+   "no": 435,
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-spread-words\", \"start\", \"end\", \"text\"?, \"opt\"?}. Без text бере сказані слова (до 4) у свою мить. 1.5-3 с."
+  },
+  {
+   "name": "fx-rf-vertical-word",
+   "fx": "rf-vertical-word",
+   "engine": "fx",
+   "ua": "Одне слово повернуте боком біля голови, друкується по літерах",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "use": "overlay",
+   "quality": 4,
+   "rank": 2,
+   "group": "Свої (з рілс-референсу)",
+   "text": "fx",
+   "text_vars": [
+    "text",
+    "side",
+    "color"
+   ],
+   "no": 436,
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-vertical-word\", \"start\", \"end\", \"text\"?, \"opt\"?}. text = одне слово. 1.5-3 с."
+  },
+  {
+   "name": "fx-rf-texture-title",
+   "fx": "rf-texture-title",
+   "engine": "fx",
+   "ua": "Величезне вузьке слово за тобою, залите розмитим кадром і градієнтом бренду",
+   "moments": [
+    "хук / ключова фраза",
+    "ім'я / хто я"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "Свої (з рілс-референсу)",
+   "text": "fx",
+   "text_vars": [
+    "text",
+    "sub ([ дрібне ] під ним)",
+    "color",
+    "color2"
+   ],
+   "no": 437,
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-texture-title\", \"start\", \"end\", \"text\"?, \"opt\"?}. text = 1 слово до 9 літер. 2-4 с, для теми рілса."
+  },
+  {
+   "name": "fx-rf-color-wash",
+   "fx": "rf-color-wash",
+   "engine": "fx",
+   "ua": "Перехід: кремовий спалах тане в короткий кольоровий наплив",
+   "moments": [
+    "перехід"
+   ],
+   "status": "ready",
+   "use": "transition",
+   "quality": 4,
+   "rank": 2,
+   "group": "Свої (з рілс-референсу)",
+   "text": "fx",
+   "text_vars": [
+    "color",
+    "flash",
+    "hold"
+   ],
+   "no": 438,
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-color-wash\", \"start\", \"end\", \"text\"?, \"opt\"?}. Декор: субтитри лишаються. Картка 0.6-0.9 с між двома думками."
+  },
+  {
+   "name": "fx-ay-head-stack",
+   "no": 439,
+   "fx": "ay-head-stack",
+   "engine": "fx",
+   "ua": "Бірки зі словами падають одна за одною і складаються стосом на голові",
+   "moments": [
+    "список / кроки",
+    "проблема / тиск"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "22 ефекти (рілс 13.11)",
+   "text": "fx",
+   "text_vars": [
+    "text (слово::підпис|…)",
+    "size",
+    "every",
+    "colors"
+   ],
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-head-stack\", \"start\", \"end\", \"text\"?, \"opt\"?}. Все, що на ній: обовʼязки, задачі, ролі. 1.6-2.6 с, до 7 бірок. Обличчя вільне."
+  },
+  {
+   "name": "fx-ay-day-dial",
+   "no": 440,
+   "fx": "ay-day-dial",
+   "engine": "fx",
+   "ua": "Кімната стає кремовим папером, за головою величезний циферблат днів прокручується на поділку",
+   "moments": [
+    "цифра",
+    "список / кроки"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "22 ефекти (рілс 13.11)",
+   "text": "fx",
+   "text_vars": [
+    "text (слово над ободом)",
+    "unit",
+    "size",
+    "dx",
+    "dy",
+    "every",
+    "word_at"
+   ],
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-day-dial\", \"start\", \"end\", \"text\"?, \"opt\"?}. Регулярність, щоденна звичка, «кожен день». 1.5-2.5 с. Вона попереду."
+  },
+  {
+   "name": "fx-ay-orbit-ring",
+   "no": 441,
+   "fx": "ay-orbit-ring",
+   "engine": "fx",
+   "ua": "Металеві літери слова кружляють навколо неї на нахиленому кільці, ховаючись за спину",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "22 ефекти (рілс 13.11)",
+   "text": "fx",
+   "text_vars": [
+    "text (слово)",
+    "look (lime|pink)",
+    "size",
+    "radius",
+    "drop",
+    "tilt",
+    "speed"
+   ],
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-orbit-ring\", \"start\", \"end\", \"text\"?, \"opt\"?}. Одне ключове слово до 8 літер. 1.2-1.8 с."
+  },
+  {
+   "name": "fx-ay-letter-dive",
+   "no": 442,
+   "fx": "ay-letter-dive",
+   "engine": "fx",
+   "ua": "Велике засічкове слово на кремовому папері, твоє відео всередині літер, камера пірнає в літеру",
+   "moments": [
+    "хук / ключова фраза",
+    "перехід"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "22 ефекти (рілс 13.11)",
+   "text": "fx",
+   "text_vars": [
+    "text (коротке слово)",
+    "into",
+    "dive",
+    "zoom",
+    "y"
+   ],
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-letter-dive\", \"start\", \"end\", \"text\"?, \"opt\"?}. Повноекранний, працює як перехід на нову думку. Коротке слово 4-6 літер. 1.2-1.6 с."
+  },
+  {
+   "name": "fx-ay-sketch-words",
+   "no": 443,
+   "fx": "ay-sketch-words",
+   "engine": "fx",
+   "ua": "Зошит у лінійку, слово малюється від руки контуром і штрихуванням за нею",
+   "moments": [
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "22 ефекти (рілс 13.11)",
+   "text": "fx",
+   "text_vars": [
+    "text (слово)",
+    "label",
+    "y"
+   ],
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-sketch-words\", \"start\", \"end\", \"text\"?, \"opt\"?}. Ідея, задум, «накидати». 1.2-1.8 с. Вона попереду."
+  },
+  {
+   "name": "fx-ay-post-wall",
+   "no": 444,
+   "fx": "ay-post-wall",
+   "engine": "fx",
+   "ua": "Угорі сітка днів як у GitHub заповнюється постами, лічильник росте",
+   "moments": [
+    "цифра",
+    "ріст / падіння"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "22 ефекти (рілс 13.11)",
+   "text": "fx",
+   "text_vars": [
+    "to (твоє реальне число)",
+    "label",
+    "unit",
+    "days",
+    "look (dark|light)",
+    "cols",
+    "y"
+   ],
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-post-wall\", \"start\", \"end\", \"text\"?, \"opt\"?}. Регулярність публікацій, результат за рік. `to` тільки твоє реальне число. 2-3 с."
+  },
+  {
+   "name": "fx-ay-clone-row",
+   "no": 445,
+   "fx": "ay-clone-row",
+   "engine": "fx",
+   "ua": "Копії неї з затримкою в часі виходять убік рядом і складаються назад",
+   "moments": [
+    "список / кроки",
+    "перехід"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "22 ефекти (рілс 13.11)",
+   "text": "fx",
+   "text_vars": [
+    "side",
+    "n",
+    "lag",
+    "gap"
+   ],
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-clone-row\", \"start\", \"end\", \"text\"?, \"opt\"?}. Багато ролей, «я одна за всіх», масштабування. 1.2 с."
+  },
+  {
+   "name": "fx-ay-blade-slice",
+   "no": 446,
+   "fx": "ay-blade-slice",
+   "engine": "fx",
+   "ua": "Лезо по діагоналі розрізає кадр, верхня частина зсувається і падає назад",
+   "moments": [
+    "проблема / тиск",
+    "перехід"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "22 ефекти (рілс 13.11)",
+   "text": "fx",
+   "text_vars": [
+    "angle",
+    "slide",
+    "gap"
+   ],
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-blade-slice\", \"start\", \"end\", \"text\"?, \"opt\"?}. Різко відрізати, «зрізати бюджет», рішучий момент. 1.1 с."
+  },
+  {
+   "name": "fx-ay-layer-explode",
+   "no": 447,
+   "fx": "ay-layer-explode",
+   "engine": "fx",
+   "ua": "Кадр нахиляється в 3D і розкладається на прозорі шари: фон, людина, текст",
+   "moments": [
+    "список / кроки",
+    "питання / ШІ"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "22 ефекти (рілс 13.11)",
+   "text": "fx",
+   "text_vars": [
+    "text (підпис)",
+    "caption (рядок|*акцент*)",
+    "yaw",
+    "spread"
+   ],
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-layer-explode\", \"start\", \"end\", \"text\"?, \"opt\"?}. Як це влаштовано, з чого складається креатив / реклама. 1.2 с."
+  },
+  {
+   "name": "fx-ay-rack-focus",
+   "no": 448,
+   "fx": "ay-rack-focus",
+   "engine": "fx",
+   "ua": "Перевод фокусу: фон розмивається, фокус іде на фон і повертається до неї",
+   "moments": [
+    "хук / ключова фраза",
+    "перехід"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "22 ефекти (рілс 13.11)",
+   "text": "fx",
+   "text_vars": [
+    "blur",
+    "zoom"
+   ],
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-rack-focus\", \"start\", \"end\", \"text\"?, \"opt\"?}. Акцент «а тепер головне», зміна думки. 1.4 с. Субтитри лишаються."
+  },
+  {
+   "name": "fx-ay-blow-away",
+   "no": 449,
+   "fx": "ay-blow-away",
+   "engine": "fx",
+   "ua": "Ти розсипаєшся на пластівці, що летять убік, і збирається назад",
+   "moments": [
+    "проблема / тиск",
+    "до / після"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "22 ефекти (рілс 13.11)",
+   "text": "fx",
+   "text_vars": [
+    "from (right|left)",
+    "back",
+    "flake",
+    "fill"
+   ],
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-blow-away\", \"start\", \"end\", \"text\"?, \"opt\"?}. Зникнення: «бюджет просто зник», «клієнти зникли». 1.6 с з поверненням."
+  },
+  {
+   "name": "fx-ay-dolly-zoom",
+   "no": 450,
+   "fx": "ay-dolly-zoom",
+   "engine": "fx",
+   "ua": "Вертиго: фон наїжджає, а ти лишаєшся того ж розміру",
+   "moments": [
+    "проблема / тиск",
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "22 ефекти (рілс 13.11)",
+   "text": "fx",
+   "text_vars": [
+    "amount (≤0.25)",
+    "back"
+   ],
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-dolly-zoom\", \"start\", \"end\", \"text\"?, \"opt\"?}. Осяяння, шок, «і тут я зрозуміла». 1.5 с. Субтитри лишаються."
+  },
+  {
+   "name": "fx-ay-banknote",
+   "no": 451,
+   "fx": "ay-banknote",
+   "engine": "fx",
+   "ua": "Кадр стає банкнотою: твій живий портрет гравюрою, гільйошні розетки, сума набігає",
+   "moments": [
+    "цифра",
+    "відгук / доказ",
+    "успіх / готово"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "22 ефекти (рілс 13.11)",
+   "text": "fx",
+   "text_vars": [
+    "to (реальна сума)",
+    "from",
+    "sub",
+    "ring",
+    "serial",
+    "name",
+    "role",
+    "count",
+    "out"
+   ],
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-banknote\", \"start\", \"end\", \"text\"?, \"opt\"?}. Гроші, дохід, бюджет, результат клієнта. `to` тільки реальна цифра. 1.0-1.3 с."
+  },
+  {
+   "name": "fx-ay-press",
+   "no": 452,
+   "fx": "ay-press",
+   "engine": "fx",
+   "ua": "Газетна шпальта «Щоденний рілс» з твоїм живим фото растром, сторінка падає",
+   "moments": [
+    "відгук / доказ",
+    "ім'я / хто я",
+    "хук / ключова фраза"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "22 ефекти (рілс 13.11)",
+   "text": "fx",
+   "text_vars": [
+    "text (заголовок)",
+    "title",
+    "sub",
+    "quote",
+    "caption",
+    "date",
+    "issue",
+    "list"
+   ],
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-press\", \"start\", \"end\", \"text\"?, \"opt\"?}. Новина, «про це всі говорять», кейс. 1.0 с; разом з ay-paper-tear одним рухом."
+  },
+  {
+   "name": "fx-ay-paper-tear",
+   "no": 453,
+   "fx": "ay-paper-tear",
+   "engine": "fx",
+   "ua": "Сторінка рветься навпіл, половинки падають і відкривають твоє відео",
+   "moments": [
+    "перехід",
+    "до / після"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "22 ефекти (рілс 13.11)",
+   "text": "fx",
+   "text_vars": [
+    "page (press|word)",
+    "text",
+    "hold",
+    "rip",
+    "+ ключі ay-press"
+   ],
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-paper-tear\", \"start\", \"end\", \"text\"?, \"opt\"?}. Одразу після ay-press з тими ж текстами, або сам зі словом (page=word). 1.0-1.2 с."
+  },
+  {
+   "name": "fx-ay-impact",
+   "no": 454,
+   "fx": "ay-impact",
+   "engine": "fx",
+   "ua": "Кадр-удар: ти двотонною графікою, лінії швидкості, гігантське слово, тряска",
+   "moments": [
+    "хук / ключова фраза",
+    "проблема / тиск"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "22 ефекти (рілс 13.11)",
+   "text": "fx",
+   "text_vars": [
+    "text (слово)",
+    "look (cream|lime)",
+    "dark"
+   ],
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-impact\", \"start\", \"end\", \"text\"?, \"opt\"?}. Найсильніший наголос рілса, одне слово. 0.6-0.8 с."
+  },
+  {
+   "name": "fx-ay-code-body",
+   "no": 455,
+   "fx": "ay-code-body",
+   "engine": "fx",
+   "ua": "Фон темніє в код, а ти складена з моно-символів",
+   "moments": [
+    "питання / ШІ"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "22 ефекти (рілс 13.11)",
+   "text": "fx",
+   "text_vars": [
+    "code",
+    "size",
+    "hi",
+    "in",
+    "out"
+   ],
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-code-body\", \"start\", \"end\", \"text\"?, \"opt\"?}. ШІ, автоматизація, «алгоритм», технічна частина. 1.1-1.5 с."
+  },
+  {
+   "name": "fx-ay-predict-keys",
+   "no": 456,
+   "fx": "ay-predict-keys",
+   "engine": "fx",
+   "ua": "Під підборіддям виїжджає темно-зелена iOS-клавіатура і друкує фразу з підказками",
+   "moments": [
+    "повідомлення / чат",
+    "питання / ШІ"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "22 ефекти (рілс 13.11)",
+   "text": "fx",
+   "text_vars": [
+    "text (фраза)",
+    "placeholder",
+    "x"
+   ],
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-predict-keys\", \"start\", \"end\", \"text\"?, \"opt\"?}. Те, що ти пишеш клієнту / в промт / в оголошення. 2.6-3.2 с. Під підборіддям, може закрити руки."
+  },
+  {
+   "name": "fx-ay-voice-note",
+   "no": 457,
+   "fx": "ay-voice-note",
+   "engine": "fx",
+   "ua": "Зверху голосове з директу: хвиля заповнюється, таймер біжить, аватарка з твого обличчя",
+   "moments": [
+    "повідомлення / чат"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "22 ефекти (рілс 13.11)",
+   "text": "fx",
+   "text_vars": [
+    "text (підпис)",
+    "secs",
+    "x",
+    "y"
+   ],
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-voice-note\", \"start\", \"end\", \"text\"?, \"opt\"?}. Голосове від клієнта / їй написали. 2.0-2.6 с. Угорі."
+  },
+  {
+   "name": "fx-ay-comment-drop",
+   "no": 458,
+   "fx": "ay-comment-drop",
+   "engine": "fx",
+   "ua": "Коментар друкується в полі Instagram, публікується, під ним падає відповідь, слово спалахує за головою",
+   "moments": [
+    "заклик (CTA)",
+    "повідомлення / чат"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "22 ефекти (рілс 13.11)",
+   "text": "fx",
+   "text_vars": [
+    "text (кодове слово)",
+    "comment",
+    "likes",
+    "you",
+    "big"
+   ],
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-comment-drop\", \"start\", \"end\", \"text\"?, \"opt\"?}. CTA «напиши слово в коментарях». 2.2-2.6 с."
+  },
+  {
+   "name": "fx-ay-liquid-glass",
+   "no": 459,
+   "fx": "ay-liquid-glass",
+   "engine": "fx",
+   "ua": "Фінал: скляне сповіщення, навбар Instagram з рідким селектором, матова картка з CTA",
+   "moments": [
+    "заклик (CTA)"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "22 ефекти (рілс 13.11)",
+   "text": "fx",
+   "text_vars": [
+    "text (кодове слово)",
+    "note",
+    "label",
+    "top",
+    "sub",
+    "nav",
+    "y",
+    "outro"
+   ],
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-liquid-glass\", \"start\", \"end\", \"text\"?, \"opt\"?}. Останні 4-4.6 с рілса, CTA з кодовим словом. Картка лягає на розмите обличчя (кінець)."
+  },
+  {
+   "name": "fx-ay-index",
+   "no": 460,
+   "fx": "ay-index",
+   "engine": "fx",
+   "ua": "Темно-зелена панель «У цьому відео 03 / 07» справа вгорі: пункт, про який ти говориш, підсвічено",
+   "moments": [
+    "список / кроки"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "22 ефекти (рілс 13.11)",
+   "text": "fx",
+   "text_vars": [
+    "text (пункт|пункт|…)",
+    "now",
+    "at",
+    "total",
+    "label",
+    "foot",
+    "foot_at",
+    "pill"
+   ],
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-index\", \"start\", \"end\", \"text\"?, \"opt\"?}. Рілс-список: довга картка на всю частину зі списком; `at` перемикає пункти. Субтитри лишаються."
+  },
+  {
+   "name": "fx-ay-live-cursor",
+   "no": 461,
+   "fx": "ay-live-cursor",
+   "engine": "fx",
+   "ua": "Курсор з бейджем твого імені тягне рамку виділення навколо неї, як у Figma, з розміром",
+   "moments": [
+    "хук / ключова фраза",
+    "ім'я / хто я"
+   ],
+   "status": "ready",
+   "use": "fx",
+   "quality": 4,
+   "rank": 2,
+   "group": "22 ефекти (рілс 13.11)",
+   "text": "fx",
+   "text_vars": [
+    "name",
+    "color (lime|cream)",
+    "dims",
+    "bw",
+    "top",
+    "bot"
+   ],
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-live-cursor\", \"start\", \"end\", \"text\"?, \"opt\"?}. Хук «виділимо головне», дизайн креативу, «ось я». 1.4-1.8 с."
   }
  ]
 }

@@ -1,0 +1,213 @@
+<!doctype html>
+<!-- rf-laptop-reveal: a closed aluminium laptop in a white studio opens on a damped hinge, the screen wakes with a live page
+     (wordmark, two-word headline, button, caption, ferns), then the camera pushes into the glass until only the page fills the frame.
+     Rebuilt from an ultra-skills motion prompt (CSS 3D boxes + DOM/SVG page, no WebGL). -->
+<html lang="uk" data-composition-id="rf-laptop-reveal" data-composition-duration="600" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "brand", "type": "string", "label": "Назва бренду (вордмарк)", "default": "Brand name" },
+  { "id": "word1", "type": "string", "label": "Заголовок, слово 1", "default": "Word one" },
+  { "id": "word2", "type": "string", "label": "Заголовок, слово 2", "default": "Word two" },
+  { "id": "button", "type": "string", "label": "Текст кнопки", "default": "Button label" },
+  { "id": "caption", "type": "string", "label": "Підпис під кнопкою", "default": "Caption" },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 2 },
+  { "id": "bg", "type": "color", "label": "Студія: центр", "default": "#f7f9fc" },
+  { "id": "bg2", "type": "color", "label": "Студія: середина", "default": "#eef2f8" },
+  { "id": "bg3", "type": "color", "label": "Студія: краї", "default": "#e3e9f2" },
+  { "id": "alu", "type": "color", "label": "Алюміній світлий", "default": "#e3e9f2" },
+  { "id": "alu_mid", "type": "color", "label": "Алюміній темніший (ребра)", "default": "#8d96ab" },
+  { "id": "keys", "type": "color", "label": "Клавіші", "default": "#4c566e" },
+  { "id": "shadow", "type": "color", "label": "Тінь на підлозі", "default": "#0c1a3a" },
+  { "id": "page_bg", "type": "color", "label": "Фон сторінки", "default": "#efe6da" },
+  { "id": "ink", "type": "color", "label": "Текст сторінки", "default": "#221a12" },
+  { "id": "muted", "type": "color", "label": "Другорядний текст (підпис)", "default": "#6d5d4c" },
+  { "id": "accent", "type": "color", "label": "Акцент (кнопка)", "default": "#c4552d" },
+  { "id": "on_accent", "type": "color", "label": "Текст на кнопці", "default": "#fff8f0" },
+  { "id": "fern", "type": "color", "label": "Папороть", "default": "#1f5c4a" }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-laptop-reveal</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-laptop-reveal" data-duration="600" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; overflow: hidden; }
+          .rflr { position: absolute; inset: 0; overflow: hidden; perspective: 4600px; perspective-origin: 540px 960px;
+                  background: radial-gradient(120% 80% at 50% 45%, var(--bg) 0%, var(--bg2) 55%, var(--bg3) 100%); }
+          .rflr div { box-sizing: border-box; }
+          .rflr .rflr-cam, .rflr .rflr-lid, .rflr .rflr-base { position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; }
+          .rflr .rflr-f { position: absolute; left: 0; top: 0; transform-origin: 0 0; backface-visibility: hidden; }
+          .rflr .rflr-top { background: linear-gradient(180deg, color-mix(in srgb, var(--alu) 94%, var(--alu-mid)) 0%, color-mix(in srgb, var(--alu) 85%, white) 40%, color-mix(in srgb, var(--alu) 92%, var(--alu-mid)) 100%); border-radius: 0 0 60px 60px; }
+          .rflr .rflr-deck { position: absolute; left: 230px; top: 150px; width: 2752px; height: 1060px; border-radius: 26px; background: color-mix(in srgb, var(--alu) 60%, var(--alu-mid));
+                             box-shadow: inset 0 6px 14px color-mix(in srgb, var(--shadow) 25%, transparent); }
+          .rflr .rflr-key { position: absolute; border-radius: 18px; background: var(--keys); box-shadow: inset 0 -6px 0 rgba(0,0,0,.25), 0 2px 0 rgba(255,255,255,.35); }
+          .rflr .rflr-pad { position: absolute; left: 1006px; top: 1320px; width: 1200px; height: 720px; border-radius: 36px; background: color-mix(in srgb, var(--alu) 85%, var(--alu-mid));
+                            box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--alu) 55%, var(--alu-mid)); }
+          .rflr .rflr-spill { position: absolute; left: 0; top: 0; width: 3212px; height: 1400px; opacity: 0;
+                              background: radial-gradient(60% 100% at 50% 0%, color-mix(in srgb, color-mix(in srgb, var(--accent) 30%, white) 55%, transparent), transparent 70%); }
+          .rflr .rflr-front { background: linear-gradient(180deg, color-mix(in srgb, var(--alu) 45%, var(--alu-mid)), var(--alu-mid)); border-radius: 0 0 40px 40px; }
+          .rflr .rflr-side { background: linear-gradient(90deg, color-mix(in srgb, var(--alu) 30%, var(--alu-mid)), var(--alu-mid)); }
+          .rflr .rflr-shell { background: linear-gradient(160deg, color-mix(in srgb, var(--alu) 60%, white) 0%, var(--alu) 50%, color-mix(in srgb, var(--alu) 82%, var(--alu-mid)) 100%); border-radius: 60px;
+                              box-shadow: inset 0 0 0 6px color-mix(in srgb, var(--alu) 55%, var(--alu-mid)); }
+          .rflr .rflr-ledge { background: linear-gradient(180deg, color-mix(in srgb, var(--alu) 60%, var(--alu-mid)), var(--alu-mid)); }
+          .rflr .rflr-glass { background: #000; border-radius: 60px; box-shadow: inset 0 0 0 6px var(--alu-mid); }
+          .rflr .rflr-page { position: absolute; left: 70px; top: 80px; width: 3072px; height: 1920px; overflow: hidden; }
+          .rflr .rflr-col { position: absolute; left: 996px; top: 0; width: 1080px; height: 1920px; }
+          .rflr .rflr-wm { position: absolute; left: 0; right: 0; top: 432px; display: flex; justify-content: center; align-items: center; gap: 16px;
+                           font-family: var(--font-display, sans-serif); font-weight: 700; font-size: 44px; line-height: 56px; white-space: nowrap; }
+          .rflr .rflr-wm svg { width: 44px; height: 44px; }
+          .rflr .rflr-w { position: absolute; left: 0; right: 0; height: 170px; text-align: center; font-family: var(--font-display, sans-serif);
+                          font-weight: 900; font-size: 156px; line-height: 170px; letter-spacing: -0.03em; white-space: nowrap; }
+          .rflr .rflr-btn { position: absolute; left: 50%; top: 1080px; height: 100px; padding: 0 64px; border-radius: 50px; transform-origin: 50% 50%;
+                            font-family: var(--font-body, sans-serif); font-weight: 700; font-size: 44px; line-height: 100px; white-space: nowrap; }
+          .rflr .rflr-cap { position: absolute; left: 60px; right: 60px; top: 1280px; text-align: center; font-family: var(--font-body, sans-serif);
+                            font-size: 32px; line-height: 40px; white-space: nowrap; }
+          .rflr .rflr-ferns { position: absolute; left: 0; top: 0; width: 3072px; height: 1920px; overflow: visible; }
+          .rflr .rflr-dark { position: absolute; inset: 0; background: #000; }
+          .rflr .rflr-shadow { background: radial-gradient(50% 50% at 50% 50%, color-mix(in srgb, var(--shadow) 42%, transparent), color-mix(in srgb, var(--shadow) 14%, transparent) 55%, transparent 100%); }
+        </style>
+        <div class="rflr">
+          <div class="rflr-cam">
+            <div class="rflr-f rflr-shadow sh1"></div>
+            <div class="rflr-f rflr-shadow sh2"></div>
+            <div class="rflr-base">
+              <div class="rflr-f rflr-top"><div class="rflr-deck"></div><div class="rflr-pad"></div><div class="rflr-spill"></div></div>
+              <div class="rflr-f rflr-front"></div>
+              <div class="rflr-f rflr-side sl"></div>
+              <div class="rflr-f rflr-side sr"></div>
+            </div>
+            <div class="rflr-lid">
+              <div class="rflr-f rflr-glass">
+                <div class="rflr-page">
+                  <svg class="rflr-ferns" viewBox="0 0 3072 1920"></svg>
+                  <div class="rflr-col">
+                    <div class="rflr-wm"><svg viewBox="0 0 44 44"><path d="M22 42 C22 28 20 16 12 4" fill="none" stroke-width="3" stroke-linecap="round"/><path d="M21 34 l-9 -4 M21 26 l-8 -5 M19 18 l-6 -5 M22 30 l8 -5 M21 22 l7 -6 M18 13 l5 -5" fill="none" stroke-width="3" stroke-linecap="round"/></svg><span class="bn"></span></div>
+                    <div class="rflr-w w1" style="top:620px"></div>
+                    <div class="rflr-w w2" style="top:790px"></div>
+                    <div class="rflr-btn"></div>
+                    <div class="rflr-cap"></div>
+                  </div>
+                  <div class="rflr-dark"></div>
+                </div>
+              </div>
+              <div class="rflr-f rflr-shell"></div>
+              <div class="rflr-f rflr-ledge"></div>
+            </div>
+          </div>
+        </div>
+        <script>
+          (function () {
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            var secs = Math.max(1, +v.seconds || 2), END = secs * 30;
+            var PAGE = v.page_bg || "#efe6da", ACC = v.accent || "#c4552d", INK = v.ink || "#221a12", INK2 = v.muted || "#6d5d4c", ONACC = v.on_accent || "#fff8f0", FERN = v.fern || "#1f5c4a";
+            function str(x, d) { return x == null ? d : String(x); }
+            var R = document.querySelector(".rflr"), q = function (s) { return R.querySelector(s); };
+            [["bg", "#f7f9fc"], ["bg2", "#eef2f8"], ["bg3", "#e3e9f2"], ["alu", "#e3e9f2"], ["alu-mid", "#8d96ab", "alu_mid"], ["keys", "#4c566e"], ["shadow", "#0c1a3a"], ["accent", "#c4552d"]]
+              .forEach(function (c) { R.style.setProperty("--" + c[0], v[c[2] || c[0]] || c[1]); });
+            function clamp(x, a, b) { return Math.max(a, Math.min(b, x)); }
+            function lin(f, a, b) { return clamp((f - a) / (b - a), 0, 1); }
+            function bez(x1, y1, x2, y2) { return function (t) { if (t <= 0) return 0; if (t >= 1) return 1; var lo = 0, hi = 1, s = t;
+              for (var i = 0; i < 30; i++) { s = (lo + hi) / 2; var x = 3 * (1 - s) * (1 - s) * s * x1 + 3 * (1 - s) * s * s * x2 + s * s * s; if (x < t) lo = s; else hi = s; }
+              return 3 * (1 - s) * (1 - s) * s * y1 + 3 * (1 - s) * s * s * y2 + s * s * s; }; }
+            var eLid = bez(0.62, 0, 0.3, 1), eCam = bez(0.7, 0, 0.3, 1);
+            function oc(t) { return 1 - Math.pow(1 - t, 3); }
+
+            // geometry in page pixels: screen 3072x1920 + bezel -> lid 3212x2080; base depth 2150, thickness 70
+            var W = 3212, H = 2080, D = 2150, T = 70, LT = 30;
+            function css(e, w, h, tf) { e.style.width = w + "px"; e.style.height = h + "px"; e.style.transform = tf; }
+            css(q(".rflr-top"), W, D, "translate3d(" + (-W / 2) + "px,0px,0px) rotateX(90deg)");
+            css(q(".rflr-front"), W, T, "translate3d(" + (-W / 2) + "px,0px," + D + "px)");
+            css(q(".sl"), D, T, "translate3d(" + (-W / 2) + "px,0px," + D + "px) rotateY(-90deg)");
+            css(q(".sr"), D, T, "translate3d(" + (W / 2) + "px,0px,0px) rotateY(90deg)");
+            var sh1 = q(".sh1"), sh2 = q(".sh2");
+            // keyboard: 6 rows of keys on the recessed deck
+            var deck = q(".rflr-deck"), rows = [14, 14, 13, 12, 11, 0];
+            for (var r = 0; r < 6; r++) { var n = rows[r] || 0, kw = 172, gap = 20, y = 30 + r * 170;
+              if (r === 5) { [[40, 220], [280, 220], [520, 1700], [2240, 220], [2480, 220]].forEach(function (k) { var e = document.createElement("div"); e.className = "rflr-key";
+                e.style.cssText = "left:" + k[0] + "px;top:" + y + "px;width:" + k[1] + "px;height:140px"; deck.appendChild(e); }); continue; }
+              var total = n * kw + (n - 1) * gap, extra = (2672 - total), x = 40;
+              for (var k = 0; k < n; k++) { var w = kw + (k === n - 1 ? extra : 0) + (k === 0 && r > 1 ? 0 : 0); var e = document.createElement("div"); e.className = "rflr-key";
+                e.style.cssText = "left:" + x + "px;top:" + y + "px;width:" + w + "px;height:140px"; deck.appendChild(e); x += w + gap; } }
+
+            // lid pieces (lid-local: vertical, bottom edge = hinge at y 0, screen faces +z)
+            css(q(".rflr-glass"), W, H, "translate3d(" + (-W / 2) + "px," + (-H) + "px,0px)");
+            css(q(".rflr-shell"), W, H, "translate3d(" + (W / 2) + "px," + (-H) + "px," + (-LT) + "px) rotateY(180deg)");
+            css(q(".rflr-ledge"), W, LT, "translate3d(" + (-W / 2) + "px," + (-H) + "px," + (-LT) + "px) rotateX(90deg)");
+            var lid = q(".rflr-lid"), base = q(".rflr-base"), cam = q(".rflr-cam");
+
+            // page content
+            var page = q(".rflr-page"); page.style.background = PAGE;
+            q(".rflr-wm .bn").textContent = str(v.brand, "Brand name"); q(".rflr-wm").style.color = INK;
+            q(".rflr-wm svg").setAttribute("stroke", FERN); q(".rflr-wm svg").querySelectorAll("path").forEach(function (p) { p.setAttribute("stroke", FERN); });
+            var w1 = q(".w1"), w2 = q(".w2"), btn = q(".rflr-btn"), cap = q(".rflr-cap"), dark = q(".rflr-dark"), spill = q(".rflr-spill");
+            w1.textContent = str(v.word1, "Word one"); w2.textContent = str(v.word2, "Word two"); w1.style.color = INK; w2.style.color = INK;
+            btn.textContent = str(v.button, "Button label"); btn.style.background = ACC; btn.style.color = ONACC;
+            cap.textContent = str(v.caption, "Caption"); cap.style.color = INK2;
+            function fit(e, maxW, size, min) { var s = size; e.style.fontSize = s + "px"; while (e.scrollWidth > maxW && s > min) { s -= 2; e.style.fontSize = s + "px"; } }
+            [w1, w2].forEach(function (e) { e.style.left = "auto"; e.style.right = "auto"; e.style.display = "inline-block"; fit(e, 960, 156, 60); e.style.display = ""; e.style.left = "0"; e.style.right = "0"; });
+            fit(q(".rflr-wm"), 900, 44, 24); fit(cap, 900, 32, 20);
+            (function () { var s = 44; btn.style.fontSize = s + "px"; while (btn.offsetWidth > 900 && s > 24) { s -= 2; btn.style.fontSize = s + "px"; } })();
+
+            // two coded fern fronds, drawn on (evolvePath-like) from the column edges
+            var NS = "http://www.w3.org/2000/svg", fsvg = q(".rflr-ferns"), ferns = [];
+            function cub(p, t) { var u = 1 - t; return [u * u * u * p[0][0] + 3 * u * u * t * p[1][0] + 3 * u * t * t * p[2][0] + t * t * t * p[3][0],
+              u * u * u * p[0][1] + 3 * u * u * t * p[1][1] + 3 * u * t * t * p[2][1] + t * t * t * p[3][1]]; }
+            function makeFern(sx, rootX) { var g = document.createElementNS(NS, "g"); fsvg.appendChild(g);
+              var P = [[0, 0], [30 * sx, -320], [210 * sx, -560], [120 * sx, -800]], d = "M0,0";
+              for (var i = 1; i <= 40; i++) { var p = cub(P, i / 40); d += " L" + p[0].toFixed(1) + "," + p[1].toFixed(1); }
+              var stem = document.createElementNS(NS, "path"); stem.setAttribute("d", d); stem.setAttribute("fill", "none"); stem.setAttribute("stroke", FERN);
+              stem.setAttribute("stroke-width", 9); stem.setAttribute("stroke-linecap", "round"); g.appendChild(stem);
+              var L = stem.getTotalLength(); stem.style.strokeDasharray = L; var leaves = [];
+              for (var j = 0; j < 16; j++) { var t = 0.08 + j * 0.055, p0 = cub(P, t), p1 = cub(P, t + 0.01), ang = Math.atan2(p1[1] - p0[1], p1[0] - p0[0]);
+                [-1, 1].forEach(function (side) { var len = 150 * (1 - t * 0.85), a2 = ang + side * 1.05, bx = p0[0] + Math.cos(a2) * len, by = p0[1] + Math.sin(a2) * len - 26;
+                  var mx = p0[0] + Math.cos(a2) * len * 0.5, my = p0[1] + Math.sin(a2) * len * 0.5 - 30;
+                  var lf = document.createElementNS(NS, "path"); lf.setAttribute("d", "M" + p0[0].toFixed(1) + "," + p0[1].toFixed(1) + " Q" + mx.toFixed(1) + "," + my.toFixed(1) + " " + bx.toFixed(1) + "," + by.toFixed(1));
+                  lf.setAttribute("fill", "none"); lf.setAttribute("stroke", FERN); lf.setAttribute("stroke-width", 7); lf.setAttribute("stroke-linecap", "round"); g.appendChild(lf);
+                  var ll = lf.getTotalLength(); lf.style.strokeDasharray = ll; leaves.push({ e: lf, t: t, l: ll }); }); }
+              return { g: g, stem: stem, L: L, leaves: leaves, x: rootX, sx: sx }; }
+            ferns.push(makeFern(1, 1010), makeFern(-1, 2062));
+
+            function camAt(f) {
+              var k = eCam(lin(f, 22, 45)), s0 = 0.25, s1 = 1;
+              var s = s0 * Math.pow(s1 / s0, k) * (1 + 0.01 * lin(f, 45, 59));
+              var a0 = 22 * Math.PI / 180;
+              var P0 = [0, -520, 1050], P1 = [0, -1040 * Math.cos(a0), -1040 * Math.sin(a0)];
+              return { s: s, ax: -28 + 6 * k, ay: -24 * (1 - k), ty: 1080 - 120 * k, p: [P0[0] + (P1[0] - P0[0]) * k, P0[1] + (P1[1] - P0[1]) * k, P0[2] + (P1[2] - P0[2]) * k] }; }
+
+            function render(f) {
+              // lid angle: 0 -> 115 by f23 on bezier(0.62,0,0.3,1), settles to 112 by f26
+              var th = f < 23 ? 115 * eLid(f / 23) : 115 - 3 * Math.sin(Math.PI / 2 * lin(f, 23, 26));
+              lid.style.transform = "translate3d(0px,-2px,0px) rotateX(" + (-(90 - th)).toFixed(3) + "deg)";
+              var c = camAt(f);
+              cam.style.transform = "translate3d(540px," + c.ty + "px,0px) scale(" + c.s.toFixed(5) + ") rotateX(" + c.ax.toFixed(3) + "deg) rotateY(" + c.ay.toFixed(3) +
+                "deg) translate3d(" + (-c.p[0]).toFixed(1) + "px," + (-c.p[1]).toFixed(1) + "px," + (-c.p[2]).toFixed(1) + "px)";
+              base.style.visibility = f > 41 ? "hidden" : "inherit";
+              // floor shadows: one under the base, one growing behind as the lid rises
+              var rise = Math.sin(clamp(th, 0, 112) * Math.PI / 180 * 0.5 + 0) , back = clamp(th / 112, 0, 1);
+              css(sh1, W + 700, D + 600, "translate3d(" + (-(W + 700) / 2) + "px," + (T + 2) + "px," + (-300) + "px) rotateX(90deg)");
+              css(sh2, W + 500, 1400, "translate3d(" + (-(W + 500) / 2) + "px," + (T + 1) + "px," + (-1300 * back) + "px) rotateX(90deg)");
+              sh2.style.opacity = (0.85 * back).toFixed(3); sh1.style.visibility = sh2.style.visibility = f > 41 ? "hidden" : "inherit";
+              // screen wake: black until f10, backlight 0 -> 1 over f10-18, warm spill on the deck in step
+              var bl = lin(f, 10, 18); dark.style.opacity = (1 - bl).toFixed(3); spill.style.opacity = (0.9 * bl).toFixed(3);
+              // page beats
+              var wm = q(".rflr-wm"), pw = lin(f, 12, 16); wm.style.opacity = pw; wm.style.transform = "translateY(" + (14 * (1 - oc(pw))) + "px)";
+              [[w1, 16], [w2, 20]].forEach(function (a) { var p = lin(f, a[1], a[1] + 4); a[0].style.opacity = p; a[0].style.transform = "translateY(" + (14 * (1 - oc(p))).toFixed(2) + "px)"; });
+              var pb = lin(f, 26, 32), sc = pb <= 0 ? 0.9 : (pb < 0.6 ? 0.9 + 0.14 * oc(pb / 0.6) : 1.04 - 0.04 * Math.sin(Math.PI / 2 * (pb - 0.6) / 0.4));
+              btn.style.opacity = lin(f, 26, 28); btn.style.transform = "translateX(-50%) scale(" + sc.toFixed(4) + ")";
+              var pc = lin(f, 40, 46); cap.style.opacity = pc; cap.style.transform = "translateY(" + (10 * (1 - oc(pc))).toFixed(2) + "px)";
+              ferns.forEach(function (fr, i) { var pr = oc(lin(f, 14, 42));
+                fr.stem.style.strokeDashoffset = (fr.L * (1 - pr)).toFixed(1);
+                fr.leaves.forEach(function (lf) { var lp = clamp((pr - lf.t) / 0.12, 0, 1); lf.e.style.strokeDashoffset = (lf.l * (1 - lp)).toFixed(1); });
+                var sway = f > 42 ? 2 * Math.sin((f - 42) / 30 * Math.PI * 2 * 0.5 + i) : 0;
+                fr.g.setAttribute("transform", "translate(" + fr.x + ",1940) rotate(" + (sway * fr.sx).toFixed(3) + ")"); });
+              R.style.opacity = f > END - 7.5 ? clamp((END - f) / 7.5, 0, 1) : 1;
+            }
+
+            var cur = 0, st = { get f() { return cur; }, set f(x) { cur = x; render(x); } }, tl = gsap.timeline({ paused: true });
+            tl.fromTo(st, { f: 0 }, { f: END, duration: secs, ease: "none", immediateRender: false }, 0);
+            render(0);
+            window.__timelines = window.__timelines || {};
+            window.__timelines["rf-laptop-reveal"] = tl;
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

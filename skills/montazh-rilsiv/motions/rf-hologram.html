@@ -1,0 +1,253 @@
+<!doctype html>
+<!-- rf-hologram: a scan-line drone hologram assembles in a cone of cyan light and two targeting brackets lock on (three.js). Rebuilt from an ultra-skills motion prompt. -->
+<html lang="uk" data-composition-id="rf-hologram" data-composition-duration="600" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "part_1", "type": "string", "label": "Мітка 1 (внизу ліворуч, на посилці)", "default": "Part 1 label" },
+  { "id": "part_2", "type": "string", "label": "Мітка 2 (вгорі праворуч, на корпусі)", "default": "Part 2 label" },
+  { "id": "object_name", "type": "string", "label": "Назва об&apos;єкта (вгорі)", "default": "Object name" },
+  { "id": "bg", "type": "color", "label": "Фон кімнати", "default": "#05070e" },
+  { "id": "surface", "type": "color", "label": "Відблиск підлоги", "default": "#111827" },
+  { "id": "accent", "type": "color", "label": "Промінь світла", "default": "#22c7d9" },
+  { "id": "glow", "type": "color", "label": "Контури голограми і рамки", "default": "#3ee6d0" },
+  { "id": "ink", "type": "color", "label": "Ядро голограми і текст", "default": "#f2f5ff" },
+  { "id": "muted", "type": "color", "label": "Другорядний текст і лінії", "default": "#a9b4d0" },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 2 }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-hologram</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-hologram" data-duration="600" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; }
+          .rfhg { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden; }
+          .rfhg .rfhg-gl, .rfhg .rfhg-tear, .rfhg .rfhg-glow, .rfhg .rfhg-svg { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+          .rfhg .rfhg-glow { mix-blend-mode: screen; opacity: .7; }
+          .rfhg .rfhg-tag { position: absolute; height: 60px; box-sizing: border-box; padding: 0 18px; display: flex; align-items: center; white-space: nowrap;
+                            font-family: var(--font-body, "Inter", "Helvetica Neue", Arial, sans-serif); font-weight: 600; font-size: 34px; letter-spacing: .01em;
+                            border-width: 1.5px; border-style: solid; opacity: 0; transform-origin: 50% 50%; }
+          .rfhg .rfhg-name { position: absolute; left: 60px; top: 300px; width: 460px; height: 60px; display: flex; align-items: center; white-space: nowrap;
+                             font-family: var(--font-display, "Inter", "Helvetica Neue", Arial, sans-serif); font-weight: 700; font-size: 44px; letter-spacing: .01em; opacity: 0; }
+        </style>
+        <div class="rfhg">
+          <canvas class="rfhg-gl" width="1080" height="1920"></canvas>
+          <canvas class="rfhg-tear" width="1080" height="1920"></canvas>
+          <canvas class="rfhg-glow" width="270" height="480"></canvas>
+          <svg class="rfhg-svg" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg"></svg>
+          <div class="rfhg-tag rfhg-t1"></div>
+          <div class="rfhg-tag rfhg-t2"></div>
+          <div class="rfhg-name"></div>
+        </div>
+        <script>
+          (function () {
+            var ID = "rf-hologram";
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            function sv(x, d) { return (x == null || x === "") ? d : String(x); }
+            var secs = Math.max(1, +v.seconds || 2);
+            var BG = v.bg || "#05070e", SURF = v.surface || "#111827", BEAM = v.accent || "#22c7d9", EDGE = v.glow || "#3ee6d0", INK = v.ink || "#f2f5ff", MUTED = v.muted || "#a9b4d0";
+            var box = document.querySelector(".rfhg");
+            var tl = gsap.timeline({ paused: true });
+            window.__timelines = window.__timelines || {};
+            window.__timelines[ID] = tl;
+            if (!box || !window.THREE) { tl.to({}, { duration: secs }); return; }
+            var T = window.THREE, PI = Math.PI;
+            box.style.background = BG;
+            function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+            function clamp(x, a, b) { return x < a ? a : x > b ? b : x; }
+            function seg(f, a, b) { return clamp((f - a) / (b - a), 0, 1); }
+            function oCub(p) { return 1 - Math.pow(1 - p, 3); }
+            function ioSine(p) { return -(Math.cos(PI * p) - 1) / 2; }
+            function canvasTex(w, h, paint) { var c = document.createElement("canvas"); c.width = w; c.height = h; paint(c.getContext("2d"), w, h); return new T.CanvasTexture(c); }
+            function radial(stops) { return canvasTex(128, 128, function (g) { var gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); stops.forEach(function (s) { gr.addColorStop(s[0], s[1]); }); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); }); }
+            function rgba(hex, a) { var c = new T.Color(hex); return "rgba(" + Math.round(c.r * 255) + "," + Math.round(c.g * 255) + "," + Math.round(c.b * 255) + "," + a + ")"; }
+
+            var cv = box.querySelector(".rfhg-gl"), tearCv = box.querySelector(".rfhg-tear"), tctx = tearCv.getContext("2d");
+            var glowCv = box.querySelector(".rfhg-glow"), gctx = glowCv.getContext("2d"), svg = box.querySelector(".rfhg-svg");
+            var R = new T.WebGLRenderer({ canvas: cv, antialias: true, preserveDrawingBuffer: true, alpha: false });
+            R.setPixelRatio(1); R.setSize(1080, 1920, false);
+            var scene = new T.Scene(), cBG = new T.Color(BG);
+            scene.background = cBG;
+            var camera = new T.PerspectiveCamera(32, 1080 / 1920, .1, 200);
+
+            // ---------- room: floor, emitter, cone, dust ----------
+            var floorTex = radial([[0, SURF], [.45, rgba(SURF, .55)], [1, rgba(BG, 0)]]);
+            var floor = new T.Mesh(new T.PlaneGeometry(22, 22), new T.MeshBasicMaterial({ map: floorTex, transparent: true, depthWrite: false }));
+            floor.rotation.x = -PI / 2; scene.add(floor);
+            var add = { transparent: true, depthWrite: false, blending: T.AdditiveBlending };
+            var pool = new T.Mesh(new T.PlaneGeometry(4.6, 4.6), new T.MeshBasicMaterial(Object.assign({ map: radial([[0, rgba(BEAM, .55)], [.35, rgba(BEAM, .16)], [1, rgba(BEAM, 0)]]) }, add)));
+            pool.rotation.x = -PI / 2; pool.position.y = .01; scene.add(pool);
+            var plate = new T.Mesh(new T.CylinderGeometry(.95, 1.0, .08, 64), new T.MeshBasicMaterial({ color: new T.Color(SURF).lerp(new T.Color(MUTED), .12) }));
+            plate.position.y = .04; scene.add(plate);
+            var plateTop = new T.Mesh(new T.CircleGeometry(.62, 48), new T.MeshBasicMaterial(Object.assign({ map: radial([[0, rgba(INK, .9)], [.4, rgba(BEAM, .6)], [1, rgba(BEAM, .05)]]) }, add)));
+            plateTop.rotation.x = -PI / 2; plateTop.position.y = .085; scene.add(plateTop);
+            var dotTex = radial([[0, "rgba(255,255,255,1)"], [.35, "rgba(255,255,255,.55)"], [1, "rgba(255,255,255,0)"]]);
+            var ringLights = new T.Group(); scene.add(ringLights);
+            for (var i = 0; i < 24; i++) {
+              var a = i / 24 * PI * 2;
+              var bulb = new T.Mesh(new T.SphereGeometry(.035, 8, 6), new T.MeshBasicMaterial({ color: new T.Color(BEAM).lerp(new T.Color(INK), .4) }));
+              bulb.position.set(Math.cos(a) * .8, .09, Math.sin(a) * .8); ringLights.add(bulb);
+              var sp = new T.Sprite(new T.SpriteMaterial(Object.assign({ map: dotTex, color: new T.Color(BEAM) }, add))); sp.scale.set(.32, .32, 1); sp.position.copy(bulb.position); ringLights.add(sp);
+            }
+            var CONE_H = 5.6, CONE_R0 = .75, CONE_R1 = 2.5;
+            var coneMat = new T.ShaderMaterial({
+              uniforms: { uCol: { value: new T.Color(BEAM) }, uI: { value: .4 } }, side: T.DoubleSide, transparent: true, depthWrite: false, blending: T.AdditiveBlending,
+              vertexShader: "varying vec2 vUv; varying vec3 vN; varying vec3 vW; void main(){ vUv=uv; vec4 w=modelMatrix*vec4(position,1.0); vW=w.xyz; vN=normalize(mat3(modelMatrix)*normal); gl_Position=projectionMatrix*viewMatrix*w; }",
+              fragmentShader: "uniform vec3 uCol; uniform float uI; varying vec2 vUv; varying vec3 vN; varying vec3 vW; void main(){ vec3 V=normalize(cameraPosition-vW); float c=pow(abs(dot(normalize(vN),V)),1.6); float h=pow(1.0-vUv.y,1.5); float a=uI*h*(0.12+0.5*c)*0.55; gl_FragColor=vec4(uCol*a,1.0); }"
+            });
+            var cone = new T.Mesh(new T.CylinderGeometry(CONE_R1, CONE_R0, CONE_H, 64, 1, true), coneMat); cone.position.y = CONE_H / 2 + .08; scene.add(cone);
+            var rnd = mulberry32(5150), NDUST = 60, DUST = [];
+            for (i = 0; i < NDUST; i++) DUST.push([rnd(), rnd() * PI * 2, rnd() * CONE_H, .6 + rnd() * .9]);
+            var dPos = new Float32Array(NDUST * 3), dGeo = new T.BufferGeometry(); dGeo.setAttribute("position", new T.BufferAttribute(dPos, 3));
+            var dust = new T.Points(dGeo, new T.PointsMaterial(Object.assign({ color: new T.Color(BEAM).lerp(new T.Color(INK), .35), size: 5, sizeAttenuation: false, map: dotTex }, add)));
+            dust.frustumCulled = false; scene.add(dust);
+            var scanDisc = new T.Mesh(new T.CircleGeometry(1, 48), new T.MeshBasicMaterial(Object.assign({ map: radial([[0, rgba(EDGE, .05)], [.8, rgba(EDGE, .22)], [.97, rgba(INK, .5)], [1, rgba(EDGE, 0)]]), depthTest: false }, add)));
+            scanDisc.rotation.x = -PI / 2; scene.add(scanDisc);
+
+            // ---------- hologram drone ----------
+            var U = { uCol: { value: new T.Color(EDGE) }, uCore: { value: new T.Color(INK) }, uClip: { value: -99 }, uBase: { value: 0 }, uTime: { value: 0 }, uOp: { value: 1 }, uBand2: { value: -99 }, uSeed: { value: 0 }, uAmt: { value: 1 } };
+            var VS = "varying vec3 vW; varying vec3 vN; void main(){ vec4 w=modelMatrix*vec4(position,1.0); vW=w.xyz; #ifdef SHELL\n vN=normalize(mat3(modelMatrix)*normal);\n#endif\n gl_Position=projectionMatrix*viewMatrix*w; }";
+            VS = VS.replace("#ifdef SHELL\n", "\n#ifdef SHELL\n");
+            var FS = [
+              "uniform vec3 uCol; uniform vec3 uCore; uniform float uClip, uBase, uTime, uOp, uBand2, uSeed, uAmt; varying vec3 vW; varying vec3 vN;",
+              "float hash(vec2 p){ return fract(sin(dot(p, vec2(12.9898,78.233))+uSeed)*43758.5453); }",
+              "void main(){ if (vW.y > uClip) discard; float y=vW.y-uBase;",
+              " float bands=smoothstep(0.8,1.0,0.5+0.5*sin(y*26.0-uTime*5.0));",
+              " float pl=1.0-smoothstep(0.0,0.07,uClip-vW.y); float b2=1.0-smoothstep(0.0,0.12,abs(vW.y-uBand2));",
+              "#ifdef SHELL",
+              " vec3 V=normalize(cameraPosition-vW); float fr=pow(1.0-abs(dot(normalize(vN),V)),2.2); float a=uAmt*(0.04+0.42*fr+0.10*bands);",
+              "#else",
+              " float a=uAmt*(0.7+0.3*bands);",
+              "#endif",
+              " a+=pl*0.9+b2*0.55; float g=0.8+0.4*hash(floor(gl_FragCoord.xy));",
+              " vec3 c=mix(uCol,uCore,clamp(pl+b2*0.6,0.0,1.0));",
+              " gl_FragColor=vec4(c*a*g*uOp,1.0); }"].join("\n");
+            var HMATS = [];
+            function holoMat(shell, core, amt) {
+              var u = T.UniformsUtils.clone(U); if (core) u.uCol.value = new T.Color(INK); u.uAmt.value = amt;
+              var m = new T.ShaderMaterial({ uniforms: u, vertexShader: VS, fragmentShader: FS, defines: shell ? { SHELL: 1 } : {}, transparent: true, depthTest: false, depthWrite: false, blending: T.AdditiveBlending, side: T.DoubleSide });
+              HMATS.push(m); return m;
+            }
+            var mShell = holoMat(true, false, 1), mLine = holoMat(false, false, 1), mHub = holoMat(true, true, 2.2), mHubL = holoMat(false, true, 1.4);
+            var drone = new T.Group(); scene.add(drone);
+            function part(geo, parent, x, y, z, hub, thr) {
+              var g = new T.Group(); g.position.set(x || 0, y || 0, z || 0); parent.add(g);
+              g.add(new T.Mesh(geo, hub ? mHub : mShell));
+              var ln = new T.LineSegments(new T.EdgesGeometry(geo, thr || 25), hub ? mHubL : mLine); ln.layers.enable(1); g.add(ln);
+              if (hub) g.children[0].layers.enable(1);
+              return g;
+            }
+            var body = part(new T.CapsuleGeometry(.36, 1.05, 3, 8), drone, 0, 0, 0); body.rotation.z = PI / 2;
+            part(new T.SphereGeometry(.2, 8, 6), drone, .68, -.02, 0, true);
+            var ROT = [];
+            [[1, 1], [-1, 1], [1, -1], [-1, -1]].forEach(function (s) {
+              var arm = part(new T.CylinderGeometry(.06, .07, 1.5, 6), drone, s[0] * .55, .12, s[1] * .55);
+              arm.rotation.set(0, Math.atan2(s[0], s[1]), PI / 2); arm.rotation.order = "YZX"; arm.rotation.set(PI / 2, 0, 0); arm.lookAt(new T.Vector3(s[0] * 1.2, .12 + 3.2, s[1] * 1.2));
+              var rx = s[0] * 1.08, rz = s[1] * 1.08;
+              part(new T.CylinderGeometry(.11, .13, .22, 10), drone, rx, .2, rz, true);
+              var ring = part(new T.TorusGeometry(.56, .035, 6, 40), drone, rx, .3, rz); ring.rotation.x = PI / 2;
+              var rot = new T.Group(); rot.position.set(rx, .33, rz); drone.add(rot);
+              for (var b = 0; b < 2; b++) { var bl = part(new T.BoxGeometry(1.0, .02, .09), rot, 0, 0, 0); bl.rotation.y = b * PI / 2; }
+              ROT.push(rot);
+            });
+            [-1, 1].forEach(function (s) {
+              var sk = part(new T.CylinderGeometry(.04, .04, 1.7, 6), drone, 0, -.66, s * .46); sk.rotation.z = PI / 2;
+              [-.4, .4].forEach(function (x) { var st = part(new T.CylinderGeometry(.03, .03, .42, 5), drone, x, -.45, s * .38); st.rotation.x = s * .35; });
+            });
+            part(new T.BoxGeometry(.62, .5, .62, 2, 2, 2), drone, 0, -1.18, 0, false, 10);
+            part(new T.BoxGeometry(.64, .06, .1), drone, 0, -.92, 0, false);
+            [-.22, .22].forEach(function (x) { var cord = part(new T.CylinderGeometry(.01, .01, .55, 3), drone, x, -.65, 0); });
+            var Y_LO = -1.45, Y_HI = .4, DRONE_Y = 3.15;
+            var P_PARCEL = new T.Vector3(0, -1.18, 0), P_BODY = new T.Vector3(.1, 0, 0);
+
+            // ---------- overlays ----------
+            var NS = "http://www.w3.org/2000/svg";
+            function brackets(color) {
+              var g = document.createElementNS(NS, "g"), cs = [];
+              for (var k = 0; k < 4; k++) { var p = document.createElementNS(NS, "path"); p.setAttribute("d", "M0,38 L0,0 L38,0"); p.setAttribute("fill", "none"); p.setAttribute("stroke", color); p.setAttribute("stroke-width", "4"); p.setAttribute("stroke-linecap", "square"); g.appendChild(p); cs.push(p); }
+              svg.appendChild(g); return cs;
+            }
+            function leader() { var l = document.createElementNS(NS, "line"); l.setAttribute("stroke", MUTED); l.setAttribute("stroke-width", "1.5"); svg.appendChild(l); return l; }
+            var B1 = brackets(EDGE), B2 = brackets(EDGE), L1 = leader(), L2 = leader();
+            var t1 = box.querySelector(".rfhg-t1"), t2 = box.querySelector(".rfhg-t2"), nm = box.querySelector(".rfhg-name");
+            [t1, t2].forEach(function (t) { t.style.color = INK; t.style.borderColor = EDGE; t.style.background = rgba(BG, .55); });
+            nm.style.color = INK;
+            t1.textContent = sv(v.part_1, "Part 1 label"); t2.textContent = sv(v.part_2, "Part 2 label"); nm.textContent = sv(v.object_name, "Object name");
+            function fitW(el, max, min, w) { var s = max; el.style.fontSize = s + "px"; while (s > min && el.scrollWidth > w + 1) { s -= 1; el.style.fontSize = s + "px"; } }
+            t1.style.left = "90px"; t1.style.top = "1120px"; fitW(t1, 34, 20, 430);
+            t2.style.right = "60px"; t2.style.top = "560px"; fitW(t2, 34, 20, 420);
+            fitW(nm, 44, 24, 460); nm.style.width = "auto"; nm.style.maxWidth = "460px";
+            var T1W = Math.min(430, t1.offsetWidth), T2W = Math.min(420, t2.offsetWidth);
+
+            var tmp = new T.Vector3();
+            function proj(p) { tmp.copy(p).applyMatrix4(drone.matrixWorld).project(camera); return { x: (tmp.x + 1) / 2 * 1080, y: (1 - tmp.y) / 2 * 1920 }; }
+            var DIRS = [[-1, -1, 0], [1, -1, 90], [1, 1, 180], [-1, 1, 270]];
+            function lockOn(cs, c, half, f, s0) {
+              var p = oCub(seg(f, s0, s0 + 10)), sc = p < 1 ? 2.2 + (.94 - 2.2) * p : .94 + .06 * oCub(seg(f, s0 + 10, s0 + 14)), vis = f >= s0 ? 1 : 0;
+              for (var k = 0; k < 4; k++) {
+                var d = DIRS[k], fx = c.x + d[0] * half * sc, fy = c.y + d[1] * half * sc;
+                var sx = c.x + d[0] * 1250, sy = c.y + d[1] * 1250;
+                var x = sx + (fx - sx) * p, y = sy + (fy - sy) * p;
+                cs[k].setAttribute("transform", "translate(" + x.toFixed(1) + "," + y.toFixed(1) + ") rotate(" + d[2] + ") scale(" + sc.toFixed(3) + ")");
+                cs[k].setAttribute("opacity", vis);
+              }
+              return { x0: c.x - half * sc, x1: c.x + half * sc, y0: c.y - half * sc, y1: c.y + half * sc, on: f >= s0 + 10 };
+            }
+            function pop(el, f, f0) {
+              var p = seg(f, f0, f0 + 6), s = p <= 0 ? .6 : p < .5 ? .6 + .96 * p : 1.08 - .16 * (p - .5);
+              el.style.opacity = f >= f0 ? 1 : 0; el.style.transform = "scale(" + s.toFixed(3) + ")";
+            }
+
+            // ---------- frame ----------
+            function draw(t) {
+              var f = t * 30, k;
+              var bob = .029 * Math.sin(f / 40 * PI * 2);
+              drone.position.set(0, DRONE_Y + bob, 0);
+              drone.rotation.y = (-25 + 1.6 * f) * PI / 180;
+              for (k = 0; k < 4; k++) ROT[k].rotation.y = 1.1 * f * (k % 3 === 0 ? 1 : -1);
+              var zoom = 1 + .03 * ioSine(seg(f, 20, 59));
+              camera.position.set(0, 4.1, 16.2); camera.lookAt(0, 2.55, 0); camera.zoom = zoom; camera.updateProjectionMatrix(); camera.updateMatrixWorld();
+              scene.updateMatrixWorld(true);
+              // scan plane + second band
+              var sp = oCub(seg(f, 0, 20)), base = DRONE_Y + bob, clip = f < 20 ? base + Y_LO + (Y_HI - Y_LO) * sp : 99;
+              var b2 = (f >= 48 && f <= 60) ? base + Y_LO + (Y_HI - Y_LO + .15) * seg(f, 48, 59) : -99;
+              var flick = f < 22 ? 1 : f < 24.5 ? 1 - .55 * seg(f, 22, 24.5) : 1 - .55 * (1 - seg(f, 24.5, 27));
+              HMATS.forEach(function (m) { var u = m.uniforms; u.uClip.value = clip; u.uBase.value = base; u.uTime.value = t; u.uOp.value = flick; u.uBand2.value = b2; u.uSeed.value = Math.floor(f) * .37; });
+              var bandY = f < 20 ? clip : (b2 > -50 ? b2 : -99);
+              scanDisc.visible = bandY > -50 && (f < 20.5 || (f >= 48 && f <= 59.5));
+              if (scanDisc.visible) { var rr = CONE_R0 + (CONE_R1 - CONE_R0) * (bandY / CONE_H); scanDisc.position.y = bandY; scanDisc.scale.set(rr * .92, rr * .92, 1); scanDisc.material.opacity = f < 20 ? 1 : .6; }
+              coneMat.uniforms.uI.value = .4 + .6 * oCub(seg(f, 0, 20));
+              for (k = 0; k < NDUST; k++) {
+                var D = DUST[k], y = (D[2] + f * .012 * D[3]) % CONE_H, r = (CONE_R0 + (CONE_R1 - CONE_R0) * y / CONE_H) * Math.sqrt(D[0]) * .85, a = D[1] + f * .004;
+                dPos[k * 3] = Math.cos(a) * r; dPos[k * 3 + 1] = y + .1; dPos[k * 3 + 2] = Math.sin(a) * r;
+              }
+              dGeo.attributes.position.needsUpdate = true;
+              // glow pass (edges + hubs only), quarter-res, blurred, screen-blended
+              scene.background = null; camera.layers.set(1);
+              R.setViewport(0, 0, 270, 480); R.setClearColor(0x000000, 1); R.clear(); R.render(scene, camera);
+              gctx.clearRect(0, 0, 270, 480); gctx.filter = "blur(3px)"; gctx.drawImage(cv, 0, 1440, 270, 480, 0, 0, 270, 480);
+              gctx.filter = "blur(8px)"; gctx.globalAlpha = .8; gctx.drawImage(cv, 0, 1440, 270, 480, 0, 0, 270, 480); gctx.globalAlpha = 1;
+              scene.background = cBG; camera.layers.set(0); R.setViewport(0, 0, 1080, 1920);
+              R.render(scene, camera);
+              // one 18px horizontal tear during the flicker dip
+              tctx.clearRect(0, 0, 1080, 1920);
+              if (f >= 23.5 && f < 25.5) { var c0 = proj(P_BODY), ty = Math.round(c0.y - 10); tctx.fillStyle = BG; tctx.fillRect(0, ty, 1080, 46); tctx.drawImage(cv, 0, ty, 1080, 46, 18, ty, 1080, 46); }
+              // lock-ons
+              var c1 = proj(P_PARCEL), c2 = proj(P_BODY);
+              var bb1 = lockOn(B1, c1, 72, f, 20), bb2 = lockOn(B2, c2, 108, f, 28);
+              pop(t1, f, 30); pop(t2, f, 38);
+              var l1 = seg(f, 30, 34), l2 = seg(f, 38, 42);
+              var a1x = 90 + T1W, a1y = 1120, e1x = bb1.x0, e1y = bb1.y1;
+              L1.setAttribute("x1", a1x); L1.setAttribute("y1", a1y); L1.setAttribute("x2", a1x + (e1x - a1x) * l1); L1.setAttribute("y2", a1y + (e1y - a1y) * l1); L1.setAttribute("opacity", l1 > 0 ? 1 : 0);
+              var a2x = 1020 - T2W, a2y = 620, e2x = bb2.x1, e2y = bb2.y0;
+              L2.setAttribute("x1", a2x); L2.setAttribute("y1", a2y); L2.setAttribute("x2", a2x + (e2x - a2x) * l2); L2.setAttribute("y2", a2y + (e2y - a2y) * l2); L2.setAttribute("opacity", l2 > 0 ? 1 : 0);
+              var np = oCub(seg(f, 44, 54)); nm.style.opacity = np; nm.style.transform = "translateY(" + (16 * (1 - np)).toFixed(1) + "px)";
+              box.style.opacity = clamp((secs - t) / .25, 0, 1);
+            }
+            var st = {}, _t = 0;
+            Object.defineProperty(st, "t", { get: function () { return _t; }, set: function (x) { _t = x; draw(x); } });
+            tl.to(st, { t: secs, duration: secs, ease: "none" }, 0);
+            draw(0);
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

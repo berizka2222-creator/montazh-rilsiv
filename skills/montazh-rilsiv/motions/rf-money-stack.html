@@ -1,0 +1,181 @@
+<!doctype html>
+<!-- rf-money-stack: ten banded cash bricks drop onto a wooden pallet faster and faster, each hit presses the stack, a big counter
+     rolls one tenth per landing and pops on the total, the last hit sends a floor ring and scraps. Rebuilt from an ultra-skills
+     motion prompt (CSS 3D boxes, no WebGL). -->
+<html lang="uk" data-composition-id="rf-money-stack" data-composition-duration="600" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "headline", "type": "string", "label": "Заголовок над лічильником", "default": "$1M, in real size" },
+  { "id": "total", "type": "number", "label": "Підсумок лічильника (число)", "default": 1000000 },
+  { "id": "prefix", "type": "string", "label": "Перед числом (валюта)", "default": "$" },
+  { "id": "suffix", "type": "string", "label": "Після числа (напр. « грн»)", "default": "" },
+  { "id": "sep", "type": "string", "label": "Роздільник тисяч", "default": "," },
+  { "id": "caption", "type": "string", "label": "Підпис під лічильником", "default": "Caption" },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 2 },
+  { "id": "bg", "type": "color", "label": "Студія: верх", "default": "#f7f9fc" },
+  { "id": "bg2", "type": "color", "label": "Студія: середина", "default": "#eef2f8" },
+  { "id": "bg3", "type": "color", "label": "Студія: підлога", "default": "#e3e9f2" },
+  { "id": "note", "type": "color", "label": "Купюра (папір)", "default": "#f4efe5" },
+  { "id": "print", "type": "color", "label": "Друк купюри і бандероль", "default": "#1f5c4a" },
+  { "id": "wood", "type": "color", "label": "Дерево піддона", "default": "#a4927d" },
+  { "id": "wood_dark", "type": "color", "label": "Темне дерево", "default": "#6d5d4c" },
+  { "id": "ink", "type": "color", "label": "Текст і лічильник", "default": "#0d1324" },
+  { "id": "muted", "type": "color", "label": "Підпис", "default": "#4c566e" },
+  { "id": "hit", "type": "color", "label": "Колір лічильника на фініші", "default": "#1f5c4a" },
+  { "id": "ring", "type": "color", "label": "Кільце по підлозі", "default": "#2f5bff" },
+  { "id": "shadow", "type": "color", "label": "Тіні", "default": "#0c1a3a" }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-money-stack</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-money-stack" data-duration="600" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; overflow: hidden; }
+          .rfms { position: absolute; inset: 0; overflow: hidden; perspective: 2400px; perspective-origin: 540px 1000px;
+                  background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 55%, var(--bg3) 100%); }
+          .rfms div { box-sizing: border-box; }
+          .rfms .rfms-cam, .rfms .rfms-o { position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; }
+          .rfms .rfms-f { position: absolute; left: 0; top: 0; transform-origin: 0 0; backface-visibility: hidden; }
+          .rfms .rfms-fl { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+          .rfms .n-front { background: repeating-linear-gradient(180deg, var(--note) 0 3px, color-mix(in srgb, var(--note) 82%, var(--print)) 3px 4px);
+                           border-radius: 6px; box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--note) 75%, var(--shadow)); }
+          .rfms .n-side { background: repeating-linear-gradient(180deg, color-mix(in srgb, var(--note) 88%, var(--shadow)) 0 3px, color-mix(in srgb, var(--note) 70%, var(--print)) 3px 4px); }
+          .rfms .n-top { background: var(--note); border-radius: 8px; box-shadow: inset 0 0 0 10px var(--note), inset 0 0 0 13px color-mix(in srgb, var(--print) 55%, var(--note)); overflow: hidden; }
+          .rfms .n-top i { position: absolute; left: 50%; top: 50%; width: 84px; height: 96px; margin: -48px 0 0 -42px; border-radius: 50%;
+                           border: 5px solid color-mix(in srgb, var(--print) 45%, var(--note)); }
+          .rfms .n-top s { position: absolute; top: 18px; font: 700 24px/1 var(--font-display, sans-serif); text-decoration: none;
+                           color: color-mix(in srgb, var(--print) 70%, var(--note)); }
+          .rfms .strap { position: absolute; top: 0; bottom: 0; left: 50%; width: 64px; margin-left: -32px; background: var(--print);
+                         box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--print) 70%, black); }
+          .rfms .w-top { background: repeating-linear-gradient(90deg, var(--wood) 0 112px, var(--wood-dark) 112px 124px); }
+          .rfms .w-front { background: linear-gradient(180deg, var(--wood), color-mix(in srgb, var(--wood) 70%, var(--wood-dark))); border-radius: 3px; }
+          .rfms .w-side { background: var(--wood-dark); }
+          .rfms .rfms-streak { position: absolute; left: 0; width: 300px; bottom: 76px; transform-origin: 50% 100%; opacity: 0;
+                               background: linear-gradient(0deg, color-mix(in srgb, var(--note) 70%, transparent), transparent); }
+          .rfms .rfms-shadow { background: radial-gradient(50% 50% at 50% 50%, color-mix(in srgb, var(--shadow) 45%, transparent), color-mix(in srgb, var(--shadow) 14%, transparent) 55%, transparent 100%); }
+          .rfms .rfms-ring { border-radius: 50%; border: 10px solid var(--ring); }
+          .rfms .rfms-txt { position: absolute; left: 60px; right: 60px; text-align: center; white-space: nowrap; }
+          .rfms .rfms-hl { top: 350px; height: 70px; font-family: var(--font-display, sans-serif); font-weight: 700; font-size: 60px; line-height: 70px; color: var(--ink); }
+          .rfms .rfms-ct { top: 440px; height: 160px; display: flex; justify-content: center; transform-origin: 50% 50%; }
+          .rfms .rfms-num { display: inline-flex; font-family: var(--font-display, sans-serif); font-weight: 900; font-size: 136px; line-height: 160px;
+                            font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+          .rfms .rfms-sl { display: inline-block; overflow: hidden; height: 160px; }
+          .rfms .rfms-sl i { display: block; font-style: normal; white-space: pre; height: 160px; text-align: center; }
+          .rfms .rfms-cap { top: 610px; height: 40px; font-family: var(--font-body, sans-serif); font-size: 34px; line-height: 40px; color: var(--muted); }
+          .rfms .rfms-scrap { position: absolute; left: 0; top: 0; width: 26px; height: 12px; border-radius: 2px; opacity: 0; }
+        </style>
+        <div class="rfms">
+          <div class="rfms-cam"></div>
+          <div class="rfms-txt rfms-hl"></div>
+          <div class="rfms-txt rfms-ct"><span class="rfms-num"></span></div>
+          <div class="rfms-txt rfms-cap"></div>
+        </div>
+        <script>
+          (function () {
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            var secs = Math.max(1, +v.seconds || 2), END = secs * 30;
+            var R = document.querySelector(".rfms"), cam = R.querySelector(".rfms-cam");
+            var COL = [["bg", "#f7f9fc"], ["bg2", "#eef2f8"], ["bg3", "#e3e9f2"], ["note", "#f4efe5"], ["print", "#1f5c4a"], ["wood", "#a4927d"], ["wood-dark", "#6d5d4c", "wood_dark"],
+              ["ink", "#0d1324"], ["muted", "#4c566e"], ["hit", "#1f5c4a"], ["ring", "#2f5bff"], ["shadow", "#0c1a3a"]];
+            COL.forEach(function (c) { R.style.setProperty("--" + c[0], v[c[2] || c[0]] || c[1]); });
+            function clamp(x, a, b) { return Math.max(a, Math.min(b, x)); }
+            function lin(f, a, b) { return clamp((f - a) / (b - a), 0, 1); }
+            function oc(t) { return 1 - Math.pow(1 - t, 3); }
+            function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a);
+              t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+            var rnd = mulberry32(2024);
+            function div(cls, parent) { var e = document.createElement("div"); e.className = cls; if (parent) parent.appendChild(e); return e; }
+            // a box: origin at its bottom-centre; faces front, top, left, right (back/bottom never seen)
+            function makeBox(w, h, d, cls, parent) { var o = div("rfms-o", parent);
+              var fr = div("rfms-f " + cls.front, o); fr.style.cssText += ";width:" + w + "px;height:" + h + "px;transform:translate3d(" + (-w / 2) + "px," + (-h) + "px," + (d / 2) + "px)";
+              var tp = div("rfms-f " + cls.top, o); tp.style.cssText += ";width:" + w + "px;height:" + d + "px;transform:translate3d(" + (-w / 2) + "px," + (-h) + "px," + (-d / 2) + "px) rotateX(90deg)";
+              var lf = div("rfms-f " + cls.side, o); lf.style.cssText += ";width:" + d + "px;height:" + h + "px;transform:translate3d(" + (-w / 2) + "px," + (-h) + "px," + (-d / 2) + "px) rotateY(-90deg)";
+              var rt = div("rfms-f " + cls.side, o); rt.style.cssText += ";width:" + d + "px;height:" + h + "px;transform:translate3d(" + (w / 2) + "px," + (-h) + "px," + (d / 2) + "px) rotateY(90deg)";
+              return { o: o, front: fr, top: tp }; }
+            function floorDiv(cls, w, d, y, parent) { var e = div("rfms-fl " + cls, parent); e.style.width = w + "px"; e.style.height = d + "px";
+              e.style.transform = "translate3d(" + (-w / 2) + "px," + y + "px," + (-d / 2) + "px) rotateX(90deg)"; return e; }
+
+            // floor shadow + ring
+            var shadow = floorDiv("rfms-shadow", 1000, 520, -1, cam);
+            var ringWrap = div("rfms-o", cam), ring = div("rfms-fl rfms-ring", ringWrap);
+            // pallet (620 wide, 100 tall): bottom boards, three blocks, slatted top deck
+            var pallet = div("rfms-o", cam), pcls = { front: "w-front", top: "w-top", side: "w-side" };
+            makeBox(620, 16, 200, pcls, pallet);
+            [-262, 0, 262].forEach(function (x) { var b = makeBox(96, 66, 200, { front: "w-front", top: "w-front", side: "w-side" }, pallet); b.o.style.transform = "translate3d(" + x + "px,-16px,0px)"; });
+            var deck = makeBox(620, 18, 200, pcls, pallet); deck.o.style.transform = "translate3d(0px,-82px,0px)";
+            // ten bricks: five layers of two, left then right
+            var LAND = [2, 10, 17, 23, 28, 32, 36, 39, 42, 46], stack = div("rfms-o", cam), bricks = [];
+            var pre = String(v.prefix != null ? v.prefix : "$");
+            LAND.forEach(function (lf, i) { var layer = Math.floor(i / 2), side = i % 2 ? 1 : -1;
+              var b = makeBox(300, 76, 150, { front: "n-front", top: "n-top", side: "n-side" }, stack);
+              div("strap", b.front); div("strap", b.top); b.top.appendChild(document.createElement("i"));
+              var s1 = document.createElement("s"); s1.textContent = "100"; s1.style.left = "18px"; b.top.appendChild(s1);
+              var s2 = document.createElement("s"); s2.textContent = "100"; s2.style.right = "18px"; b.top.appendChild(s2);
+              var sk = div("rfms-streak", b.front);
+              bricks.push({ b: b, sk: sk, lf: lf, x: side * 151, y: -100 - layer * 76, rz: (rnd() - .5) * 6, ry: (rnd() - .5) * 6 }); });
+            // scraps for the last hit (screen space)
+            var scraps = [];
+            for (var k = 0; k < 9; k++) { var e = div("rfms-scrap", R); e.style.background = k % 3 === 0 ? "var(--print)" : "var(--note)";
+              e.style.boxShadow = "0 2px 4px color-mix(in srgb, var(--shadow) 30%, transparent)";
+              scraps.push({ e: e, vx: (rnd() - .5) * 46, vy: -18 - rnd() * 16, r: (rnd() - .5) * 60, x0: 540 + (rnd() - .5) * 500 }); }
+
+            // texts
+            var hl = R.querySelector(".rfms-hl"), ct = R.querySelector(".rfms-ct"), num = R.querySelector(".rfms-num"), cap = R.querySelector(".rfms-cap");
+            hl.textContent = v.headline != null ? String(v.headline) : "$1M, in real size"; cap.textContent = v.caption != null ? String(v.caption) : "Caption";
+            function fit(e, size, min) { var s = size; e.style.fontSize = s + "px"; while (e.scrollWidth > 960 && s > min) { s -= 2; e.style.fontSize = s + "px"; } }
+            fit(hl, 60, 30); fit(cap, 34, 20);
+            var total = +v.total; if (!isFinite(total) || total <= 0) total = 1000000;
+            var sep = v.sep != null ? String(v.sep) : ",", suf = v.suffix != null ? String(v.suffix) : "";
+            function fmt(n) { var s = String(Math.round(n)), o = ""; for (var i = 0; i < s.length; i++) { if (i && (s.length - i) % 3 === 0) o += sep; o += s[i]; } return pre + o + suf; }
+            var steps = LAND.map(function (lf, i) { return fmt(total * (i + 1) / 10); });
+            function counter(f) { var k = 0; LAND.forEach(function (lf, i) { if (f >= lf) k = i + 1; });
+              var curS = k ? steps[k - 1] : fmt(0), prevS = k > 1 ? steps[k - 2] : fmt(0), p = k ? oc(lin(f, LAND[k - 1], LAND[k - 1] + 3)) : 1;
+              var n = Math.max(curS.length, prevS.length), h = "";
+              for (var j = 0; j < n; j++) { var a = prevS[prevS.length - n + j] || "", b = curS[curS.length - n + j] || "";
+                if (a === b || p >= 1) h += '<span class="rfms-sl"><i>' + (b || "") + "</i></span>";
+                else h += '<span class="rfms-sl"><i style="transform:translateY(' + (-p * 160).toFixed(1) + 'px)">' + (a || "&nbsp;") + '</i><i style="transform:translateY(' + (-p * 160).toFixed(1) + 'px)">' + b + "</i></span>"; }
+              return h; }
+            num.innerHTML = '<span class="rfms-sl"><i>' + steps[9] + "</i></span>";
+            var ctScale = Math.min(1, 960 / Math.max(1, num.scrollWidth));
+
+            function render(f) {
+              // camera: front-on, 12 degrees above, rising to follow the stack over f0-48, then a 1% push; last-hit shake
+              var rise = oc(lin(f, 0, 48)), ty = 1310 + 60 * rise, push = 1 + 0.01 * lin(f, 48, END);
+              var sh = f >= 46 && f < 51 ? 18 * (1 - (f - 46) / 5) * (Math.floor(f) % 2 ? -1 : 1) : 0;
+              // stack press: each landing dips the stack 6px and returns over 8 frames
+              var dip = 0, nLanded = 0;
+              LAND.forEach(function (lf) { if (f >= lf) { nLanded++; var t = (f - lf) / 8; if (t < 1) dip = Math.max(dip, 6 * (t < 0.25 ? t / 0.25 : 1 - oc((t - 0.25) / 0.75))); } });
+              cam.style.transform = "translate3d(" + (540 + sh).toFixed(1) + "px," + ty.toFixed(1) + "px,0px) scale(" + push.toFixed(4) + ") rotateX(-12deg)";
+              pallet.style.transform = "translate3d(0px," + (dip * 0.35).toFixed(2) + "px,0px)";
+              bricks.forEach(function (br, i) {
+                var t0 = br.lf - 8, t = lin(f, t0, br.lf), fall = 1 - t * t, y = br.y - 2300 * fall + (f >= br.lf ? dip : 0);
+                var rz = br.rz * (1 - t), ry = br.ry * (1 - t);
+                br.b.o.style.visibility = f >= t0 ? "inherit" : "hidden";
+                br.b.o.style.transform = "translate3d(" + br.x + "px," + y.toFixed(1) + "px,0px) rotateZ(" + rz.toFixed(2) + "deg) rotateY(" + ry.toFixed(2) + "deg)";
+                var vel = f >= t0 && f < br.lf ? 2 * t : 0; br.sk.style.opacity = vel > 0 ? 0.9 : 0; br.sk.style.height = (220 * vel).toFixed(1) + "px"; });
+              shadow.style.opacity = (0.55 + 0.045 * nLanded).toFixed(3);
+              shadow.style.transform = "translate3d(-500px,-1px,-260px) rotateX(90deg) scale(" + (1.08 - 0.012 * nLanded).toFixed(3) + ")";
+              // last hit: floor ring from a pressure disc 120 -> 1500 wide over 16 frames
+              var rp = lin(f, 46, 62), rw = 120 + 1380 * oc(rp);
+              ring.style.width = rw + "px"; ring.style.height = (rw * 0.55) + "px"; ring.style.opacity = f >= 46 && rp < 1 ? (0.85 * (1 - rp)).toFixed(3) : 0;
+              ring.style.borderWidth = (10 * (1 - rp) + 2) + "px";
+              ring.style.transform = "translate3d(" + (-rw / 2) + "px,-2px," + (-rw * 0.275) + "px) rotateX(90deg)";
+              scraps.forEach(function (s) { var tt = f - 46; if (tt < 0 || tt > 16) { s.e.style.opacity = 0; return; }
+                var x = s.x0 + s.vx * tt, y = 1000 + s.vy * tt + 1.4 * tt * tt; s.e.style.opacity = (1 - tt / 16).toFixed(3);
+                s.e.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px) rotate(" + (s.r * tt).toFixed(1) + "deg)"; });
+              // counter + pop on the total
+              num.innerHTML = counter(f);
+              var pop = f >= 49 ? 1 + 0.08 * Math.sin(Math.PI * lin(f, 49, 55)) : 1;
+              ct.style.transform = "scale(" + (ctScale * pop).toFixed(4) + ")"; num.style.color = f >= 49 ? "var(--hit)" : "var(--ink)";
+              R.style.opacity = f > END - 7.5 ? clamp((END - f) / 7.5, 0, 1) : 1;
+            }
+
+            var cur = 0, st = { get f() { return cur; }, set f(x) { cur = x; render(x); } }, tl = gsap.timeline({ paused: true });
+            tl.fromTo(st, { f: 0 }, { f: END, duration: secs, ease: "none", immediateRender: false }, 0);
+            render(0);
+            window.__timelines = window.__timelines || {};
+            window.__timelines["rf-money-stack"] = tl;
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

@@ -173,7 +173,7 @@ def ideas(reel):
         for x in mine: print(f"         ★ моя марка {x['key']}: {x['ua']}  (з рілса {x['reel']}, налаштування: {json.dumps(x['spec'], ensure_ascii=False)})")
         for m in picks: print(f"         -> {m['name']}: {m['ua']}" + (" [просте]" if is_simple(m) else " [складне]") + (f"  [текст: {', '.join(m['text_vars'])}]" if m.get("text_vars") else "") + (" [інтерфейс, свої кольори]" if m.get("keep_ui") else "") + (" [на весь кадр]" if m.get("status") == "full_only" else "")
                               + ("  [render-overlay.sh, картка overlay + \"brand\"]" if m["status"] == "brand" else "")
-                              + (f"  [{'ефект Гвоздарева' if str(m.get('fx', '')).startswith('gv-') else '9 ефектів' if str(m.get('fx', '')).startswith('e9-') else 'ефект Vibha'}: картка {{\"type\": \"fx\", \"fx\": \"{m['fx']}\"}}]" if m.get("engine") == "fx" else ""))
+                              + (f"  [{'свій ефект' if str(m.get('fx', '')).startswith('rf-') else '22 ефекти' if str(m.get('fx', '')).startswith('ay-') else 'ефект Гвоздарева' if str(m.get('fx', '')).startswith('gv-') else '9 ефектів' if str(m.get('fx', '')).startswith('e9-') else 'ефект Vibha'}: картка {{\"type\": \"fx\", \"fx\": \"{m['fx']}\"}}]" if m.get("engine") == "fx" else ""))
 
 
 # «Мої марки» (stamps): every graphic a finished reel kept, with a still from that reel and its tested settings.

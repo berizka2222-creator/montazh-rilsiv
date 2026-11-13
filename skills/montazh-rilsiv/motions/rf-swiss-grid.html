@@ -1,0 +1,106 @@
+<!doctype html>
+<!-- rf-swiss-grid: Swiss poster grid, vermilion blocks on rails, three huge words cut between cells and lock into a stack.
+     Rebuilt from an ultra-skills motion prompt. -->
+<html lang="uk" data-composition-id="rf-swiss-grid" data-composition-duration="600" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "word1", "type": "string", "label": "Слово 1", "default": "Word one," },
+  { "id": "word2", "type": "string", "label": "Слово 2", "default": "word two" },
+  { "id": "word3", "type": "string", "label": "Слово 3", "default": "word three" },
+  { "id": "bg", "type": "color", "label": "Фон (папір)", "default": "#f6f2ea" },
+  { "id": "ink", "type": "color", "label": "Чорнило і сітка", "default": "#17130f" },
+  { "id": "accent", "type": "color", "label": "Блоки (вермільйон)", "default": "#e5432d" },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 2 }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-swiss-grid</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-swiss-grid" data-duration="600" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; overflow: hidden; }
+          .rfsg { position: absolute; inset: 0; overflow: hidden; background: var(--rfsg-paper); }
+          .rfsg-grid { position: absolute; inset: 0; width: 1080px; height: 1920px; }
+          .rfsg-blk { position: absolute; left: 0; top: 0; background: var(--rfsg-accent); }
+          .rfsg-wd { position: absolute; left: 0; top: 0; white-space: nowrap; font-family: var(--font-display, "Helvetica Neue", Arial, sans-serif);
+                     font-weight: 900; font-size: 210px; line-height: 250px; letter-spacing: -0.03em; color: var(--rfsg-ink); visibility: hidden; }
+        </style>
+        <div class="rfsg">
+          <svg class="rfsg-grid" viewBox="0 0 1080 1920"></svg>
+          <div class="rfsg-blk" data-b="1"></div><div class="rfsg-blk" data-b="2"></div><div class="rfsg-blk" data-b="3"></div>
+          <div class="rfsg-blk" data-b="4"></div>
+          <div class="rfsg-wd" data-w="1"></div><div class="rfsg-wd" data-w="2"></div><div class="rfsg-wd" data-w="3"></div>
+        </div>
+        <script>
+          (function () {
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            function g(k, d) { return (v[k] === undefined || v[k] === null || v[k] === "") ? d : v[k]; }
+            var secs = Math.max(1, +g("seconds", 2)), F = 1 / 30;
+            var paper = g("bg", "#f6f2ea"), ink = g("ink", "#17130f"), acc = g("accent", "#e5432d");
+            var root = document.querySelector(".rfsg");
+            root.style.setProperty("--rfsg-paper", paper); root.style.setProperty("--rfsg-ink", ink); root.style.setProperty("--rfsg-accent", acc);
+            // cubic-bezier easing (same maths as CSS cubic-bezier)
+            function bz(x1, y1, x2, y2) {
+              function c(a, b, u) { return 3 * a * u * (1 - u) * (1 - u) + 3 * b * u * u * (1 - u) + u * u * u; }
+              return function (t) { if (t <= 0) return 0; if (t >= 1) return 1; var lo = 0, hi = 1, u = t;
+                for (var i = 0; i < 26; i++) { u = (lo + hi) / 2; if (c(x1, x2, u) < t) lo = u; else hi = u; } return c(y1, y2, u); };
+            }
+            var RAIL = bz(0.75, 0, 0.15, 1), LAND = bz(0.45, 0, 0.3, 1.22);
+            // grid lines, drawn by length with a 1-frame stagger
+            var svg = document.querySelector(".rfsg-grid"), NS = "http://www.w3.org/2000/svg", lines = [];
+            [270, 540, 810].forEach(function (x) { lines.push([x, 0, x, 1920]); });
+            [320, 640, 960, 1280, 1600].forEach(function (y) { lines.push([0, y, 1080, y]); });
+            var tl = gsap.timeline({ paused: true });
+            lines.forEach(function (L, i) {
+              var p = document.createElementNS(NS, "line");
+              p.setAttribute("x1", L[0]); p.setAttribute("y1", L[1]); p.setAttribute("x2", L[2]); p.setAttribute("y2", L[3]);
+              p.setAttribute("stroke", ink); p.setAttribute("stroke-width", "2"); p.setAttribute("pathLength", "1");
+              p.setAttribute("stroke-dasharray", "1 1"); p.setAttribute("stroke-dashoffset", "1"); svg.appendChild(p);
+              tl.fromTo(p, { attr: { "stroke-dashoffset": 1 } }, { attr: { "stroke-dashoffset": 0 }, duration: 4 * F, ease: "power2.out" }, i * F);
+            });
+            // blocks: left / top / width / height animate on their own (never transform scale); size lands 2 frames after position
+            var B = {}; document.querySelectorAll(".rfsg-blk").forEach(function (b) { b.style.background = acc; B[b.dataset.b] = b; });
+            function mv(b, at, dur, to, ease) {
+              var pos = {}, size = {};
+              if (to.x !== undefined) pos.left = to.x; if (to.y !== undefined) pos.top = to.y;
+              if (to.w !== undefined) size.width = to.w; if (to.h !== undefined) size.height = to.h;
+              pos.duration = dur * F; pos.ease = ease; tl.to(b, pos, at * F);
+              if (to.w !== undefined || to.h !== undefined) { size.duration = (dur + 2) * F; size.ease = ease; tl.to(b, size, at * F); }
+            }
+            tl.set(B[1], { left: -540, top: 320, width: 540, height: 320 }, 0);
+            tl.set(B[2], { left: 0, top: -640, width: 270, height: 640 }, 0);
+            tl.set(B[3], { left: 1080, top: 960, width: 270, height: 320 }, 0);
+            tl.set(B[4], { left: 783, top: 1253, width: 54, height: 54, opacity: 0 }, 0);
+            mv(B[1], 4, 8, { x: 0 }, RAIL);                 // B1 enters from the left along y 320
+            mv(B[1], 12, 8, { x: 540 }, RAIL);              // B1 slides right
+            mv(B[2], 12, 8, { y: 640 }, RAIL);              // B2 drops in at x 0
+            mv(B[3], 16, 8, { x: 540 }, RAIL);              // B3 runs in along y 960 from the right
+            mv(B[2], 24, 8, { x: 270 }, RAIL);              // B2 slides right
+            mv(B[1], 32, 8, { x: 540, y: 0, w: 540, h: 640 }, LAND);     // settle with one light overshoot
+            mv(B[2], 32, 8, { x: 0, y: 1280, w: 810, h: 320 }, LAND);
+            mv(B[3], 32, 8, { x: 810, y: 960, w: 270, h: 320 }, LAND);
+            // words: cut between cells, no tween
+            var W = {}, txt = { 1: String(g("word1", "Word one,")), 2: String(g("word2", "word two")), 3: String(g("word3", "word three")) };
+            document.querySelectorAll(".rfsg-wd").forEach(function (w) { w.textContent = txt[w.dataset.w]; w.style.color = ink; W[w.dataset.w] = w; });
+            var maxW = 0; [1, 2, 3].forEach(function (k) { maxW = Math.max(maxW, W[k].scrollWidth); });
+            var LEFT = 60, fs = 210; if (maxW > 810 - LEFT) fs = Math.floor(210 * (810 - LEFT) / maxW);
+            [1, 2, 3].forEach(function (k) { W[k].style.fontSize = fs + "px"; });
+            function cut(k, at, x, y) { tl.set(W[k], { visibility: "inherit", left: x, top: y }, at * F); }
+            cut(1, 8, 300, 350); cut(1, 16, LEFT, 670);
+            cut(2, 16, 560, 670); cut(2, 24, 300, 990);
+            cut(3, 24, LEFT, 990);
+            cut(1, 42, LEFT, 350); cut(2, 42, LEFT, 670); cut(3, 42, LEFT, 990);
+            // live hold: a tiny square keeps running along the y 1280 line
+            tl.set(B[4], { opacity: 1 }, 45 * F);
+            tl.fromTo(B[4], { left: 783 }, { left: 1026, duration: 14 * F, ease: "none" }, 45 * F);
+            var holdLen = secs - 59 * F;
+            if (holdLen > 0.3) {
+              var legs = Math.max(1, Math.floor(holdLen / 1.6));
+              tl.to(B[4], { left: 783, duration: 1.6, ease: "sine.inOut", repeat: legs - 1, yoyo: true }, 59 * F);
+            }
+            tl.to(root, { opacity: 0, duration: 0.25, ease: "power2.in" }, Math.max(59 * F, secs - 0.25));
+            window.__timelines = window.__timelines || {};
+            window.__timelines["rf-swiss-grid"] = tl;
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

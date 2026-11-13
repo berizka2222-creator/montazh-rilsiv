@@ -12,3 +12,7 @@ Changes made here (the rest is as published):
 - `scripts/words.py` is left out: the reel skill has its own word timing (ElevenLabs Scribe).
 - `requirements.txt` adds fonttools + brotli (brand fonts shipped as .woff2 are converted to .ttf for Pillow).
 The reel skill runs it through `scripts/fx_pass.py` (only the seconds with an effect are processed).
+- `scripts/rf_fx.py` is the reel skill's own (not Vibha's): 15 `rf-*` effects from a reference reel (2026-11-06);
+  `fx.py` runs it at its end so they share its helpers.
+- `scripts/ay_fx.py` + `scripts/ay/*.py` are the reel skill's own (not Vibha's): 23 `ay-*` effects rebuilt in the person's brand from
+  a reference reel (2026-11-13, instagram.com/reel/Dfqx2tSOA_6); `fx.py` runs `ay_fx.py` after `rf_fx.py`. `scripts/ay_check.py` makes

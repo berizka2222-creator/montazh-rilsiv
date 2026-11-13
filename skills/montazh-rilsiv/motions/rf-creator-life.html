@@ -1,0 +1,229 @@
+<!doctype html>
+<!-- rf-creator-life: a badly drawn, boiling character at a desk; calendar pages and coffee cups stack on threes into two
+     leaning towers that collapse smoothly (precomputed rigid-body sim); a last cup rolls away; one blink. Rebuilt from an ultra-skills motion prompt. -->
+<html lang="uk" data-composition-id="rf-creator-life" data-composition-duration="600" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "title", "type": "string", "label": "Рукописний заголовок", "default": "Hand-lettered title" },
+  { "id": "days", "type": "json", "label": "Підписи календарних аркушів (7 шт.)", "default": ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"] },
+  { "id": "bg", "type": "color", "label": "Папір (фон)", "default": "#e8ddce" },
+  { "id": "bg2", "type": "color", "label": "Віньєтка по краю паперу", "default": "#ddd0bd" },
+  { "id": "ink", "type": "color", "label": "Лінії і текст", "default": "#221a12" },
+  { "id": "muted", "type": "color", "label": "Штрихування (півтон)", "default": "#6d5d4c" },
+  { "id": "accent", "type": "color", "label": "Розлита кава", "default": "#c4552d" },
+  { "id": "accent2", "type": "color", "label": "Смужка календаря", "default": "#3d5a80" },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 2 }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-creator-life</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-creator-life" data-duration="600" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; overflow: hidden; }
+          .rfcl { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden; background: #e8ddce; }
+          .rfcl .rfcl-svg { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; display: block; }
+          .rfcl .rfcl-hand { font-family: var(--font-display, "Patrick Hand", "Chalkboard SE", "Comic Sans MS", cursive); font-weight: 400; }
+        </style>
+        <div class="rfcl">
+          <svg class="rfcl-svg" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="rfcl-vig" cx="0.5" cy="0.5" r="0.75"><stop class="rfcl-v1" offset="0.6" stop-opacity="0" /><stop class="rfcl-v2" offset="1" stop-opacity="1" /></radialGradient>
+              <filter id="rfcl-boil" x="-5%" y="-20%" width="110%" height="140%">
+                <feTurbulence class="rfcl-turb" type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="5" result="t" />
+                <feDisplacementMap in="SourceGraphic" in2="t" scale="6" xChannelSelector="R" yChannelSelector="G" /></filter>
+            </defs>
+            <rect class="rfcl-paper" width="1080" height="1920" />
+            <rect class="rfcl-vigr" width="1080" height="1920" fill="url(#rfcl-vig)" />
+            <g class="rfcl-title" filter="url(#rfcl-boil)"></g>
+            <g class="rfcl-scene"></g>
+            <g class="rfcl-spill"></g>
+            <g class="rfcl-items"></g>
+            <g class="rfcl-fx"></g>
+          </svg>
+        </div>
+        <script>
+          (function () {
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            function S(x, d) { return (x === undefined || x === null || x === "") ? d : String(x); }
+            var secs = Math.max(1, +v.seconds || 2), FPS = 30;
+            var C = { paper: S(v.bg, "#e8ddce"), edge: S(v.bg2, "#ddd0bd"), ink: S(v.ink, "#221a12"), mid: S(v.muted, "#6d5d4c"), spill: S(v.accent, "#c4552d"), strip: S(v.accent2, "#3d5a80") };
+            var DAYS = Array.isArray(v.days) && v.days.length ? v.days.map(String) : ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
+            while (DAYS.length < 7) DAYS.push(""); DAYS = DAYS.slice(0, 7);
+            var root = document.querySelector(".rfcl"); function q(s) { return root.querySelector(s); }
+            root.style.background = C.paper; q(".rfcl-paper").setAttribute("fill", C.paper);
+            q(".rfcl-v1").setAttribute("stop-color", C.edge); q(".rfcl-v2").setAttribute("stop-color", C.edge);
+            function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a);
+              t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+            function cl(x, a, b) { return Math.max(a, Math.min(b, x)); }
+            var NS = "http://www.w3.org/2000/svg";
+            function el(tag, at, parent) { var e = document.createElementNS(NS, tag); for (var k in at) e.setAttribute(k, at[k]); if (parent) parent.appendChild(e); return e; }
+            // ---- roughjs-style strokes: two passes, bowed segments, 3 seeded variants per outline (the boil)
+            var seedN = 1;
+            function roughOne(pts, closed, r) {
+              var d = "";
+              for (var pass = 0; pass < 2; pass++) {
+                var P = pts.map(function (p) { return [p[0] + (r() - .5) * 4.5, p[1] + (r() - .5) * 4.5]; });
+                if (closed) P.push([P[0][0] + (r() - .5) * 6, P[0][1] + (r() - .5) * 6]);
+                d += "M" + P[0][0].toFixed(1) + " " + P[0][1].toFixed(1);
+                for (var i = 1; i < P.length; i++) { var a = P[i - 1], b = P[i], len = Math.hypot(b[0] - a[0], b[1] - a[1]), bw = (r() - .5) * (len * 0.05 + 2);
+                  var mx = (a[0] + b[0]) / 2 - (b[1] - a[1]) / (len || 1) * bw, my = (a[1] + b[1]) / 2 + (b[0] - a[0]) / (len || 1) * bw;
+                  d += " Q" + mx.toFixed(1) + " " + my.toFixed(1) + " " + b[0].toFixed(1) + " " + b[1].toFixed(1); }
+                d += " ";
+              }
+              return d; }
+            var shapes = [];
+            function rough(parent, pts, closed, attrs) { var s0 = seedN++ * 101, vars = [];
+              for (var k = 0; k < 3; k++) vars.push(roughOne(pts, closed, mulberry32(s0 + k * 7919)));
+              var a = { fill: "none", stroke: C.ink, "stroke-width": 5.5, "stroke-linecap": "round", "stroke-linejoin": "round" };
+              for (var kk in attrs) a[kk] = attrs[kk];
+              var node = el("path", a, parent); node.setAttribute("d", vars[0]); shapes.push({ node: node, vars: vars }); return node; }
+            function fillShape(parent, pts, color) { var d = "M" + pts.map(function (p) { return p[0].toFixed(1) + " " + p[1].toFixed(1); }).join(" L") + " Z";
+              return el("path", { d: d, fill: color }, parent); }
+            function ell(cx, cy, rx, ry, n) { var p = []; n = n || 14; for (var i = 0; i < n; i++) { var a = i / n * Math.PI * 2; p.push([cx + Math.cos(a) * rx, cy + Math.sin(a) * ry]); } return p; }
+            function rect(x, y, w, h) { return [[x, y], [x + w, y], [x + w, y + h], [x, y + h]]; }
+            function hatch(parent, x0, y0, x1, y1, step) { for (var x = x0 - (y1 - y0); x < x1; x += step) {
+              var ax = Math.max(x0, x), ay = y1 - (ax - x), bx = Math.min(x1, x + (y1 - y0)), by = y1 - (bx - x);
+              if (bx - ax > 6) rough(parent, [[ax, ay], [bx, by]], false, { stroke: C.mid, "stroke-width": 3 }); } }
+
+            // ---- title (boils via displacement seeds)
+            var tg = q(".rfcl-title"), title = S(v.title, "Hand-lettered title");
+            function mkTitle(lines, fs) { while (tg.firstChild) tg.removeChild(tg.firstChild); var ts = [];
+              lines.forEach(function (ln, i) { var t = el("text", { x: 540, y: 0, "text-anchor": "middle", fill: C.ink, class: "rfcl-hand", "font-size": fs }, tg); t.textContent = ln; ts.push(t); });
+              var lh = fs * 1.05, top = 415 - (lines.length - 1) * lh / 2 + fs * 0.33; ts.forEach(function (t, i) { t.setAttribute("y", (top + i * lh).toFixed(0)); }); return ts; }
+            function widest(ts) { return Math.max.apply(null, ts.map(function (t) { return t.getComputedTextLength(); })); }
+            var fs = 84, ts = mkTitle([title], fs);
+            while (fs > 56 && widest(ts) > 960) { fs -= 2; ts.forEach(function (t) { t.setAttribute("font-size", fs); }); }
+            if (widest(ts) > 960) { var words = title.split(/\s+/), best = 1, bw = 1e9;
+              for (var cut = 1; cut < words.length; cut++) { var a = words.slice(0, cut).join(" ").length, b = words.slice(cut).join(" ").length; if (Math.max(a, b) < bw) { bw = Math.max(a, b); best = cut; } }
+              fs = 64; ts = mkTitle([words.slice(0, best).join(" "), words.slice(best).join(" ")], fs);
+              while (fs > 30 && widest(ts) > 960) { fs -= 2; ts = mkTitle([words.slice(0, best).join(" "), words.slice(best).join(" ")], fs); } }
+
+            // ---- scene: floor, desk, laptop, character
+            var scn = q(".rfcl-scene"), FLOOR = 1482;
+            rough(scn, [[60, FLOOR], [540, FLOOR + 3], [1020, FLOOR]], false, { "stroke-width": 4 });
+            // character body (behind desk)
+            rough(scn, [[540, 965], [540, 1182]], false);
+            rough(scn, [[540, 1020], [492, 1100], [470, 1176]], false);
+            rough(scn, [[540, 1020], [588, 1100], [610, 1176]], false);
+            var head = ell(540, 880, 84, 86, 16); fillShape(scn, head, C.paper); rough(scn, head, true);
+            var eyesOpen = el("g", {}, scn), eyesShut = el("g", {}, scn);
+            el("circle", { cx: 508, cy: 868, r: 8, fill: C.ink }, eyesOpen); el("circle", { cx: 572, cy: 868, r: 8, fill: C.ink }, eyesOpen);
+            rough(eyesShut, [[496, 870], [520, 871]], false); rough(eyesShut, [[560, 871], [584, 870]], false);
+            rough(scn, [[518, 922], [562, 921]], false, { "stroke-width": 5 });
+            // laptop lid (back side faces us), desk
+            var lid = [[462, 1068], [618, 1068], [628, 1180], [452, 1180]]; fillShape(scn, lid, C.paper); rough(scn, lid, true); hatch(scn, 470, 1080, 610, 1170, 22);
+            var desk = rect(300, 1182, 480, 24); fillShape(scn, desk, C.paper); rough(scn, desk, true);
+            rough(scn, [[330, 1206], [332, FLOOR]], false); rough(scn, [[750, 1206], [748, FLOOR]], false);
+
+            // ---- items: 7 calendar pages + 5 cups, alternating towers
+            var ORDER = [["p", 0, "L"], ["c", 0, "R"], ["p", 1, "L"], ["p", 2, "R"], ["c", 0, "L"], ["p", 3, "R"], ["c", 0, "L"], ["p", 4, "R"], ["p", 5, "L"], ["c", 0, "R"], ["c", 0, "L"], ["p", 6, "R"]];
+            var IR = mulberry32(2121), items = [], ig = q(".rfcl-items");
+            ORDER.forEach(function (o, i) {
+              var g = el("g", {}, ig), it = { i: i, type: o[0], side: o[2], g: g, w: o[0] === "p" ? 150 : 100, h: o[0] === "p" ? 125 : 105, dx: (IR() - .5) * 20, dr: (IR() - .5) * 8, hopR: (IR() < .5 ? -1 : 1) * (6 + IR() * 5) };
+              var w = it.w, h = it.h;
+              if (it.type === "p") { var pr = rect(-w / 2, -h / 2, w, h); fillShape(g, pr, C.paper); fillShape(g, rect(-w / 2, -h / 2, w, 34), C.strip); rough(g, pr, true); rough(g, [[-w / 2, -h / 2 + 34], [w / 2, -h / 2 + 34]], false);
+                rough(g, [[-38, -h / 2 - 10], [-38, -h / 2 + 12]], false, { "stroke-width": 5 }); rough(g, [[38, -h / 2 - 10], [38, -h / 2 + 12]], false, { "stroke-width": 5 });
+                var t = el("text", { x: 0, y: 32, "text-anchor": "middle", fill: C.ink, class: "rfcl-hand", "font-size": 40, filter: "url(#rfcl-boil)" }, g); t.textContent = DAYS[o[1]];
+                var lf = 40; while (lf > 32 && t.getComputedTextLength() > w - 20) { lf -= 2; t.setAttribute("font-size", lf); }
+                if (t.getComputedTextLength() > w - 16) { t.setAttribute("textLength", w - 16); t.setAttribute("lengthAdjust", "spacingAndGlyphs"); }
+              } else { var body = [[-w / 2, -h / 2 + 12], [w / 2, -h / 2 + 12], [w / 2 - 12, h / 2], [-w / 2 + 12, h / 2]]; fillShape(g, body, C.paper); hatch(g, -w / 2 + 14, -h / 2 + 30, w / 2 - 14, h / 2 - 6, 18);
+                rough(g, body, true); var rim = ell(0, -h / 2 + 12, w / 2, 12, 12); fillShape(g, rim, C.spill); rough(g, rim, true);
+                rough(g, [[w / 2 - 4, -h / 2 + 32], [w / 2 + 26, -h / 2 + 36], [w / 2 + 24, 14], [w / 2 - 8, 18]], false); }
+              items.push(it);
+            });
+            // tower layout: base pivots, stacked offsets
+            var BASE = { L: [175, FLOOR], R: [905, FLOOR] }, stackY = { L: 0, R: 0 };
+            items.forEach(function (it) { it.ly = stackY[it.side] + it.h / 2; stackY[it.side] += it.h; it.k = 0; });
+            function lean(side, f) { var n = 0; items.forEach(function (it) { if (it.side === side && f >= it.i * 3) n++; }); return (side === "L" ? 1 : -1) * 9 * n / 6; }
+            function towerPose(it, f) { var a = lean(it.side, f) * Math.PI / 180, b = BASE[it.side], lx = it.dx, ly = -it.ly;
+              return { x: b[0] + lx * Math.cos(a) - ly * Math.sin(a), y: b[1] + lx * Math.sin(a) + ly * Math.cos(a), r: lean(it.side, f) + it.dr }; }
+
+            // ---- pre-simulated collapse (fixed step, run once), frames 36..96 stored
+            var LASTCUP = 10, SIMF0 = 36, SIMN = 61, rec = [], impacts = [];
+            (function simulate() {
+              var R = mulberry32(3636), g = 6200, sub = 30, dt = 1 / (FPS * sub), bodies = [];
+              items.forEach(function (it, i) { if (i === LASTCUP) return; var p = towerPose(it, 35), inTower = 0, nIn = 0;
+                items.forEach(function (o) { if (o.side === it.side) { nIn++; if (o.ly < it.ly) inTower++; } });
+                var high = inTower / (nIn - 1), dirIn = it.side === "L" ? 1 : -1, dir = high > 0.45 ? dirIn : -dirIn;
+                var m = 1, I = m * (it.w * it.w + it.h * it.h) / 12;
+                bodies.push({ i: i, x: p.x, y: p.y, a: p.r * Math.PI / 180, vx: dir * (160 + 380 * high) * (0.8 + R() * 0.4), vy: -120 - R() * 260,
+                  va: dir * (3 + R() * 6), hw: it.w / 2, hh: it.h / 2, m: m, I: I, floor: FLOOR - 4 - R() * 40, hit: false }); });
+              for (var fr = 0; fr < SIMN; fr++) {
+                var snap = {}; bodies.forEach(function (b) { snap[b.i] = [b.x, b.y, b.a * 180 / Math.PI]; }); rec.push(snap);
+                var damp = (SIMF0 + fr) >= 47 ? 0.992 : 1;
+                for (var s = 0; s < sub; s++) bodies.forEach(function (b) {
+                  b.vy += g * dt; b.x += b.vx * dt; b.y += b.vy * dt; b.a += b.va * dt; b.vx *= damp; b.vy = b.vy * damp; b.va *= damp;
+                  var ca = Math.cos(b.a), sa = Math.sin(b.a), corners = [[-b.hw, -b.hh], [b.hw, -b.hh], [b.hw, b.hh], [-b.hw, b.hh]];
+                  for (var c = 0; c < 4; c++) { var rx = corners[c][0] * ca - corners[c][1] * sa, ry = corners[c][0] * sa + corners[c][1] * ca, px = b.x + rx, py = b.y + ry;
+                    // floor (pseudo-depth per body) and side walls
+                    var nx = 0, ny = 0, pen = 0;
+                    if (py > b.floor) { ny = -1; pen = py - b.floor; } else if (px < 50) { nx = 1; pen = 50 - px; } else if (px > 1030) { nx = -1; pen = px - 1030; }
+                    if (!pen) continue;
+                    var vpx = b.vx - b.va * ry, vpy = b.vy + b.va * rx, vn = vpx * nx + vpy * ny;
+                    b.x += nx * pen * 0.8; b.y += ny * pen * 0.8;
+                    if (vn < 0) { var rn = rx * ny - ry * nx, j = -(1.25) * vn / (1 / b.m + rn * rn / b.I);
+                      b.vx += j * nx / b.m; b.vy += j * ny / b.m; b.va += rn * j / b.I;
+                      var tx = -ny, ty = nx, vt = (b.vx - b.va * ry) * tx + (b.vy + b.va * rx) * ty, rt = rx * ty - ry * tx, jt = -vt / (1 / b.m + rt * rt / b.I);
+                      jt = cl(jt, -0.6 * j, 0.6 * j); b.vx += jt * tx / b.m; b.vy += jt * ty / b.m; b.va += rt * jt / b.I;
+                      if (j > 350 && ny < 0 && !b.hit) { b.hit = true; impacts.push({ f: SIMF0 + fr, x: px, y: b.floor, cup: items[b.i].type === "c" }); } }
+                  }
+                });
+              }
+            })();
+            // last cup: scripted roll across the desk (deterministic), frames 36-52
+            var lc = items[LASTCUP], lc0 = towerPose(lc, 35);
+            function lastCup(f) {
+              if (f < 42) { var u = (f - 36) / 6; return { x: lc0.x + (380 - lc0.x) * u, y: lc0.y + (1132 - lc0.y) * u - 260 * Math.sin(u * Math.PI) * (1 - u) , r: lc0.r + 90 * u }; }
+              if (f < 47) { var u2 = (f - 42) / 5, x = 380 + 410 * u2; return { x: x, y: 1132 - 6 * Math.abs(Math.sin(u2 * Math.PI * 3)), r: 90 + (x - 380) / 50 * 57.3 }; }
+              var r47 = 90 + 410 / 50 * 57.3;
+              if (f < 49.5) { var u3 = (f - 47) / 2.5; return { x: 790 + 70 * u3, y: 1132 + (1430 - 1132) * u3 * u3, r: r47 + 120 * u3 }; }
+              var u4 = cl((f - 49.5) / 2.5, 0, 1), e = 1 - Math.pow(1 - u4, 3), rEnd = Math.ceil((r47 + 120 + 60) / 180) * 180 + 90;
+              return { x: 860 + 90 * e, y: 1430 - 4 * Math.sin(e * Math.PI), r: (r47 + 120) + (rEnd - (r47 + 120)) * e };
+            }
+
+            // ---- fx: impact lines (36-37), ink dust dashes, coffee spills
+            var fx = q(".rfcl-fx"), impG = el("g", {}, fx), dustG = el("g", {}, fx), spillG = q(".rfcl-spill");
+            ["L", "R"].forEach(function (sd) { var top = null; items.forEach(function (it) { if (it.side === sd && (!top || it.ly > top.ly)) top = it; });
+              var p = towerPose(top, 35); for (var k = 0; k < 9; k++) { var a = -Math.PI + k / 8 * Math.PI, r1 = 95, r2 = 150 + (k % 2) * 30;
+                rough(impG, [[p.x + Math.cos(a) * r1, p.y - 30 + Math.sin(a) * r1 * 0.8], [p.x + Math.cos(a) * r2, p.y - 30 + Math.sin(a) * r2 * 0.8]], false, { "stroke-width": 6 }); } });
+            var DR = mulberry32(77), dusts = impacts.map(function (im) { var gg = el("g", {}, dustG);
+              for (var k = 0; k < 6; k++) { var a = -Math.PI * (0.1 + 0.8 * k / 5), r1 = 30 + DR() * 10, r2 = r1 + 18 + DR() * 14;
+                rough(gg, [[im.x + Math.cos(a) * r1, im.y + Math.sin(a) * r1], [im.x + Math.cos(a) * r2, im.y + Math.sin(a) * r2]], false, { "stroke-width": 4 }); }
+              return { g: gg, f: im.f }; });
+            var spills = impacts.filter(function (im) { return im.cup; }).map(function (im) { return { f: im.f, x: im.x, y: im.y }; });
+            spills.push({ f: 52, x: 950, y: 1478 });
+            spills.forEach(function (sp) { var pts = []; var r2 = mulberry32(Math.round(sp.x));
+              for (var k = 0; k < 12; k++) { var a = Math.PI + k / 11 * Math.PI, rr = 60 + r2() * 25; pts.push([sp.x + Math.cos(a) * rr, sp.y + Math.sin(a) * rr * 0.22]); }
+              sp.node = fillShape(spillG, pts, C.spill); sp.node.setAttribute("opacity", 0.85); });
+
+            var turb = q(".rfcl-turb"), lastB = -1;
+            function render(f) {
+              root.style.opacity = cl((secs * FPS - f) / (0.25 * FPS), 0, 1);
+              var b = Math.floor(f / 3) % 3;
+              if (b !== lastB) { lastB = b; shapes.forEach(function (s) { s.node.setAttribute("d", s.vars[b]); }); turb.setAttribute("seed", [5, 23, 61][b]); }
+              var qf = Math.floor(f / 3) * 3, ff = Math.floor(f);
+              items.forEach(function (it, i) { var p;
+                if (f < 36) { if (qf < it.i * 3) { it.g.style.display = "none"; return; }
+                  p = towerPose(it, qf); if (qf === it.i * 3) { p = { x: p.x, y: p.y - 48, r: p.r + it.hopR, s: 1.08 }; } }
+                else if (i === LASTCUP) p = lastCup(f);
+                else { var k = Math.min(SIMN - 1, f - SIMF0), k0 = Math.floor(k), k1 = Math.min(SIMN - 1, k0 + 1), t = k - k0, a = rec[k0][i], c = rec[k1][i];
+                  p = { x: a[0] + (c[0] - a[0]) * t, y: a[1] + (c[1] - a[1]) * t, r: a[2] + (c[2] - a[2]) * t }; }
+                it.g.style.display = "";
+                it.g.setAttribute("transform", "translate(" + p.x.toFixed(1) + " " + p.y.toFixed(1) + ") rotate(" + p.r.toFixed(2) + ")" + (p.s ? " scale(" + p.s + ")" : ""));
+              });
+              impG.style.display = (ff === 36 || ff === 37) ? "" : "none";
+              dusts.forEach(function (d) { d.g.style.display = (ff >= d.f && ff < d.f + 4) ? "" : "none"; });
+              spills.forEach(function (sp) { var u = cl((f - sp.f) / 3, 0, 1); sp.node.style.display = u > 0 ? "" : "none";
+                sp.node.setAttribute("transform", "translate(" + sp.x + " " + sp.y + ") scale(" + (0.3 + 0.7 * u).toFixed(3) + ") translate(" + (-sp.x) + " " + (-sp.y) + ")"); });
+              var blink = ff === 53 || ff === 54; eyesOpen.style.display = blink ? "none" : ""; eyesShut.style.display = blink ? "" : "none";
+            }
+            // st.f is an accessor: every value GSAP writes (seek with or without events) redraws the frame
+            var st = { _f: 0, get f() { return this._f; }, set f(x) { this._f = x; render(x); } }, tl = gsap.timeline({ paused: true });
+            tl.to(st, { f: secs * FPS, duration: secs, ease: "none", lazy: false }, 0);
+            render(0);
+            window.__timelines = window.__timelines || {};
+            window.__timelines["rf-creator-life"] = tl;
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

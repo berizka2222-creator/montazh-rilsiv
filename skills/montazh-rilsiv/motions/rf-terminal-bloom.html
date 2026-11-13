@@ -1,0 +1,224 @@
+<!doctype html>
+<!-- rf-terminal-bloom: a typed terminal command breaks into flying 3D letters that lock together into a landing page (nav, hero, buttons,
+     three cards), its text tumbling in letter by letter while a violet glow breathes behind. Rebuilt from an ultra-skills motion prompt. -->
+<html lang="uk" data-composition-id="rf-terminal-bloom" data-composition-duration="600" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "command", "type": "string", "label": "Команда в терміналі", "default": "> claude \"Product landing page\"" },
+  { "id": "product", "type": "string", "label": "Назва продукту (логотип)", "default": "Product" },
+  { "id": "headline", "type": "string", "label": "Заголовок сторінки", "default": "Headline" },
+  { "id": "disclaimer", "type": "string", "label": "Дрібний напис над заголовком", "default": "Demo page, fictional product" },
+  { "id": "subline", "type": "string", "label": "Підзаголовок", "default": "Subline" },
+  { "id": "button1", "type": "string", "label": "Головна кнопка", "default": "Primary button" },
+  { "id": "button2", "type": "string", "label": "Друга кнопка", "default": "Secondary button" },
+  { "id": "card1", "type": "string", "label": "Картка 1", "default": "Card one" },
+  { "id": "card2", "type": "string", "label": "Картка 2", "default": "Card two" },
+  { "id": "card3", "type": "string", "label": "Картка 3", "default": "Card three" },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 2 },
+  { "id": "bg", "type": "color", "label": "Фон (центр)", "default": "#140d24" },
+  { "id": "bg2", "type": "color", "label": "Фон (середина)", "default": "#0b0816" },
+  { "id": "bg3", "type": "color", "label": "Фон (краї)", "default": "#06040c" },
+  { "id": "surface", "type": "color", "label": "Блоки сторінки", "default": "#151024" },
+  { "id": "surface2", "type": "color", "label": "Блоки сторінки 2", "default": "#1e1733" },
+  { "id": "line", "type": "color", "label": "Тонкі лінії (з 13% прозорості)", "default": "#c8aaff" },
+  { "id": "ink", "type": "color", "label": "Текст", "default": "#f7f2ff" },
+  { "id": "muted", "type": "color", "label": "Другорядний текст", "default": "#b9acd6" },
+  { "id": "accent", "type": "color", "label": "Акцент (кнопка, курсор)", "default": "#a78bfa" },
+  { "id": "accent2", "type": "color", "label": "Акцент 2 (градієнт)", "default": "#f472b6" },
+  { "id": "on_accent", "type": "color", "label": "Текст на акцентній кнопці", "default": "#0b0616" },
+  { "id": "glow", "type": "color", "label": "Сяйво", "default": "#8b5cf6" }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-terminal-bloom</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-terminal-bloom" data-duration="600" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; overflow: hidden; }
+          .rftb { position: absolute; inset: 0; overflow: hidden; }
+          .rftb .rftb-cam { position: absolute; inset: 0; transform-origin: 50% 47%; }
+          .rftb .rftb-glow { position: absolute; left: 540px; top: 900px; width: 1500px; height: 1500px; margin: -750px 0 0 -750px; border-radius: 50%;
+                             background: radial-gradient(circle, color-mix(in srgb, var(--rftb-glow) 70%, transparent) 0%, color-mix(in srgb, var(--rftb-glow) 22%, transparent) 38%, transparent 68%); opacity: 0; }
+          .rftb .rftb-pg { position: absolute; inset: 0; transform-origin: 50% 47%; perspective: 1400px; }
+          .rftb .rftb-bn { position: absolute; box-sizing: border-box; background: var(--rftb-surface); border: 1.5px solid color-mix(in srgb, var(--rftb-line) 13%, transparent);
+                           opacity: 0; overflow: hidden; }
+          .rftb .rftb-bar { position: absolute; height: 12px; border-radius: 6px; background: color-mix(in srgb, var(--rftb-muted) 45%, transparent); }
+          .rftb .rftb-tx { position: absolute; box-sizing: border-box; display: flex; perspective: 900px; line-height: 1.08; }
+          .rftb .rftb-tx .rftb-wd { display: inline-block; white-space: nowrap; }
+          .rftb .rftb-tx .rftb-ch { display: inline-block; white-space: pre; opacity: 0; transform-origin: 50% 60%; }
+          .rftb .rftb-cmd { position: absolute; left: 120px; top: 876px; width: 840px; font-family: ui-monospace, Menlo, monospace; font-weight: 500;
+                            font-size: 40px; line-height: 1.25; color: var(--rftb-ink); }
+          .rftb .rftb-cmd .rftb-wd { display: inline-block; white-space: nowrap; }
+          .rftb .rftb-cmd .rftb-ch { display: inline-block; white-space: pre; visibility: hidden; }
+          .rftb .rftb-fl { position: absolute; inset: 0; perspective: 900px; perspective-origin: 50% 900px; }
+          .rftb .rftb-fc { position: absolute; left: 0; top: 0; font-family: ui-monospace, Menlo, monospace; font-weight: 500; color: var(--rftb-ink);
+                           white-space: pre; line-height: 1; opacity: 0; }
+          .rftb .rftb-cur { position: absolute; width: .6em; height: 1.1em; background: var(--rftb-accent); font-size: 40px; transform-origin: 50% 50%; }
+        </style>
+        <div class="rftb"><div class="rftb-cam"><div class="rftb-glow"></div><div class="rftb-pg"></div>
+          <div class="rftb-cmd"></div><div class="rftb-fl"></div></div></div>
+        <script>
+          (function () {
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            var ID = "rf-terminal-bloom", secs = Math.max(1, +v.seconds || 2), FR = 30;
+            var C = { bg: v.bg || "#140d24", bg2: v.bg2 || "#0b0816", bg3: v.bg3 || "#06040c", surface: v.surface || "#151024", surface2: v.surface2 || "#1e1733",
+                      line: v.line || "#c8aaff", ink: v.ink || "#f7f2ff", muted: v.muted || "#b9acd6", accent: v.accent || "#a78bfa",
+                      accent2: v.accent2 || "#f472b6", on_accent: v.on_accent || "#0b0616", glow: v.glow || "#8b5cf6" };
+            function S(k, d) { return v[k] == null ? d : String(v[k]); }
+            var R = document.querySelector(".rftb");
+            for (var ck in C) R.style.setProperty("--rftb-" + ck, C[ck]);
+            R.style.background = "radial-gradient(ellipse 90% 70% at 50% 47%, " + C.bg + " 0%, " + C.bg2 + " 55%, " + C.bg3 + " 100%)";
+            function q(s) { return R.querySelector(s); }
+            function mk(tag, cls, par) { var e = document.createElement(tag); if (cls) e.className = cls; if (par) par.appendChild(e); return e; }
+            function mb32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+            function rand(i) { return mb32(i * 7919 + 17)(); }
+            function cl(x, a, b) { return x < a ? a : x > b ? b : x; }
+            function lin(f, a, b) { return cl((f - a) / (b - a), 0, 1); }
+            function eoc(p) { return 1 - Math.pow(1 - p, 3); }
+            function bko(p, s) { s = s || 1.70158; p = p - 1; return p * p * ((s + 1) * p + s) + 1; }
+            function chars(el, text) {   // words as nowrap groups of per-letter spans
+              var out = []; el.innerHTML = "";
+              String(text).split(/(\s+)/).forEach(function (w) {
+                if (!w) return;
+                if (/^\s+$/.test(w)) { el.appendChild(document.createTextNode(" ")); return; }
+                var wd = mk("span", "rftb-wd", el);
+                Array.from(w).forEach(function (c) { var s = mk("span", "rftb-ch", wd); s.textContent = c; out.push(s); });
+              });
+              return out;
+            }
+            // ---- page bones: nav, wordmark slot, headline, subline, 2 buttons, hero, 3 cards
+            var PG = q(".rftb-pg");
+            var BD = [
+              [60, 250, 960, 100, 26, "surface"], [84, 268, 330, 64, 16, "surface2"], [60, 440, 960, 230, 28, "surface2"], [60, 690, 960, 110, 22, "surface"],
+              [60, 825, 460, 104, 52, "accent"], [560, 825, 460, 104, 52, "surface2"], [60, 955, 960, 280, 30, "hero"],
+              [60, 1260, 304, 200, 22, "surface"], [388, 1260, 304, 200, 22, "surface"], [716, 1260, 304, 200, 22, "surface"]];
+            var BS = [14, 15, 15, 16, 16, 17, 17, 18, 18, 18];
+            var bones = BD.map(function (b, i) {
+              var e = mk("div", "rftb-bn", PG); e.style.left = b[0] + "px"; e.style.top = b[1] + "px"; e.style.width = b[2] + "px"; e.style.height = b[3] + "px";
+              e.style.borderRadius = b[4] + "px";
+              if (b[5] === "accent") { e.style.background = C.accent; e.style.borderColor = "transparent"; }
+              else if (b[5] === "surface2") e.style.background = C.surface2;
+              else if (b[5] === "hero") e.style.background = "linear-gradient(120deg, color-mix(in srgb, " + C.accent + " 30%, " + C.surface + "), color-mix(in srgb, " + C.accent2 + " 26%, " + C.surface + "))";
+              var r = mb32(500 + i), ang = r() * Math.PI * 2, dist = 120 + r() * 300;
+              return { el: e, cx: b[0] + b[2] / 2, cy: b[1] + b[3] / 2, s: BS[i], dx: Math.cos(ang) * dist, dy: Math.sin(ang) * dist, rot: (r() * 2 - 1) * 7 };
+            });
+            [[640, 60], [740, 60], [840, 80]].forEach(function (b) { var e = mk("div", "rftb-bar", bones[0].el); e.style.left = b[0] + "px"; e.style.top = "44px"; e.style.width = b[1] + "px"; });
+            // hero mock note: plain line bars
+            var note = mk("div", "", bones[6].el);
+            note.style.cssText = "position:absolute;left:180px;top:50px;width:600px;height:180px;border-radius:20px;box-sizing:border-box;background:color-mix(in srgb," + C.surface + " 72%, transparent);border:1.5px solid color-mix(in srgb," + C.line + " 13%, transparent)";
+            [[40, 40, 300, C.ink, 55], [40, 82, 470, C.muted, 45], [40, 116, 400, C.muted, 45]].forEach(function (b) { var e = mk("div", "rftb-bar", note);
+              e.style.left = b[0] + "px"; e.style.top = b[1] + "px"; e.style.width = b[2] + "px"; e.style.background = "color-mix(in srgb," + b[3] + " " + b[4] + "%, transparent)"; });
+            var dot = mk("div", "", note); dot.style.cssText = "position:absolute;right:40px;top:34px;width:28px;height:28px;border-radius:50%;background:" + C.accent2;
+            // ---- page texts (headline first)
+            var TX = [
+              { t: S("headline", "Headline"), box: [96, 456, 888, 198], fs: 96, fam: "var(--font-display, sans-serif)", w: 900, col: C.ink, lines: 2 },
+              { t: S("product", "Product"), box: [108, 268, 290, 64], fs: 44, fam: "var(--font-display, sans-serif)", w: 900, col: C.ink, lines: 1 },
+              { t: S("disclaimer", "Demo page, fictional product"), box: [64, 368, 952, 56], fs: 32, fam: "var(--font-body, sans-serif)", w: 500, col: C.muted, lines: 1 },
+              { t: S("subline", "Subline"), box: [96, 700, 888, 90], fs: 40, fam: "var(--font-body, sans-serif)", w: 500, col: C.muted, lines: 2 },
+              { t: S("button1", "Primary button"), box: [84, 825, 412, 104], fs: 44, fam: "var(--font-body, sans-serif)", w: 700, col: C.on_accent, lines: 1, center: 1 },
+              { t: S("button2", "Secondary button"), box: [584, 825, 412, 104], fs: 44, fam: "var(--font-body, sans-serif)", w: 700, col: C.ink, lines: 1, center: 1 },
+              { t: S("card1", "Card one"), box: [84, 1284, 256, 152], fs: 36, fam: "var(--font-body, sans-serif)", w: 700, col: C.ink, lines: 3 },
+              { t: S("card2", "Card two"), box: [412, 1284, 256, 152], fs: 36, fam: "var(--font-body, sans-serif)", w: 700, col: C.ink, lines: 3 },
+              { t: S("card3", "Card three"), box: [740, 1284, 256, 152], fs: 36, fam: "var(--font-body, sans-serif)", w: 700, col: C.ink, lines: 3 }];
+            var tchars = [];
+            TX.forEach(function (d, g) {
+              var e = mk("div", "rftb-tx", PG); var b = d.box;
+              e.style.cssText += ";left:" + b[0] + "px;top:" + b[1] + "px;width:" + b[2] + "px;height:" + b[3] + "px;font-family:" + d.fam + ";font-weight:" + d.w +
+                ";color:" + d.col + ";align-items:" + (g >= 6 ? "flex-start" : "center") + ";justify-content:" + (d.center ? "center" : "flex-start") + ";text-align:" + (d.center ? "center" : "left");
+              var inner = mk("div", "", e); d.el = e; d.in = inner;
+              d.ch = chars(inner, d.t);
+              var n = d.ch.length;
+              d.ch.forEach(function (c, i) { tchars.push({ el: c, t0: 36 + g * 0.6 + Math.min(2.2, n * 0.2) * (n > 1 ? i / (n - 1) : 0), r: rand(900 + g * 131 + i) }); });
+            });
+            function fitText() {
+              TX.forEach(function (d) { var s = d.fs, e = d.el, inn = d.in; inn.style.fontSize = s + "px";
+                function bad() { return inn.offsetWidth > d.box[2] + 1 || inn.offsetHeight > Math.min(d.box[3], d.lines * s * 1.12) + 1; }
+                while (bad() && s > 14) { s -= 2; inn.style.fontSize = s + "px"; } });
+            }
+            // ---- terminal command
+            var CMD = q(".rftb-cmd"), cch = chars(CMD, S("command", "> claude \"Product landing page\""));
+            var cur = mk("div", "rftb-cur", q(".rftb-cam")), FL = q(".rftb-fl"), N = cch.length;
+            var flys = cch.map(function (c, i) { var e = mk("div", "rftb-fc", FL); e.textContent = c.textContent; return { el: e, i: i }; });
+            function layout() {
+              fitText();
+              var fs = 40; CMD.style.fontSize = fs + "px";
+              while ((CMD.scrollWidth > 840 || CMD.offsetHeight > fs * 1.25 * 2.1) && fs > 20) { fs -= 2; CMD.style.fontSize = fs + "px"; }
+              CMD.style.top = (900 - CMD.offsetHeight / 2) + "px";
+              cur.style.fontSize = fs + "px";
+              var gap = Math.min(0.35, 12 / Math.max(1, N));
+              flys.forEach(function (o, i) {
+                var c = cch[i], y = CMD.offsetTop + c.offsetTop;   // offsets are relative to .rftb-cmd (word spans are not positioned)
+                o.x = 120 + c.offsetLeft; o.y = y; o.w = c.offsetWidth; o.el.style.fontSize = fs + "px";
+                o.ap = 10.5 * (N > 1 ? i / (N - 1) : 0); o.s = 11 + gap * i;
+                var r = mb32(3000 + i);
+                o.dx = (r() * 2 - 1) * 260; o.dy = (r() * 2 - 1) * 200; o.dz = -200 - r() * 560;
+                o.rx = (r() * 2 - 1) * 170; o.ry = (r() * 2 - 1) * 170; o.rz = (r() * 2 - 1) * 170;
+                // the nearest bone pulls this letter in when it arrives
+                var bx = o.x + o.dx, by = o.y + o.dy, best = 0, bd = 1e9;
+                bones.forEach(function (b, k) { var d = (b.cx - bx) * (b.cx - bx) + (b.cy - by) * (b.cy - by); if (d < bd) { bd = d; best = k; } });
+                o.b = bones[best]; o.ab = Math.max(o.b.s + 8, o.s + 6);
+              });
+            }
+            layout();
+            function render(f) {
+              f = Math.round(f * 1000) / 1000;
+              // typing 0-11
+              var lastVis = -1;
+              flys.forEach(function (o, i) { var on = f >= o.ap; cch[i].style.visibility = (on && f < o.s) ? "inherit" : "hidden"; if (on) lastVis = i; });
+              if (f < 13) {
+                var cx = lastVis < 0 ? 120 : flys[lastVis].x + flys[lastVis].w + 4, cy = lastVis < 0 ? CMD.offsetTop : flys[lastVis].y;
+                var pulse = f >= 11 ? 1 + 0.5 * (1 - eoc(lin(f, 11, 13))) : 1, blink = f < 11 ? 1 : (f < 12.5 ? 1 : 0);
+                cur.style.display = "block"; cur.style.left = cx + "px"; cur.style.top = (cy + 0.08 * parseFloat(cur.style.fontSize)) + "px";
+                cur.style.transform = "scale(" + pulse + ")"; cur.style.opacity = blink;
+              } else cur.style.display = "none";
+              // letters lift off 11-23, scatter in 3D, get pulled into the bones
+              flys.forEach(function (o) {
+                var e = o.el;
+                if (f < o.s || f >= o.ab + 5) { e.style.opacity = 0; return; }
+                var p = eoc(lin(f, o.s, o.s + 9)), x = o.x + o.dx * p, y = o.y + o.dy * p, z = o.dz * p;
+                var rx = o.rx * p, ry = o.ry * p, rz = o.rz * p, sxs = 1, sys = 1, op = 1;
+                if (f >= o.ab) { var a = eoc(lin(f, o.ab, o.ab + 5)); x += (o.b.cx - x) * a; y += (o.b.cy - y) * a; z *= 1 - a; rx *= 1 - a; ry *= 1 - a; rz *= 1 - a;
+                  sxs = 1 + 1.6 * a; sys = 1 - 0.75 * a; op = 1 - a; }
+                var bl = Math.abs(z) / 760 * 5;
+                e.style.opacity = op; e.style.filter = bl > 0.2 ? "blur(" + bl.toFixed(2) + "px)" : "none";
+                e.style.transform = "translate3d(" + x.toFixed(1) + "px," + y.toFixed(1) + "px," + z.toFixed(1) + "px) rotateX(" + rx.toFixed(1) + "deg) rotateY(" + ry.toFixed(1) +
+                  "deg) rotateZ(" + rz.toFixed(1) + "deg) scale(" + sxs.toFixed(3) + "," + sys.toFixed(3) + ")";
+              });
+              // bones fly into their slots with overshoot, rotation settles 4 frames late
+              bones.forEach(function (b) {
+                var p = lin(f, b.s, b.s + 16), pr = lin(f, b.s, b.s + 20), e = b.el;
+                if (f < b.s) { e.style.opacity = 0; return; }
+                var k = bko(p, 1.6), kr = bko(pr, 1.6), bl = 7 * Math.pow(1 - p, 2);
+                e.style.opacity = lin(f, b.s, b.s + 3);
+                e.style.transform = "translate(" + (b.dx * (1 - k)).toFixed(1) + "px," + (b.dy * (1 - k)).toFixed(1) + "px) rotate(" + (b.rot * (1 - kr)).toFixed(2) + "deg)";
+                e.style.filter = bl > 0.15 ? "blur(" + bl.toFixed(2) + "px)" : "none";
+              });
+              // text tumbles in 36-48
+              tchars.forEach(function (c) {
+                var p = lin(f, c.t0, c.t0 + 5), e = c.el;
+                if (p <= 0) { e.style.opacity = 0; return; }
+                if (p >= 1) { e.style.opacity = 1; e.style.transform = "none"; return; }
+                var k = eoc(p), r = c.r;
+                e.style.opacity = Math.min(1, p * 2.5);
+                e.style.transform = "translateZ(" + (-300 * (1 - k)).toFixed(1) + "px) translateY(" + (30 * (1 - k)).toFixed(1) + "px) rotateX(" + ((-90 + r * 30) * (1 - k)).toFixed(1) +
+                  "deg) rotateY(" + ((r - 0.5) * 60 * (1 - k)).toFixed(1) + "deg)";
+              });
+              // lock at 46 (1.02 -> 1), glow breathes behind, 1% push
+              var ps = f < 43 ? 1 : f < 46 ? 1 + 0.02 * lin(f, 43, 46) : 1 + 0.02 * (1 - eoc(lin(f, 46, 50)));
+              PG.style.transform = "scale(" + ps.toFixed(4) + ")";
+              var g = f < 46 ? 0 : lin(f, 46, 54) * (0.85 + 0.15 * Math.sin((f - 46) / 30 * Math.PI * 2));
+              var gl = q(".rftb-glow"); gl.style.opacity = g.toFixed(3); gl.style.transform = "scale(" + (0.7 + 0.3 * lin(f, 46, 56)) + ")";
+              q(".rftb-cam").style.transform = "scale(" + (1 + 0.01 * lin(f, 46, 60)) + ")";
+              R.style.opacity = f / FR > secs - 0.25 ? cl((secs - f / FR) / 0.25, 0, 1) : 1;
+            }
+            var st = { _f: 0 };
+            Object.defineProperty(st, "f", { get: function () { return this._f; }, set: function (x) { this._f = x; render(x); } });
+            render(0);
+            if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { layout(); render(st._f); });
+            var tl = gsap.timeline({ paused: true });
+            tl.fromTo(st, { f: 0 }, { f: secs * FR, duration: secs, ease: "none", immediateRender: false }, 0);
+            window.__timelines = window.__timelines || {};
+            window.__timelines[ID] = tl;
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

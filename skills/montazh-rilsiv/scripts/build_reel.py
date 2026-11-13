@@ -286,6 +286,8 @@ elif DRAFT:
 else:
     link_or_copy(reel / "master.mp4", proj / "master.mp4")
 # Vibha's effects («fx» cards) are already drawn into the cut by fx_pass.py: that version is the video under everything else
+# own effects that only decorate the person (no words of their own): captions keep running under them
+FX_KEEP_CAPS = {"rf-neon-trace", "rf-outline", "rf-glow", "rf-track-dots", "rf-color-wash", "ay-index", "ay-rack-focus", "ay-dolly-zoom"}
 _FXC = [k for k in edit.get("cards", []) if k.get("type") == "fx"]
 _FXM = reel / ("master_fx_540.mp4" if DRAFT else "master_fx.mp4")
 if _FXC and _FXM.exists():
@@ -306,6 +308,33 @@ def mount(src):
     (proj / rel).parent.mkdir(parents=True, exist_ok=True)
     (proj / rel).write_text(re.sub(r"<audio[^>]*>(</audio>)?", "", src.read_text()))
     return rel
+def brand_palette(txt, vars_):
+    """Card "colors": "brand" on an effect with its own palette (rf-* from the 30 motion prompts): every colour variable
+    gets the brand colour of the same role and the same lightness, so a light paper effect stays light and a dark board
+    stays dark. Roles by variable name: accent/glow/hit/marker/lamp/sun -> pop, accent2/green/secondary -> soft, the rest by
+    lightness: dark -> deep/main, light -> light. Colours the card sets in "vars" itself always win."""
+    def lum(h):
+        h = h.lstrip("#")
+        if len(h) == 3: h = "".join(ch * 2 for ch in h)
+        try: r, g, b = (int(h[i:i + 2], 16) / 255 for i in (0, 2, 4))
+        except ValueError: return 0.5
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b
+    mm = re.search(r"data-composition-variables='(\[.*?\])'", txt, re.S)
+    try: decl = json.loads(mm.group(1)) if mm else []
+    except ValueError: decl = []
+    deep, main, light = C.get("deep") or C["main"], C["main"], C.get("light", "#FFFFFF")
+    pop, soft = C["pop"], C.get("soft") or C["pop"]
+    dark_brand = lum(main) < 0.4
+    for v in decl:
+        vid, dv = v.get("id", ""), v.get("default")
+        if v.get("type") != "color" or not isinstance(dv, str) or vid in vars_ or vid.startswith("brand_"): continue
+        if re.match(r"(accent2|green|secondary|go)", vid): vars_[vid] = soft
+        elif re.match(r"(accent|glow|hit|marker|lamp|sun|digits|ring)", vid): vars_[vid] = pop
+        elif vid.startswith("on_"): vars_[vid] = deep if lum(pop) > 0.5 else light
+        elif lum(dv) < 0.25: vars_[vid] = deep if vid.endswith(("2", "3")) else main
+        elif lum(dv) > 0.8: vars_[vid] = light if dark_brand or not vid.startswith(("bg", "paper", "sheet", "page", "surface", "note", "board", "sky")) else dv
+        # mid tones (muted greys, wood, shades) keep the effect's own colour: repainting them breaks the look
+    return vars_
 def img(src):
     """Copy an image into the project and return its path there. Looks in the reel folder, ~/reels/assets/, then as given."""
     for cand in (reel / src, HOME / "assets" / src, Path(src).expanduser()):
@@ -922,7 +951,10 @@ for i, c in enumerate(edit.get("cards", [])):
         zone(cid, "page", a, b, (0, 0, W, H), full=True)
         if c.get("title"): zone(cid, "page title", a, b, (*tw(c["title"], 92)[:1], 150, tw(c["title"], 92)[1], 92))
     elif kind == "fx":   # drawn into the video by fx_pass.py; here only the captions step aside (no captions over an effect)
-        quiet.append((a, b)); zone(cid, "fx " + c.get("fx", ""), a, b, (0, 0, W, H), text=False, full=True)
+        if c.get("fx") in FX_KEEP_CAPS:   # decor around the person (lines, glow, marks, a colour wash): the captions stay
+            zone(cid, "fx " + c.get("fx", ""), a, b, (0, 0, W, H), text=False, full=True)
+        else:
+            quiet.append((a, b)); zone(cid, "fx " + c.get("fx", ""), a, b, (0, 0, W, H), text=False, full=True)
         if not CARD_MUTE: sfx("whoosh_soft", a - 0.05, -14)   # 2026-10-26: effects without a picked sound were silent; the card's own sound wins
         continue
     elif kind == "head":
@@ -1011,7 +1043,8 @@ for i, c in enumerate(edit.get("cards", [])):
         # our own motions (rf-*) ask for what only the reel knows: brand colours, where the face is, how long the card lasts
         for k_ in ("main", "pop", "light", "soft", "deep"):
             if f'"id": "brand_{k_}"' in txt and C.get(k_): vars_.setdefault(f"brand_{k_}", C[k_])
-        if '"id": "face"' in txt:                         # inside a split her face sits in the lower half, zoomed (split_frame)
+        if c.get("colors") == "brand": vars_ = brand_palette(txt, vars_)   # repaint a full-frame effect in their brand
+        if '"id": "face"' in txt:                        # inside a split her face sits in the lower half, zoomed (split_frame)
             f_ = FACE or [300, 500, 480, 600]
             if any(k_.get("type") == "split" and k_.get("side", "top") != "left" or (k_.get("type") == "motion" and k_.get("layout") == "split")
                    for k_ in edit.get("cards", []) if k_ is not c and k_.get("start", 0) <= a + 0.05 and k_.get("end", 0) >= min(b, a + 0.5)):
@@ -1446,6 +1479,11 @@ for i, c in enumerate(edit.get("captions", [])):
 _sp = float(S_MOT.get("speed", 1)) * float(edit.get("motion_mul", 1))   # the style's speed x this reel's «Повільніше / Швидше»
 if _sp != 1:   # every tween and stagger runs faster (>1) or calmer (<1); start times stay on the words
     js = [re.sub(r"\b(duration|stagger):([\d.]+)", lambda m: f"{m.group(1)}:{float(m.group(2)) / _sp:.3f}", x) for x in js]
+# 3D motions (rf-* with three.js): the sub-compositions can't load scripts of their own, so the page loads it once for them
+USES_THREE = any(re.search(r"\bTHREE\b", f.read_text(errors="ignore")) for f in (proj / "compositions").rglob("*.html")) if (proj / "compositions").exists() else False
+if USES_THREE:
+    if (ENGINE / "three.min.js").exists(): shutil.copy(ENGINE / "three.min.js", proj / "vendor/three.min.js")
+    else: print("warning: a 3D motion needs engine/three.min.js - run scripts/setup_engine.sh"); USES_THREE = False
 doc = f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8" />
 <style>
@@ -1566,6 +1604,7 @@ html, body {{ margin: 0; background: #000; overflow: hidden; }}
   <div id="front">{"".join(front)}</div>
   </div>
   {"".join(audio)}
+  {'<script src="vendor/three.min.js"></script>' if USES_THREE else ''}
   <script src="vendor/gsap.min.js"></script>
   <script>(function () {{ window.__timelines = window.__timelines || {{}};
     const tl = window.gsap.timeline({{ paused: true }});

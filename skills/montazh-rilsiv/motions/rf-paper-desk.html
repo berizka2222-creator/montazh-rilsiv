@@ -1,0 +1,216 @@
+<!doctype html>
+<!-- rf-paper-desk: paper notes land in stop motion on a green cutting mat, then a red marker circles the drop on the curve
+     and scrawls a short phrase. Rebuilt from an ultra-skills motion prompt. -->
+<html lang="uk" data-composition-id="rf-paper-desk" data-composition-duration="600" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "title", "type": "string", "label": "Заголовок нотатки з графіком", "default": "Note title" },
+  { "id": "y_label", "type": "string", "label": "Підпис осі Y", "default": "Y axis label" },
+  { "id": "x_label", "type": "string", "label": "Підпис осі X", "default": "X axis label" },
+  { "id": "drop_label", "type": "string", "label": "Підпис під точкою падіння", "default": "Drop label" },
+  { "id": "source_tag", "type": "string", "label": "Табличка-джерело (моноширинний)", "default": "Source tag" },
+  { "id": "log_label", "type": "string", "label": "Вирізка: мітка (моноширинний)", "default": "Log label" },
+  { "id": "advice", "type": "string", "label": "Вирізка: один рядок поради", "default": "One line of advice" },
+  { "id": "slip_text", "type": "string", "label": "Чорна смужка: заголовок", "default": "SLIP TEXT" },
+  { "id": "marker_words", "type": "string", "label": "Слова червоним маркером", "default": "MARKER WORDS" },
+  { "id": "mat", "type": "color", "label": "Килимок (фон)", "default": "#1f5c4a" },
+  { "id": "grid", "type": "color", "label": "Сітка килимка (22%)", "default": "#fffdf8" },
+  { "id": "note", "type": "color", "label": "Папір нотатки (і текст смужки)", "default": "#fffdf8" },
+  { "id": "clipping", "type": "color", "label": "Папір вирізки", "default": "#f4efe5" },
+  { "id": "ink", "type": "color", "label": "Чорнило (текст, графік, смужка)", "default": "#17130f" },
+  { "id": "ink2", "type": "color", "label": "Друге чорнило (мітки, джерело)", "default": "#5e554b" },
+  { "id": "marker", "type": "color", "label": "Червоний маркер", "default": "#e5432d" },
+  { "id": "tape", "type": "color", "label": "Скотч", "default": "#ddd0bd" },
+  { "id": "shadow", "type": "color", "label": "Тінь паперу", "default": "#2a1d10" },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 2 }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-paper-desk</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-paper-desk" data-duration="600" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; overflow: hidden; }
+          .rfpd { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--rfpd-mat); }
+          .rfpd .rfpd-mat { position: absolute; inset: 0; }
+          .rfpd .rfpd-pc { position: absolute; visibility: hidden; transform-origin: 50% 50%; }
+          .rfpd .rfpd-note { left: 130px; top: 370px; width: 820px; height: 780px; background: var(--rfpd-note); }
+          .rfpd .rfpd-clip { left: 380px; top: 1200px; width: 640px; height: 300px; background: var(--rfpd-clipping); }
+          .rfpd .rfpd-slip { left: 90px; top: 214px; width: 630px; height: 130px; background: var(--rfpd-ink); }
+          .rfpd .rfpd-face { position: absolute; inset: 0; }
+          .rfpd .rfpd-ttl { position: absolute; left: 60px; right: 60px; top: 50px; height: 120px; display: flex; align-items: center;
+                  font-family: var(--font-display, Georgia, "Times New Roman", serif); font-weight: 700; font-size: 48px; line-height: 1.1; color: var(--rfpd-ink); }
+          .rfpd .rfpd-lbl { position: absolute; font-family: var(--font-body, Georgia, serif); font-size: 32px; line-height: 1; color: var(--rfpd-ink); white-space: nowrap; }
+          .rfpd .rfpd-src { position: absolute; left: 60px; top: 712px; padding: 8px 14px; border: 2px solid var(--rfpd-ink2); color: var(--rfpd-ink2);
+                  font-family: ui-monospace, Menlo, monospace; font-size: 22px; line-height: 1; white-space: nowrap; }
+          .rfpd .rfpd-log { position: absolute; left: 50px; right: 50px; top: 74px; font-family: ui-monospace, Menlo, monospace; font-size: 32px;
+                  color: var(--rfpd-ink2); white-space: nowrap; overflow: hidden; }
+          .rfpd .rfpd-adv { position: absolute; left: 50px; right: 50px; top: 128px; bottom: 26px; font-family: var(--font-display, Georgia, serif);
+                  font-size: 38px; line-height: 1.2; color: var(--rfpd-ink); }
+          .rfpd .rfpd-sl { position: absolute; left: 20px; top: 0; width: 590px; height: 130px; line-height: 130px !important; text-align: center; overflow: visible;
+                  font-family: var(--font-display, "Arial Black", Helvetica, sans-serif); font-weight: 900; font-size: 80px; line-height: 1;
+                  color: var(--rfpd-note); white-space: nowrap; letter-spacing: -0.01em; }
+          .rfpd .rfpd-tape { position: absolute; width: 150px; height: 46px; background: var(--rfpd-tape); opacity: .86; box-shadow: 0 1px 2px rgba(0,0,0,.25); }
+          .rfpd .rfpd-ink { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; pointer-events: none; }
+          .rfpd .rfpd-mw { position: absolute; font-family: "Marker Felt", "Chalkboard SE", "Bradley Hand", "Comic Sans MS", cursive;
+                  font-weight: 700; font-size: 56px; line-height: 1.05; white-space: pre; transform: rotate(-4deg); transform-origin: 0 50%; }
+        </style>
+        <div class="rfpd">
+          <svg class="rfpd-mat" width="1080" height="1920" viewBox="0 0 1080 1920"></svg>
+          <div class="rfpd-pc rfpd-note"><div class="rfpd-face">
+            <svg width="820" height="780" viewBox="0 0 820 780" style="position:absolute;left:0;top:0"></svg>
+            <div class="rfpd-ttl"></div><div class="rfpd-lbl rfpd-yl"></div><div class="rfpd-lbl rfpd-xl"></div><div class="rfpd-lbl rfpd-dl"></div>
+            <div class="rfpd-src"></div></div></div>
+          <div class="rfpd-pc rfpd-clip"><div class="rfpd-face"><div class="rfpd-log"></div><div class="rfpd-adv"></div></div>
+            <div class="rfpd-tape" style="left:250px;top:-14px;transform:rotate(-4deg)"></div></div>
+          <div class="rfpd-pc rfpd-slip"><div class="rfpd-face"><div class="rfpd-sl"></div></div>
+            <div class="rfpd-tape" style="left:540px;top:-14px;transform:rotate(24deg)"></div></div>
+          <svg class="rfpd-ink" width="1080" height="1920" viewBox="0 0 1080 1920">
+            <defs><filter id="rfpd-wet" x="-10%" y="-10%" width="120%" height="120%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="3" result="n" />
+              <feDisplacementMap in="SourceGraphic" in2="n" scale="5" xChannelSelector="R" yChannelSelector="G" /></filter></defs>
+            <g filter="url(#rfpd-wet)"><path class="rfpd-c1" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+              <path class="rfpd-c2" fill="none" stroke-linecap="round" stroke-linejoin="round" /></g>
+          </svg>
+          <div class="rfpd-mw"></div>
+        </div>
+        <script>
+          (function () {
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            function S(x, d) { return (x === undefined || x === null) ? d : String(x); }
+            var secs = Math.max(1, +v.seconds || 2), FPS = 30;
+            var root = document.querySelector(".rfpd"), C = {};
+            [["mat", "#1f5c4a"], ["grid", "#fffdf8"], ["note", "#fffdf8"], ["clipping", "#f4efe5"], ["ink", "#17130f"], ["ink2", "#5e554b"],
+             ["marker", "#e5432d"], ["tape", "#ddd0bd"], ["shadow", "#2a1d10"]].forEach(function (c) { C[c[0]] = v[c[0]] || c[1]; root.style.setProperty("--rfpd-" + c[0], C[c[0]]); });
+            var MARK = C.marker;
+            function rgba(h, a) { h = String(h).replace("#", ""); if (h.length === 3) h = h.replace(/./g, "$&$&"); var n = parseInt(h, 16);
+              return "rgba(" + (n >> 16 & 255) + "," + (n >> 8 & 255) + "," + (n & 255) + "," + a + ")"; }
+            function q(s) { return root.querySelector(s); }
+            function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a);
+              t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+            var NS = "http://www.w3.org/2000/svg";
+            function el(tag, at, parent) { var e = document.createElementNS(NS, tag); for (var k in at) e.setAttribute(k, at[k]); parent.appendChild(e); return e; }
+            // fit text: shrink font until it fits the box width (and height when wrapping)
+            function fit(node, size, min, maxW, maxH) {
+              node.style.fontSize = size + "px";
+              while (size > min && (node.scrollWidth > maxW + 1 || (maxH && node.scrollHeight > maxH + 1))) { size -= 2; node.style.fontSize = size + "px"; }
+              return size;
+            }
+            // ---- mat: 96px grid at 22% + edge ticks
+            var mat = q(".rfpd-mat");
+            for (var gx = 0; gx <= 1080; gx += 96) el("line", { x1: gx, y1: 0, x2: gx, y2: 1920, stroke: C.grid, "stroke-opacity": .22, "stroke-width": 2 }, mat);
+            for (var gy = 0; gy <= 1920; gy += 96) el("line", { x1: 0, y1: gy, x2: 1080, y2: gy, stroke: C.grid, "stroke-opacity": .22, "stroke-width": 2 }, mat);
+            for (var t = 0; t <= 1920; t += 24) { var L = t % 96 === 0 ? 26 : 12;
+              el("line", { x1: 0, y1: t, x2: L, y2: t, stroke: C.grid, "stroke-opacity": .4, "stroke-width": 2 }, mat);
+              el("line", { x1: 1080 - L, y1: t, x2: 1080, y2: t, stroke: C.grid, "stroke-opacity": .4, "stroke-width": 2 }, mat); }
+            for (t = 0; t <= 1080; t += 24) { L = t % 96 === 0 ? 26 : 12;
+              el("line", { x1: t, y1: 0, x2: t, y2: L, stroke: C.grid, "stroke-opacity": .4, "stroke-width": 2 }, mat);
+              el("line", { x1: t, y1: 1920 - L, x2: t, y2: 1920, stroke: C.grid, "stroke-opacity": .4, "stroke-width": 2 }, mat); }
+            // ---- curve note
+            var note = q(".rfpd-note"), ns = note.querySelector("svg");
+            var AX = 90, AY0 = 250, AY1 = 640, AX1 = 760, DROP = [300, 560];
+            el("line", { x1: AX, y1: AY0, x2: AX, y2: AY1, stroke: C.ink, "stroke-width": 4, "stroke-linecap": "round" }, ns);
+            el("line", { x1: AX, y1: AY1, x2: AX1, y2: AY1, stroke: C.ink, "stroke-width": 4, "stroke-linecap": "round" }, ns);
+            el("path", { d: "M" + (AX - 10) + " " + (AY0 + 14) + " L" + AX + " " + AY0 + " L" + (AX + 10) + " " + (AY0 + 14), fill: "none", stroke: C.ink, "stroke-width": 4 }, ns);
+            el("path", { d: "M" + (AX1 - 14) + " " + (AY1 - 10) + " L" + AX1 + " " + AY1 + " L" + (AX1 - 14) + " " + (AY1 + 10), fill: "none", stroke: C.ink, "stroke-width": 4 }, ns);
+            el("line", { x1: DROP[0], y1: AY1 - 12, x2: DROP[0], y2: AY1 + 12, stroke: C.ink, "stroke-width": 4 }, ns);
+            el("line", { x1: DROP[0], y1: DROP[1] + 10, x2: DROP[0], y2: AY1 - 14, stroke: C.ink2, "stroke-width": 2, "stroke-dasharray": "6 8" }, ns);
+            el("path", { d: "M110 272 C170 268 205 282 232 330 C258 382 270 500 " + DROP[0] + " " + DROP[1] + " C340 598 420 596 500 600 C580 604 660 598 740 602",
+                         fill: "none", stroke: C.ink, "stroke-width": 5, "stroke-linecap": "round" }, ns);
+            var ttl = q(".rfpd-ttl"); ttl.textContent = S(v.title, "Note title"); fit(ttl, 48, 28, 700, 120);
+            var yl = q(".rfpd-yl"); yl.textContent = S(v.y_label, "Y axis label"); yl.style.left = (AX - 20) + "px"; yl.style.top = (AY0 - 52) + "px"; fit(yl, 32, 20, 680);
+            var dl = q(".rfpd-dl"); dl.textContent = S(v.drop_label, "Drop label"); fit(dl, 32, 18, 300);
+            dl.style.top = (AY1 + 22) + "px"; dl.style.left = Math.max(40, DROP[0] - dl.offsetWidth / 2) + "px";
+            var xl = q(".rfpd-xl"); xl.textContent = S(v.x_label, "X axis label"); fit(xl, 32, 18, 300);
+            xl.style.top = (AY1 + 22) + "px"; xl.style.left = (AX1 + 10 - xl.offsetWidth) + "px";
+            var src = q(".rfpd-src"); src.textContent = S(v.source_tag, "Source tag"); fit(src, 22, 14, 700);
+            if (!src.textContent) src.style.display = "none";
+            // ---- clipping: torn top edge
+            var clip = q(".rfpd-clip"), rnd = mulberry32(1807), pts = ["0% 100%", "100% 100%", "100% 8%"];
+            for (var k = 1; k < 24; k++) pts.push((100 - k * 100 / 24).toFixed(2) + "% " + (2 + rnd() * 9).toFixed(1) + "%");
+            pts.push("0% 6%"); clip.querySelector(".rfpd-face").style.clipPath = "polygon(" + pts.join(",") + ")";
+            clip.querySelector(".rfpd-face").style.background = C.clipping; clip.style.background = "transparent";
+            var lg = q(".rfpd-log"); lg.textContent = S(v.log_label, "Log label"); fit(lg, 32, 18, 540);
+            var adv = q(".rfpd-adv"); adv.textContent = S(v.advice, "One line of advice"); fit(adv, 38, 22, 540, 146);
+            // ---- slip: cut ink paper with rough edges
+            var slip = q(".rfpd-slip"); pts = [];
+            rnd = mulberry32(2104);
+            for (k = 0; k <= 16; k++) pts.push((k * 100 / 16).toFixed(2) + "% " + (rnd() * 7).toFixed(1) + "%");
+            for (k = 0; k <= 4; k++) pts.push((100 - rnd() * 1.2).toFixed(2) + "% " + (k * 25).toFixed(1) + "%");
+            for (k = 16; k >= 0; k--) pts.push((k * 100 / 16).toFixed(2) + "% " + (100 - rnd() * 7).toFixed(1) + "%");
+            for (k = 4; k >= 0; k--) pts.push((rnd() * 1.2).toFixed(2) + "% " + (k * 25).toFixed(1) + "%");
+            slip.querySelector(".rfpd-face").style.clipPath = "polygon(" + pts.join(",") + ")";
+            slip.querySelector(".rfpd-face").style.background = C.ink; slip.style.background = "transparent";
+            var sl = q(".rfpd-sl"), slb = document.createElement("span"); slb.textContent = S(v.slip_text, "SLIP TEXT"); sl.appendChild(slb);
+            for (var ss = 80; ss > 36 && slb.offsetWidth > 590; ss -= 2) sl.style.fontSize = ss - 2 + "px";
+            // ---- marker: drop point on screen (note rotated -2deg about its centre)
+            function toScreen(lx, ly, left, top, w, h, deg) {
+              var a = deg * Math.PI / 180, dx = lx - w / 2, dy = ly - h / 2;
+              return [left + w / 2 + dx * Math.cos(a) - dy * Math.sin(a), top + h / 2 + dx * Math.sin(a) + dy * Math.cos(a)];
+            }
+            var DP = toScreen(DROP[0], DROP[1], 130, 370, 820, 780, -2), R = 130;
+            // one loop that overshoots its start, radius wobbling a little (a hand-drawn ellipse)
+            var loop = [], N = 90, r2 = mulberry32(3003);
+            var ph1 = r2() * 6.28, ph2 = r2() * 6.28;
+            for (k = 0; k <= N; k++) { var u = k / N, ang = -2.3 + u * (Math.PI * 2 + 0.55);
+              var rr = R * (1 + 0.05 * Math.sin(ang * 2 + ph1) + 0.03 * Math.sin(ang * 3 + ph2)) * (1 - 0.06 * u);
+              loop.push([DP[0] + rr * 1.08 * Math.cos(ang), DP[1] + rr * 0.92 * Math.sin(ang)]); }
+            var dstr = "M" + loop.map(function (p) { return p[0].toFixed(1) + " " + p[1].toFixed(1); }).join(" L");
+            var c1 = q(".rfpd-c1"), c2 = q(".rfpd-c2");
+            c1.setAttribute("d", dstr); c2.setAttribute("d", dstr);
+            c1.setAttribute("stroke", MARK); c1.setAttribute("stroke-width", 15); c1.setAttribute("stroke-opacity", .93);
+            c2.setAttribute("stroke", C.ink); c2.setAttribute("stroke-width", 4); c2.setAttribute("stroke-opacity", .16);
+            c2.setAttribute("transform", "translate(2 3)");
+            var LEN = c1.getTotalLength(); c1.setAttribute("stroke-dasharray", LEN + " " + LEN); c2.setAttribute("stroke-dasharray", LEN + " " + LEN);
+            var mw = q(".rfpd-mw"); mw.style.color = MARK;
+            var words = S(v.marker_words, "MARKER WORDS"), mx = DP[0] + R * 1.08 + 34, maxW = 1000 - mx;
+            mw.textContent = words; mw.style.left = mx + "px";
+            var ms = fit(mw, 56, 44, maxW), ws = words.split(/\s+/);
+            if (mw.scrollWidth > maxW + 1 && ws.length > 1) {      // too long for one line: break into two, then three
+              var n3 = ws.length > 4 ? 3 : 2, per = Math.ceil(ws.length / n3), rows = [];
+              for (var wi = 0; wi < ws.length; wi += per) rows.push(ws.slice(wi, wi + per).join(" "));
+              mw.textContent = rows.join("\n"); ms = fit(mw, 56, 26, maxW);
+            } else ms = fit(mw, 56, 24, maxW);
+            mw.style.top = (DP[1] - mw.offsetHeight / 2 - 30) + "px";
+            mw.style.filter = "url(#rfpd-wet)";
+            var turb = root.querySelector("#rfpd-wet feTurbulence");
+            // ---- pieces: [element, rotation, enter offset dx, dy, first frame]
+            var P = [[note, -2, 760, -900, 0], [clip, 2.5, 700, 760, 9], [slip, -3, -720, -460, 21]];
+            var OFF = [1, 0.42, 0];                                  // three chunky poses, the last one landed
+            function render(f) {
+              var qf = Math.floor(f / 3 + 1e-6) * 3;                // stop motion on threes
+              P.forEach(function (p, i) {
+                var e = p[0], k = Math.floor((qf - p[4]) / 3 + 1e-6);
+                if (k < 0) { e.style.visibility = "hidden"; return; }
+                e.style.visibility = "inherit";
+                var o = OFF[Math.min(k, 2)], up = k < 2;
+                var b = mulberry32(qf * 7 + i * 131)(), b2 = mulberry32(qf * 13 + i * 71)();
+                var rot = p[1] + (up ? (1 - b * 2) * 1.5 : (b - .5) * 0.5), jx = up ? 0 : (b2 - .5) * 2, jy = up ? 0 : (b - .5) * 2;
+                var sc = up ? 1 + 0.05 * o + 0.025 : 1;
+                e.style.transform = "translate(" + (p[2] * o + jx).toFixed(1) + "px," + (p[3] * o + jy).toFixed(1) + "px) rotate(" + rot.toFixed(2) + "deg) scale(" + sc + ")";
+                e.style.filter = up ? "drop-shadow(26px 40px 30px " + rgba(C.shadow, .38) + ") drop-shadow(10px 16px 14px " + rgba(C.shadow, .3) + ")"
+                                    : "drop-shadow(5px 7px 5px " + rgba(C.shadow, .55) + ") drop-shadow(1px 2px 1px " + rgba(C.shadow, .6) + ")";
+              });
+              // marker circle: smooth, raw frames 30-37
+              var cp = Math.max(0, Math.min(1, (f - 30) / 8)); cp = 1 - Math.pow(1 - cp, 1.6);
+              c1.setAttribute("stroke-dashoffset", LEN * (1 - cp)); c2.setAttribute("stroke-dashoffset", LEN * (1 - cp));
+              c1.style.visibility = c2.style.visibility = cp > 0 ? "inherit" : "hidden";
+              // words: revealed left to right, raw frames 38-45
+              var wp = Math.max(0, Math.min(1, (f - 38) / 8));
+              mw.style.visibility = wp > 0 ? "inherit" : "hidden";
+              mw.style.clipPath = "inset(-20px " + ((1 - wp) * 100).toFixed(1) + "% -20px -20px)";
+              // marker edges boil: reseed every 6 frames from frame 45
+              turb.setAttribute("seed", f < 45 ? 3 : 3 + Math.floor((f - 45) / 6) + 1);
+              var fo = Math.max(0, Math.min(1, (secs * FPS - f) / (0.25 * FPS)));
+              root.style.opacity = fo;
+            }
+            // repaint from a property setter: gsap seek() suppresses onUpdate, a tweened setter always runs
+            var fv = 0, st = {}, tl = gsap.timeline({ paused: true });
+            Object.defineProperty(st, "f", { get: function () { return fv; }, set: function (x) { fv = x; render(x); } });
+            tl.to(st, { f: secs * FPS, duration: secs, ease: "none" }, 0);
+            render(0);
+            window.__timelines = window.__timelines || {};
+            window.__timelines["rf-paper-desk"] = tl;
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

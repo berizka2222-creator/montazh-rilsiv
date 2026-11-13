@@ -1,0 +1,238 @@
+<!doctype html>
+<!-- rf-ink-doodle: a boiling marker stick figure at a typewriter under a self-lettering paper sign, crumpled sheets turn
+     into a paper storm, one sheet slaps to camera with a mistyped word struck out in red. Rebuilt from an ultra-skills motion prompt. -->
+<html lang="uk" data-composition-id="rf-ink-doodle" data-composition-duration="600" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "sign_line1", "type": "string", "label": "Табличка: рядок 1", "default": "SIGN LINE ONE" },
+  { "id": "sign_line2", "type": "string", "label": "Табличка: рядок 2", "default": "SIGN LINE TWO" },
+  { "id": "typo", "type": "string", "label": "Слово з помилкою на аркуші", "default": "mistyped word" },
+  { "id": "bg", "type": "color", "label": "Небо (верх)", "default": "#5b8cff" },
+  { "id": "bg2", "type": "color", "label": "Небо (низ)", "default": "#b5cafb" },
+  { "id": "paper", "type": "color", "label": "Хмари і папір", "default": "#fffdf8" },
+  { "id": "ink", "type": "color", "label": "Маркер (лінії, текст)", "default": "#17130f" },
+  { "id": "accent", "type": "color", "label": "Червона ручка", "default": "#e5432d" },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 2 }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-ink-doodle</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-ink-doodle" data-duration="600" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; overflow: hidden; }
+          .rfid { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden; background: #5b8cff; }
+          .rfid .rfid-svg { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; display: block; }
+          .rfid .rfid-hand { font-family: var(--font-display, "Patrick Hand", "Chalkboard SE", "Comic Sans MS", cursive); font-weight: 400; }
+        </style>
+        <div class="rfid">
+          <svg class="rfid-svg" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="rfid-sky" x1="0" y1="0" x2="0" y2="1"><stop class="rfid-s1" offset="0" /><stop class="rfid-s2" offset="1" /></linearGradient>
+              <filter id="rfid-grain" x="0" y="0" width="100%" height="100%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="7" result="n" />
+                <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.6 1.05" /></filter>
+              <filter id="rfid-boil" x="-5%" y="-5%" width="110%" height="110%">
+                <feTurbulence class="rfid-turb" type="fractalNoise" baseFrequency="0.022" numOctaves="2" seed="3" result="t" />
+                <feDisplacementMap in="SourceGraphic" in2="t" scale="9" xChannelSelector="R" yChannelSelector="G" /></filter>
+            </defs>
+            <rect width="1080" height="1920" fill="url(#rfid-sky)" />
+            <rect width="1080" height="1920" filter="url(#rfid-grain)" opacity="0.12" />
+            <g class="rfid-cam"><g filter="url(#rfid-boil)">
+              <g class="rfid-clouds"></g>
+              <g class="rfid-sign"></g>
+              <g class="rfid-back"></g>
+              <g class="rfid-scene"></g>
+              <g class="rfid-fig"></g>
+              <g class="rfid-throw"></g>
+              <g class="rfid-front"></g>
+              <g class="rfid-slap"></g>
+            </g></g>
+          </svg>
+        </div>
+        <script>
+          (function () {
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            function S(x, d) { return (x === undefined || x === null || x === "") ? d : String(x); }
+            var secs = Math.max(1, +v.seconds || 2), FPS = 30;
+            var C = { sky: S(v.bg, "#5b8cff"), sky2: S(v.bg2, "#b5cafb"), paper: S(v.paper, "#fffdf8"), ink: S(v.ink, "#17130f"), red: S(v.accent, "#e5432d") };
+            var root = document.querySelector(".rfid"); function q(s) { return root.querySelector(s); }
+            root.style.background = C.sky;
+            q(".rfid-s1").setAttribute("stop-color", C.sky); q(".rfid-s2").setAttribute("stop-color", C.sky2);
+            function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a);
+              t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+            var NS = "http://www.w3.org/2000/svg", rnd = mulberry32(1919);
+            function el(tag, at, parent) { var e = document.createElementNS(NS, tag); for (var k in at) e.setAttribute(k, at[k]); if (parent) parent.appendChild(e); return e; }
+            function cl(x, a, b) { return Math.max(a, Math.min(b, x)); }
+            var W = 6;
+            function inkAt(extra) { var a = { fill: "none", stroke: C.ink, "stroke-width": W, "stroke-linecap": "round", "stroke-linejoin": "round", "vector-effect": "non-scaling-stroke" };
+              for (var k in extra) a[k] = extra[k]; return a; }
+            // smooth hand path through points (quadratic through midpoints), light seeded jitter
+            function hand(pts, closed, j) { j = j === undefined ? 1.5 : j;
+              var p = pts.map(function (o) { return [o[0] + (rnd() - .5) * j * 2, o[1] + (rnd() - .5) * j * 2]; });
+              if (closed) p.push(p[0], p[1]);
+              var d = "M" + p[0][0].toFixed(1) + " " + p[0][1].toFixed(1);
+              if (p.length === 2) return d + " L" + p[1][0].toFixed(1) + " " + p[1][1].toFixed(1);
+              for (var i = 1; i < p.length - 1; i++) { var mx = (p[i][0] + p[i + 1][0]) / 2, my = (p[i][1] + p[i + 1][1]) / 2;
+                d += " Q" + p[i][0].toFixed(1) + " " + p[i][1].toFixed(1) + " " + mx.toFixed(1) + " " + my.toFixed(1); }
+              return d; }
+            function seg(x1, y1, x2, y2, bow) { bow = bow || 0; var mx = (x1 + x2) / 2 - (y2 - y1) * bow, my = (y1 + y2) / 2 + (x2 - x1) * bow;
+              return hand([[x1, y1], [mx, my], [x2, y2]], false, 1); }
+            function blob(cx, cy, rx, ry, n, var_) { var pts = []; for (var i = 0; i < n; i++) { var a = i / n * Math.PI * 2, k = 1 + (rnd() - .5) * var_;
+              pts.push([cx + Math.cos(a) * rx * k, cy + Math.sin(a) * ry * k]); } return hand(pts, true, 0); }
+
+            // ---- clouds (marker outline, paper fill)
+            var clouds = [];
+            [[210, 270, 1], [860, 720, 0.85], [250, 1660, 1.1]].forEach(function (c) {
+              var g = el("g", {}, q(".rfid-clouds")), pts = [], n = 9;
+              for (var i = 0; i < n; i++) { var a = Math.PI + i / (n - 1) * Math.PI; pts.push([Math.cos(a) * 120, Math.sin(a) * 52 - 8 - (i % 2 ? 26 : 0)]); }
+              var top = hand(pts, false, 2);
+              el("path", inkAt({ d: top + " Q118 30 60 34 L-60 34 Q-118 30 -120 -8", fill: C.paper }), g);
+              clouds.push({ g: g, x: c[0], y: c[1], s: c[2] });
+            });
+
+            // ---- sign (700x260 at y 340-600) on two strings, letters itself
+            var sign = q(".rfid-sign");
+            el("path", inkAt({ d: seg(330, 200, 300, 345, .02) }), sign);
+            el("path", inkAt({ d: seg(750, 200, 780, 345, -.02) }), sign);
+            el("path", inkAt({ d: hand([[192, 344], [540, 338], [888, 346], [884, 470], [890, 598], [540, 604], [188, 596], [194, 470]], true, 2), fill: C.paper }), sign);
+            function mkLine(txt, y) { var t = el("text", { x: 540, y: y, "text-anchor": "middle", fill: C.ink, class: "rfid-hand", "font-size": 84 }, sign);
+              var chars = Array.from(txt.toLocaleUpperCase("uk")), spans = [];
+              chars.forEach(function (ch) { var s = el("tspan", {}, t); s.textContent = ch; spans.push(s); });
+              var fs = 84; while (fs > 34 && t.getComputedTextLength() > 640) { fs -= 2; t.setAttribute("font-size", fs); }
+              return { t: t, spans: spans, fs: fs }; }
+            var L1 = mkLine(S(v.sign_line1, "SIGN LINE ONE"), 455), L2 = mkLine(S(v.sign_line2, "SIGN LINE TWO"), 552);
+            var ulW = Math.min(640, Math.max(200, L2.t.getComputedTextLength() + 30));
+            var ul = el("path", { d: hand([[540 - ulW / 2, 575], [540 - ulW / 6, 581], [540 + ulW / 6, 572], [540 + ulW / 2, 579]], false, 1.5), fill: "none", stroke: C.red,
+              "stroke-width": 8, "stroke-linecap": "round" }, sign);
+            var ulLen = ul.getTotalLength(); ul.setAttribute("stroke-dasharray", ulLen);
+
+            // ---- desk + typewriter (static), platen sheet (grows)
+            var scn = q(".rfid-scene");
+            el("path", inkAt({ d: hand([[440, 1082], [640, 1078], [842, 1083], [842, 1102], [640, 1100], [440, 1103]], true, 1), fill: C.paper }), scn);
+            el("path", inkAt({ d: seg(472, 1102, 468, 1330) }), scn); el("path", inkAt({ d: seg(810, 1102, 814, 1330) }), scn);
+            var sheetP = el("path", inkAt({ fill: C.paper }), scn);
+            el("path", inkAt({ d: hand([[562, 990], [670, 986], [780, 992], [782, 1078], [670, 1080], [558, 1078]], true, 1), fill: C.paper }), scn);
+            el("path", inkAt({ d: hand([[575, 958], [670, 955], [766, 959], [766, 986], [670, 988], [574, 985]], true, 1), fill: C.paper }), scn);
+            for (var kr = 0; kr < 3; kr++) for (var kk = 0; kk < 6; kk++) el("circle", { cx: 590 + kk * 32 + kr * 8, cy: 1012 + kr * 20, r: 5, fill: C.ink }, scn);
+            // stool
+            el("path", inkAt({ d: seg(320, 1180, 430, 1178) }), scn); el("path", inkAt({ d: seg(335, 1180, 330, 1330) }), scn); el("path", inkAt({ d: seg(415, 1178, 420, 1330) }), scn);
+            function sheetAt(h) { return h < 4 ? "" : "M602 958 L604 " + (958 - h) + " L738 " + (956 - h) + " L736 958 Z M622 " + (946 - h * 0.6).toFixed(0) + " L712 " + (946 - h * 0.6).toFixed(0); }
+
+            // ---- figure (pose-driven, rebuilt every held drawing)
+            var fig = q(".rfid-fig"), figHead = el("path", inkAt({ fill: C.paper }), fig), figBody = el("path", inkAt({}), fig),
+                figLegs = el("path", inkAt({}), fig), armA = el("path", inkAt({}), fig), armB = el("path", inkAt({}), fig),
+                handSheet = el("path", inkAt({ fill: C.paper }), fig);
+            function circ(cx, cy, r) { return blob(cx, cy, r, r, 10, 0.06); }
+            var headSit = circ(380, 880, 50), headStand = circ(380, 795, 50);
+            var bodySit = seg(382, 932, 372, 1150, .02), bodyStand = seg(382, 847, 380, 1085, .01);
+            var legsSit = hand([[372, 1150], [460, 1160], [465, 1320], [505, 1322]], false, 1), legsStand = seg(380, 1085, 345, 1325) + " " + seg(380, 1085, 418, 1325);
+            var poses = [[[450, 1040], [585, 1010]], [[455, 1028], [602, 995]], [[446, 1046], [574, 1016]]];
+            function arm(sh, el2, h2) { return hand([sh, el2, h2], false, 0.8); }
+
+            // crumpled ball variants (unit radius 50) + half-crumple + flat sheet, in nominal 100px units
+            function ballD(k) { var r2 = mulberry32(500 + k), pts = []; for (var i = 0; i < 9; i++) { var a = i / 9 * Math.PI * 2 + r2() * .3, rr = 40 + r2() * 12;
+              pts.push([Math.cos(a) * rr, Math.sin(a) * rr]); }
+              var d = hand(pts, true, 0); d += " M" + (-20 + r2() * 10).toFixed(0) + " " + (-18 + r2() * 8).toFixed(0) + " L" + (6 + r2() * 8).toFixed(0) + " " + (-2 + r2() * 8).toFixed(0) +
+                " L" + (-4 + r2() * 8).toFixed(0) + " " + (18 + r2() * 8).toFixed(0) + " M" + (10 + r2() * 6).toFixed(0) + " " + (-24 + r2() * 6).toFixed(0) + " L" + (24 + r2() * 4).toFixed(0) + " " + (4 + r2() * 6).toFixed(0);
+              return d; }
+            var BALLS = [0, 1, 2].map(ballD);
+            var HALF = hand([[-55, -40], [-10, -55], [50, -35], [40, 10], [55, 45], [-5, 40], [-50, 50], [-35, 0]], true, 0) + " M-30 -30 L10 0 L-20 30 M20 -40 L15 20";
+            var FLAT = hand([[-40, -50], [40, -50], [40, 50], [-40, 50]], true, 0) + " M-26 -28 L24 -28 M-26 -8 L20 -8 M-26 12 L26 12 M-26 32 L8 32";
+            function piece(parent) { return el("path", inkAt({ fill: C.paper }), parent); }
+            function place(node, d, x, y, s, rot, sx) { node.setAttribute("d", d); node.setAttribute("transform", "translate(" + x.toFixed(1) + " " + y.toFixed(1) + ") rotate(" + rot.toFixed(1) + ") scale(" + (s * (sx || 1)).toFixed(3) + " " + s.toFixed(3) + ")"); node.style.display = ""; }
+
+            // ---- thrown balls (rip at 6, 14, 24: crumple on 2 drawings, throw over the shoulder on a high arc)
+            var RIPS = [6, 14, 24], thrown = RIPS.map(function () { return piece(q(".rfid-throw")); });
+            function throwPos(k) { return [330 - 22 * k, 820 - 72 * k + 9 * k * k]; }
+
+            // ---- storm: up to 28 pieces on a rising ellipse
+            var SR = mulberry32(2828), storm = [];
+            for (var i = 0; i < 28; i++) storm.push({ ball: i < 3 ? true : SR() < 0.6, rx: 330 + SR() * 150, ry: 110 + SR() * 90, ph: SR() * Math.PI * 2, spd: 0.26 + SR() * 0.14,
+              yo: (SR() - .5) * 140, size: 60 + SR() * 80, rot0: SR() * 360, dir: SR() < .5 ? -1 : 1, node: null });
+            storm.forEach(function (p) { p.node = piece(q(".rfid-back")); });
+            function stormPos(p, qq) { var a = p.ph + p.spd * (qq - 32) / 2, cy = 1000 - 6 * Math.min(qq - 32, 22);
+              return { x: 440 + p.rx * Math.cos(a), y: cy + p.yo + p.ry * Math.sin(a), front: Math.sin(a) > 0 }; }
+
+            // ---- slap sheet (frame 36) with the mistyped word and a red pen slash (40-44)
+            var slap = q(".rfid-slap"), slapG = el("g", {}, slap);
+            el("path", inkAt({ d: hand([[-240, -150], [0, -153], [240, -149], [242, 0], [239, 150], [0, 152], [-241, 151], [-238, 0]], true, 1.5), fill: C.paper }), slapG);
+            el("path", inkAt({ d: seg(-200, -105, 180, -106) + " " + seg(-200, -70, 120, -69), stroke: C.ink, opacity: .35 }), slapG);
+            var word = el("text", { x: 0, y: 30, "text-anchor": "middle", fill: C.ink, class: "rfid-hand", "font-size": 60 }, slapG);
+            word.textContent = S(v.typo, "mistyped word");
+            var wfs = 60; while (wfs > 26 && word.getComputedTextLength() > 420) { wfs -= 2; word.setAttribute("font-size", wfs); }
+            var ww = Math.min(440, word.getComputedTextLength() + 40);
+            var slash = el("path", { d: hand([[-ww / 2, 40], [-ww / 6, 12], [ww / 6, -6], [ww / 2, -30]], false, 2), fill: "none", stroke: C.red, "stroke-width": 12, "stroke-linecap": "round" }, slapG);
+            var slashLen = slash.getTotalLength(); slash.setAttribute("stroke-dasharray", slashLen);
+
+            var turb = q(".rfid-turb"), cam = q(".rfid-cam"), SEEDS = [3, 17, 41], lastQ = -1;
+            function render(f) {
+              // camera zoom on the real frame
+              var z = 1 + 0.03 * Math.min(f, 60) / 60;
+              cam.setAttribute("transform", "translate(540 1000) scale(" + z.toFixed(4) + ") translate(-540 -1000)");
+              root.style.opacity = cl((secs * FPS - f) / (0.25 * FPS), 0, 1);
+              var qq = Math.floor(f / 2) * 2; if (qq === lastQ) return; lastQ = qq;
+              turb.setAttribute("seed", SEEDS[(qq / 2) % 3]);
+              rnd = mulberry32(7000 + (qq / 2) % 3); // arm strokes jitter from a per-drawing seed (seek-safe)
+              clouds.forEach(function (c) { c.g.setAttribute("transform", "translate(" + ((((c.x - 2.2 * qq + 160) % 1400) + 1400) % 1400 - 160).toFixed(1) + " " + c.y + ") scale(" + c.s + ")"); });
+              // sign: sways 2 deg, letters itself frames 4-18
+              sign.setAttribute("transform", "rotate(" + (2 * Math.sin(qq * 0.21)).toFixed(2) + " 540 200)");
+              var all = L1.spans.concat(L2.spans), lp = cl((qq - 4) / 13, 0, 1), shown = Math.round(lp * all.length);
+              all.forEach(function (s, i) { s.style.visibility = i < shown ? "inherit" : "hidden"; });
+              var up = cl((qq - 14) / 4, 0, 1); ul.setAttribute("stroke-dashoffset", ulLen * (1 - up)); ul.style.visibility = up > 0 ? "inherit" : "hidden";
+              // figure
+              var standing = qq >= 46, rip = -1, rk = 0;
+              for (var r = 0; r < RIPS.length; r++) if (qq >= RIPS[r] && qq < RIPS[r] + 6) { rip = r; rk = (qq - RIPS[r]) / 2; }
+              figHead.setAttribute("d", standing ? headStand : headSit);
+              figBody.setAttribute("d", standing ? bodyStand : bodySit);
+              figLegs.setAttribute("d", standing ? legsStand : legsSit);
+              handSheet.style.display = "none";
+              if (standing) { armA.setAttribute("d", arm([382, 892], [318, 820], [300, 690])); armB.setAttribute("d", arm([382, 892], [448, 820], [466, 690])); }
+              else if (rip >= 0) {
+                var hpos = [[670, 880], [610, 875], [565, 860]][rk];
+                armA.setAttribute("d", arm([382, 965], [hpos[0] - 110, hpos[1] + 40], hpos));
+                var pz = poses[0]; armB.setAttribute("d", arm([382, 965], pz[0], [pz[1][0] + 40, pz[1][1]]));
+                place(handSheet, rk === 0 ? FLAT : (rk === 1 ? HALF : BALLS[r % 3]), hpos[0], hpos[1] - 40, rk === 0 ? 1.2 : 0.75, rk * 25, 1);
+              } else {
+                var pi = Math.floor(qq / 4) % 3, pz2 = poses[pi], pz3 = poses[(pi + 1) % 3];
+                armA.setAttribute("d", arm([382, 965], pz2[0], pz2[1])); armB.setAttribute("d", arm([382, 965], [pz3[0][0] + 20, pz3[0][1] - 6], [pz3[1][0] + 45, pz3[1][1] - 4]));
+              }
+              // platen sheet: ripped away, then grows back while typing
+              var lastRip = -100; RIPS.forEach(function (x) { if (qq >= x) lastRip = x; });
+              var h = lastRip < 0 ? 60 + qq * 4 : Math.min(90, Math.max(0, (qq - lastRip - 2) * 7));
+              sheetP.setAttribute("d", sheetAt(standing ? 90 : h));
+              // thrown balls: released 6 frames after each rip, fall on a high arc until the storm takes them (frame 32)
+              thrown.forEach(function (node, j) { var rel = RIPS[j] + 6; storm[j].node.style.display = "none";
+                if (qq < rel) { node.style.display = "none"; return; }
+                var k = (Math.min(qq, 32) - rel) / 2, tp = throwPos(k);
+                if (qq < 32) { place(node, BALLS[(j + qq / 2) % 3], tp[0], tp[1], 0.8, 40 * qq / 2 * (j % 2 ? 1 : -1)); return; }
+                node.style.display = "none";
+              });
+              // storm
+              var count = qq < 32 ? 0 : Math.round(8 + 20 * cl((qq - 32) / 18, 0, 1));
+              storm.forEach(function (p, j) { var n = p.node;
+                if (j >= count) { if (j >= 3 || qq < 32) n.style.display = "none"; return; }
+                var sp = stormPos(p, qq), x = sp.x, y = sp.y, s = p.size / 100;
+                if (j < 3) { var rel = RIPS[j] + 6, tp = throwPos((32 - rel) / 2), b = cl((qq - 32) / 6, 0, 1); x = tp[0] + (x - tp[0]) * b; y = tp[1] + (y - tp[1]) * b; s = 0.8 + (s - 0.8) * b; }
+                var born = j < 8 ? 32 : 32 + Math.ceil((j - 8) / 20 * 18 / 2) * 2; if (qq === born && j >= 3) s *= 0.5;
+                var dr = qq / 2, d = p.ball ? BALLS[(j + dr) % 3] : FLAT, sx = p.ball ? 1 : [1, 0.45, -0.8][(j + dr) % 3];
+                place(n, d, x, y, s, p.rot0 + p.dir * 38 * dr, sx);
+                var nearHead = Math.abs(x - 382) < 120 + p.size / 2 && y > 640 && y < 1000; // never cover the face or the raised arms
+                var want = (sp.front && !nearHead) ? q(".rfid-front") : q(".rfid-back"); want.appendChild(n); // re-append every drawing so stacking order never depends on seek history
+              });
+              // slap: 36 flight, 38 overshoot, 40 flat
+              if (qq < 36) slapG.style.display = "none";
+              else { slapG.style.display = "";
+                var sl = qq === 36 ? [760, 1120, 0.45, 14] : (qq === 38 ? [548, 1286, 1.08, -4] : [540, 1290, 1, -1]);
+                slapG.setAttribute("transform", "translate(" + sl[0] + " " + sl[1] + ") rotate(" + sl[3] + ") scale(" + sl[2] + ")"); }
+              var pp = qq < 40 ? 0 : cl((qq - 38) / 6, 0, 1); slash.setAttribute("stroke-dashoffset", slashLen * (1 - pp)); slash.style.visibility = pp > 0 ? "inherit" : "hidden";
+            }
+            // st.f is an accessor: every value GSAP writes (seek with or without events) redraws the frame
+            var st = { _f: 0, get f() { return this._f; }, set f(x) { this._f = x; render(x); } }, tl = gsap.timeline({ paused: true });
+            tl.to(st, { f: secs * FPS, duration: secs, ease: "none", lazy: false }, 0);
+            render(0);
+            window.__timelines = window.__timelines || {};
+            window.__timelines["rf-ink-doodle"] = tl;
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

@@ -9,6 +9,12 @@ if [ ! -s "$E/gsap.min.js" ]; then
   [ "$(shasum -a 256 "$E/gsap.min.js.tmp" | cut -d' ' -f1)" = "$GSAP_SHA" ] || { rm -f "$E/gsap.min.js.tmp"; echo "gsap download failed its checksum - not installing it" >&2; exit 1; }
   mv "$E/gsap.min.js.tmp" "$E/gsap.min.js"
 fi
+THREE_SHA=f34446bf875b5fb0dcd93819ffe1d9e182d46634ee855f5d904c6c4ac7cdbc95   # three.js 0.147.0 (MIT): the 3D motions rf-* load it
+if [ ! -s "$E/three.min.js" ]; then
+  curl -fsSL https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js -o "$E/three.min.js.tmp"
+  [ "$(shasum -a 256 "$E/three.min.js.tmp" | cut -d' ' -f1)" = "$THREE_SHA" ] || { rm -f "$E/three.min.js.tmp"; echo "three.js download failed its checksum - not installing it" >&2; exit 1; }
+  mv "$E/three.min.js.tmp" "$E/three.min.js"
+fi
 
 # Sound effects synthesised with ffmpeg: no downloads, no licences to worry about.
 mk() { [ -s "$E/sfx/$1.wav" ] || ffmpeg -v error -y -f lavfi -i "$2" -af "$3" -ar 48000 -ac 2 "$E/sfx/$1.wav"; }

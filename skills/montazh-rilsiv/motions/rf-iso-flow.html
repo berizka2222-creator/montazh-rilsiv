@@ -1,0 +1,227 @@
+<!doctype html>
+<!-- rf-iso-flow: a white isometric board (warehouse, trees, S-road, house); a cobalt van drives the road painting it, three numbered
+     pins bounce in with labels, a tick draws at the end. Rebuilt from an ultra-skills motion prompt (own orthographic projection on canvas 2D, no WebGL). -->
+<html lang="uk" data-composition-id="rf-iso-flow" data-composition-duration="600" data-width="1080" data-height="1920" data-composition-variables='[
+  { "id": "heading", "type": "string", "label": "Заголовок над дошкою", "default": "Your order&apos;s trip home" },
+  { "id": "step1", "type": "string", "label": "Підпис пін 1 (склад)", "default": "Step 1" },
+  { "id": "step2", "type": "string", "label": "Підпис пін 2 (середина дороги)", "default": "Step 2" },
+  { "id": "step3", "type": "string", "label": "Підпис пін 3 (будинок)", "default": "Step 3" },
+  { "id": "seconds", "type": "number", "label": "Тривалість картки, с", "default": 2 },
+  { "id": "bg", "type": "color", "label": "Фон: верх", "default": "#f7f9fc" },
+  { "id": "bg2", "type": "color", "label": "Фон: середина", "default": "#eef2f8" },
+  { "id": "bg3", "type": "color", "label": "Фон: низ", "default": "#e3e9f2" },
+  { "id": "board", "type": "color", "label": "Дошка: верх", "default": "#ffffff" },
+  { "id": "board_side", "type": "color", "label": "Дошка: бік", "default": "#e3e9f2" },
+  { "id": "ground", "type": "color", "label": "Земля (вставка)", "default": "#f3f6fb" },
+  { "id": "road", "type": "color", "label": "Дорога", "default": "#8d96ab" },
+  { "id": "accent", "type": "color", "label": "Маршрут, піни, фургон, дах складу", "default": "#2f5bff" },
+  { "id": "on_accent", "type": "color", "label": "Цифри на пінах", "default": "#ffffff" },
+  { "id": "green", "type": "color", "label": "Дерева і галочка", "default": "#00b39a" },
+  { "id": "wall", "type": "color", "label": "Стіни будинку", "default": "#fbf6ef" },
+  { "id": "roof", "type": "color", "label": "Дах будинку", "default": "#c4552d" },
+  { "id": "ink", "type": "color", "label": "Текст", "default": "#0d1324" },
+  { "id": "muted", "type": "color", "label": "Другорядний (колеса, стовбури)", "default": "#4c566e" },
+  { "id": "shadow", "type": "color", "label": "Тіні", "default": "#0c1a3a" }
+]'>
+  <head><meta charset="UTF-8" /><title>rf-iso-flow</title></head>
+  <body>
+    <template>
+      <div id="root" data-composition-id="rf-iso-flow" data-duration="600" data-fps="30">
+        <style>
+          #root { position: absolute; inset: 0; overflow: hidden; }
+          .rfif { position: absolute; inset: 0; overflow: hidden; }
+          .rfif canvas { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+          .rfif .rfif-h { position: absolute; left: 60px; right: 60px; top: 380px; height: 90px; text-align: center; font-family: var(--font-display, sans-serif);
+                          font-weight: 600; font-size: 64px; line-height: 90px; white-space: nowrap; }
+          .rfif .rfif-pin { position: absolute; left: 0; top: 0; width: 84px; height: 112px; margin-left: -42px; margin-top: -112px; transform-origin: 50% 100%; opacity: 0; }
+          .rfif .rfif-pin svg { position: absolute; inset: 0; width: 84px; height: 112px; overflow: visible; }
+          .rfif .rfif-pin b { position: absolute; left: 0; width: 84px; top: 12px; height: 60px; line-height: 60px; text-align: center;
+                              font-family: var(--font-display, sans-serif); font-weight: 700; font-size: 44px; }
+          .rfif .rfif-lab { position: absolute; left: 0; top: 0; padding: 10px 20px; border-radius: 14px; white-space: nowrap; opacity: 0;
+                            font-family: var(--font-body, sans-serif); font-size: 34px; line-height: 42px; box-shadow: 0 8px 22px rgba(0,0,0,.14); }
+          .rfif .rfif-tick { position: absolute; left: 0; top: 0; width: 64px; height: 64px; margin: -32px 0 0 -32px; opacity: 0; }
+        </style>
+        <div class="rfif">
+          <canvas width="1080" height="1920"></canvas>
+          <div class="rfif-h"></div>
+          <svg class="rfif-tick" viewBox="0 0 64 64"><circle cx="32" cy="32" r="30"/><path d="M19 33 L28 42 L46 23" fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <script>
+          (function () {
+            var v = (window.__hyperframes && window.__hyperframes.getVariables) ? window.__hyperframes.getVariables() : {};
+            var secs = Math.max(1, +v.seconds || 2), END = secs * 30;
+            function c(id, d) { return v[id] || d; }
+            var C = { bg: c("bg", "#f7f9fc"), bg2: c("bg2", "#eef2f8"), bg3: c("bg3", "#e3e9f2"), board: c("board", "#ffffff"), side: c("board_side", "#e3e9f2"),
+              ground: c("ground", "#f3f6fb"), road: c("road", "#8d96ab"), acc: c("accent", "#2f5bff"), onacc: c("on_accent", "#ffffff"), green: c("green", "#00b39a"),
+              wall: c("wall", "#fbf6ef"), roof: c("roof", "#c4552d"), ink: c("ink", "#0d1324"), muted: c("muted", "#4c566e"), shadow: c("shadow", "#0c1a3a") };
+            function rgb(h) { h = String(h).replace("#", ""); if (h.length === 3) h = h.replace(/./g, "$&$&"); var n = parseInt(h.slice(0, 6), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
+            function mix(a, b, t) { var x = rgb(a), y = rgb(b); return "rgb(" + [0, 1, 2].map(function (i) { return Math.round(x[i] + (y[i] - x[i]) * t); }).join(",") + ")"; }
+            function rgba(h, a) { var x = rgb(h); return "rgba(" + x[0] + "," + x[1] + "," + x[2] + "," + a + ")"; }
+            function shade(h, k) { return k >= 0 ? mix(h, "#ffffff", k) : mix(h, "#000000", -k); }
+            function clamp(x, a, b) { return Math.max(a, Math.min(b, x)); }
+            function lin(f, a, b) { return clamp((f - a) / (b - a), 0, 1); }
+            function oc(t) { return 1 - Math.pow(1 - t, 3); }
+            function iio(t) { return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+            function backOut(t) { var k = 1.9; return 1 + (k + 1) * Math.pow(t - 1, 3) + k * Math.pow(t - 1, 2); }
+            function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a);
+              t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+            var R = document.querySelector(".rfif"), cv = R.querySelector("canvas"), g = cv.getContext("2d");
+            var head = R.querySelector(".rfif-h"); head.textContent = v.heading != null ? String(v.heading) : "Your order's trip home"; head.style.color = C.ink;
+            (function () { var s = 64; while (head.scrollWidth > 960 && s > 30) { s -= 2; head.style.fontSize = s + "px"; } })();
+            var tick = R.querySelector(".rfif-tick"); tick.querySelector("circle").setAttribute("fill", C.board); tick.querySelector("path").setAttribute("stroke", C.green);
+            tick.style.filter = "drop-shadow(0 6px 10px " + rgba(C.shadow, .25) + ")";
+            var tp = tick.querySelector("path"), tpl = tp.getTotalLength(); tp.style.strokeDasharray = tpl;
+
+            // ---- projection: orthographic, pitch 35, yaw 45 (+ drift), zoom around a focus point ----
+            var P = 35 * Math.PI / 180, yaw, zoom, fx, fy, S = 1;
+            function pr(x, y, z) { var cy = Math.cos(yaw), sy = Math.sin(yaw), sx = x * cy - z * sy, z1 = x * sy + z * cy;
+              return [540 + (sx - fx) * zoom + fx * 0, 1010 + (-y * Math.cos(P) + z1 * Math.sin(P) - fy) * zoom, z1 * Math.cos(P) + y * Math.sin(P)]; }
+            function dirV() { return [Math.sin(yaw) * Math.cos(P), Math.sin(P), Math.cos(yaw) * Math.cos(P)]; }
+            function poly(pts, fill, stroke) { g.beginPath(); pts.forEach(function (p, i) { if (i) g.lineTo(p[0], p[1]); else g.moveTo(p[0], p[1]); }); g.closePath();
+              if (fill) { g.fillStyle = fill; g.fill(); } if (stroke) { g.strokeStyle = stroke; g.lineWidth = 1; g.stroke(); } }
+            // rounded square outline in the board plane
+            function rsq(h, r, y) { var o = [], k; for (var q = 0; q < 4; q++) { var cx = (q === 0 || q === 3) ? h - r : -h + r, cz = (q < 2) ? h - r : -h + r, a0 = q * Math.PI / 2;
+              for (k = 0; k <= 6; k++) { var a = a0 + k / 6 * Math.PI / 2; o.push([cx + Math.cos(a) * r, y, cz + Math.sin(a) * r]); } } return o; }
+
+            // ---- road: one S-curve from the warehouse to the house, sampled by arc length ----
+            var B = [[-185, -5], [-40, 430], [40, -430], [175, -40]], road = [], acc = [0];
+            for (var i = 0; i <= 200; i++) { var t = i / 200, u = 1 - t;
+              road.push([u * u * u * B[0][0] + 3 * u * u * t * B[1][0] + 3 * u * t * t * B[2][0] + t * t * t * B[3][0], u * u * u * B[0][1] + 3 * u * u * t * B[1][1] + 3 * u * t * t * B[2][1] + t * t * t * B[3][1]]);
+              if (i) acc.push(acc[i - 1] + Math.hypot(road[i][0] - road[i - 1][0], road[i][1] - road[i - 1][1])); }
+            var LEN = acc[200];
+            function at(d) { d = clamp(d, 0, LEN); var i = 1; while (i < 200 && acc[i] < d) i++; var k = (d - acc[i - 1]) / ((acc[i] - acc[i - 1]) || 1);
+              var x = road[i - 1][0] + (road[i][0] - road[i - 1][0]) * k, z = road[i - 1][1] + (road[i][1] - road[i - 1][1]) * k;
+              return { x: x, z: z, a: Math.atan2(road[i][1] - road[i - 1][1], road[i][0] - road[i - 1][0]) }; }
+            function strip(d0, d1, w, y, col) { var L = [], Rr = []; for (var d = d0; d <= d1 + 0.01; d += 4) { var p = at(Math.min(d, d1)), nx = -Math.sin(p.a), nz = Math.cos(p.a);
+                L.push(pr(p.x + nx * w / 2, y, p.z + nz * w / 2)); Rr.push(pr(p.x - nx * w / 2, y, p.z - nz * w / 2)); }
+              if (L.length < 2) return; poly(L.concat(Rr.reverse()), col);
+              var e0 = pr(at(d0).x, y, at(d0).z), e1 = pr(at(d1).x, y, at(d1).z);       // round caps
+              [e0, e1].forEach(function (e) { g.beginPath(); g.ellipse(e[0], e[1], w / 2 * 0.72 * zoom, w / 2 * 0.72 * zoom * Math.sin(P) * 1.15, 0, 0, Math.PI * 2); g.fillStyle = col; g.fill(); }); }
+
+            // ---- box helper: center (x,z), base y, size (w along local x, h, d along local z), yaw a, pitch tilt t ----
+            function box(cx, by, cz, w, h, d, a, cols, tilt, sq) { sq = sq || 1; var H = h * sq, ca = Math.cos(a || 0), sa = Math.sin(a || 0), tl = tilt || 0;
+              function W(lx, ly, lz) { var yy = ly + lx * Math.sin(tl); return [cx + lx * ca - lz * sa, by + yy, cz + lx * sa + lz * ca]; }
+              var V = [[-w / 2, 0, -d / 2], [w / 2, 0, -d / 2], [w / 2, 0, d / 2], [-w / 2, 0, d / 2], [-w / 2, H, -d / 2], [w / 2, H, -d / 2], [w / 2, H, d / 2], [-w / 2, H, d / 2]].map(function (p) { return W(p[0], p[1], p[2]); });
+              var F = [[[4, 5, 6, 7], [0, 1, 0], cols[0]], [[0, 1, 5, 4], [-sa, 0, -ca], cols[1]], [[2, 3, 7, 6], [sa, 0, ca], cols[1]], [[1, 2, 6, 5], [ca, 0, sa], cols[2]], [[3, 0, 4, 7], [-ca, 0, -sa], cols[2]]];
+              var dv = dirV(); F.forEach(function (fc) { var n = fc[1]; if (n[0] * dv[0] + n[1] * dv[1] + n[2] * dv[2] <= 0.001) return;
+                poly(fc[0].map(function (k) { return pr(V[k][0], V[k][1], V[k][2]); }), fc[2]); });
+              return { W: W, H: H }; }
+            function softShadow(x, z, r, a) { var p = pr(x, 0.5, z); g.save(); g.translate(p[0], p[1]); g.scale(1, Math.sin(P) * 1.2);
+              var gr = g.createRadialGradient(0, 0, 0, 0, 0, r * zoom); gr.addColorStop(0, rgba(C.shadow, a)); gr.addColorStop(1, rgba(C.shadow, 0));
+              g.fillStyle = gr; g.beginPath(); g.arc(0, 0, r * zoom, 0, Math.PI * 2); g.fill(); g.restore(); }
+
+            // ---- scene objects ----
+            var WH = { x: -250, z: -40 }, HO = { x: 238, z: -118 };
+            var rnd = mulberry32(77), trees = [];
+            for (var n = 0; trees.length < 8 && n < 400; n++) { var tx = -250 + rnd() * 500, tz = -250 + rnd() * 500, ok = true;
+              for (var j = 0; j <= 200; j += 4) if (Math.hypot(road[j][0] - tx, road[j][1] - tz) < 64) { ok = false; break; }
+              if (Math.hypot(tx - WH.x, tz - WH.z) < 120 || Math.hypot(tx - HO.x, tz - HO.z) < 95) ok = false;
+              trees.forEach(function (o) { if (Math.hypot(o.x - tx, o.z - tz) < 70) ok = false; });
+              if (ok) trees.push({ x: tx, z: tz, s: 0.8 + rnd() * 0.45, ph: rnd() * 6.28 }); }
+
+            // pins + labels (DOM, positioned from projected 3D points)
+            var NS = "http://www.w3.org/2000/svg", pins = [], steps = [v.step1, v.step2, v.step3].map(function (s, i) { return s != null ? String(s) : "Step " + (i + 1); });
+            [[8, 60, 0.10, 10], [26, 90, 0.15, 28], [42, 120, 0.20, 46]].forEach(function (cfg, i) {
+              var e = document.createElement("div"); e.className = "rfif-pin";
+              e.innerHTML = '<svg viewBox="0 0 84 112"><path d="M42 110 C30 88 4 70 4 42 A38 38 0 1 1 80 42 C80 70 54 88 42 110 Z" fill="' + C.acc + '"/></svg><b>' + (i + 1) + "</b>";
+              e.querySelector("b").style.color = C.onacc; e.style.filter = "drop-shadow(0 8px 10px " + rgba(C.shadow, .28) + ")"; R.appendChild(e);
+              var l = document.createElement("div"); l.className = "rfif-lab"; l.textContent = steps[i]; l.style.background = C.board; l.style.color = C.ink; R.appendChild(l);
+              (function () { var s = 34; while (l.offsetWidth > 330 && s > 20) { s -= 1; l.style.fontSize = s + "px"; } })();
+              pins.push({ e: e, l: l, f: cfg[0], h: cfg[1], sq: cfg[2], lf: cfg[3] }); });
+
+            function render(f) {
+              // camera: zoom 1.14 on the warehouse side at f0 -> 1.0 whole board by f32, then a 1-degree yaw drift
+              var k = iio(lin(f, 0, 32)); zoom = 1.14 + (1.0 - 1.14) * k;
+              yaw = (45 + (f > 32 ? (f - 32) / 28 : 0)) * Math.PI / 180;
+              fx = 0; fy = 0; var wf = (function () { var cy = Math.cos(yaw), sy = Math.sin(yaw); return [WH.x * cy - WH.z * sy, (WH.x * sy + WH.z * cy) * Math.sin(P)]; })();
+              fx = wf[0] * 0.55 * (1 - k); fy = wf[1] * 0.55 * (1 - k);
+              // stage
+              var bgG = g.createLinearGradient(0, 0, 0, 1920); bgG.addColorStop(0, C.bg); bgG.addColorStop(0.5, C.bg2); bgG.addColorStop(1, C.bg3);
+              g.fillStyle = bgG; g.fillRect(0, 0, 1080, 1920);
+              softShadow(30, 60, 560, 0.16);
+              // board: side edge (30px), top, ground inset
+              var top = rsq(340, 46, 0).map(function (p) { return pr(p[0], p[1], p[2]); }), bot = rsq(340, 46, -30).map(function (p) { return pr(p[0], p[1], p[2]); });
+              for (var i = 0; i < top.length; i++) { var j = (i + 1) % top.length; poly([top[i], top[j], bot[j], bot[i]], C.side); }
+              poly(top, C.board); poly(rsq(300, 34, 0).map(function (p) { return pr(p[0], p[1], p[2]); }), C.ground);
+              // road + route (route head exactly under the van)
+              strip(0, LEN, 44, 0.2, C.road);
+              var vp = iio(lin(f, 10, 42)), vd = vp * LEN; if (vd > 2) strip(0, vd, 20, 0.4, C.acc);
+              // ripples on pin landings
+              pins.forEach(function (pn, i) { var rp = lin(f, pn.f, pn.f + 12); if (f < pn.f || rp >= 1) return; var base = pinBase(i, f);
+                g.save(); var p = pr(base.x, base.y, base.z); g.translate(p[0], p[1]); g.scale(1, Math.sin(P) * 1.2); g.strokeStyle = rgba(C.acc, 0.6 * (1 - rp)); g.lineWidth = 3;
+                g.beginPath(); g.arc(0, 0, (14 + 60 * oc(rp)) * zoom, 0, Math.PI * 2); g.stroke(); g.restore(); });
+              // depth-sorted objects
+              var objs = [];
+              trees.forEach(function (t, i) { objs.push({ d: pr(t.x, 0, t.z)[2], fn: function () { drawTree(t, i, f); } }); });
+              objs.push({ d: pr(WH.x, 0, WH.z)[2], fn: function () { drawWarehouse(f); } });
+              objs.push({ d: pr(HO.x, 0, HO.z)[2], fn: function () { drawHouse(f); } });
+              objs.push({ d: pr(at(vd).x, 0, at(vd).z)[2] + 1, fn: function () { drawVan(f, vd); } });
+              objs.sort(function (a, b) { return a.d - b.d; }).forEach(function (o) { o.fn(); });
+              // pins, labels, tick
+              pins.forEach(function (pn, i) { var b = pinBase(i, f), p = pr(b.x, b.y, b.z), dp = lin(f, pn.f - 5, pn.f), lift = pn.h * (1 - dp * dp);
+                var sq = f >= pn.f && f < pn.f + 2 ? pn.sq : (f >= pn.f + 2 && f < pn.f + 4 ? pn.sq * (1 - (f - pn.f - 2) / 2) * 0.4 : 0);
+                pn.e.style.opacity = f >= pn.f - 5 ? 1 : 0;
+                pn.e.style.transform = "translate(" + p[0].toFixed(1) + "px," + (p[1] - lift).toFixed(1) + "px) scale(" + (1 + sq * 0.6).toFixed(3) + "," + (1 - sq).toFixed(3) + ")";
+                var lp = oc(lin(f, pn.lf, pn.lf + 6)); pn.l.style.opacity = lp;
+                var lw = pn.l.offsetWidth, lx = clamp(p[0] + 52, 60, 1020 - lw), ly = p[1] - 100 + 10 * (1 - lp);
+                if (i === 1) lx = clamp(p[0] - 52 - lw, 60, 1020 - lw);
+                if (i === 2) { lx = clamp(p[0] + 52, 60, 1020 - lw); ly = p[1] - 40 + 10 * (1 - lp); }
+                pn.l.style.transform = "translate(" + lx.toFixed(1) + "px," + ly.toFixed(1) + "px)";
+                if (i === 2) { var tk = lin(f, 44, 52); tick.style.opacity = f >= 44 ? 1 : 0; tick.style.transform = "translate(" + (p[0] + 84).toFixed(1) + "px," + (p[1] - 112).toFixed(1) + "px) scale(" + (0.6 + 0.4 * backOut(lin(f, 44, 48))).toFixed(3) + ")";
+                  tp.style.strokeDashoffset = (tpl * (1 - oc(lin(f, 45, 52)))).toFixed(2); } });
+              R.style.opacity = f > END - 7.5 ? clamp((END - f) / 7.5, 0, 1) : 1;
+            }
+            function pinBase(i, f) { if (i === 0) return { x: WH.x, y: 110, z: WH.z }; if (i === 2) return { x: HO.x, y: 108, z: HO.z };
+              var m = at(LEN / 2); return { x: m.x, y: 4, z: m.z }; }
+            function drawTree(t, i, f) { var p = backOut(lin(f, 4 + i, 10 + i)); if (f < 4 + i) return; var s = Math.max(0, p) * t.s;
+              var sway = f > 10 + i ? 1.5 * Math.sin((f - 10 - i) * 0.25 + t.ph) * Math.PI / 180 : 0;
+              softShadow(t.x, t.z, 26 * s, 0.22);
+              var b = pr(t.x, 0, t.z), tp2 = pr(t.x, 34 * s, t.z), r = 22 * s * zoom;
+              g.save(); g.translate(b[0], b[1]); g.rotate(sway); g.translate(-b[0], -b[1]);
+              g.beginPath(); g.moveTo(b[0] - 6 * s * zoom, b[1]); g.lineTo(b[0] + 6 * s * zoom, b[1]); g.lineTo(tp2[0], tp2[1] - 6 * zoom * s); g.closePath(); g.fillStyle = mix(C.green, C.muted, 0.55); g.fill();
+              var cc = pr(t.x, 48 * s, t.z), gr = g.createRadialGradient(cc[0] - r * 0.35, cc[1] - r * 0.4, r * 0.1, cc[0], cc[1], r);
+              gr.addColorStop(0, shade(C.green, 0.35)); gr.addColorStop(1, shade(C.green, -0.12)); g.fillStyle = gr; g.beginPath(); g.arc(cc[0], cc[1], r, 0, Math.PI * 2); g.fill();
+              g.restore(); }
+            function drawWarehouse(f) { if (f < 2) return; var dp = lin(f, 2, 6), y = 80 * (1 - dp * dp), sq = f >= 6 && f < 9 ? 1 - 0.1 * Math.sin(Math.PI * (f - 6) / 3) : 1;
+              softShadow(WH.x, WH.z, 95 * (0.7 + 0.3 * dp), 0.25 * dp);
+              var bx = box(WH.x, y, WH.z, 130, 70, 100, 0, [C.board, shade(C.side, 0.2), shade(C.side, -0.06)], 0, sq);
+              box(WH.x, y + bx.H, WH.z, 138, 12, 108, 0, [C.acc, shade(C.acc, -0.15), shade(C.acc, -0.3)], 0, sq);
+              // two dock doors on the camera-facing long side
+              [-30, 30].forEach(function (dx) { var a = bx.W(dx - 17, 4, 50.5), b2 = bx.W(dx + 17, 4, 50.5), c2 = bx.W(dx + 17, 44 * sq, 50.5), d2 = bx.W(dx - 17, 44 * sq, 50.5);
+                poly([pr(a[0], a[1], a[2]), pr(b2[0], b2[1], b2[2]), pr(c2[0], c2[1], c2[2]), pr(d2[0], d2[1], d2[2])], shade(C.road, 0.25)); }); }
+            function drawHouse(f) { if (f < 4) return; var s = backOut(lin(f, 4, 9)); softShadow(HO.x, HO.z, 70, 0.22);
+              var w = 76 * s, h = 52 * s, d = 70 * s, bx = box(HO.x, 0, HO.z, w, h, d, 0, [C.wall, shade(C.wall, -0.04), shade(C.wall, -0.12)]);
+              var ry = h, rh = 34 * s, o = 6 * s, dv = dirV(), A = [HO.x - w / 2 - o, ry, HO.z - d / 2 - o], Bp = [HO.x + w / 2 + o, ry, HO.z - d / 2 - o], Cp = [HO.x + w / 2 + o, ry, HO.z + d / 2 + o], Dp = [HO.x - w / 2 - o, ry, HO.z + d / 2 + o];
+              var r1 = [HO.x - w / 2 - o, ry + rh, HO.z], r2 = [HO.x + w / 2 + o, ry + rh, HO.z];
+              function P3(p) { return pr(p[0], p[1], p[2]); }
+              // gable (end wall) on +x side, then the two roof planes
+              poly([P3([HO.x + w / 2, ry, HO.z - d / 2]), P3([HO.x + w / 2, ry, HO.z + d / 2]), P3([HO.x + w / 2, ry + rh - 4 * s, HO.z])], shade(C.wall, -0.12));
+              poly([P3(A), P3(Bp), P3(r2), P3(r1)], shade(C.roof, -0.2)); poly([P3(Dp), P3(Cp), P3(r2), P3(r1)], C.roof);
+              var dw = bx.W(0, 0, d / 2 + 0.5); poly([P3([HO.x - 9 * s, 0, HO.z + d / 2 + .5]), P3([HO.x + 9 * s, 0, HO.z + d / 2 + .5]), P3([HO.x + 9 * s, 28 * s, HO.z + d / 2 + .5]), P3([HO.x - 9 * s, 28 * s, HO.z + d / 2 + .5])], C.roof); }
+            function drawVan(f, vd) { var p = at(vd), dip = f >= 42 && f < 50 ? -3 * Math.sin(Math.PI / 2 * (1 - (f - 42) / 8)) * Math.PI / 180 : 0;
+              var ca = Math.cos(p.a), sa = Math.sin(p.a), dv = dirV();
+              function L(lx, ly, lz) { return [p.x + lx * ca - lz * sa, ly + lx * Math.sin(dip), p.z + lx * sa + lz * ca]; }
+              softShadow(p.x, p.z, 46, 0.25);
+              // wheels first (behind the body), turning with distance
+              [[-21, 20], [21, 20], [-21, -20], [21, -20]].forEach(function (wv) { var q = L(wv[0], 9, wv[1]), sc = pr(q[0], q[1], q[2]);
+                g.fillStyle = C.muted; g.beginPath(); g.arc(sc[0], sc[1], 10 * zoom, 0, Math.PI * 2); g.fill();
+                var rot = vd / 10; g.strokeStyle = shade(C.muted, 0.5); g.lineWidth = 2; g.beginPath(); g.moveTo(sc[0], sc[1]); g.lineTo(sc[0] + Math.cos(rot) * 7 * zoom, sc[1] + Math.sin(rot) * 7 * zoom); g.stroke(); });
+              var b = box(p.x, 9, p.z, 70, 36, 38, p.a, [C.acc, shade(C.acc, -0.12), shade(C.acc, -0.28)], dip);
+              // white cab window on the front end, or on the side when the front faces away
+              var fwd = [ca, 0, sa], q4;
+              if (fwd[0] * dv[0] + fwd[2] * dv[2] > 0) q4 = [L(35.4, 27, -14), L(35.4, 27, 14), L(35.4, 41, 14), L(35.4, 41, -14)];
+              else { var sd = (-sa * dv[0] + ca * dv[2]) > 0 ? 19.4 : -19.4; q4 = [L(10, 27, sd), L(31, 27, sd), L(31, 41, sd), L(10, 41, sd)]; }
+              poly(q4.map(function (q) { return pr(q[0], q[1], q[2]); }), C.board); }
+
+            var cur = 0, st = { get f() { return cur; }, set f(x) { cur = x; render(x); } }, tl = gsap.timeline({ paused: true });
+            tl.fromTo(st, { f: 0 }, { f: END, duration: secs, ease: "none", immediateRender: false }, 0);
+            render(0);
+            window.__timelines = window.__timelines || {};
+            window.__timelines["rf-iso-flow"] = tl;
+          })();
+        </script>
+      </div>
+    </template>
+  </body>
+</html>
