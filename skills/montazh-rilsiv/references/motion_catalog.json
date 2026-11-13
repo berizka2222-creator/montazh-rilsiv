@@ -36,7 +36,8 @@
    "text_vars": [
     "text"
    ],
-   "no": 270
+   "no": 270,
+   "tier": "top"
   },
   {
    "name": "per-word-rise",
@@ -57,7 +58,8 @@
    "text_vars": [
     "text"
    ],
-   "no": 268
+   "no": 268,
+   "tier": "top"
   },
   {
    "name": "titlecard-calm",
@@ -79,7 +81,8 @@
     "headline",
     "kicker"
    ],
-   "no": 279
+   "no": 279,
+   "tier": "top"
   },
   {
    "name": "headline-slam",
@@ -100,7 +103,8 @@
    "text_vars": [
     "text"
    ],
-   "no": 222
+   "no": 222,
+   "tier": "top"
   },
   {
    "name": "kinetic-center-build",
@@ -122,7 +126,8 @@
    "text_vars": [
     "text"
    ],
-   "no": 261
+   "no": 261,
+   "tier": "top"
   },
   {
    "name": "kinetic-type-swap",
@@ -145,7 +150,8 @@
     "options",
     "suffix"
    ],
-   "no": 248
+   "no": 248,
+   "tier": "top"
   },
   {
    "name": "char-slam-explode",
@@ -166,7 +172,8 @@
    "text_vars": [
     "text"
    ],
-   "no": 254
+   "no": 254,
+   "tier": "top"
   },
   {
    "name": "shutter-slam",
@@ -185,7 +192,8 @@
    "use": "overlay",
    "quality": 4,
    "text_vars": [],
-   "no": 249
+   "no": 249,
+   "tier": "top"
   },
   {
    "name": "text-shimmer",
@@ -205,7 +213,8 @@
    "text_vars": [
     "text"
    ],
-   "no": 251
+   "no": 251,
+   "tier": "top"
   },
   {
    "name": "variable-font-flex",
@@ -225,7 +234,8 @@
    "text_vars": [
     "text"
    ],
-   "no": 275
+   "no": 275,
+   "tier": "top"
   },
   {
    "name": "vox-annotate",
@@ -248,7 +258,8 @@
     "keyword",
     "note"
    ],
-   "no": 233
+   "no": 233,
+   "tier": "top"
   },
   {
    "name": "marker-highlight",
@@ -270,7 +281,8 @@
     "text",
     "emphasis_word"
    ],
-   "no": 245
+   "no": 245,
+   "tier": "top"
   },
   {
    "name": "particle-text-dissolve",
@@ -291,7 +303,8 @@
    "text_vars": [
     "text"
    ],
-   "no": 273
+   "no": 273,
+   "tier": "top"
   },
   {
    "name": "scramble-reveal",
@@ -313,7 +326,8 @@
    "text_vars": [
     "text"
    ],
-   "no": 242
+   "no": 242,
+   "tier": "top"
   },
   {
    "name": "outline-draw",
@@ -333,7 +347,8 @@
    "quality": 3,
    "text_vars": [],
    "note": "лінії через кадр",
-   "no": 246
+   "no": 246,
+   "tier": "top"
   },
   {
    "name": "gloss-sweep",
@@ -354,7 +369,8 @@
    "text_vars": [
     "text"
    ],
-   "no": 232
+   "no": 232,
+   "tier": "top"
   },
   {
    "name": "typewriter",
@@ -375,7 +391,8 @@
    "text_vars": [
     "text"
    ],
-   "no": 282
+   "no": 282,
+   "tier": "top"
   },
   {
    "name": "matrix-decode",
@@ -396,7 +413,8 @@
    "text_vars": [
     "text"
    ],
-   "no": 258
+   "no": 258,
+   "tier": "top"
   },
   {
    "name": "rgb-glitch-text",
@@ -417,7 +435,8 @@
    "text_vars": [
     "text"
    ],
-   "no": 284
+   "no": 284,
+   "tier": "top"
   },
   {
    "name": "top-down-letters",
@@ -437,7 +456,8 @@
    "text_vars": [
     "text"
    ],
-   "no": 241
+   "no": 241,
+   "tier": "top"
   },
   {
    "name": "per-word-crossfade",
@@ -457,7 +477,8 @@
    "text_vars": [
     "text"
    ],
-   "no": 263
+   "no": 263,
+   "tier": "top"
   },
   {
    "name": "staggered-fade-up",
@@ -477,7 +498,8 @@
    "text_vars": [
     "words"
    ],
-   "no": 266
+   "no": 266,
+   "tier": "top"
   },
   {
    "name": "caret-swap",
@@ -499,7 +521,8 @@
     "from_text",
     "to_text"
    ],
-   "no": 32
+   "no": 32,
+   "tier": "top"
   },
   {
    "name": "line-swap",
@@ -523,7 +546,8 @@
     "line_b",
     "underline_word"
    ],
-   "no": 35
+   "no": 35,
+   "tier": "top"
   },
   {
    "name": "text-match-cut",
@@ -552,7 +576,8 @@
     "text_a",
     "text_b"
    ],
-   "no": 34
+   "no": 34,
+   "tier": "top"
   },
   {
    "name": "split-tilt-cards",
@@ -578,7 +603,8 @@
    "replace": {
     "Split Tilt Cards": "<її слова>"
    },
-   "no": 31
+   "no": 31,
+   "tier": "top"
   },
   {
    "name": "physical-exit",
@@ -622,7 +648,8 @@
     "prefix",
     "suffix"
    ],
-   "no": 297
+   "no": 297,
+   "tier": "top"
   },
   {
    "name": "conic-progress-ring",
@@ -646,7 +673,8 @@
    "replace": {
     "Conic Progress Ring": "<її слова>"
    },
-   "no": 291
+   "no": 291,
+   "tier": "top"
   },
   {
    "name": "number-pop-in",
@@ -667,7 +695,8 @@
     "value",
     "unit"
    ],
-   "no": 296
+   "no": 296,
+   "tier": "top"
   },
   {
    "name": "slot-machine-roll",
@@ -687,7 +716,8 @@
    "text_vars": [
     "result"
    ],
-   "no": 293
+   "no": 293,
+   "tier": "top"
   },
   {
    "name": "star-rating-fill",
@@ -707,7 +737,8 @@
    "use": "overlay",
    "quality": 5,
    "text_vars": [],
-   "no": 290
+   "no": 290,
+   "tier": "top"
   },
   {
    "name": "decline-chart",
@@ -730,7 +761,8 @@
    "replace": {
     "Decline Chart": "<її слова>"
    },
-   "no": 184
+   "no": 184,
+   "tier": "top"
   },
   {
    "name": "chart-story",
@@ -754,7 +786,8 @@
     "labels",
     "unit"
    ],
-   "no": 181
+   "no": 181,
+   "tier": "top"
   },
   {
    "name": "mk-line-graph",
@@ -782,7 +815,8 @@
     "May": "<її слова>",
     "Jun": "<її слова>"
    },
-   "no": 183
+   "no": 183,
+   "tier": "top"
   },
   {
    "name": "badge-pop",
@@ -804,7 +838,8 @@
     "count"
    ],
    "no": 167,
-   "keep_ui": true
+   "keep_ui": true,
+   "tier": "top"
   },
   {
    "name": "marker-checklist-card",
@@ -867,7 +902,8 @@
    "replace": {
     "Grid Card Assemble": "<її слова>"
    },
-   "no": 193
+   "no": 193,
+   "tier": "top"
   },
   {
    "name": "constellation-hub",
@@ -888,7 +924,8 @@
     "hub_label",
     "nodes"
    ],
-   "no": 189
+   "no": 189,
+   "tier": "top"
   },
   {
    "name": "radial-surround",
@@ -913,7 +950,8 @@
    "replace": {
     "Radial Surround": "<її слова>"
    },
-   "no": 203
+   "no": 203,
+   "tier": "reserve"
   },
   {
    "name": "perspective-marquee",
@@ -934,7 +972,8 @@
    "text_vars": [
     "words"
    ],
-   "no": 207
+   "no": 207,
+   "tier": "top"
   },
   {
    "name": "overwhelm-surround",
@@ -956,7 +995,8 @@
    "replace": {
     "Overwhelm Surround": "<її слова>"
    },
-   "no": 178
+   "no": 178,
+   "tier": "top"
   },
   {
    "name": "ai-answer-rank",
@@ -1005,7 +1045,8 @@
     "correction"
    ],
    "no": 163,
-   "keep_ui": true
+   "keep_ui": true,
+   "tier": "top"
   },
   {
    "name": "ai-chat-reveal",
@@ -1038,7 +1079,8 @@
    ],
    "image_vars": true,
    "keep_ui": true,
-   "no": 164
+   "no": 164,
+   "tier": "top"
   },
   {
    "name": "chatgpt-exchange",
@@ -1057,7 +1099,8 @@
    "quality": 4,
    "text_vars": [],
    "keep_ui": true,
-   "no": 161
+   "no": 161,
+   "tier": "top"
   },
   {
    "name": "claude-exchange",
@@ -1076,7 +1119,8 @@
    "quality": 4,
    "text_vars": [],
    "keep_ui": true,
-   "no": 162
+   "no": 162,
+   "tier": "top"
   },
   {
    "name": "chat-thread",
@@ -1098,7 +1142,8 @@
     "messages"
    ],
    "keep_ui": true,
-   "no": 172
+   "no": 172,
+   "tier": "top"
   },
   {
    "name": "message-thread-reveal",
@@ -1131,7 +1176,8 @@
    ],
    "image_vars": true,
    "keep_ui": true,
-   "no": 173
+   "no": 173,
+   "tier": "top"
   },
   {
    "name": "chat-message",
@@ -1159,7 +1205,8 @@
     "Chat Message": "<її слова>"
    },
    "no": 169,
-   "keep_ui": true
+   "keep_ui": true,
+   "tier": "top"
   },
   {
    "name": "typing-indicator",
@@ -1178,7 +1225,8 @@
    "quality": 4,
    "text_vars": [],
    "keep_ui": true,
-   "no": 168
+   "no": 168,
+   "tier": "top"
   },
   {
    "name": "native-notification-pop",
@@ -1205,7 +1253,8 @@
    "replace": {
     "Native Notification Pop": "<її слова>"
    },
-   "no": 175
+   "no": 175,
+   "tier": "top"
   },
   {
    "name": "notification-stack",
@@ -1229,7 +1278,8 @@
     "bodies"
    ],
    "keep_ui": true,
-   "no": 170
+   "no": 170,
+   "tier": "top"
   },
   {
    "name": "notification-cascade",
@@ -1260,7 +1310,8 @@
    ],
    "image_vars": true,
    "keep_ui": true,
-   "no": 176
+   "no": 176,
+   "tier": "top"
   },
   {
    "name": "notes-reveal",
@@ -1294,7 +1345,8 @@
     "check1Value"
    ],
    "keep_ui": true,
-   "no": 199
+   "no": 199,
+   "tier": "top"
   },
   {
    "name": "notes-typing",
@@ -1323,7 +1375,8 @@
     "Things nobody told me": "<її слова>",
     "about video.": "<її слова>"
    },
-   "no": 200
+   "no": 200,
+   "tier": "top"
   },
   {
    "name": "yt-comment-card",
@@ -1365,7 +1418,8 @@
     "author",
     "handle"
    ],
-   "no": 29
+   "no": 29,
+   "tier": "top"
   },
   {
    "name": "testimonial-proof-card",
@@ -1391,7 +1445,8 @@
     "emphasis"
    ],
    "image_vars": true,
-   "no": 21
+   "no": 21,
+   "tier": "top"
   },
   {
    "name": "social-proof-card",
@@ -1417,7 +1472,8 @@
     "f2",
     "f3"
    ],
-   "no": 22
+   "no": 22,
+   "tier": "top"
   },
   {
    "name": "lt-accent-underline",
@@ -1446,7 +1502,8 @@
    "use": "overlay",
    "quality": 4,
    "text_vars": [],
-   "no": 3
+   "no": 3,
+   "tier": "reserve"
   },
   {
    "name": "lt-clean-bar",
@@ -1475,7 +1532,8 @@
    "use": "overlay",
    "quality": 4,
    "text_vars": [],
-   "no": 5
+   "no": 5,
+   "tier": "top"
   },
   {
    "name": "lt-dark-card",
@@ -1504,7 +1562,8 @@
    "use": "overlay",
    "quality": 4,
    "text_vars": [],
-   "no": 18
+   "no": 18,
+   "tier": "top"
   },
   {
    "name": "lt-kicker-name",
@@ -1533,7 +1592,8 @@
    "use": "overlay",
    "quality": 4,
    "text_vars": [],
-   "no": 10
+   "no": 10,
+   "tier": "reserve"
   },
   {
    "name": "lt-mask-reveal",
@@ -1562,7 +1622,8 @@
    "use": "overlay",
    "quality": 5,
    "text_vars": [],
-   "no": 16
+   "no": 16,
+   "tier": "top"
   },
   {
    "name": "lt-side-rule",
@@ -1591,7 +1652,8 @@
    "use": "overlay",
    "quality": 4,
    "text_vars": [],
-   "no": 2
+   "no": 2,
+   "tier": "top"
   },
   {
    "name": "lt-soft-pill",
@@ -1620,7 +1682,8 @@
    "use": "overlay",
    "quality": 4,
    "text_vars": [],
-   "no": 6
+   "no": 6,
+   "tier": "top"
   },
   {
    "name": "cta-close",
@@ -1642,7 +1705,8 @@
     "action_line",
     "button_label"
    ],
-   "no": 40
+   "no": 40,
+   "tier": "top"
   },
   {
    "name": "cta-lockup",
@@ -1664,7 +1728,8 @@
     "button_label",
     "microcopy"
    ],
-   "no": 50
+   "no": 50,
+   "tier": "top"
   },
   {
    "name": "instagram-follow",
@@ -1698,7 +1763,8 @@
    "replace_default": {
     "47.5K followers": ""
    },
-   "no": 42
+   "no": 42,
+   "tier": "top"
   },
   {
    "name": "success-check",
@@ -1716,7 +1782,8 @@
    "use": "overlay",
    "quality": 4,
    "text_vars": [],
-   "no": 218
+   "no": 218,
+   "tier": "top"
   },
   {
    "name": "icon-morph-beat",
@@ -1734,7 +1801,8 @@
    "use": "overlay",
    "quality": 4,
    "text_vars": [],
-   "no": 214
+   "no": 214,
+   "tier": "top"
   },
   {
    "name": "toggle-flip",
@@ -1762,7 +1830,8 @@
     "(not\n         inside": "<її слова>"
    },
    "no": 215,
-   "keep_ui": true
+   "keep_ui": true,
+   "tier": "top"
   },
   {
    "name": "press-ripple",
@@ -1808,7 +1877,8 @@
    "replace": {
     "Image Carousel · Circle 1": "<її слова>"
    },
-   "no": 72
+   "no": 72,
+   "tier": "top"
   },
   {
    "name": "carousel-circle-2",
@@ -1830,7 +1900,8 @@
    "replace": {
     "Image Carousel · Circle 2": "<її слова>"
    },
-   "no": 73
+   "no": 73,
+   "tier": "top"
   },
   {
    "name": "carousel-circle-3",
@@ -1852,7 +1923,8 @@
    "replace": {
     "Image Carousel · Circle 3": "<її слова>"
    },
-   "no": 74
+   "no": 74,
+   "tier": "top"
   },
   {
    "name": "carousel-path-1",
@@ -1874,7 +1946,8 @@
    "replace": {
     "Image Carousel · Path 1": "<її слова>"
    },
-   "no": 77
+   "no": 77,
+   "tier": "top"
   },
   {
    "name": "carousel-path-2",
@@ -1897,7 +1970,8 @@
    "replace": {
     "Image Carousel · Path 2": "<її слова>"
    },
-   "no": 78
+   "no": 78,
+   "tier": "top"
   },
   {
    "name": "carousel-path-3",
@@ -1920,7 +1994,8 @@
    "replace": {
     "Image Carousel · Path 3": "<її слова>"
    },
-   "no": 79
+   "no": 79,
+   "tier": "top"
   },
   {
    "name": "carousel-orbit-1",
@@ -1942,7 +2017,8 @@
    "replace": {
     "Image Carousel · Orbit 1": "<її слова>"
    },
-   "no": 65
+   "no": 65,
+   "tier": "top"
   },
   {
    "name": "carousel-vision-1",
@@ -1964,7 +2040,8 @@
    "replace": {
     "Image Carousel · Vision 1": "<її слова>"
    },
-   "no": 84
+   "no": 84,
+   "tier": "top"
   },
   {
    "name": "carousel-text-circle-1",
@@ -1991,7 +2068,8 @@
    "replace": {
     "Carousels are so in — Circle 1": "<її слова>"
    },
-   "no": 54
+   "no": 54,
+   "tier": "top"
   },
   {
    "name": "carousel-text-circle-2",
@@ -2018,7 +2096,8 @@
    "replace": {
     "Carousels are so in — Circle 2": "<її слова>"
    },
-   "no": 55
+   "no": 55,
+   "tier": "top"
   },
   {
    "name": "device-frame-stage",
@@ -2059,7 +2138,8 @@
    "replace": {
     "Scroll Feed": "<її слова>"
    },
-   "no": 95
+   "no": 95,
+   "tier": "top"
   },
   {
    "name": "whiteboard-ink",
@@ -2079,7 +2159,8 @@
    "text_vars": [
     "caption"
    ],
-   "no": 257
+   "no": 257,
+   "tier": "top"
   },
   {
    "name": "oversized-cursor",
@@ -2101,7 +2182,8 @@
     "click_label"
    ],
    "no": 51,
-   "keep_ui": true
+   "keep_ui": true,
+   "tier": "top"
   },
   {
    "name": "hw-arrow",
@@ -2122,7 +2204,8 @@
    "replace": {
     "point at things": "<її слова>"
    },
-   "no": 247
+   "no": 247,
+   "tier": "top"
   },
   {
    "name": "hw-underline",
@@ -2145,7 +2228,8 @@
     "cross this out": "<її слова>",
     "bracket the aside": "<її слова>"
    },
-   "no": 252
+   "no": 252,
+   "tier": "top"
   },
   {
    "name": "code-terminal-run",
@@ -2190,7 +2274,8 @@
    "use": "transition",
    "quality": 4,
    "text_vars": [],
-   "no": 156
+   "no": 156,
+   "tier": "top"
   },
   {
    "name": "organic-light-leak-overlay",
@@ -2214,7 +2299,8 @@
    "use": "overlay",
    "quality": 4,
    "text_vars": [],
-   "no": 155
+   "no": 155,
+   "tier": "top"
   },
   {
    "name": "hw-scribble-transition",
@@ -2238,7 +2324,8 @@
    "use": "transition",
    "quality": 4,
    "text_vars": [],
-   "no": 122
+   "no": 122,
+   "tier": "top"
   },
   {
    "name": "freeze-frame-dressing",
@@ -2259,7 +2346,8 @@
    "use": "overlay",
    "quality": 4,
    "text_vars": [],
-   "no": 133
+   "no": 133,
+   "tier": "top"
   },
   {
    "name": "caption-camera-follow",
@@ -2300,7 +2388,8 @@
    "quality": 3,
    "text_vars": [],
    "no": 292,
-   "keep_ui": true
+   "keep_ui": true,
+   "tier": "top"
   },
   {
    "name": "bar-chart-race",
@@ -2330,7 +2419,8 @@
     "Period": "<її слова>",
     "Placeholder data": "<її слова>"
    },
-   "no": 185
+   "no": 185,
+   "tier": "top"
   },
   {
    "name": "camcorder-hud",
@@ -2397,7 +2487,8 @@
    "replace": {
     "Before After Wipe": "<її слова>"
    },
-   "no": 39
+   "no": 39,
+   "tier": "top"
   },
   {
    "name": "comparison-split",
@@ -2421,7 +2512,8 @@
    "replace": {
     "use strict": "<її слова>"
    },
-   "no": 30
+   "no": 30,
+   "tier": "top"
   },
   {
    "name": "camera-shake",
@@ -2466,7 +2558,8 @@
    "quality": 3,
    "text_vars": [],
    "no": 212,
-   "was_status": "manual"
+   "was_status": "manual",
+   "tier": "top"
   },
   {
    "name": "caption-clip-wipe",
@@ -2483,7 +2576,8 @@
    "rank": 5,
    "use": "overlay",
    "quality": 3,
-   "text_vars": []
+   "text_vars": [],
+   "tier": "top"
   },
   {
    "name": "caption-emoji-pop",
@@ -2500,7 +2594,8 @@
    "rank": 5,
    "use": "overlay",
    "quality": 4,
-   "text_vars": []
+   "text_vars": [],
+   "tier": "top"
   },
   {
    "name": "caption-gradient-fill",
@@ -2519,7 +2614,8 @@
    "quality": 3,
    "text_vars": [],
    "was_status": "caption",
-   "note": "22.10.2026: прев'ю не рендериться або ефект не видно, прибрано з меню до перевірки"
+   "note": "22.10.2026: прев'ю не рендериться або ефект не видно, прибрано з меню до перевірки",
+   "tier": "top"
   },
   {
    "name": "caption-highlight",
@@ -2536,7 +2632,8 @@
    "rank": 5,
    "use": "overlay",
    "quality": 5,
-   "text_vars": []
+   "text_vars": [],
+   "tier": "top"
   },
   {
    "name": "caption-kinetic-slam",
@@ -2573,7 +2670,8 @@
    "rank": 5,
    "use": "overlay",
    "quality": 3,
-   "text_vars": []
+   "text_vars": [],
+   "tier": "top"
   },
   {
    "name": "caption-pill-karaoke",
@@ -2590,7 +2688,8 @@
    "rank": 5,
    "use": "overlay",
    "quality": 5,
-   "text_vars": []
+   "text_vars": [],
+   "tier": "top"
   },
   {
    "name": "cursor-annotate",
@@ -2609,7 +2708,8 @@
    "use": "overlay",
    "quality": 5,
    "text_vars": [],
-   "no": 243
+   "no": 243,
+   "tier": "top"
   },
   {
    "name": "cursor-drag-drop",
@@ -2645,7 +2745,8 @@
     "KL": "<її слова>",
     "Docs": "<її слова>"
    },
-   "no": 219
+   "no": 219,
+   "tier": "top"
   },
   {
    "name": "cursor-marquee-select",
@@ -2672,7 +2773,8 @@
     "Summer shoot": "<її слова>",
     "12 photos, edited yesterday": "<її слова>"
    },
-   "no": 82
+   "no": 82,
+   "tier": "top"
   },
   {
    "name": "cursor-text-select",
@@ -2701,7 +2803,8 @@
     "Text Select Cursor": "<її слова>",
     "Draft · edited just now": "<її слова>"
    },
-   "no": 234
+   "no": 234,
+   "tier": "top"
   },
   {
    "name": "curtain-reveal",
@@ -2723,7 +2826,8 @@
     "Curtain Reveal": "<її слова>",
     "Stage": "<її слова>"
    },
-   "no": 152
+   "no": 152,
+   "tier": "reserve"
   },
   {
    "name": "focus-swap",
@@ -2770,7 +2874,8 @@
     "Maya Chen": "<її слова>",
     "Product designer sharing practical interaction notes.": "<її слова>"
    },
-   "no": 46
+   "no": 46,
+   "tier": "top"
   },
   {
    "name": "hw-box-label",
@@ -2791,7 +2896,8 @@
    "replace": {
     "Europe": "<її слова>"
    },
-   "no": 253
+   "no": 253,
+   "tier": "top"
   },
   {
    "name": "hw-callout-circle",
@@ -2813,7 +2919,8 @@
    "replace": {
     "subject": "<її слова>"
    },
-   "no": 220
+   "no": 220,
+   "tier": "top"
   },
   {
    "name": "iris-reveal",
@@ -2864,7 +2971,8 @@
     "Logo Wall": "<її слова>",
     "Trusted by teams": "<її слова>"
    },
-   "no": 27
+   "no": 27,
+   "tier": "top"
   },
   {
    "name": "mk-emphasis-type",
@@ -2905,7 +3013,8 @@
    "replace": {
     "Usage": "<її слова>"
    },
-   "no": 295
+   "no": 295,
+   "tier": "top"
   },
   {
    "name": "morph-text",
@@ -2932,7 +3041,8 @@
     "Your work, amplified.": "<її слова>",
     "Start free today.": "<її слова>"
    },
-   "no": 265
+   "no": 265,
+   "tier": "top"
   },
   {
    "name": "notification-pileup",
@@ -2951,7 +3061,8 @@
    "quality": 4,
    "text_vars": [],
    "keep_ui": true,
-   "no": 180
+   "no": 180,
+   "tier": "top"
   },
   {
    "name": "paper-collage-reveal",
@@ -3004,7 +3115,8 @@
     "Retention": "<її слова>",
     "Teams": "<її слова>"
    },
-   "no": 289
+   "no": 289,
+   "tier": "top"
   },
   {
    "name": "spring-pop",
@@ -3025,7 +3137,8 @@
    "text_vars": [
     "text"
    ],
-   "no": 225
+   "no": 225,
+   "tier": "top"
   },
   {
    "name": "yt-circle-pointer",
@@ -3049,7 +3162,8 @@
     "the thing": "<її слова>",
     "sec": "<її слова>"
    },
-   "no": 221
+   "no": 221,
+   "tier": "top"
   },
   {
    "name": "yt-feather-highlight",
@@ -3068,7 +3182,8 @@
    "use": "overlay",
    "quality": 3,
    "text_vars": [],
-   "no": 226
+   "no": 226,
+   "tier": "top"
   },
   {
    "name": "data-chart",
@@ -3097,7 +3212,8 @@
     "Conversion Rate": "<її слова>",
     "Source: Internal analytics": "<її слова>"
    },
-   "no": 186
+   "no": 186,
+   "tier": "top"
   },
   {
    "name": "flowchart-vertical",
@@ -3127,7 +3243,8 @@
     "You": "<її слова>"
    },
    "no": 188,
-   "was_status": "manual"
+   "was_status": "manual",
+   "tier": "top"
   },
   {
    "name": "hw-frame",
@@ -3148,7 +3265,8 @@
    "replace": {
     "photo": "<її слова>"
    },
-   "no": 64
+   "no": 64,
+   "tier": "top"
   },
   {
    "name": "hw-path-text",
@@ -3168,7 +3286,8 @@
    "use": "overlay",
    "quality": 4,
    "text_vars": [],
-   "no": 256
+   "no": 256,
+   "tier": "top"
   },
   {
    "name": "hw-pipeline",
@@ -3214,7 +3333,8 @@
    "replace": {
     "what are you looking at?": "<її слова>"
    },
-   "no": 171
+   "no": 171,
+   "tier": "top"
   },
   {
    "name": "hw-title",
@@ -3236,7 +3356,8 @@
    "replace": {
     "shine like the star you are": "<її слова>"
    },
-   "no": 255
+   "no": 255,
+   "tier": "top"
   },
   {
    "name": "hw-write-title",
@@ -3258,7 +3379,8 @@
    "replace": {
     "write it on": "<її слова>"
    },
-   "no": 274
+   "no": 274,
+   "tier": "top"
   },
   {
    "name": "lower-third-bild",
@@ -3285,7 +3407,8 @@
     "BILD EXKLUSIV": "<її слова>",
     "Sonderbericht": "<її слова>"
    },
-   "no": 13
+   "no": 13,
+   "tier": "reserve"
   },
   {
    "name": "lt-bold-block",
@@ -3304,7 +3427,8 @@
     "Maya Chen": "<її слова>",
     "Host · Neuroscientist": "<її слова>"
    },
-   "no": 19
+   "no": 19,
+   "tier": "top"
   },
   {
    "name": "lt-color-block",
@@ -3323,7 +3447,8 @@
     "Dr. Maya Chen": "<її слова>",
     "Host · Neuroscientist": "<її слова>"
    },
-   "no": 9
+   "no": 9,
+   "tier": "top"
   },
   {
    "name": "lt-stack-bars",
@@ -3342,7 +3467,8 @@
     "Maya Chen": "<її слова>",
     "Host · Neuroscientist": "<її слова>"
    },
-   "no": 7
+   "no": 7,
+   "tier": "top"
   },
   {
    "name": "lt-neon-border",
@@ -3360,7 +3486,8 @@
     "name",
     "role"
    ],
-   "no": 15
+   "no": 15,
+   "tier": "top"
   },
   {
    "name": "macos-notification",
@@ -3426,7 +3553,8 @@
    "replace": {
     "s shrink IS the wall": "<її слова>"
    },
-   "no": 150
+   "no": 150,
+   "tier": "top"
   },
   {
    "name": "mk-placeholder-grid",
@@ -3448,7 +3576,8 @@
     "inside scale": "<її слова>",
     "box, box, box": "<її слова>"
    },
-   "no": 96
+   "no": 96,
+   "tier": "top"
   },
   {
    "name": "mk-progress-stat",
@@ -3469,7 +3598,8 @@
    "use": "overlay",
    "quality": 5,
    "text_vars": [],
-   "no": 288
+   "no": 288,
+   "tier": "top"
   },
   {
    "name": "mk-specs-list",
@@ -3489,7 +3619,8 @@
    "use": "overlay",
    "quality": 5,
    "text_vars": [],
-   "no": 208
+   "no": 208,
+   "tier": "top"
   },
   {
    "name": "news-ticker",
@@ -3521,7 +3652,8 @@
     "Rendering queues clear in under": "<її слова>",
     "2 min": "<її слова>"
    },
-   "no": 280
+   "no": 280,
+   "tier": "top"
   },
   {
    "name": "reddit-post",
@@ -3562,7 +3694,8 @@
     "HyperFrames": "<її назва або слова>",
     "HeyGen": "<її назва або слова>"
    },
-   "no": 70
+   "no": 70,
+   "tier": "top"
   },
   {
    "name": "thread-message-stack",
@@ -3586,7 +3719,8 @@
    "replace": {
     "Thread Message Stack": "<її слова>"
    },
-   "no": 177
+   "no": 177,
+   "tier": "top"
   },
   {
    "name": "tiktok-follow",
@@ -3620,7 +3754,8 @@
    "replace_default": {
     "1,999 followers": ""
    },
-   "no": 43
+   "no": 43,
+   "tier": "top"
   },
   {
    "name": "weight-wave",
@@ -3640,7 +3775,8 @@
    "text_vars": [
     "text"
    ],
-   "no": 287
+   "no": 287,
+   "tier": "top"
   },
   {
    "name": "x-post",
@@ -3668,7 +3804,8 @@
     "@hyperframes": "handle"
    },
    "avatar": true,
-   "no": 23
+   "no": 23,
+   "tier": "top"
   },
   {
    "name": "yt-lower-third",
@@ -3701,7 +3838,8 @@
    "replace_default": {
     "82.2K subscribers": ""
    },
-   "no": 47
+   "no": 47,
+   "tier": "top"
   },
   {
    "name": "yt-prism-title",
@@ -3720,7 +3858,8 @@
    "use": "overlay",
    "quality": 4,
    "text_vars": [],
-   "no": 223
+   "no": 223,
+   "tier": "top"
   },
   {
    "name": "share-sheet-carousel",
@@ -3747,7 +3886,8 @@
    ],
    "image_vars": true,
    "keep_ui": true,
-   "no": 90
+   "no": 90,
+   "tier": "top"
   },
   {
    "name": "split-flap-board",
@@ -3770,7 +3910,8 @@
    "text_vars": [
     "boardText"
    ],
-   "no": 281
+   "no": 281,
+   "tier": "top"
   },
   {
    "name": "animated-bar-chart",
@@ -3793,7 +3934,8 @@
    "replace": {
     "Animated Bar Chart": "<її слова>"
    },
-   "no": 182
+   "no": 182,
+   "tier": "reserve"
   },
   {
    "name": "blur-in",
@@ -3818,7 +3960,8 @@
     "for": "<її слова>",
     "video": "<її слова>"
    },
-   "no": 267
+   "no": 267,
+   "tier": "top"
   },
   {
    "name": "blur-out-up",
@@ -3840,7 +3983,8 @@
    "replace": {
     "HELLO": "<її слова>"
    },
-   "no": 262
+   "no": 262,
+   "tier": "top"
   },
   {
    "name": "bottom-up-letters",
@@ -3864,7 +4008,8 @@
     "bottom-up-letters": "<її слова>"
    },
    "no": 238,
-   "was_status": "manual"
+   "was_status": "manual",
+   "tier": "reserve"
   },
   {
    "name": "confetti",
@@ -3886,7 +4031,8 @@
    "replace": {
     "Confetti": "<її слова>"
    },
-   "no": 216
+   "no": 216,
+   "tier": "reserve"
   },
   {
    "name": "focus-blur-resolve",
@@ -3908,7 +4054,8 @@
     "Crystal": "<її слова>",
     "clear": "<її слова>"
    },
-   "no": 285
+   "no": 285,
+   "tier": "top"
   },
   {
    "name": "inline-highlight",
@@ -3928,7 +4075,8 @@
    "quality": 4,
    "text_vars": [],
    "no": 244,
-   "was_status": "manual"
+   "was_status": "manual",
+   "tier": "reserve"
   },
   {
    "name": "line-by-line-slide",
@@ -3952,7 +4100,8 @@
     "Render cleaner": "<її слова>",
     "Ship louder": "<її слова>"
    },
-   "no": 205
+   "no": 205,
+   "tier": "top"
   },
   {
    "name": "number-wheel",
@@ -3973,7 +4122,8 @@
    "quality": 4,
    "text_vars": [],
    "no": 298,
-   "was_status": "manual"
+   "was_status": "manual",
+   "tier": "top"
   },
   {
    "name": "soft-blur-in",
@@ -3993,7 +4143,8 @@
    "quality": 4,
    "text_vars": [],
    "no": 224,
-   "was_status": "manual"
+   "was_status": "manual",
+   "tier": "top"
   },
   {
    "name": "strikethrough-replace",
@@ -4016,7 +4167,8 @@
     "Slow": "<її слова>",
     "Fast": "<її слова>"
    },
-   "no": 37
+   "no": 37,
+   "tier": "top"
   },
   {
    "name": "tracking-in",
@@ -4037,7 +4189,8 @@
    "quality": 4,
    "text_vars": [],
    "no": 240,
-   "was_status": "manual"
+   "was_status": "manual",
+   "tier": "top"
   },
   {
    "name": "x-follow-card",
@@ -4063,7 +4216,8 @@
    "brand_text": {},
    "avatar": true,
    "no": 8,
-   "keep_ui": true
+   "keep_ui": true,
+   "tier": "top"
   },
   {
    "name": "decision-tree",
@@ -4190,7 +4344,8 @@
     "Cycling": "<її слова>"
    },
    "no": 99,
-   "keep_ui": true
+   "keep_ui": true,
+   "tier": "top"
   },
   {
    "name": "aurora",
@@ -4308,7 +4463,8 @@
    "replace": {
     "Aa": "<її слова>"
    },
-   "no": 235
+   "no": 235,
+   "tier": "reserve"
   },
   {
    "name": "carousel-circle-4",
@@ -4327,7 +4483,8 @@
    "replace": {
     "Image Carousel · Circle 4": "<її слова>"
    },
-   "no": 75
+   "no": 75,
+   "tier": "top"
   },
   {
    "name": "carousel-circle-5",
@@ -4346,7 +4503,8 @@
    "replace": {
     "Image Carousel · Circle 5": "<її слова>"
    },
-   "no": 76
+   "no": 76,
+   "tier": "top"
   },
   {
    "name": "carousel-orbit-2",
@@ -4365,7 +4523,8 @@
    "replace": {
     "Image Carousel · Orbit 2": "<її слова>"
    },
-   "no": 66
+   "no": 66,
+   "tier": "top"
   },
   {
    "name": "carousel-orbit-3",
@@ -4384,7 +4543,8 @@
    "replace": {
     "Image Carousel · Orbit 3": "<її слова>"
    },
-   "no": 67
+   "no": 67,
+   "tier": "top"
   },
   {
    "name": "carousel-orbit-4",
@@ -4403,7 +4563,8 @@
    "replace": {
     "Image Carousel · Orbit 4": "<її слова>"
    },
-   "no": 68
+   "no": 68,
+   "tier": "top"
   },
   {
    "name": "carousel-orbit-5",
@@ -4422,7 +4583,8 @@
    "replace": {
     "Image Carousel · Orbit 5": "<її слова>"
    },
-   "no": 69
+   "no": 69,
+   "tier": "top"
   },
   {
    "name": "carousel-path-4",
@@ -4442,7 +4604,8 @@
    "replace": {
     "Image Carousel · Path 4": "<її слова>"
    },
-   "no": 80
+   "no": 80,
+   "tier": "top"
   },
   {
    "name": "carousel-path-5",
@@ -4462,7 +4625,8 @@
    "replace": {
     "Image Carousel · Path 5": "<її слова>"
    },
-   "no": 81
+   "no": 81,
+   "tier": "top"
   },
   {
    "name": "carousel-text-circle-3",
@@ -4486,7 +4650,8 @@
    "replace": {
     "Carousels are so in — Circle 3": "<її слова>"
    },
-   "no": 56
+   "no": 56,
+   "tier": "top"
   },
   {
    "name": "carousel-text-circle-4",
@@ -4510,7 +4675,8 @@
    "replace": {
     "Carousels are so in — Circle 4": "<її слова>"
    },
-   "no": 57
+   "no": 57,
+   "tier": "top"
   },
   {
    "name": "carousel-text-circle-5",
@@ -4534,7 +4700,8 @@
    "replace": {
     "Carousels are so in — Circle 5": "<її слова>"
    },
-   "no": 58
+   "no": 58,
+   "tier": "top"
   },
   {
    "name": "carousel-vision-2",
@@ -4553,7 +4720,8 @@
    "replace": {
     "Image Carousel · Vision 2": "<її слова>"
    },
-   "no": 85
+   "no": 85,
+   "tier": "top"
   },
   {
    "name": "carousel-vision-3",
@@ -4572,7 +4740,8 @@
    "replace": {
     "Image Carousel · Vision 3": "<її слова>"
    },
-   "no": 86
+   "no": 86,
+   "tier": "top"
   },
   {
    "name": "carousel-vision-4",
@@ -4591,7 +4760,8 @@
    "replace": {
     "Image Carousel · Vision 4": "<її слова>"
    },
-   "no": 87
+   "no": 87,
+   "tier": "top"
   },
   {
    "name": "carousel-vision-5",
@@ -4611,7 +4781,8 @@
    "replace": {
     "Image Carousel · Vision 5": "<її слова>"
    },
-   "no": 88
+   "no": 88,
+   "tier": "top"
   },
   {
    "name": "chromatic-radial-split",
@@ -4627,7 +4798,8 @@
    },
    "status": "ready",
    "note": "шейдерний перехід на склейці: start = час склейки, кадр до і після з master.mp4, ±0.19 с, тихий звук; дуже активний: максимум 2 на рілс, лише на зміні теми, щонайменше 12 с між ними (перевірено 2026-10-22)",
-   "no": 135
+   "no": 135,
+   "tier": "top"
   },
   {
    "name": "chrome-orb",
@@ -4656,7 +4828,8 @@
     "place": "low",
     "layout": "front"
    },
-   "no": 59
+   "no": 59,
+   "tier": "top"
   },
   {
    "name": "cinematic-zoom",
@@ -4672,7 +4845,8 @@
    },
    "status": "ready",
    "note": "шейдерний перехід на склейці: start = час склейки, кадр до і після з master.mp4, ±0.19 с, тихий звук; дуже активний: максимум 2 на рілс, лише на зміні теми, щонайменше 12 с між ними (перевірено 2026-10-22)",
-   "no": 138
+   "no": 138,
+   "tier": "top"
   },
   {
    "name": "code-3d-extrude",
@@ -4778,7 +4952,8 @@
    "replace": {
     "Code Slice Hero": "<її слова>"
    },
-   "no": 144
+   "no": 144,
+   "tier": "reserve"
   },
   {
    "name": "code-snippet-apple-terminal-pro",
@@ -4871,7 +5046,8 @@
    },
    "status": "ready",
    "note": "шейдерний перехід на склейці: start = час склейки, кадр до і після з master.mp4, ±0.19 с, тихий звук; дуже активний: максимум 2 на рілс, лише на зміні теми, щонайменше 12 с між ними (перевірено 2026-10-22)",
-   "no": 137
+   "no": 137,
+   "tier": "top"
   },
   {
    "name": "cuboid-carousel",
@@ -4892,7 +5068,8 @@
    "replace": {
     "Aa": "<її слова>"
    },
-   "no": 89
+   "no": 89,
+   "tier": "reserve"
   },
   {
    "name": "domain-warp-dissolve",
@@ -4908,7 +5085,8 @@
    },
    "status": "manual",
    "note": "шейдерний перехід на склейці; край розчинення неоново-рожевий і бірюзовий (зашито в шейдер, не кольори бренду)",
-   "no": 142
+   "no": 142,
+   "tier": "top"
   },
   {
    "name": "exploded-stack",
@@ -4929,7 +5107,8 @@
    "replace": {
     "Exploded Stack": "<її слова>"
    },
-   "no": 209
+   "no": 209,
+   "tier": "top"
   },
   {
    "name": "extruded-logo",
@@ -4950,7 +5129,8 @@
     "Extruded Logo": "<її слова>"
    },
    "no": 14,
-   "was_status": "manual"
+   "was_status": "manual",
+   "tier": "top"
   },
   {
    "name": "falling-lines",
@@ -4978,7 +5158,8 @@
    },
    "status": "ready",
    "note": "шейдерний перехід на склейці: start = час склейки, кадр до і після з master.mp4, ±0.19 с, тихий звук; дуже активний: максимум 2 на рілс, лише на зміні теми, щонайменше 12 с між ними (перевірено 2026-10-22)",
-   "no": 140
+   "no": 140,
+   "tier": "top"
   },
   {
    "name": "flowchart",
@@ -5007,7 +5188,8 @@
     "You": "<її слова>"
    },
    "no": 187,
-   "was_status": "manual"
+   "was_status": "manual",
+   "tier": "top"
   },
   {
    "name": "flowing-gradient",
@@ -5066,7 +5248,8 @@
     "Building Frost · ": "<її слова>",
     "Frost failed: ": "<її слова>"
    },
-   "no": 127
+   "no": 127,
+   "tier": "reserve"
   },
   {
    "name": "gabor-noise",
@@ -5098,7 +5281,8 @@
    "replace": {
     "Gallery Tunnel": "<її слова>"
    },
-   "no": 91
+   "no": 91,
+   "tier": "reserve"
   },
   {
    "name": "glass-hero",
@@ -5118,7 +5302,8 @@
    "replace": {
     "Glass Hero": "<її слова>"
    },
-   "no": 259
+   "no": 259,
+   "tier": "top"
   },
   {
    "name": "glass-shard-title",
@@ -5139,7 +5324,8 @@
     "Glass Shard Title": "<її слова>",
     "Aa": "<її слова>"
    },
-   "no": 260
+   "no": 260,
+   "tier": "reserve"
   },
   {
    "name": "glitch",
@@ -5156,7 +5342,8 @@
    },
    "status": "ready",
    "note": "шейдерний перехід на склейці: start = час склейки, кадр до і після з master.mp4, ±0.19 с, тихий звук; дуже активний: максимум 2 на рілс, лише на зміні теми, щонайменше 12 с між ними (перевірено 2026-10-22)",
-   "no": 139
+   "no": 139,
+   "tier": "top"
   },
   {
    "name": "godrays",
@@ -5204,7 +5391,8 @@
     "use strict": "<її слова>",
     "s tracker needs the timeline": "<її слова>"
    },
-   "no": 126
+   "no": 126,
+   "tier": "reserve"
   },
   {
    "name": "gravitational-lens",
@@ -5220,7 +5408,8 @@
    },
    "status": "manual",
    "note": "шейдерний перехід на склейці; чорна «діра» лягає на обличчя",
-   "no": 134
+   "no": 134,
+   "tier": "top"
   },
   {
    "name": "halftone-field",
@@ -5273,7 +5462,8 @@
    "card": {
     "layout": "dim"
    },
-   "no": 48
+   "no": 48,
+   "tier": "reserve"
   },
   {
    "name": "hologram",
@@ -5330,7 +5520,8 @@
     "Translate": "<її слова>"
    },
    "no": 166,
-   "keep_ui": true
+   "keep_ui": true,
+   "tier": "top"
   },
   {
    "name": "lens-flare",
@@ -5370,7 +5561,8 @@
    },
    "status": "ready",
    "note": "шейдерний перехід на склейці: start = час склейки, кадр до і після з master.mp4, ±0.19 с, тихий звук; дуже активний: максимум 2 на рілс, лише на зміні теми, щонайменше 12 с між ними (перевірено 2026-10-22)",
-   "no": 136
+   "no": 136,
+   "tier": "top"
   },
   {
    "name": "liquid-glass-notification",
@@ -5402,7 +5594,8 @@
    },
    "no": 174,
    "was_status": "manual",
-   "keep_ui": true
+   "keep_ui": true,
+   "tier": "top"
   },
   {
    "name": "liquid-glass-widgets",
@@ -5433,7 +5626,8 @@
     "Preview ready": "<її слова>"
    },
    "no": 294,
-   "was_status": "manual"
+   "was_status": "manual",
+   "tier": "top"
   },
   {
    "name": "liquid-metal",
@@ -5467,7 +5661,8 @@
     "Nothing great is made alone.": "<її слова>",
     "figma.com": "<її слова>"
    },
-   "no": 45
+   "no": 45,
+   "tier": "top"
   },
   {
    "name": "lottie-character-walk",
@@ -5489,7 +5684,8 @@
    },
    "status": "manual",
    "note": "дрібна фігурка",
-   "no": 198
+   "no": 198,
+   "tier": "top"
   },
   {
    "name": "macos-tahoe-liquid-glass",
@@ -5522,7 +5718,8 @@
     "Go": "<її слова>"
    },
    "no": 110,
-   "keep_ui": true
+   "keep_ui": true,
+   "tier": "top"
   },
   {
    "name": "marble",
@@ -5593,7 +5790,8 @@
     "DOWN": "<її слова>",
     "© OpenStreetMap contributors © CARTO": "<її слова>"
    },
-   "no": 103
+   "no": 103,
+   "tier": "top"
   },
   {
    "name": "nyc-paris-flight",
@@ -5624,7 +5822,8 @@
     "5,837 km compressed": "<її слова>",
     "© OpenStreetMap contributors © CARTO": "<її слова>"
    },
-   "no": 109
+   "no": 109,
+   "tier": "top"
   },
   {
    "name": "obsidian",
@@ -5658,7 +5857,8 @@
     "Orbit Card — approved Blender motion": "<її слова>",
     "Aa": "<її слова>"
    },
-   "no": 123
+   "no": 123,
+   "tier": "top"
   },
   {
    "name": "oscilloscope-trace",
@@ -5686,7 +5886,8 @@
     "VERT": "<її слова>",
     "PHOSPHOR": "<її слова>"
    },
-   "no": 157
+   "no": 157,
+   "tier": "top"
   },
   {
    "name": "plasma",
@@ -5762,7 +5963,8 @@
    },
    "status": "manual",
    "note": "шейдерний перехід на склейці; вогняний край зашитого кольору, лише для драматичного моменту",
-   "no": 117
+   "no": 117,
+   "tier": "top"
   },
   {
    "name": "ripple-waves",
@@ -5778,7 +5980,8 @@
    },
    "status": "ready",
    "note": "шейдерний перехід на склейці: start = час склейки, кадр до і після з master.mp4, ±0.19 с, тихий звук; дуже активний: максимум 2 на рілс, лише на зміні теми, щонайменше 12 с між ними (перевірено 2026-10-22)",
-   "no": 158
+   "no": 158,
+   "tier": "top"
   },
   {
    "name": "ripples",
@@ -5806,7 +6009,8 @@
    },
    "status": "ready",
    "note": "шейдерний перехід на склейці: start = час склейки, кадр до і після з master.mp4, ±0.19 с, тихий звук; дуже активний: максимум 2 на рілс, лише на зміні теми, щонайменше 12 с між ними (перевірено 2026-10-22)",
-   "no": 125
+   "no": 125,
+   "tier": "top"
   },
   {
    "name": "sine-wave",
@@ -5838,7 +6042,8 @@
     "layout": "dim"
    },
    "no": 113,
-   "keep_ui": true
+   "keep_ui": true,
+   "tier": "top"
   },
   {
    "name": "snow",
@@ -5855,7 +6060,8 @@
    },
    "status": "manual",
    "note": "майже не видно",
-   "no": 93
+   "no": 93,
+   "tier": "top"
   },
   {
    "name": "spain-map",
@@ -5879,7 +6085,8 @@
    "card": {
     "layout": "dim"
    },
-   "no": 102
+   "no": 102,
+   "tier": "reserve"
   },
   {
    "name": "spiral",
@@ -5920,7 +6127,8 @@
    },
    "status": "manual",
    "note": "майже не видно",
-   "no": 60
+   "no": 60,
+   "tier": "top"
   },
   {
    "name": "strands",
@@ -5984,7 +6192,8 @@
    },
    "status": "ready",
    "note": "шейдерний перехід на склейці: start = час склейки, кадр до і після з master.mp4, ±0.19 с, тихий звук; дуже активний: максимум 2 на рілс, лише на зміні теми, щонайменше 12 с між ними (перевірено 2026-10-22)",
-   "no": 116
+   "no": 116,
+   "tier": "top"
   },
   {
    "name": "thermal-distortion",
@@ -6000,7 +6209,8 @@
    },
    "status": "ready",
    "note": "шейдерний перехід на склейці: start = час склейки, кадр до і після з master.mp4, ±0.19 с, тихий звук; дуже активний: максимум 2 на рілс, лише на зміні теми, щонайменше 12 с між ними (перевірено 2026-10-22)",
-   "no": 118
+   "no": 118,
+   "tier": "top"
   },
   {
    "name": "thin-film",
@@ -6199,7 +6409,8 @@
     "Navigation": "<її слова>"
    },
    "no": 111,
-   "keep_ui": true
+   "keep_ui": true,
+   "tier": "top"
   },
   {
    "name": "us-map",
@@ -6223,7 +6434,8 @@
    "card": {
     "layout": "dim"
    },
-   "no": 107
+   "no": 107,
+   "tier": "reserve"
   },
   {
    "name": "us-map-bubble",
@@ -6245,7 +6457,8 @@
    "card": {
     "layout": "dim"
    },
-   "no": 104
+   "no": 104,
+   "tier": "reserve"
   },
   {
    "name": "us-map-flow",
@@ -6268,7 +6481,8 @@
     "layout": "dim",
     "zoom": 1.0
    },
-   "no": 105
+   "no": 105,
+   "tier": "reserve"
   },
   {
    "name": "us-map-hex",
@@ -6291,7 +6505,8 @@
     "layout": "dim",
     "zoom": 1.0
    },
-   "no": 106
+   "no": 106,
+   "tier": "reserve"
   },
   {
    "name": "vfx-anamorphic-flare",
@@ -6354,7 +6569,8 @@
     "Creators": "<її слова>",
     "Videos Rendered": "<її слова>"
    },
-   "no": 115
+   "no": 115,
+   "tier": "reserve"
   },
   {
    "name": "vfx-magnetic",
@@ -6384,7 +6600,8 @@
     "No html2canvas. Browser's own rasterizer at full fidelity.": "<її слова>",
     "GPU Shaders": "<її слова>"
    },
-   "no": 129
+   "no": 129,
+   "tier": "reserve"
   },
   {
    "name": "vfx-portal",
@@ -6414,7 +6631,8 @@
     "Start Creating": "<її слова>",
     "Lightning Fast": "<її слова>"
    },
-   "no": 114
+   "no": 114,
+   "tier": "reserve"
   },
   {
    "name": "vfx-shatter",
@@ -6446,7 +6664,8 @@
     "AES-256 at rest, TLS 1.3 in transit. SOC2 certified.": "<її слова>",
     "Real-time Analytics": "<її слова>"
    },
-   "no": 120
+   "no": 120,
+   "tier": "reserve"
   },
   {
    "name": "vfx-text-cursor",
@@ -6471,7 +6690,8 @@
     "in HyperFrames": "<її слова>"
    },
    "no": 283,
-   "was_status": "manual"
+   "was_status": "manual",
+   "tier": "reserve"
   },
   {
    "name": "voronoi",
@@ -6516,7 +6736,8 @@
     "BeatShelf": "<її слова>"
    },
    "no": 153,
-   "keep_ui": true
+   "keep_ui": true,
+   "tier": "reserve"
   },
   {
    "name": "water",
@@ -6576,7 +6797,8 @@
    },
    "status": "ready",
    "note": "шейдерний перехід на склейці: start = час склейки, кадр до і після з master.mp4, ±0.19 с, тихий звук; дуже активний: максимум 2 на рілс, лише на зміні теми, щонайменше 12 с між ними (перевірено 2026-10-22)",
-   "no": 146
+   "no": 146,
+   "tier": "top"
   },
   {
    "name": "wireframe-portal-title",
@@ -6597,7 +6819,8 @@
     "Wireframe Portal Title": "<її слова>",
     "HYPERFRAMES PRESENTS": "<її слова>"
    },
-   "no": 227
+   "no": 227,
+   "tier": "reserve"
   },
   {
    "name": "world-map",
@@ -6622,7 +6845,8 @@
     "layout": "dim",
     "zoom": 1.0
    },
-   "no": 108
+   "no": 108,
+   "tier": "top"
   },
   {
    "name": "worley-noise",
@@ -6651,7 +6875,8 @@
     "place": "low",
     "layout": "front"
    },
-   "no": 132
+   "no": 132,
+   "tier": "top"
   },
   {
    "name": "yt-logo-intro",
@@ -6672,7 +6897,8 @@
     "YT": "<її слова>",
     "LET'S DIVE IN": "<її слова>"
    },
-   "no": 236
+   "no": 236,
+   "tier": "top"
   },
   {
    "name": "yt-vertical-fill",
@@ -6744,7 +6970,8 @@
     "zoom": 1.0
    },
    "status": "ready",
-   "no": 286
+   "no": 286,
+   "tier": "reserve"
   },
   {
    "name": "aurora-drift",
@@ -6778,7 +7005,8 @@
    "no": 28,
    "replace_default": {
     "Community": ""
-   }
+   },
+   "tier": "top"
   },
   {
    "name": "avatar-group-hover",
@@ -6794,7 +7022,8 @@
     "layout": "front"
    },
    "status": "ready",
-   "no": 25
+   "no": 25,
+   "tier": "top"
   },
   {
    "name": "beat-accent",
@@ -6812,7 +7041,8 @@
     "layout": "front"
    },
    "status": "ready",
-   "no": 278
+   "no": 278,
+   "tier": "top"
   },
   {
    "name": "beat-pulse-background",
@@ -6869,7 +7099,8 @@
     ", a muted": "<її слова>",
     "Browser Device Stage": "<її слова>"
    },
-   "no": 52
+   "no": 52,
+   "tier": "top"
   },
   {
    "name": "camera-rig-depth-stack",
@@ -6899,7 +7130,8 @@
     "layout": "front"
    },
    "status": "ready",
-   "no": 217
+   "no": 217,
+   "tier": "top"
   },
   {
    "name": "caption-editorial-emphasis",
@@ -6920,7 +7152,8 @@
    "replace": {
     "Editorial Emphasis": "<її слова>"
    },
-   "no": 211
+   "no": 211,
+   "tier": "top"
   },
   {
    "name": "caption-glitch-rgb",
@@ -6935,7 +7168,8 @@
     "place": "low",
     "layout": "front"
    },
-   "status": "caption"
+   "status": "caption",
+   "tier": "top"
   },
   {
    "name": "caption-neon-accent",
@@ -6950,7 +7184,8 @@
     "place": "low",
     "layout": "front"
    },
-   "status": "caption"
+   "status": "caption",
+   "tier": "top"
   },
   {
    "name": "caption-neon-glow",
@@ -6965,7 +7200,8 @@
     "place": "low",
     "layout": "front"
    },
-   "status": "caption"
+   "status": "caption",
+   "tier": "top"
   },
   {
    "name": "caption-parallax-layers",
@@ -6998,7 +7234,8 @@
     "place": "low",
     "layout": "front"
    },
-   "status": "caption"
+   "status": "caption",
+   "tier": "top"
   },
   {
    "name": "caption-texture",
@@ -7019,7 +7256,8 @@
     "Texture": "<її слова>"
    },
    "no": 210,
-   "was_status": "manual"
+   "was_status": "manual",
+   "tier": "top"
   },
   {
    "name": "caption-weight-shift",
@@ -7035,7 +7273,8 @@
     "layout": "front"
    },
    "status": "caption",
-   "cap_at": 970
+   "cap_at": 970,
+   "tier": "top"
   },
   {
    "name": "card-resize",
@@ -7057,7 +7296,8 @@
     "Ready to render": "<її слова>",
     "All scenes validated and queued for export.": "<її слова>"
    },
-   "no": 197
+   "no": 197,
+   "tier": "top"
   },
   {
    "name": "chromatic-aberration-wipe",
@@ -7084,7 +7324,8 @@
     "Before": "<її слова>",
     "Chromatic Aberration Wipe": "<її слова>"
    },
-   "no": 159
+   "no": 159,
+   "tier": "reserve"
   },
   {
    "name": "colorama-wipe",
@@ -7124,7 +7365,8 @@
     "Context Menu Cursor": "<її слова>",
     "Launch assets": "<її слова>"
    },
-   "no": 194
+   "no": 194,
+   "tier": "top"
   },
   {
    "name": "cursor-glyph-trail",
@@ -7159,7 +7401,8 @@
     "Email digest": "<її слова>"
    },
    "no": 195,
-   "keep_ui": true
+   "keep_ui": true,
+   "tier": "top"
   },
   {
    "name": "cursor-zoom-follow",
@@ -7190,7 +7433,8 @@
     "Top plans": "<її слова>"
    },
    "no": 62,
-   "keep_ui": true
+   "keep_ui": true,
+   "tier": "top"
   },
   {
    "name": "cut-the-curve",
@@ -7213,7 +7457,8 @@
    },
    "status": "manual",
    "note": "не видно",
-   "no": 147
+   "no": 147,
+   "tier": "top"
   },
   {
    "name": "dart-cursor",
@@ -7258,7 +7503,8 @@
     "Before": "<її слова>",
     "Directional Wipe": "<її слова>"
    },
-   "no": 131
+   "no": 131,
+   "tier": "top"
   },
   {
    "name": "drift-hold",
@@ -7277,7 +7523,8 @@
     "zoom": 1.35
    },
    "status": "ready",
-   "no": 231
+   "no": 231,
+   "tier": "top"
   },
   {
    "name": "dynamic-grid",
@@ -7372,7 +7619,8 @@
    },
    "status": "manual",
    "note": "не видно",
-   "no": 143
+   "no": 143,
+   "tier": "top"
   },
   {
    "name": "filmed-screen",
@@ -7412,7 +7660,8 @@
    },
    "status": "manual",
    "note": "не видно",
-   "no": 38
+   "no": 38,
+   "tier": "top"
   },
   {
    "name": "grade-split-reveal",
@@ -7432,7 +7681,8 @@
     "Ungraded": "<її слова>",
     "Warm Cinematic": "<її слова>"
    },
-   "no": 36
+   "no": 36,
+   "tier": "reserve"
   },
   {
    "name": "grain-field",
@@ -7501,7 +7751,8 @@
    },
    "status": "manual",
    "note": "не шейдер з двома кадрами (немає captureScene): на склейці не працює, лише вручну",
-   "no": 141
+   "no": 141,
+   "tier": "top"
   },
   {
    "name": "hw-boil",
@@ -7537,7 +7788,8 @@
     "layout": "front"
    },
    "status": "ready",
-   "no": 213
+   "no": 213,
+   "tier": "top"
   },
   {
    "name": "ink-bleed-reveal",
@@ -7583,7 +7835,8 @@
     "OK": "<її слова>",
     "Looks good.": "<її слова>"
    },
-   "no": 179
+   "no": 179,
+   "tier": "top"
   },
   {
    "name": "keyframe-scrub-stack",
@@ -7618,7 +7871,8 @@
    },
    "status": "manual",
    "note": "не видно",
-   "no": 149
+   "no": 149,
+   "tier": "top"
   },
   {
    "name": "locked-nucleus-orbit",
@@ -7638,7 +7892,8 @@
    "replace": {
     "Locked Nucleus Orbit": "<її слова>"
    },
-   "no": 11
+   "no": 11,
+   "tier": "top"
   },
   {
    "name": "logo-brand-close",
@@ -7659,7 +7914,8 @@
     "zoom": 1.0
    },
    "status": "ready",
-   "no": 4
+   "no": 4,
+   "tier": "top"
   },
   {
    "name": "logo-sting",
@@ -7677,7 +7933,8 @@
     "layout": "front"
    },
    "status": "ready",
-   "no": 1
+   "no": 1,
+   "tier": "top"
   },
   {
    "name": "magnetic-cursor",
@@ -7697,7 +7954,8 @@
     "Magnetic Cursor": "<її слова>"
    },
    "no": 20,
-   "keep_ui": true
+   "keep_ui": true,
+   "tier": "top"
   },
   {
    "name": "match-cut",
@@ -7727,7 +7985,8 @@
     "Match Cut": "<її слова>",
     "Match complete": "<її слова>"
    },
-   "no": 124
+   "no": 124,
+   "tier": "reserve"
   },
   {
    "name": "menu-morph",
@@ -7860,7 +8119,8 @@
     "Multi Device Splay": "<її слова>"
    },
    "no": 98,
-   "keep_ui": true
+   "keep_ui": true,
+   "tier": "top"
   },
   {
    "name": "multiplayer-cursors",
@@ -7880,7 +8140,8 @@
    },
    "status": "ready",
    "no": 24,
-   "keep_ui": true
+   "keep_ui": true,
+   "tier": "top"
   },
   {
    "name": "offset-path-traveler",
@@ -7924,7 +8185,8 @@
     "Choose your visual style": "<її слова>",
     "Continue": "<її слова>"
    },
-   "no": 191
+   "no": 191,
+   "tier": "top"
   },
   {
    "name": "ordered-dither-pass",
@@ -7978,7 +8240,8 @@
     "Dashboard": "<її слова>",
     "Analytics": "<її слова>"
    },
-   "no": 130
+   "no": 130,
+   "tier": "top"
   },
   {
    "name": "pan-stations",
@@ -7998,7 +8261,8 @@
    "replace": {
     "Pan Stations": "<її слова>"
    },
-   "no": 192
+   "no": 192,
+   "tier": "top"
   },
   {
    "name": "panel-reveal",
@@ -8023,7 +8287,8 @@
     "Duration 420ms": "<її слова>",
     "Easing power3.out": "<її слова>"
    },
-   "no": 250
+   "no": 250,
+   "tier": "top"
   },
   {
    "name": "parallax-device-dive",
@@ -8050,7 +8315,8 @@
     "Active users": "<її слова>"
    },
    "no": 154,
-   "keep_ui": true
+   "keep_ui": true,
+   "tier": "reserve"
   },
   {
    "name": "parallax-unzoom",
@@ -8069,7 +8335,8 @@
     "layout": "front"
    },
    "no": 71,
-   "was_status": "manual"
+   "was_status": "manual",
+   "tier": "top"
   },
   {
    "name": "parallax-zoom",
@@ -8088,7 +8355,8 @@
     "layout": "front"
    },
    "no": 100,
-   "was_status": "manual"
+   "was_status": "manual",
+   "tier": "reserve"
   },
   {
    "name": "particle-image-reveal",
@@ -8108,7 +8376,8 @@
    "replace": {
     "Particle Image Reveal": "<її слова>"
    },
-   "no": 101
+   "no": 101,
+   "tier": "reserve"
   },
   {
    "name": "pendulum-swing",
@@ -8157,7 +8426,8 @@
     "MK": "<її слова>"
    },
    "no": 165,
-   "keep_ui": true
+   "keep_ui": true,
+   "tier": "top"
   },
   {
    "name": "rubber-band-bumper",
@@ -8208,7 +8478,8 @@
     "zoom": 1.4
    },
    "status": "ready",
-   "no": 277
+   "no": 277,
+   "tier": "top"
   },
   {
    "name": "screen-flow-carousel",
@@ -8230,7 +8501,8 @@
    "replace": {
     "Screen Flow Carousel": "<її слова>"
    },
-   "no": 83
+   "no": 83,
+   "tier": "top"
   },
   {
    "name": "scroll-camera-story",
@@ -8250,7 +8522,8 @@
    "replace": {
     "Scroll Camera Story": "<її слова>"
    },
-   "no": 63
+   "no": 63,
+   "tier": "top"
   },
   {
    "name": "segmentation-flood",
@@ -8309,7 +8582,8 @@
     "Layer subtle UI sounds": "<її слова>"
    },
    "no": 190,
-   "keep_ui": true
+   "keep_ui": true,
+   "tier": "top"
   },
   {
    "name": "shared-axis-y",
@@ -8338,7 +8612,8 @@
     "Debug": "<її слова>",
     "Ask": "<її слова>"
    },
-   "no": 148
+   "no": 148,
+   "tier": "top"
   },
   {
    "name": "shared-axis-z",
@@ -8421,7 +8696,8 @@
     "Password": "<її слова>",
     "Start building": "<її слова>"
    },
-   "no": 49
+   "no": 49,
+   "tier": "top"
   },
   {
    "name": "skeleton-reveal",
@@ -8440,7 +8716,8 @@
     "layout": "front"
    },
    "status": "ready",
-   "no": 17
+   "no": 17,
+   "tier": "top"
   },
   {
    "name": "slit-scan-reveal",
@@ -8463,7 +8740,8 @@
    "replace": {
     "Slit Scan Reveal": "<її слова>"
    },
-   "no": 119
+   "no": 119,
+   "tier": "reserve"
   },
   {
    "name": "soft-blob-touch",
@@ -8497,7 +8775,8 @@
     "Spotlight Card": "<її слова>",
     "A card with a scripted cursor spotlight and lit border.": "<її слова>"
    },
-   "no": 230
+   "no": 230,
+   "tier": "reserve"
   },
   {
    "name": "spring-stack-shuffle",
@@ -8518,7 +8797,8 @@
    "replace": {
     "Spring Stack Shuffle": "<її слова>"
    },
-   "no": 94
+   "no": 94,
+   "tier": "top"
   },
   {
    "name": "stagger-cascade",
@@ -8537,7 +8817,8 @@
    "replace": {
     "Stagger Cascade": "<її слова>"
    },
-   "no": 97
+   "no": 97,
+   "tier": "top"
   },
   {
    "name": "stagger-lattice",
@@ -8555,7 +8836,8 @@
     "layout": "front",
     "zoom": 0.82
    },
-   "no": 151
+   "no": 151,
+   "tier": "reserve"
   },
   {
    "name": "state-chip-rail",
@@ -8575,7 +8857,8 @@
     "layout": "front"
    },
    "status": "ready",
-   "no": 204
+   "no": 204,
+   "tier": "top"
   },
   {
    "name": "sticky-mock-swap",
@@ -8596,7 +8879,8 @@
    "replace": {
     "Sticky Mock Swap": "<її слова>"
    },
-   "no": 196
+   "no": 196,
+   "tier": "top"
   },
   {
    "name": "stitched-text-draw",
@@ -8617,7 +8901,8 @@
    "status": "candidate",
    "note": "не видно | 22.10.2026: прев'ю не рендериться або ефект не видно, прибрано з меню до перевірки",
    "no": 271,
-   "was_status": "manual"
+   "was_status": "manual",
+   "tier": "reserve"
   },
   {
    "name": "stop-motion-cadence",
@@ -8656,7 +8941,8 @@
     "GET IT ON": "<її слова>",
     "Google Play": "<її слова>"
    },
-   "no": 41
+   "no": 41,
+   "tier": "top"
   },
   {
    "name": "streaming-text",
@@ -8690,7 +8976,8 @@
     "layout": "front",
     "zoom": 1.0
    },
-   "no": 128
+   "no": 128,
+   "tier": "reserve"
   },
   {
    "name": "svg-mask-reveal",
@@ -8711,7 +8998,8 @@
     "zoom": 1.25
    },
    "status": "ready",
-   "no": 228
+   "no": 228,
+   "tier": "top"
   },
   {
    "name": "svg-stroke-trace",
@@ -8728,7 +9016,8 @@
     "zoom": 1.4
    },
    "status": "ready",
-   "no": 237
+   "no": 237,
+   "tier": "top"
   },
   {
    "name": "swipe-rail",
@@ -8752,7 +9041,8 @@
    "replace": {
     "Swipe Rail": "<її слова>"
    },
-   "no": 201
+   "no": 201,
+   "tier": "top"
   },
   {
    "name": "tabs-slide-indicator",
@@ -8770,7 +9060,8 @@
     "layout": "front"
    },
    "status": "ready",
-   "no": 202
+   "no": 202,
+   "tier": "top"
   },
   {
    "name": "telemetry-hud",
@@ -8812,7 +9103,8 @@
     "$ hyperframes render --skill=terminal-simulator": "<її слова>"
    },
    "no": 160,
-   "keep_ui": true
+   "keep_ui": true,
+   "tier": "reserve"
   },
   {
    "name": "text-stagger",
@@ -8831,7 +9123,8 @@
     "zoom": 1.2
    },
    "status": "ready",
-   "no": 269
+   "no": 269,
+   "tier": "top"
   },
   {
    "name": "text-state-swap",
@@ -8851,7 +9144,8 @@
     "layout": "front"
    },
    "status": "ready",
-   "no": 33
+   "no": 33,
+   "tier": "top"
   },
   {
    "name": "texture-mask-text",
@@ -8869,7 +9163,8 @@
     "layout": "front"
    },
    "no": 239,
-   "was_status": "manual"
+   "was_status": "manual",
+   "tier": "reserve"
   },
   {
    "name": "three-orbiting-cards",
@@ -8901,7 +9196,8 @@
     "zoom": 1.25
    },
    "status": "ready",
-   "no": 264
+   "no": 264,
+   "tier": "top"
   },
   {
    "name": "tilt-card",
@@ -8924,7 +9220,8 @@
     "Primitive": "<її слова>",
     "Agent-ready motion": "<її слова>"
    },
-   "no": 229
+   "no": 229,
+   "tier": "top"
   },
   {
    "name": "titlecard-lockup",
@@ -8945,7 +9242,8 @@
     "layout": "front"
    },
    "status": "ready",
-   "no": 12
+   "no": 12,
+   "tier": "top"
   },
   {
    "name": "torn-paper-rip",
@@ -8987,7 +9285,8 @@
    "replace": {
     "Touch Indicator": "<її слова>"
    },
-   "no": 44
+   "no": 44,
+   "tier": "top"
   },
   {
    "name": "tracing-beam",
@@ -9010,7 +9309,8 @@
     "Step two": "<її слова>",
     "Step three": "<її слова>"
    },
-   "no": 206
+   "no": 206,
+   "tier": "top"
   },
   {
    "name": "trust-strip",
@@ -9031,7 +9331,8 @@
    "replace": {
     "Trust Strip": "<її слова>"
    },
-   "no": 26
+   "no": 26,
+   "tier": "top"
   },
   {
    "name": "type-match-cut",
@@ -9082,7 +9383,8 @@
     "UI Focus Zoom": "<її слова>"
    },
    "no": 61,
-   "keep_ui": true
+   "keep_ui": true,
+   "tier": "top"
   },
   {
    "name": "variable-axis-type",
@@ -9101,7 +9403,8 @@
    },
    "status": "manual",
    "note": "не видно",
-   "no": 272
+   "no": 272,
+   "tier": "top"
   },
   {
    "name": "vector-editor-rig",
@@ -9134,7 +9437,8 @@
     "Width": "<її слова>",
     "Nodes": "<її слова>"
    },
-   "no": 53
+   "no": 53,
+   "tier": "top"
   },
   {
    "name": "velocity-throw-snap",
@@ -9154,7 +9458,8 @@
    "replace": {
     "Velocity Throw Snap": "<її слова>"
    },
-   "no": 92
+   "no": 92,
+   "tier": "top"
   },
   {
    "name": "vignette",
@@ -9189,7 +9494,8 @@
    },
    "status": "manual",
    "note": "чорний кадр",
-   "no": 145
+   "no": 145,
+   "tier": "top"
   },
   {
    "name": "wordmark-tiles",
@@ -9209,7 +9515,8 @@
     "zoom": 1.1
    },
    "status": "ready",
-   "no": 276
+   "no": 276,
+   "tier": "top"
   },
   {
    "name": "yt-camera-move",
@@ -9254,7 +9561,8 @@
    "replace": {
     "on screen": "<її слова>"
    },
-   "no": 112
+   "no": 112,
+   "tier": "top"
   },
   {
    "name": "zoom-through-transition",
@@ -9280,7 +9588,8 @@
    },
    "status": "manual",
    "note": "не шейдер з двома кадрами (немає captureScene): на склейці не працює, лише вручну",
-   "no": 121
+   "no": 121,
+   "tier": "reserve"
   },
   {
    "name": "head-window",
@@ -9303,7 +9612,8 @@
    "rank": 2,
    "quality": 4,
    "note": "подача голови (scripts/heads.py): перевірено 23.10.2026 на її рілсі, 540p і повний кадр; одна фраза 1.5-5 с, кадр повертається сам",
-   "no": 299
+   "no": 299,
+   "tier": "top"
   },
   {
    "name": "head-circle",
@@ -9326,7 +9636,8 @@
    "rank": 2,
    "quality": 4,
    "note": "подача голови (scripts/heads.py): перевірено 23.10.2026 на її рілсі, 540p і повний кадр; одна фраза 1.5-5 с, кадр повертається сам",
-   "no": 300
+   "no": 300,
+   "tier": "top"
   },
   {
    "name": "head-cloud",
@@ -9349,7 +9660,8 @@
    "rank": 2,
    "quality": 4,
    "note": "подача голови (scripts/heads.py): перевірено 23.10.2026 на її рілсі, 540p і повний кадр; одна фраза 1.5-5 с, кадр повертається сам",
-   "no": 301
+   "no": 301,
+   "tier": "top"
   },
   {
    "name": "head-soft",
@@ -9372,7 +9684,8 @@
    "rank": 2,
    "quality": 4,
    "note": "подача голови (scripts/heads.py): перевірено 23.10.2026 на її рілсі, 540p і повний кадр; одна фраза 1.5-5 с, кадр повертається сам",
-   "no": 302
+   "no": 302,
+   "tier": "reserve"
   },
   {
    "name": "head-polaroid",
@@ -9396,7 +9709,8 @@
    "quality": 4,
    "images": "її фото як фон (1-3) за бажанням; без фото фон з її ж відео в кольорах бренду",
    "note": "подача голови (scripts/heads.py): перевірено 23.10.2026 на її рілсі, 540p і повний кадр; одна фраза 1.5-5 с, кадр повертається сам",
-   "no": 303
+   "no": 303,
+   "tier": "top"
   },
   {
    "name": "head-bigword",
@@ -9419,7 +9733,8 @@
    "rank": 2,
    "quality": 4,
    "note": "подача голови (scripts/heads.py): перевірено 23.10.2026 на її рілсі, 540p і повний кадр; одна фраза 1.5-5 с, кадр повертається сам",
-   "no": 304
+   "no": 304,
+   "tier": "top"
   },
   {
    "name": "head-top",
@@ -9441,7 +9756,8 @@
    "rank": 2,
    "quality": 4,
    "note": "подача голови (scripts/heads.py): перевірено 23.10.2026 на її рілсі, 540p і повний кадр; одна фраза 1.5-5 с, кадр повертається сам",
-   "no": 305
+   "no": 305,
+   "tier": "top"
   },
   {
    "name": "head-collage",
@@ -9465,7 +9781,8 @@
    "quality": 4,
    "images": "потрібно 2-4 її фото",
    "note": "подача голови (scripts/heads.py): перевірено 23.10.2026 на її рілсі, 540p і повний кадр; одна фраза 1.5-5 с, кадр повертається сам",
-   "no": 306
+   "no": 306,
+   "tier": "top"
   },
   {
    "name": "head-pile",
@@ -9489,7 +9806,8 @@
    "quality": 4,
    "images": "потрібно 3-6 її фото",
    "note": "подача голови (scripts/heads.py): перевірено 23.10.2026 на її рілсі, 540p і повний кадр; одна фраза 1.5-5 с, кадр повертається сам",
-   "no": 307
+   "no": 307,
+   "tier": "top"
   },
   {
    "name": "head-around",
@@ -9512,7 +9830,8 @@
    "rank": 2,
    "quality": 4,
    "note": "подача голови (scripts/heads.py): перевірено 23.10.2026 на її рілсі, 540p і повний кадр; одна фраза 1.5-5 с, кадр повертається сам",
-   "no": 308
+   "no": 308,
+   "tier": "top"
   },
   {
    "name": "head-picture",
@@ -9536,7 +9855,8 @@
    "quality": 4,
    "images": "потрібна 1 картинка (її фото або знайдена в «Знайти»)",
    "note": "подача голови (scripts/heads.py): перевірено 23.10.2026 на її рілсі, 540p і повний кадр; одна фраза 1.5-5 с, кадр повертається сам",
-   "no": 309
+   "no": 309,
+   "tier": "top"
   },
   {
    "name": "fx-noise",
@@ -9557,7 +9877,8 @@
     "size"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"noise\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: images (папка скрінів), size",
-   "no": 310
+   "no": 310,
+   "tier": "top"
   },
   {
    "name": "fx-lineup",
@@ -9577,7 +9898,8 @@
     "text (назви через |)"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"lineup\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (назви через |)",
-   "no": 311
+   "no": 311,
+   "tier": "top"
   },
   {
    "name": "fx-locked-on",
@@ -9598,7 +9920,8 @@
     "text (бирка)"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"locked-on\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: zoom, text (бирка)",
-   "no": 312
+   "no": 312,
+   "tier": "top"
   },
   {
    "name": "fx-orbit",
@@ -9621,7 +9944,8 @@
     "size"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"orbit\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: images, count, speed, size",
-   "no": 313
+   "no": 313,
+   "tier": "top"
   },
   {
    "name": "fx-lean-in",
@@ -9642,7 +9966,8 @@
     "speed"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"lean-in\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: zoom (до 2), speed",
-   "no": 314
+   "no": 314,
+   "tier": "top"
   },
   {
    "name": "fx-backdrop-word",
@@ -9664,7 +9989,8 @@
     "font (bold/serif)"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"backdrop-word\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text, color, font (bold/serif)",
-   "no": 315
+   "no": 315,
+   "tier": "top"
   },
   {
    "name": "fx-spotlight",
@@ -9686,7 +10012,8 @@
     "push; look=sparkle (золоті промені)"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"spotlight\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text, color, push; look=sparkle (золоті промені)",
-   "no": 316
+   "no": 316,
+   "tier": "top"
   },
   {
    "name": "fx-the-bill",
@@ -9706,7 +10033,8 @@
     "text (рядки через |)"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"the-bill\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (рядки через |)",
-   "no": 317
+   "no": 317,
+   "tier": "top"
   },
   {
    "name": "fx-moody",
@@ -9726,7 +10054,8 @@
     "grade (moody/bw/warm/cool/pop)"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"moody\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: grade (moody/bw/warm/cool/pop)",
-   "no": 318
+   "no": 318,
+   "tier": "top"
   },
   {
    "name": "fx-swipe",
@@ -9746,7 +10075,8 @@
     "grade (вигляд «після»)"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"swipe\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: grade (вигляд «після»)",
-   "no": 319
+   "no": 319,
+   "tier": "top"
   },
   {
    "name": "fx-todo",
@@ -9768,7 +10098,8 @@
     "title"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"todo\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (пункти через |), ticks (секунди через |), title",
-   "no": 320
+   "no": 320,
+   "tier": "top"
   },
   {
    "name": "fx-comment-box",
@@ -9789,7 +10120,8 @@
     "напр. АНКЕТА)"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"comment-box\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (слово, напр. АНКЕТА)",
-   "no": 321
+   "no": 321,
+   "tier": "top"
   },
   {
    "name": "fx-tap",
@@ -9812,7 +10144,8 @@
     "color"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"tap\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: at (секунда), x, y, color",
-   "no": 322
+   "no": 322,
+   "tier": "top"
   },
   {
    "name": "fx-pause-point",
@@ -9833,7 +10166,8 @@
     "color"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"pause-point\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (підпис), color",
-   "no": 323
+   "no": 323,
+   "tier": "reserve"
   },
   {
    "name": "fx-uninstall",
@@ -9853,7 +10187,8 @@
     "text"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"uninstall\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text",
-   "no": 324
+   "no": 324,
+   "tier": "top"
   },
   {
    "name": "fx-reel-frame",
@@ -9873,7 +10208,8 @@
     "text (нік)"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"reel-frame\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (нік)",
-   "no": 325
+   "no": 325,
+   "tier": "reserve"
   },
   {
    "name": "fx-shortcut-rain",
@@ -9894,7 +10230,8 @@
     "count"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"shortcut-rain\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (клавіші через |), count",
-   "no": 326
+   "no": 326,
+   "tier": "top"
   },
   {
    "name": "fx-reject-stamp",
@@ -9917,7 +10254,8 @@
     "y"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"reject-stamp\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text, color, angle, y",
-   "no": 327
+   "no": 327,
+   "tier": "top"
   },
   {
    "name": "fx-countdown-flip",
@@ -9937,7 +10275,8 @@
     "from"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"countdown-flip\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: from",
-   "no": 328
+   "no": 328,
+   "tier": "top"
   },
   {
    "name": "fx-rabbit-hole",
@@ -9959,7 +10298,8 @@
     "spin"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"rabbit-hole\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: ratio, speed, spin",
-   "no": 329
+   "no": 329,
+   "tier": "reserve"
   },
   {
    "name": "fx-cover-star",
@@ -9982,7 +10322,8 @@
     "color; look=editorial"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"cover-star\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (назва), lines (через |), issue, color; look=editorial",
-   "no": 330
+   "no": 330,
+   "tier": "top"
   },
   {
    "name": "fx-scribble",
@@ -10003,7 +10344,8 @@
     "color"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"scribble\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (підпис), color",
-   "no": 331
+   "no": 331,
+   "tier": "top"
   },
   {
    "name": "fx-glass-widgets",
@@ -10026,7 +10368,8 @@
     "look=simple"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"glass-widgets\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (велике число), name, handle, look=simple",
-   "no": 332
+   "no": 332,
+   "tier": "top"
   },
   {
    "name": "fx-red-collage",
@@ -10048,7 +10391,8 @@
     "tag"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"red-collage\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (слово), lines (через |), tag",
-   "no": 333
+   "no": 333,
+   "tier": "top"
   },
   {
    "name": "fx-split-headline",
@@ -10070,7 +10414,8 @@
     "pill"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"split-headline\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (рядки через |), hl (виділене слово), pill",
-   "no": 334
+   "no": 334,
+   "tier": "top"
   },
   {
    "name": "fx-pastel-word",
@@ -10092,7 +10437,8 @@
     "handle"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"pastel-word\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text, name, handle",
-   "no": 335
+   "no": 335,
+   "tier": "top"
   },
   {
    "name": "fx-check-pills",
@@ -10113,7 +10459,8 @@
     "images"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"check-pills\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (пігулки через |), images",
-   "no": 336
+   "no": 336,
+   "tier": "top"
   },
   {
    "name": "fx-timeline",
@@ -10135,7 +10482,8 @@
     "tc"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"timeline\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (назва), sub, tc",
-   "no": 337
+   "no": 337,
+   "tier": "top"
   },
   {
    "name": "fx-headline-box",
@@ -10156,7 +10504,8 @@
     "zoom"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"headline-box\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (рядки через |), zoom",
-   "no": 338
+   "no": 338,
+   "tier": "top"
   },
   {
    "name": "fx-profile-wall",
@@ -10178,7 +10527,8 @@
     "label"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"profile-wall\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: images, count, label",
-   "no": 339
+   "no": 339,
+   "tier": "top"
   },
   {
    "name": "fx-tier-list",
@@ -10200,7 +10550,8 @@
     "others"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"tier-list\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: title, item, others",
-   "no": 340
+   "no": 340,
+   "tier": "top"
   },
   {
    "name": "fx-broll-split",
@@ -10221,7 +10572,8 @@
     "text (цінник)"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"broll-split\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: images, text (цінник)",
-   "no": 341
+   "no": 341,
+   "tier": "top"
   },
   {
    "name": "fx-phone-fan",
@@ -10242,7 +10594,8 @@
     "text (рядки через |)"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"phone-fan\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: images, text (рядки через |)",
-   "no": 342
+   "no": 342,
+   "tier": "top"
   },
   {
    "name": "fx-dot-reveal",
@@ -10263,7 +10616,8 @@
     "cell"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"dot-reveal\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: color, cell",
-   "no": 343
+   "no": 343,
+   "tier": "top"
   },
   {
    "name": "fx-headline-wall",
@@ -10285,7 +10639,8 @@
     "label"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"headline-wall\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (заголовок::підпис|...), total, label",
-   "no": 344
+   "no": 344,
+   "tier": "top"
   },
   {
    "name": "fx-checklist",
@@ -10306,7 +10661,8 @@
     "title"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"checklist\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (крок::підпис|...), title",
-   "no": 345
+   "no": 345,
+   "tier": "top"
   },
   {
    "name": "fx-liquid-glass-graph",
@@ -10330,7 +10686,8 @@
     "color"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"liquid-glass-graph\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (підпис), from, to (напр. 197K, 59%), color",
-   "no": 346
+   "no": 346,
+   "tier": "top"
   },
   {
    "name": "fx-carousel-spin",
@@ -10351,7 +10708,8 @@
     "count"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"carousel-spin\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: images, count",
-   "no": 347
+   "no": 347,
+   "tier": "top"
   },
   {
    "name": "fx-match-cut",
@@ -10371,7 +10729,8 @@
     "text"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"match-cut\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text",
-   "no": 348
+   "no": 348,
+   "tier": "top"
   },
   {
    "name": "fx-apple-toggles",
@@ -10391,7 +10750,8 @@
     "text (рядки через |)"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"apple-toggles\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text (рядки через |)",
-   "no": 349
+   "no": 349,
+   "tier": "top"
   },
   {
    "name": "fx-led-sign",
@@ -10411,7 +10771,8 @@
     "text"
    ],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"led-sign\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: text",
-   "no": 350
+   "no": 350,
+   "tier": "top"
   },
   {
    "name": "fx-slow-push",
@@ -10429,7 +10790,8 @@
    "text": "fx",
    "text_vars": [],
    "note": "Ефект Vibha (@vibha.in.progress): картка {\"type\": \"fx\", \"fx\": \"slow-push\", \"start\", \"end\", \"text\"?, \"opt\"?}. Опції: —",
-   "no": 351
+   "no": 351,
+   "tier": "top"
   },
   {
    "name": "rf-stopwatch",
@@ -10463,7 +10825,8 @@
    "no": 352,
    "note": "Картка на весь рілс або великий шматок: {\"type\":\"motion\",\"name\":\"rf-stopwatch\",\"start\":0,\"end\":<кінець>}. Тривалість і кольори підставляє build_reel; vars.from = з якої секунди рахувати, vars.y = висота пігулки.",
    "caps_ok": true,
-   "on_top": true
+   "on_top": true,
+   "tier": "top"
   },
   {
    "name": "rf-step-tag",
@@ -10495,7 +10858,8 @@
    "group": "Свої (з рілс-референсу)",
    "no": 353,
    "note": "Тримай на весь крок (у спліті теж працює: став той самий start/end, що й спліт, і \"box\" не треба). vars.step = \"2\", vars.side = right|left. Місце бере з face.json.",
-   "caps_ok": true
+   "caps_ok": true,
+   "tier": "top"
   },
   {
    "name": "rf-emoji-caption",
@@ -10521,7 +10885,8 @@
    "group": "Свої (з рілс-референсу)",
    "no": 354,
    "note": "Стиль підписів: edit.json \"caption_style\": \"rf-emoji-caption\", \"caption_vars\": {\"emojis\": \"🎧🌸💗\", \"side\": \"right\"}. Ключові слова (accent) акцентним кольором.",
-   "caps_ok": true
+   "caps_ok": true,
+   "tier": "top"
   },
   {
    "name": "rf-file-upload",
@@ -10551,7 +10916,8 @@
    "quality": 4,
    "group": "Свої (з рілс-референсу)",
    "no": 355,
-   "note": "Для верхньої половини спліта, 3-5 с. vars.headline (перше слово темним, решта акцентом), title, file, label, done."
+   "note": "Для верхньої половини спліта, 3-5 с. vars.headline (перше слово темним, решта акцентом), title, file, label, done.",
+   "tier": "top"
   },
   {
    "name": "rf-pause-cut",
@@ -10579,7 +10945,8 @@
    "quality": 4,
    "group": "Свої (з рілс-референсу)",
    "no": 356,
-   "note": "Для верхньої половини спліта, 3-5 с. vars.headline, file, badge (напр. «−12 пауз»)."
+   "note": "Для верхньої половини спліта, 3-5 с. vars.headline, file, badge (напр. «−12 пауз»).",
+   "tier": "top"
   },
   {
    "name": "fx-gv-orbit",
@@ -10600,7 +10967,8 @@
     "images (папка обкладинок)"
    ],
    "no": 372,
-   "note": "Ефекти Гвоздарева: картка {\"type\": \"fx\", \"fx\": \"gv-orbit\", \"start\", \"end\", \"text\"?, \"opt\"?}. Свої рілси, портфоліо, «скільки я зробила», клієнти. Найкраще з обкладинками своїх рілсів у images. 0.7-1.6 с. Може лягати на тіло, обличчя вільне."
+   "note": "Ефекти Гвоздарева: картка {\"type\": \"fx\", \"fx\": \"gv-orbit\", \"start\", \"end\", \"text\"?, \"opt\"?}. Свої рілси, портфоліо, «скільки я зробила», клієнти. Найкраще з обкладинками своїх рілсів у images. 0.7-1.6 с. Може лягати на тіло, обличчя вільне.",
+   "tier": "top"
   },
   {
    "name": "fx-gv-vertigo",
@@ -10621,7 +10989,8 @@
     "amount"
    ],
    "no": 373,
-   "note": "Ефекти Гвоздарева: картка {\"type\": \"fx\", \"fx\": \"gv-vertigo\", \"start\", \"end\", \"text\"?, \"opt\"?}. «І тут я зрозуміла», шок, усвідомлення. 0.7-1.5 с. Може лягати на тіло, обличчя вільне."
+   "note": "Ефекти Гвоздарева: картка {\"type\": \"fx\", \"fx\": \"gv-vertigo\", \"start\", \"end\", \"text\"?, \"opt\"?}. «І тут я зрозуміла», шок, усвідомлення. 0.7-1.5 с. Може лягати на тіло, обличчя вільне.",
+   "tier": "top"
   },
   {
    "name": "fx-gv-camzoom",
@@ -10642,7 +11011,8 @@
     "ui_y"
    ],
    "no": 374,
-   "note": "Ефекти Гвоздарева: картка {\"type\": \"fx\", \"fx\": \"gv-camzoom\", \"start\", \"end\", \"text\"?, \"opt\"?}. «Дивись уважно», «запам'ятай», розбір. ui_y вище субтитрів. 0.9-1.5 с. Може лягати на тіло, обличчя вільне."
+   "note": "Ефекти Гвоздарева: картка {\"type\": \"fx\", \"fx\": \"gv-camzoom\", \"start\", \"end\", \"text\"?, \"opt\"?}. «Дивись уважно», «запам'ятай», розбір. ui_y вище субтитрів. 0.9-1.5 с. Може лягати на тіло, обличчя вільне.",
+   "tier": "top"
   },
   {
    "name": "fx-gv-doodle",
@@ -10660,7 +11030,8 @@
    "text": "fx",
    "text_vars": [],
    "no": 375,
-   "note": "Ефекти Гвоздарева: картка {\"type\": \"fx\", \"fx\": \"gv-doodle\", \"start\", \"end\", \"text\"?, \"opt\"?}. Тільки на самоіронію / жарт, де контур щось означає (не прикраса). 1.0-1.6 с. Може лягати на тіло, обличчя вільне."
+   "note": "Ефекти Гвоздарева: картка {\"type\": \"fx\", \"fx\": \"gv-doodle\", \"start\", \"end\", \"text\"?, \"opt\"?}. Тільки на самоіронію / жарт, де контур щось означає (не прикраса). 1.0-1.6 с. Може лягати на тіло, обличчя вільне.",
+   "tier": "top"
   },
   {
    "name": "fx-gv-framebreak",
@@ -10682,7 +11053,8 @@
     "button"
    ],
    "no": 376,
-   "note": "Ефекти Гвоздарева: картка {\"type\": \"fx\", \"fx\": \"gv-framebreak\", \"start\", \"end\", \"text\"?, \"opt\"?}. «Вийти за рамки», шаблони, алгоритми стрічки. Нік береться з brand.json, кнопка «Стежити». 1.1-1.5 с. Може лягати на тіло, обличчя вільне."
+   "note": "Ефекти Гвоздарева: картка {\"type\": \"fx\", \"fx\": \"gv-framebreak\", \"start\", \"end\", \"text\"?, \"opt\"?}. «Вийти за рамки», шаблони, алгоритми стрічки. Нік береться з brand.json, кнопка «Стежити». 1.1-1.5 с. Може лягати на тіло, обличчя вільне.",
+   "tier": "top"
   },
   {
    "name": "fx-gv-ransom",
@@ -10704,7 +11076,8 @@
     "ys"
    ],
    "no": 377,
-   "note": "Ефекти Гвоздарева: картка {\"type\": \"fx\", \"fx\": \"gv-ransom\", \"start\", \"end\", \"text\"?, \"opt\"?}. Гучна теза, анти-правило: 1-2 коротких слова до 8-9 букв. 1.0-1.6 с. Може лягати на тіло, обличчя вільне."
+   "note": "Ефекти Гвоздарева: картка {\"type\": \"fx\", \"fx\": \"gv-ransom\", \"start\", \"end\", \"text\"?, \"opt\"?}. Гучна теза, анти-правило: 1-2 коротких слова до 8-9 букв. 1.0-1.6 с. Може лягати на тіло, обличчя вільне.",
+   "tier": "top"
   },
   {
    "name": "fx-gv-lens",
@@ -10727,7 +11100,8 @@
     "mag"
    ],
    "no": 378,
-   "note": "Ефекти Гвоздарева: картка {\"type\": \"fx\", \"fx\": \"gv-lens\", \"start\", \"end\", \"text\"?, \"opt\"?}. «Подивись ближче», деталь, інтерфейс. Лінза не на обличчі. 0.9-1.4 с. Може лягати на тіло, обличчя вільне."
+   "note": "Ефекти Гвоздарева: картка {\"type\": \"fx\", \"fx\": \"gv-lens\", \"start\", \"end\", \"text\"?, \"opt\"?}. «Подивись ближче», деталь, інтерфейс. Лінза не на обличчі. 0.9-1.4 с. Може лягати на тіло, обличчя вільне.",
+   "tier": "top"
   },
   {
    "name": "fx-gv-zoomblur",
@@ -10748,7 +11122,8 @@
     "blur"
    ],
    "no": 379,
-   "note": "Ефекти Гвоздарева: картка {\"type\": \"fx\", \"fx\": \"gv-zoomblur\", \"start\", \"end\", \"text\"?, \"opt\"?}. Панчлайн, «і ось головне». 0.8-1.5 с. Може лягати на тіло, обличчя вільне."
+   "note": "Ефекти Гвоздарева: картка {\"type\": \"fx\", \"fx\": \"gv-zoomblur\", \"start\", \"end\", \"text\"?, \"opt\"?}. Панчлайн, «і ось головне». 0.8-1.5 с. Може лягати на тіло, обличчя вільне.",
+   "tier": "top"
   },
   {
    "name": "fx-gv-figma",
@@ -10771,7 +11146,8 @@
     "grow_at"
    ],
    "no": 380,
-   "note": "Ефекти Гвоздарева: картка {\"type\": \"fx\", \"fx\": \"gv-figma\", \"start\", \"end\", \"text\"?, \"opt\"?}. Дизайн, «виділити», ключове слово. Синій фігмівський лишається. 1.4-2.0 с. Може лягати на тіло, обличчя вільне."
+   "note": "Ефекти Гвоздарева: картка {\"type\": \"fx\", \"fx\": \"gv-figma\", \"start\", \"end\", \"text\"?, \"opt\"?}. Дизайн, «виділити», ключове слово. Синій фігмівський лишається. 1.4-2.0 с. Може лягати на тіло, обличчя вільне.",
+   "tier": "top"
   },
   {
    "name": "fx-gv-bignum",
@@ -10793,7 +11169,8 @@
     "style"
    ],
    "no": 381,
-   "note": "Ефекти Гвоздарева: картка {\"type\": \"fx\", \"fx\": \"gv-bignum\", \"start\", \"end\", \"text\"?, \"opt\"?}. Перелік («по-перше»), топ-N, цифра. Кілька карток підряд з різними text. 1-5 с. Може лягати на тіло, обличчя вільне."
+   "note": "Ефекти Гвоздарева: картка {\"type\": \"fx\", \"fx\": \"gv-bignum\", \"start\", \"end\", \"text\"?, \"opt\"?}. Перелік («по-перше»), топ-N, цифра. Кілька карток підряд з різними text. 1-5 с. Може лягати на тіло, обличчя вільне.",
+   "tier": "top"
   },
   {
    "name": "fx-gv-meme",
@@ -10814,7 +11191,8 @@
     "to"
    ],
    "no": 382,
-   "note": "Ефекти Гвоздарева: картка {\"type\": \"fx\", \"fx\": \"gv-meme\", \"start\", \"end\", \"text\"?, \"opt\"?}. Емоція, іронія. Один на рілс, тільки картинка, яку дала людина. 1-2.5 с. Може лягати на тіло, обличчя вільне."
+   "note": "Ефекти Гвоздарева: картка {\"type\": \"fx\", \"fx\": \"gv-meme\", \"start\", \"end\", \"text\"?, \"opt\"?}. Емоція, іронія. Один на рілс, тільки картинка, яку дала людина. 1-2.5 с. Може лягати на тіло, обличчя вільне.",
+   "tier": "top"
   },
   {
    "name": "fx-gv-spring",
@@ -10836,7 +11214,8 @@
     "text (3 рядки через |)"
    ],
    "no": 383,
-   "note": "Ефекти Гвоздарева: картка {\"type\": \"fx\", \"fx\": \"gv-spring\", \"start\", \"end\", \"text\"?, \"opt\"?}. Налаштування, «вмикаємо / вимикаємо», список з 3 пунктів. 1.4-2.0 с. Може лягати на тіло, обличчя вільне."
+   "note": "Ефекти Гвоздарева: картка {\"type\": \"fx\", \"fx\": \"gv-spring\", \"start\", \"end\", \"text\"?, \"opt\"?}. Налаштування, «вмикаємо / вимикаємо», список з 3 пунктів. 1.4-2.0 с. Може лягати на тіло, обличчя вільне.",
+   "tier": "top"
   },
   {
    "name": "fx-e9-dust",
@@ -10857,7 +11236,8 @@
     "color"
    ],
    "no": 384,
-   "note": "9 ефектів (частина 2): картка {\"type\": \"fx\", \"fx\": \"e9-dust\", \"start\", \"end\", \"text\"?, \"opt\"?}. «Зникло», «видалила», «без сліду». Потрібен штатив. 1.2-2.0 с. Може лягати на тіло, обличчя вільне."
+   "note": "9 ефектів (частина 2): картка {\"type\": \"fx\", \"fx\": \"e9-dust\", \"start\", \"end\", \"text\"?, \"opt\"?}. «Зникло», «видалила», «без сліду». Потрібен штатив. 1.2-2.0 с. Може лягати на тіло, обличчя вільне.",
+   "tier": "reserve"
   },
   {
    "name": "fx-e9-lidar",
@@ -10877,7 +11257,8 @@
     "angle"
    ],
    "no": 385,
-   "note": "9 ефектів (частина 2): картка {\"type\": \"fx\", \"fx\": \"e9-lidar\", \"start\", \"end\", \"text\"?, \"opt\"?}. «Нейромережа бачить», «розібрала», технології. 1.2-2.0 с. Може лягати на тіло, обличчя вільне."
+   "note": "9 ефектів (частина 2): картка {\"type\": \"fx\", \"fx\": \"e9-lidar\", \"start\", \"end\", \"text\"?, \"opt\"?}. «Нейромережа бачить», «розібрала», технології. 1.2-2.0 с. Може лягати на тіло, обличчя вільне.",
+   "tier": "reserve"
   },
   {
    "name": "fx-e9-clones",
@@ -10896,7 +11277,8 @@
    "text": "fx",
    "text_vars": [],
    "no": 386,
-   "note": "9 ефектів (частина 2): картка {\"type\": \"fx\", \"fx\": \"e9-clones\", \"start\", \"end\", \"text\"?, \"opt\"?}. «Одна за п'ятьох», команда, масштаб. 1.2-2.0 с. Може лягати на тіло, обличчя вільне."
+   "note": "9 ефектів (частина 2): картка {\"type\": \"fx\", \"fx\": \"e9-clones\", \"start\", \"end\", \"text\"?, \"opt\"?}. «Одна за п'ятьох», команда, масштаб. 1.2-2.0 с. Може лягати на тіло, обличчя вільне.",
+   "tier": "top"
   },
   {
    "name": "fx-e9-droste",
@@ -10918,7 +11300,8 @@
     "scale"
    ],
    "no": 387,
-   "note": "9 ефектів (частина 2): картка {\"type\": \"fx\", \"fx\": \"e9-droste\", \"start\", \"end\", \"text\"?, \"opt\"?}. «По колу», «щодня одне й те саме». Рамки не на обличчі (to). 1.1-2.0 с. Може лягати на тіло, обличчя вільне."
+   "note": "9 ефектів (частина 2): картка {\"type\": \"fx\", \"fx\": \"e9-droste\", \"start\", \"end\", \"text\"?, \"opt\"?}. «По колу», «щодня одне й те саме». Рамки не на обличчі (to). 1.1-2.0 с. Може лягати на тіло, обличчя вільне.",
+   "tier": "top"
   },
   {
    "name": "fx-e9-blueprint",
@@ -10940,7 +11323,8 @@
     "stamp"
    ],
    "no": 388,
-   "note": "9 ефектів (частина 2): картка {\"type\": \"fx\", \"fx\": \"e9-blueprint\", \"start\", \"end\", \"text\"?, \"opt\"?}. «Як влаштовано», схема, «розберемо». Штамп «АРКУШ 01». 1.0-1.8 с. Може лягати на тіло, обличчя вільне."
+   "note": "9 ефектів (частина 2): картка {\"type\": \"fx\", \"fx\": \"e9-blueprint\", \"start\", \"end\", \"text\"?, \"opt\"?}. «Як влаштовано», схема, «розберемо». Штамп «АРКУШ 01». 1.0-1.8 с. Може лягати на тіло, обличчя вільне.",
+   "tier": "top"
   },
   {
    "name": "fx-e9-freeze",
@@ -10958,7 +11342,8 @@
    "text": "fx",
    "text_vars": [],
    "no": 389,
-   "note": "9 ефектів (частина 2): картка {\"type\": \"fx\", \"fx\": \"e9-freeze\", \"start\", \"end\", \"text\"?, \"opt\"?}. «Стоп», «запам'ятай цей момент». Потрібен штатив. 1.2-2.5 с. Може лягати на тіло, обличчя вільне."
+   "note": "9 ефектів (частина 2): картка {\"type\": \"fx\", \"fx\": \"e9-freeze\", \"start\", \"end\", \"text\"?, \"opt\"?}. «Стоп», «запам'ятай цей момент». Потрібен штатив. 1.2-2.5 с. Може лягати на тіло, обличчя вільне.",
+   "tier": "top"
   },
   {
    "name": "fx-e9-circle",
@@ -10980,7 +11365,8 @@
     "bg"
    ],
    "no": 390,
-   "note": "9 ефектів (частина 2): картка {\"type\": \"fx\", \"fx\": \"e9-circle\", \"start\", \"end\", \"text\"?, \"opt\"?}. Акцент, зміна теми, «головне». 1.0-1.6 с. Може лягати на тіло, обличчя вільне."
+   "note": "9 ефектів (частина 2): картка {\"type\": \"fx\", \"fx\": \"e9-circle\", \"start\", \"end\", \"text\"?, \"opt\"?}. Акцент, зміна теми, «головне». 1.0-1.6 с. Може лягати на тіло, обличчя вільне.",
+   "tier": "reserve"
   },
   {
    "name": "fx-e9-slice",
@@ -11001,7 +11387,8 @@
     "bg"
    ],
    "no": 391,
-   "note": "9 ефектів (частина 2): картка {\"type\": \"fx\", \"fx\": \"e9-slice\", \"start\", \"end\", \"text\"?, \"opt\"?}. «Розкласти по поличках», структура, пункти. 1.0-1.8 с. Може лягати на тіло, обличчя вільне."
+   "note": "9 ефектів (частина 2): картка {\"type\": \"fx\", \"fx\": \"e9-slice\", \"start\", \"end\", \"text\"?, \"opt\"?}. «Розкласти по поличках», структура, пункти. 1.0-1.8 с. Може лягати на тіло, обличчя вільне.",
+   "tier": "reserve"
   },
   {
    "name": "fx-e9-wave",
@@ -11021,7 +11408,8 @@
     "amp"
    ],
    "no": 392,
-   "note": "9 ефектів (частина 2): картка {\"type\": \"fx\", \"fx\": \"e9-wave\", \"start\", \"end\", \"text\"?, \"opt\"?}. Панчлайн, «бах». 0.9-1.3 с. Може лягати на тіло, обличчя вільне."
+   "note": "9 ефектів (частина 2): картка {\"type\": \"fx\", \"fx\": \"e9-wave\", \"start\", \"end\", \"text\"?, \"opt\"?}. Панчлайн, «бах». 0.9-1.3 с. Може лягати на тіло, обличчя вільне.",
+   "tier": "reserve"
   },
   {
    "name": "rf-paper-cutout",
@@ -11054,7 +11442,8 @@
    "quality": 4,
    "group": "Свої: паперовий колаж (Vox)",
    "note": "vars.text = 2-6 слів, / новий рядок, *слово* = ключове на кольоровому папері. vars.entrance = auto|fly|slap|drop|pop. Ставить над головою (або під підборіддям); vars.y щоб задати верх блоку. 2.5-4 с.",
-   "no": 393
+   "no": 393,
+   "tier": "top"
   },
   {
    "name": "rf-starburst",
@@ -11088,7 +11477,8 @@
    "quality": 4,
    "group": "Свої: паперовий колаж (Vox)",
    "note": "Одна сильна цифра на рілс. vars.text = \"-50$\", vars.sub = підпис (можна порожньо), vars.side = auto|right|left. 2-3.5 с.",
-   "no": 394
+   "no": 394,
+   "tier": "top"
   },
   {
    "name": "rf-paper-caption",
@@ -11114,7 +11504,8 @@
     "paper",
     "tilt"
    ],
-   "caps_ok": true
+   "caps_ok": true,
+   "tier": "top"
   },
   {
    "name": "rf-scrapbook",
@@ -11146,7 +11537,8 @@
    "quality": 4,
    "group": "Свої: паперовий колаж (Vox)",
    "note": "На весь кадр 3.5-6 с: {\"type\":\"motion\",\"name\":\"rf-scrapbook\",\"layout\":\"full\",\"images\":[2-6 їхніх фото/скрінів],\"vars\":{\"text\":\"ОСЬ ЩО / ВИЙШЛО\"}}. Тільки їхні картинки, без них не ставити. Добре як фінальна картка перед CTA.",
-   "no": 396
+   "no": 396,
+   "tier": "top"
   },
   {
    "name": "rf-globe-arcs",
@@ -11182,7 +11574,8 @@
    "quality": 4,
    "group": "Свої: 30 моушн-ефектів",
    "note": "Охоплення: «звідки → скільки». lead = рядок над числом, total = фінальне число, unit = що рахуємо, origin = [місто, довгота, широта], cities = 5 підписаних міст з координатами (бажано в межах ~70° від старту). Картка 2–3 с.",
-   "no": 397
+   "no": 397,
+   "tier": "top"
   },
   {
    "name": "rf-neon-silhouette",
@@ -11217,7 +11610,8 @@
    "quality": 4,
    "group": "Свої: 30 моушн-ефектів",
    "note": "label = підпис під годинником (коротко), time_start/time_mid/time_end у форматі ГГ:ХХ. Картка 2–3 с.",
-   "no": 398
+   "no": 398,
+   "tier": "top"
   },
   {
    "name": "rf-laptop-reveal",
@@ -11253,7 +11647,8 @@
    "quality": 4,
    "group": "Свої: 30 моушн-ефектів",
    "note": "brand = вордмарк, word1+word2 = заголовок у 2 рядки (по 1–2 слова), button = дія, caption = підпис. accent і page_bg перефарбовують сторінку. Картка 2–3 с.",
-   "no": 399
+   "no": 399,
+   "tier": "top"
   },
   {
    "name": "rf-iso-flow",
@@ -11288,7 +11683,8 @@
    "quality": 4,
    "group": "Свої: 30 моушн-ефектів",
    "note": "Шлях у 3 кроки. heading = заголовок, step1..3 = короткі підписи пінів (до ~20 знаків). Картка 2–3 с.",
-   "no": 400
+   "no": 400,
+   "tier": "top"
   },
   {
    "name": "rf-money-stack",
@@ -11325,7 +11721,8 @@
    "quality": 4,
    "group": "Свої: 30 моушн-ефектів",
    "note": "headline = заголовок, total = число, prefix/suffix = валюта («$» або suffix « грн»), sep = роздільник тисяч (« » для UA), caption = підпис. Тільки реальні цифри. Картка 2–3 с.",
-   "no": 401
+   "no": 401,
+   "tier": "top"
   },
   {
    "name": "rf-receipt",
@@ -11370,7 +11767,8 @@
    "quality": 4,
    "group": "Свої: 30 моушн-ефектів",
    "note": "Чек друкується по рядку, відривається й підлітає до камери з сумою. Заповни store, title, 3 позиції з цінами, free_item (позиція за 0) і total_label. Сума рахується сама, або вкажи total. Для гривні: currency порожньо, currency_after «грн». Картка 2,5–4 с.",
-   "no": 402
+   "no": 402,
+   "tier": "top"
   },
   {
    "name": "rf-iceberg",
@@ -11405,7 +11803,8 @@
    "quality": 4,
    "group": "Свої: 30 моушн-ефектів",
    "note": "Маленька верхівка (tip), потім камера йде під воду до величезної брили з трьома шарами layer1–3. Підписи короткі, до 4 слів. seed змінює форму брили. Картка 3–4 с.",
-   "no": 403
+   "no": 403,
+   "tier": "top"
   },
   {
    "name": "rf-headline",
@@ -11441,7 +11840,8 @@
    "quality": 4,
    "group": "Свої: 30 моушн-ефектів",
    "note": "Газетна сторінка сама верстає себе: назва, заголовок, 2 речення в колонках і речення під маркером. headline: до 10 слів, body: 2 короткі речення, pull: висновок. Картка 3–4 с.",
-   "no": 404
+   "no": 404,
+   "tier": "reserve"
   },
   {
    "name": "rf-swiss-grid",
@@ -11475,7 +11875,8 @@
    "quality": 4,
    "group": "Свої: 30 моушн-ефектів",
    "note": "Три великі слова стрибають по сітці між червоними блоками й складаються в стовпчик. По одному короткому слову в word1–3. Довгі слова зменшуються всі разом. Картка 2–3 с.",
-   "no": 405
+   "no": 405,
+   "tier": "top"
   },
   {
    "name": "rf-blueprint-draw",
@@ -11511,7 +11912,8 @@
    "quality": 4,
    "group": "Свої: 30 моушн-ефектів",
    "note": "Будинок малюється однією лінією, вікна загоряються, з'являються розміри й штамп. title і note у штампі; width_label, height_label, pitch_label: короткі підписи розмірів (3–8 символів). Картка 2,5–4 с.",
-   "no": 406
+   "no": 406,
+   "tier": "top"
   },
   {
    "name": "rf-paper-desk",
@@ -11552,7 +11954,8 @@
    "quality": 4,
    "group": "Свої: 30 моушн-ефектів",
    "note": "slip_text: короткий заголовок до 14 символів. title: про що графік. drop_label: момент падіння. advice: один рядок. marker_words: 2–4 слова. Порожній source_tag ховає табличку. Картка 2–3 с.",
-   "no": 407
+   "no": 407,
+   "tier": "top"
   },
   {
    "name": "rf-ink-wash",
@@ -11584,7 +11987,8 @@
    "quality": 4,
    "group": "Свої: 30 моушн-ефектів",
    "note": "title: коротка фраза до 5 слів, вертикально праворуч (довга переноситься в другу колонку). Картка 2–3 с.",
-   "no": 408
+   "no": 408,
+   "tier": "reserve"
   },
   {
    "name": "rf-stat-chart",
@@ -11622,7 +12026,8 @@
    "quality": 4,
    "group": "Свої: 30 моушн-ефектів",
    "note": "start_value і end_value: текст зі знаком, напр. «₴12 400» → «₴1 284 900». event: що сталося в точці злету. label: назва метрики. Цифри тільки справжні. Картка 3 с.",
-   "no": 409
+   "no": 409,
+   "tier": "top"
   },
   {
    "name": "rf-agent-swarm",
@@ -11660,7 +12065,8 @@
    "quality": 4,
    "group": "Свої: 30 моушн-ефектів",
    "note": "role1–role4: 4 ролі по 1–2 слова. page_title: що вийшло (до 2 рядків). caption: підпис. Картка 2–3 с.",
-   "no": 410
+   "no": 410,
+   "tier": "reserve"
   },
   {
    "name": "rf-day-counter",
@@ -11696,7 +12102,8 @@
    "quality": 4,
    "group": "Свої: 30 моушн-ефектів",
    "note": "Червоні галочки на календарі, лічильник «DAY N» прокручується до фінального дня, штамп ставить останній. label: рядок над лічильником; word: слово (ДЕНЬ); days: 3–35; caption: підпис під календарем. Картка 2.5–3 с.",
-   "no": 411
+   "no": 411,
+   "tier": "top"
   },
   {
    "name": "rf-split-flap",
@@ -11731,7 +12138,8 @@
    "quality": 4,
    "group": "Свої: 30 моушн-ефектів",
    "note": "Табло перебирає літери у фразу, останній рядок стає зеленим і вмикається лампа. lines: рядки через «/», до 13 знаків (довші переносяться, макс. 6); last: фінальний рядок до 12 знаків; plate: табличка; align: left/center. Картка 3–4 с.",
-   "no": 412
+   "no": 412,
+   "tier": "top"
   },
   {
    "name": "rf-type-slam",
@@ -11766,7 +12174,8 @@
    "quality": 4,
    "group": "Свої: 30 моушн-ефектів",
    "note": "Два короткі слова б'ють у кадр зі спалахом-негативом і трясінням, третє розтягується на весь кадр і заливається кольором акценту. word1, word2: по 1 короткому слову; word3: головне, 1–2 короткі слова. Картка 2.5–3 с.",
-   "no": 413
+   "no": 413,
+   "tier": "top"
   },
   {
    "name": "rf-terminal-bloom",
@@ -11808,7 +12217,8 @@
    "quality": 4,
    "group": "Свої: 30 моушн-ефектів",
    "note": "Набрана команда розлітається літерами й збирається в лендинг. command: команда; product: логотип; headline: заголовок (до 2 рядків); subline; button1/button2; card1–3; disclaimer: дрібний напис. Картка 2.5–3 с.",
-   "no": 414
+   "no": 414,
+   "tier": "top"
   },
   {
    "name": "rf-deep-time",
@@ -11842,7 +12252,8 @@
    "quality": 4,
    "group": "Свої: 30 моушн-ефектів",
    "note": "3D-шейдер (three.js). end_number = число, до якого докручується одометр, unit = підпис під ним. Картка 2–3 с.",
-   "no": 415
+   "no": 415,
+   "tier": "top"
   },
   {
    "name": "rf-ink-doodle",
@@ -11877,7 +12288,8 @@
    "quality": 4,
    "group": "Свої: 30 моушн-ефектів",
    "note": "Фігурка за машинкою, табличка з двох рядків (sign_line1, sign_line2, коротко), у камеру влітає аркуш зі словом typo, яке перекреслює червона ручка. Картка 2–3 с.",
-   "no": 416
+   "no": 416,
+   "tier": "top"
   },
   {
    "name": "rf-creator-life",
@@ -11911,7 +12323,8 @@
    "quality": 4,
    "group": "Свої: 30 моушн-ефектів",
    "note": "Рукописний заголовок title, days = 7 підписів календарних аркушів (напр. [\"ПН\",…,\"НД\"]). Вежі з аркушів і кави ростуть і обвалюються. Картка 2–3 с.",
-   "no": 417
+   "no": 417,
+   "tier": "top"
   },
   {
    "name": "rf-map-route",
@@ -11947,7 +12360,8 @@
    "use": "overlay",
    "quality": 4,
    "group": "Свої: 30 моушн-ефектів",
-   "no": 418
+   "no": 418,
+   "tier": "reserve"
   },
   {
    "name": "rf-git-city",
@@ -11981,7 +12395,8 @@
    "use": "overlay",
    "quality": 4,
    "group": "Свої: 30 моушн-ефектів",
-   "no": 419
+   "no": 419,
+   "tier": "reserve"
   },
   {
    "name": "rf-contour-map",
@@ -12016,7 +12431,8 @@
    "use": "overlay",
    "quality": 4,
    "group": "Свої: 30 моушн-ефектів",
-   "no": 420
+   "no": 420,
+   "tier": "reserve"
   },
   {
    "name": "rf-teardown",
@@ -12052,7 +12468,8 @@
    "use": "overlay",
    "quality": 4,
    "group": "Свої: 30 моушн-ефектів",
-   "no": 421
+   "no": 421,
+   "tier": "reserve"
   },
   {
    "name": "rf-hologram",
@@ -12086,7 +12503,8 @@
    "use": "overlay",
    "quality": 4,
    "group": "Свої: 30 моушн-ефектів",
-   "no": 422
+   "no": 422,
+   "tier": "reserve"
   },
   {
    "name": "rf-turntable",
@@ -12123,7 +12541,8 @@
    "use": "overlay",
    "quality": 4,
    "group": "Свої: 30 моушн-ефектів",
-   "no": 423
+   "no": 423,
+   "tier": "reserve"
   },
   {
    "name": "fx-rf-neon-trace",
@@ -12146,7 +12565,8 @@
     "tilt"
    ],
    "no": 424,
-   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-neon-trace\", \"start\", \"end\", \"text\"?, \"opt\"?}. Декор: субтитри лишаються. Картка 1-1.5 с, на початку думки. Колір за замовч. лайм бренду."
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-neon-trace\", \"start\", \"end\", \"text\"?, \"opt\"?}. Декор: субтитри лишаються. Картка 1-1.5 с, на початку думки. Колір за замовч. лайм бренду.",
+   "tier": "top"
   },
   {
    "name": "fx-rf-outline",
@@ -12167,7 +12587,8 @@
     "speed"
    ],
    "no": 425,
-   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-outline\", \"start\", \"end\", \"text\"?, \"opt\"?}. Декор: субтитри лишаються. 1-2 с на ключовій фразі."
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-outline\", \"start\", \"end\", \"text\"?, \"opt\"?}. Декор: субтитри лишаються. 1-2 с на ключовій фразі.",
+   "tier": "top"
   },
   {
    "name": "fx-rf-glow",
@@ -12189,7 +12610,8 @@
     "fade (с, 0.55)"
    ],
    "no": 426,
-   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-glow\", \"start\", \"end\", \"text\"?, \"opt\"?}. Декор: субтитри лишаються. Акцент на одному слові: картка 0.6-0.8 с, start = початок слова."
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-glow\", \"start\", \"end\", \"text\"?, \"opt\"?}. Декор: субтитри лишаються. Акцент на одному слові: картка 0.6-0.8 с, start = початок слова.",
+   "tier": "top"
   },
   {
    "name": "fx-rf-track-dots",
@@ -12209,7 +12631,8 @@
     "color"
    ],
    "no": 427,
-   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-track-dots\", \"start\", \"end\", \"text\"?, \"opt\"?}. Декор: субтитри лишаються. Коли мова про ШІ, аналітику, трекінг; 2-4 с, часто разом з rf-outline."
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-track-dots\", \"start\", \"end\", \"text\"?, \"opt\"?}. Декор: субтитри лишаються. Коли мова про ШІ, аналітику, трекінг; 2-4 с, часто разом з rf-outline.",
+   "tier": "top"
   },
   {
    "name": "fx-rf-tilt-pills",
@@ -12232,7 +12655,8 @@
     "color"
    ],
    "no": 428,
-   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-tilt-pills\", \"start\", \"end\", \"text\"?, \"opt\"?}. text = \"новий|драйвер\" (твої слова), mid необов'язково. 2-4 с."
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-tilt-pills\", \"start\", \"end\", \"text\"?, \"opt\"?}. text = \"новий|драйвер\" (твої слова), mid необов'язково. 2-4 с.",
+   "tier": "top"
   },
   {
    "name": "fx-rf-glass-flash",
@@ -12254,7 +12678,8 @@
     "hold"
    ],
    "no": 429,
-   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-glass-flash\", \"start\", \"end\", \"text\"?, \"opt\"?}. text = одне слово, яке вона наголошує. 1-1.5 с."
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-glass-flash\", \"start\", \"end\", \"text\"?, \"opt\"?}. text = одне слово, яке вона наголошує. 1-1.5 с.",
+   "tier": "reserve"
   },
   {
    "name": "fx-rf-anchor-word",
@@ -12276,7 +12701,8 @@
     "tags (через |)"
    ],
    "no": 430,
-   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-anchor-word\", \"start\", \"end\", \"text\"?, \"opt\"?}. text = головне слово, tags = 3-4 твої слова з фрази (без tags беруться сказані слова). 2-4 с."
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-anchor-word\", \"start\", \"end\", \"text\"?, \"opt\"?}. text = головне слово, tags = 3-4 твої слова з фрази (без tags беруться сказані слова). 2-4 с.",
+   "tier": "top"
   },
   {
    "name": "fx-rf-side-note",
@@ -12298,7 +12724,8 @@
     "side (left/right)"
    ],
    "no": 431,
-   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-side-note\", \"start\", \"end\", \"text\"?, \"opt\"?}. Рядки = твої слова, 2-3 слова в рядку. 2-4 с."
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-side-note\", \"start\", \"end\", \"text\"?, \"opt\"?}. Рядки = твої слова, 2-3 слова в рядку. 2-4 с.",
+   "tier": "top"
   },
   {
    "name": "fx-rf-quote-title",
@@ -12319,7 +12746,8 @@
     "text (рядки через |, рядок у «» = дрібний)"
    ],
    "no": 432,
-   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-quote-title\", \"start\", \"end\", \"text\"?, \"opt\"?}. Для CTA: \"пиши в коментар|«промт»|і я надішлю\". 2-4 с."
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-quote-title\", \"start\", \"end\", \"text\"?, \"opt\"?}. Для CTA: \"пиши в коментар|«промт»|і я надішлю\". 2-4 с.",
+   "tier": "top"
   },
   {
    "name": "fx-rf-letter-drop",
@@ -12341,7 +12769,8 @@
     "color"
    ],
    "no": 433,
-   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-letter-drop\", \"start\", \"end\", \"text\"?, \"opt\"?}. text = одне коротке слово (до 8 літер). 1.5-3 с."
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-letter-drop\", \"start\", \"end\", \"text\"?, \"opt\"?}. text = одне коротке слово (до 8 літер). 1.5-3 с.",
+   "tier": "top"
   },
   {
    "name": "fx-rf-word-cloud",
@@ -12364,7 +12793,8 @@
     "life"
    ],
    "no": 434,
-   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-word-cloud\", \"start\", \"end\", \"text\"?, \"opt\"?}. Без text бере сказані слова з розшифровки, кожне у свою мить: замінює субтитри на 2-4 с."
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-word-cloud\", \"start\", \"end\", \"text\"?, \"opt\"?}. Без text бере сказані слова з розшифровки, кожне у свою мить: замінює субтитри на 2-4 с.",
+   "tier": "top"
   },
   {
    "name": "fx-rf-spread-words",
@@ -12385,7 +12815,8 @@
     "y"
    ],
    "no": 435,
-   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-spread-words\", \"start\", \"end\", \"text\"?, \"opt\"?}. Без text бере сказані слова (до 4) у свою мить. 1.5-3 с."
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-spread-words\", \"start\", \"end\", \"text\"?, \"opt\"?}. Без text бере сказані слова (до 4) у свою мить. 1.5-3 с.",
+   "tier": "top"
   },
   {
    "name": "fx-rf-vertical-word",
@@ -12407,7 +12838,8 @@
     "color"
    ],
    "no": 436,
-   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-vertical-word\", \"start\", \"end\", \"text\"?, \"opt\"?}. text = одне слово. 1.5-3 с."
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-vertical-word\", \"start\", \"end\", \"text\"?, \"opt\"?}. text = одне слово. 1.5-3 с.",
+   "tier": "top"
   },
   {
    "name": "fx-rf-texture-title",
@@ -12431,7 +12863,8 @@
     "color2"
    ],
    "no": 437,
-   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-texture-title\", \"start\", \"end\", \"text\"?, \"opt\"?}. text = 1 слово до 9 літер. 2-4 с, для теми рілса."
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-texture-title\", \"start\", \"end\", \"text\"?, \"opt\"?}. text = 1 слово до 9 літер. 2-4 с, для теми рілса.",
+   "tier": "top"
   },
   {
    "name": "fx-rf-color-wash",
@@ -12453,7 +12886,8 @@
     "hold"
    ],
    "no": 438,
-   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-color-wash\", \"start\", \"end\", \"text\"?, \"opt\"?}. Декор: субтитри лишаються. Картка 0.6-0.9 с між двома думками."
+   "note": "Свій ефект (з рілс-референсу 2026-11-06): картка {\"type\": \"fx\", \"fx\": \"rf-color-wash\", \"start\", \"end\", \"text\"?, \"opt\"?}. Декор: субтитри лишаються. Картка 0.6-0.9 с між двома думками.",
+   "tier": "top"
   },
   {
    "name": "fx-ay-head-stack",
@@ -12477,7 +12911,8 @@
     "every",
     "colors"
    ],
-   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-head-stack\", \"start\", \"end\", \"text\"?, \"opt\"?}. Все, що на ній: обовʼязки, задачі, ролі. 1.6-2.6 с, до 7 бірок. Обличчя вільне."
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-head-stack\", \"start\", \"end\", \"text\"?, \"opt\"?}. Все, що на ній: обовʼязки, задачі, ролі. 1.6-2.6 с, до 7 бірок. Обличчя вільне.",
+   "tier": "top"
   },
   {
    "name": "fx-ay-day-dial",
@@ -12504,7 +12939,8 @@
     "every",
     "word_at"
    ],
-   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-day-dial\", \"start\", \"end\", \"text\"?, \"opt\"?}. Регулярність, щоденна звичка, «кожен день». 1.5-2.5 с. Вона попереду."
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-day-dial\", \"start\", \"end\", \"text\"?, \"opt\"?}. Регулярність, щоденна звичка, «кожен день». 1.5-2.5 с. Вона попереду.",
+   "tier": "top"
   },
   {
    "name": "fx-ay-orbit-ring",
@@ -12530,7 +12966,8 @@
     "tilt",
     "speed"
    ],
-   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-orbit-ring\", \"start\", \"end\", \"text\"?, \"opt\"?}. Одне ключове слово до 8 літер. 1.2-1.8 с."
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-orbit-ring\", \"start\", \"end\", \"text\"?, \"opt\"?}. Одне ключове слово до 8 літер. 1.2-1.8 с.",
+   "tier": "top"
   },
   {
    "name": "fx-ay-letter-dive",
@@ -12555,7 +12992,8 @@
     "zoom",
     "y"
    ],
-   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-letter-dive\", \"start\", \"end\", \"text\"?, \"opt\"?}. Повноекранний, працює як перехід на нову думку. Коротке слово 4-6 літер. 1.2-1.6 с."
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-letter-dive\", \"start\", \"end\", \"text\"?, \"opt\"?}. Повноекранний, працює як перехід на нову думку. Коротке слово 4-6 літер. 1.2-1.6 с.",
+   "tier": "top"
   },
   {
    "name": "fx-ay-sketch-words",
@@ -12577,7 +13015,8 @@
     "label",
     "y"
    ],
-   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-sketch-words\", \"start\", \"end\", \"text\"?, \"opt\"?}. Ідея, задум, «накидати». 1.2-1.8 с. Вона попереду."
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-sketch-words\", \"start\", \"end\", \"text\"?, \"opt\"?}. Ідея, задум, «накидати». 1.2-1.8 с. Вона попереду.",
+   "tier": "top"
   },
   {
    "name": "fx-ay-post-wall",
@@ -12604,7 +13043,8 @@
     "cols",
     "y"
    ],
-   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-post-wall\", \"start\", \"end\", \"text\"?, \"opt\"?}. Регулярність публікацій, результат за рік. `to` тільки твоє реальне число. 2-3 с."
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-post-wall\", \"start\", \"end\", \"text\"?, \"opt\"?}. Регулярність публікацій, результат за рік. `to` тільки твоє реальне число. 2-3 с.",
+   "tier": "top"
   },
   {
    "name": "fx-ay-clone-row",
@@ -12628,7 +13068,8 @@
     "lag",
     "gap"
    ],
-   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-clone-row\", \"start\", \"end\", \"text\"?, \"opt\"?}. Багато ролей, «я одна за всіх», масштабування. 1.2 с."
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-clone-row\", \"start\", \"end\", \"text\"?, \"opt\"?}. Багато ролей, «я одна за всіх», масштабування. 1.2 с.",
+   "tier": "top"
   },
   {
    "name": "fx-ay-blade-slice",
@@ -12651,7 +13092,8 @@
     "slide",
     "gap"
    ],
-   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-blade-slice\", \"start\", \"end\", \"text\"?, \"opt\"?}. Різко відрізати, «зрізати бюджет», рішучий момент. 1.1 с."
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-blade-slice\", \"start\", \"end\", \"text\"?, \"opt\"?}. Різко відрізати, «зрізати бюджет», рішучий момент. 1.1 с.",
+   "tier": "reserve"
   },
   {
    "name": "fx-ay-layer-explode",
@@ -12675,7 +13117,8 @@
     "yaw",
     "spread"
    ],
-   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-layer-explode\", \"start\", \"end\", \"text\"?, \"opt\"?}. Як це влаштовано, з чого складається креатив / реклама. 1.2 с."
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-layer-explode\", \"start\", \"end\", \"text\"?, \"opt\"?}. Як це влаштовано, з чого складається креатив / реклама. 1.2 с.",
+   "tier": "reserve"
   },
   {
    "name": "fx-ay-rack-focus",
@@ -12697,7 +13140,8 @@
     "blur",
     "zoom"
    ],
-   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-rack-focus\", \"start\", \"end\", \"text\"?, \"opt\"?}. Акцент «а тепер головне», зміна думки. 1.4 с. Субтитри лишаються."
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-rack-focus\", \"start\", \"end\", \"text\"?, \"opt\"?}. Акцент «а тепер головне», зміна думки. 1.4 с. Субтитри лишаються.",
+   "tier": "top"
   },
   {
    "name": "fx-ay-blow-away",
@@ -12721,7 +13165,8 @@
     "flake",
     "fill"
    ],
-   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-blow-away\", \"start\", \"end\", \"text\"?, \"opt\"?}. Зникнення: «бюджет просто зник», «клієнти зникли». 1.6 с з поверненням."
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-blow-away\", \"start\", \"end\", \"text\"?, \"opt\"?}. Зникнення: «бюджет просто зник», «клієнти зникли». 1.6 с з поверненням.",
+   "tier": "top"
   },
   {
    "name": "fx-ay-dolly-zoom",
@@ -12743,7 +13188,8 @@
     "amount (≤0.25)",
     "back"
    ],
-   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-dolly-zoom\", \"start\", \"end\", \"text\"?, \"opt\"?}. Осяяння, шок, «і тут я зрозуміла». 1.5 с. Субтитри лишаються."
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-dolly-zoom\", \"start\", \"end\", \"text\"?, \"opt\"?}. Осяяння, шок, «і тут я зрозуміла». 1.5 с. Субтитри лишаються.",
+   "tier": "reserve"
   },
   {
    "name": "fx-ay-banknote",
@@ -12773,7 +13219,8 @@
     "count",
     "out"
    ],
-   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-banknote\", \"start\", \"end\", \"text\"?, \"opt\"?}. Гроші, дохід, бюджет, результат клієнта. `to` тільки реальна цифра. 1.0-1.3 с."
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-banknote\", \"start\", \"end\", \"text\"?, \"opt\"?}. Гроші, дохід, бюджет, результат клієнта. `to` тільки реальна цифра. 1.0-1.3 с.",
+   "tier": "top"
   },
   {
    "name": "fx-ay-press",
@@ -12802,7 +13249,8 @@
     "issue",
     "list"
    ],
-   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-press\", \"start\", \"end\", \"text\"?, \"opt\"?}. Новина, «про це всі говорять», кейс. 1.0 с; разом з ay-paper-tear одним рухом."
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-press\", \"start\", \"end\", \"text\"?, \"opt\"?}. Новина, «про це всі говорять», кейс. 1.0 с; разом з ay-paper-tear одним рухом.",
+   "tier": "top"
   },
   {
    "name": "fx-ay-paper-tear",
@@ -12827,7 +13275,8 @@
     "rip",
     "+ ключі ay-press"
    ],
-   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-paper-tear\", \"start\", \"end\", \"text\"?, \"opt\"?}. Одразу після ay-press з тими ж текстами, або сам зі словом (page=word). 1.0-1.2 с."
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-paper-tear\", \"start\", \"end\", \"text\"?, \"opt\"?}. Одразу після ay-press з тими ж текстами, або сам зі словом (page=word). 1.0-1.2 с.",
+   "tier": "top"
   },
   {
    "name": "fx-ay-impact",
@@ -12850,7 +13299,8 @@
     "look (cream|lime)",
     "dark"
    ],
-   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-impact\", \"start\", \"end\", \"text\"?, \"opt\"?}. Найсильніший наголос рілса, одне слово. 0.6-0.8 с."
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-impact\", \"start\", \"end\", \"text\"?, \"opt\"?}. Найсильніший наголос рілса, одне слово. 0.6-0.8 с.",
+   "tier": "top"
   },
   {
    "name": "fx-ay-code-body",
@@ -12874,7 +13324,8 @@
     "in",
     "out"
    ],
-   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-code-body\", \"start\", \"end\", \"text\"?, \"opt\"?}. ШІ, автоматизація, «алгоритм», технічна частина. 1.1-1.5 с."
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-code-body\", \"start\", \"end\", \"text\"?, \"opt\"?}. ШІ, автоматизація, «алгоритм», технічна частина. 1.1-1.5 с.",
+   "tier": "top"
   },
   {
    "name": "fx-ay-predict-keys",
@@ -12897,7 +13348,8 @@
     "placeholder",
     "x"
    ],
-   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-predict-keys\", \"start\", \"end\", \"text\"?, \"opt\"?}. Те, що ти пишеш клієнту / в промт / в оголошення. 2.6-3.2 с. Під підборіддям, може закрити руки."
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-predict-keys\", \"start\", \"end\", \"text\"?, \"opt\"?}. Те, що ти пишеш клієнту / в промт / в оголошення. 2.6-3.2 с. Під підборіддям, може закрити руки.",
+   "tier": "top"
   },
   {
    "name": "fx-ay-voice-note",
@@ -12920,7 +13372,8 @@
     "x",
     "y"
    ],
-   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-voice-note\", \"start\", \"end\", \"text\"?, \"opt\"?}. Голосове від клієнта / їй написали. 2.0-2.6 с. Угорі."
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-voice-note\", \"start\", \"end\", \"text\"?, \"opt\"?}. Голосове від клієнта / їй написали. 2.0-2.6 с. Угорі.",
+   "tier": "top"
   },
   {
    "name": "fx-ay-comment-drop",
@@ -12945,7 +13398,8 @@
     "you",
     "big"
    ],
-   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-comment-drop\", \"start\", \"end\", \"text\"?, \"opt\"?}. CTA «напиши слово в коментарях». 2.2-2.6 с."
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-comment-drop\", \"start\", \"end\", \"text\"?, \"opt\"?}. CTA «напиши слово в коментарях». 2.2-2.6 с.",
+   "tier": "top"
   },
   {
    "name": "fx-ay-liquid-glass",
@@ -12972,7 +13426,8 @@
     "y",
     "outro"
    ],
-   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-liquid-glass\", \"start\", \"end\", \"text\"?, \"opt\"?}. Останні 4-4.6 с рілса, CTA з кодовим словом. Картка лягає на розмите обличчя (кінець)."
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-liquid-glass\", \"start\", \"end\", \"text\"?, \"opt\"?}. Останні 4-4.6 с рілса, CTA з кодовим словом. Картка лягає на розмите обличчя (кінець).",
+   "tier": "top"
   },
   {
    "name": "fx-ay-index",
@@ -12999,7 +13454,8 @@
     "foot_at",
     "pill"
    ],
-   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-index\", \"start\", \"end\", \"text\"?, \"opt\"?}. Рілс-список: довга картка на всю частину зі списком; `at` перемикає пункти. Субтитри лишаються."
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-index\", \"start\", \"end\", \"text\"?, \"opt\"?}. Рілс-список: довга картка на всю частину зі списком; `at` перемикає пункти. Субтитри лишаються.",
+   "tier": "top"
   },
   {
    "name": "fx-ay-live-cursor",
@@ -13025,7 +13481,8 @@
     "top",
     "bot"
    ],
-   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-live-cursor\", \"start\", \"end\", \"text\"?, \"opt\"?}. Хук «виділимо головне», дизайн креативу, «ось я». 1.4-1.8 с."
+   "note": "Ефект з рілс-референсу 2026-11-13 (у твоєму бренді): картка {\"type\": \"fx\", \"fx\": \"ay-live-cursor\", \"start\", \"end\", \"text\"?, \"opt\"?}. Хук «виділимо головне», дизайн креативу, «ось я». 1.4-1.8 с.",
+   "tier": "top"
   }
  ]
 }

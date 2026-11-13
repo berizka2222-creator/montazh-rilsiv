@@ -23,7 +23,9 @@ CAT = json.load(open(HERE.parent / "references" / "motion_catalog.json"))
 # manual = works but small or niche, only when the person asks; candidate = not checked in the frame yet, never suggested;
 # skip = unusable. Brand elements (Remotion, below) are "brand" and suggested like ready ones.
 SUGGEST = ("ready", "replace")
-READY = [m for m in CAT["motions"] if m.get("status") in SUGGEST]
+# tiers picked by hand (catalog "tier", 2026-11-13): «top» manual effects are suggested too; «reserve» only after every top one
+READY = [m for m in CAT["motions"] if m.get("status") in SUGGEST or (m.get("status") == "manual" and m.get("tier") == "top")]
+TIER = lambda m: m.get("tier") == "reserve"
 FULL = [m for m in CAT["motions"] if m.get("status") == "full_only"]
 HOME = Path(os.environ.get("REELS_HOME", "~/reels")).expanduser()
 # Their black list (<REELS_HOME>/blacklist.json, grows reel by reel): effects they don't want are never suggested.
@@ -157,14 +159,14 @@ def ideas(reel):
         # fresh first: not in this reel, not in the last reels, offered least so far
         order = {mo: k for k, mo in enumerate(moments)}           # the more specific moment (a number before a key phrase) first
         # scenes before plain text effects (is_simple), then fresh first
-        pool.sort(key=lambda m: (m["name"] in used_here, m["name"] in rec, is_simple(m), min(order.get(x, 99) for x in m["moments"]),
+        pool.sort(key=lambda m: (m["name"] in used_here, m["name"] in rec, TIER(m), is_simple(m), min(order.get(x, 99) for x in m["moments"]),
                                  offered.get(m["name"], 0), -m.get("quality", 3), m.get("rank", 5)))
         rich = [m for m in pool if not is_simple(m)]
         # every phrase also gets scenes from any moment that fits a talking head (UI, chats, carousels, lower thirds, transitions)
         if len(rich) < 3:
             extra = [m for m in READY + FULL if not is_simple(m) and m["name"] not in {x["name"] for x in rich} and m["name"] not in used_here
                      and m.get("use") in ("ui", "full", "transition") and m["name"] not in rec]
-            extra.sort(key=lambda m: (offered.get(m["name"], 0), -m.get("quality", 3)))
+            extra.sort(key=lambda m: (TIER(m), offered.get(m["name"], 0), -m.get("quality", 3)))
             rich += extra[:3 - len(rich)]
         picks = rich[:3] + [m for m in pool if is_simple(m)][:1]
         for m in picks: offered[m["name"]] = offered.get(m["name"], 0) + 1
