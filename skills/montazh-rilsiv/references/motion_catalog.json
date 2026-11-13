@@ -803,7 +803,8 @@
    "text_vars": [
     "count"
    ],
-   "no": 167
+   "no": 167,
+   "keep_ui": true
   },
   {
    "name": "marker-checklist-card",
@@ -1003,7 +1004,8 @@
     "prompt_glyph",
     "correction"
    ],
-   "no": 163
+   "no": 163,
+   "keep_ui": true
   },
   {
    "name": "ai-chat-reveal",
@@ -1156,7 +1158,8 @@
    "replace": {
     "Chat Message": "<її слова>"
    },
-   "no": 169
+   "no": 169,
+   "keep_ui": true
   },
   {
    "name": "typing-indicator",
@@ -1758,7 +1761,8 @@
     "Toggle Flip": "<її слова>",
     "(not\n         inside": "<її слова>"
    },
-   "no": 215
+   "no": 215,
+   "keep_ui": true
   },
   {
    "name": "press-ripple",
@@ -2096,7 +2100,8 @@
    "text_vars": [
     "click_label"
    ],
-   "no": 51
+   "no": 51,
+   "keep_ui": true
   },
   {
    "name": "hw-arrow",
@@ -2294,7 +2299,8 @@
    "use": "overlay",
    "quality": 3,
    "text_vars": [],
-   "no": 292
+   "no": 292,
+   "keep_ui": true
   },
   {
    "name": "bar-chart-race",
@@ -4056,7 +4062,8 @@
    },
    "brand_text": {},
    "avatar": true,
-   "no": 8
+   "no": 8,
+   "keep_ui": true
   },
   {
    "name": "decision-tree",
@@ -4182,7 +4189,8 @@
     "5.2 km": "<її слова>",
     "Cycling": "<її слова>"
    },
-   "no": 99
+   "no": 99,
+   "keep_ui": true
   },
   {
    "name": "aurora",
@@ -5321,7 +5329,8 @@
     "Files": "<її слова>",
     "Translate": "<її слова>"
    },
-   "no": 166
+   "no": 166,
+   "keep_ui": true
   },
   {
    "name": "lens-flare",
@@ -5392,7 +5401,8 @@
     "liquid-glass-notification.mp4 is ready.": "<її слова>"
    },
    "no": 174,
-   "was_status": "manual"
+   "was_status": "manual",
+   "keep_ui": true
   },
   {
    "name": "liquid-glass-widgets",
@@ -5511,7 +5521,8 @@
     "View": "<її слова>",
     "Go": "<її слова>"
    },
-   "no": 110
+   "no": 110,
+   "keep_ui": true
   },
   {
    "name": "marble",
@@ -5826,7 +5837,8 @@
    "card": {
     "layout": "dim"
    },
-   "no": 113
+   "no": 113,
+   "keep_ui": true
   },
   {
    "name": "snow",
@@ -6186,7 +6198,8 @@
     "HeyGen — Home": "<її слова>",
     "Navigation": "<її слова>"
    },
-   "no": 111
+   "no": 111,
+   "keep_ui": true
   },
   {
    "name": "us-map",
@@ -6502,7 +6515,8 @@
     "Photo editor": "<її слова>",
     "BeatShelf": "<її слова>"
    },
-   "no": 153
+   "no": 153,
+   "keep_ui": true
   },
   {
    "name": "water",
@@ -7144,7 +7158,8 @@
     "Choose what we email you, and how often.": "<її слова>",
     "Email digest": "<її слова>"
    },
-   "no": 195
+   "no": 195,
+   "keep_ui": true
   },
   {
    "name": "cursor-zoom-follow",
@@ -7174,7 +7189,8 @@
     "Aug 25": "<її слова>",
     "Top plans": "<її слова>"
    },
-   "no": 62
+   "no": 62,
+   "keep_ui": true
   },
   {
    "name": "cut-the-curve",
@@ -7680,7 +7696,8 @@
    "replace": {
     "Magnetic Cursor": "<її слова>"
    },
-   "no": 20
+   "no": 20,
+   "keep_ui": true
   },
   {
    "name": "match-cut",
@@ -7842,7 +7859,8 @@
    "replace": {
     "Multi Device Splay": "<її слова>"
    },
-   "no": 98
+   "no": 98,
+   "keep_ui": true
   },
   {
    "name": "multiplayer-cursors",
@@ -7861,7 +7879,8 @@
     "zoom": 1.2
    },
    "status": "ready",
-   "no": 24
+   "no": 24,
+   "keep_ui": true
   },
   {
    "name": "offset-path-traveler",
@@ -8030,7 +8049,8 @@
     "Conversion": "<її слова>",
     "Active users": "<її слова>"
    },
-   "no": 154
+   "no": 154,
+   "keep_ui": true
   },
   {
    "name": "parallax-unzoom",
@@ -8136,7 +8156,8 @@
     "Now": "<її слова>",
     "MK": "<її слова>"
    },
-   "no": 165
+   "no": 165,
+   "keep_ui": true
   },
   {
    "name": "rubber-band-bumper",
@@ -8287,7 +8308,8 @@
     "Sound effects": "<її слова>",
     "Layer subtle UI sounds": "<її слова>"
    },
-   "no": 190
+   "no": 190,
+   "keep_ui": true
   },
   {
    "name": "shared-axis-y",
@@ -8789,7 +8811,8 @@
     "timeline.js": "<її слова>",
     "$ hyperframes render --skill=terminal-simulator": "<її слова>"
    },
-   "no": 160
+   "no": 160,
+   "keep_ui": true
   },
   {
    "name": "text-stagger",
@@ -9058,7 +9081,8 @@
    "replace": {
     "UI Focus Zoom": "<її слова>"
    },
-   "no": 61
+   "no": 61,
+   "keep_ui": true
   },
   {
    "name": "variable-axis-type",
@@ -12857,7 +12881,7 @@
    "no": 456,
    "fx": "ay-predict-keys",
    "engine": "fx",
-   "ua": "Під підборіддям виїжджає темно-зелена iOS-клавіатура і друкує фразу з підказками",
+   "ua": "Під підборіддям виїжджає стандартна iOS-клавіатура і друкує фразу з підказками",
    "moments": [
     "повідомлення / чат",
     "питання / ШІ"

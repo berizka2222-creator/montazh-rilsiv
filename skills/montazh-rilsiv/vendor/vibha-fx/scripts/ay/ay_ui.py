@@ -12,6 +12,10 @@ import re as _ui_re
 _UI_K = 2
 _UI_DEEP = (22, 46, 30)           # deep brand green for buttons / play circle on cream
 _UI_PANEL = (17, 33, 21)          # panel tint (between c3 and green)
+# Real interfaces keep their native look (2026-11-13): iOS keyboard light grey, Instagram white / blue / red, DM violet, Figma blue
+IOS = dict(kb=(209, 212, 219), key=(255, 255, 255), spec=(172, 177, 187), ink=(0, 0, 0), shadow=(137, 139, 145), blue=(0, 122, 255), ph=(142, 142, 147), off=(199, 199, 204))
+IG = dict(card=(255, 255, 255), ink=(0, 0, 0), sub=(115, 115, 115), heart=(255, 48, 64), heart_off=(38, 38, 38), blue=(0, 149, 246), avatar=(199, 199, 204), dm=(118, 56, 250), ring=(225, 48, 108))
+FIGMA = (13, 153, 255)
 
 
 def _ui_s(c): return c.W / 1080.0
@@ -387,7 +391,7 @@ def _ui_lift(im, r):
     return sh
 
 
-def _ui_cursor_img(size, name, col=AY['lime'], ink=AY['ink']):
+def _ui_cursor_img(size, name, col=FIGMA, ink=(255, 255, 255)):
     k = 3; s = size * k
     ft = ay_font('h', size * 0.62 * k)
     tw = ft.getlength(name)
@@ -410,8 +414,8 @@ def _ui_cursor_img(size, name, col=AY['lime'], ink=AY['ink']):
 def fx_ay_live_cursor(c, e):
     s = _ui_s(c); d_ = e.d; lt = c.lt
     name = str(e.o.get('name') or 'Ти')
-    col = AY['lime'] if e.o.get('color', 'lime') != 'cream' else AY['cream']
-    guide_col = AY['pink_dk']
+    col = FIGMA
+    guide_col = (242, 72, 34)
     # box around the head and shoulders (sizes frozen at the first frame, position follows her)
     fw0 = cached(e, 'fw0', lambda: c.fw)
     bw = fw0 * float(e.o.get('bw', 1.6)); top = fw0 * float(e.o.get('top', 1.12)); bot = fw0 * float(e.o.get('bot', 1.3))
@@ -485,7 +489,7 @@ def fx_ay_live_cursor(c, e):
             X, Y = P(mxp, myp)
             imc = Image.new('RGBA', im.size, (0, 0, 0, 0)); dc = ImageDraw.Draw(imc)
             dc.rounded_rectangle([X - tw / 2 - 10 * s * K, Y, X + tw / 2 + 10 * s * K, Y + th], int(6 * s * K), fill=_ui_a(col))
-            dc.text((X, Y + th / 2 + 1), dims, font=fm, fill=_ui_a(AY['ink']), anchor='mm')
+            dc.text((X, Y + th / 2 + 1), dims, font=fm, fill=_ui_a((255, 255, 255)), anchor='mm')
         else: imc = None
         L = ay_np(_ui_down(_ui_lift(im, 2.2 * s * K), K))
         comp(c, L, gx0, gy0, out, guard=not snapped)
@@ -556,12 +560,12 @@ def fx_ay_voice_note(c, e):
     # --- pill at 2x
     W2, H2 = int(pw * K), int(ph * K)
     im = Image.new('RGBA', (W2, H2), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
-    d.rounded_rectangle([0, 0, W2 - 1, H2 - 1], H2 // 2, fill=_ui_a(AY['cream']))
+    d.rounded_rectangle([0, 0, W2 - 1, H2 - 1], H2 // 2, fill=_ui_a(IG['dm']))
     pc = 82 * s * K; px0 = (ph * K - pc) / 2
     tap = 1 - 0.1 * math.sin(math.pi * clamp((lt - T_IN + 0.05) / 0.16))
     pcs = pc * tap; pcx, pcy = px0 + pc / 2, H2 / 2
-    d.ellipse([pcx - pcs / 2, pcy - pcs / 2, pcx + pcs / 2, pcy + pcs / 2], fill=_ui_a(_UI_DEEP))
-    ic = _ui_icon('pause' if playing else 'play', pcs * 0.42, AY['cream'])
+    d.ellipse([pcx - pcs / 2, pcy - pcs / 2, pcx + pcs / 2, pcy + pcs / 2], fill=_ui_a((255, 255, 255)))
+    ic = _ui_icon('pause' if playing else 'play', pcs * 0.42, IG['dm'])
     im.alpha_composite(ic, (int(pcx - ic.width / 2 + (0 if playing else pcs * 0.03)), int(pcy - ic.height / 2)))
     # waveform
     wx0 = px0 + pc + 26 * s * K; wx1 = W2 - (176 * s * K)
@@ -579,16 +583,16 @@ def fx_ay_voice_note(c, e):
         x = wx0 + i * step
         fill_f = clamp(head - i)
         mixk = 0.26 + 0.74 * clamp(fill_f)
-        base = _ui_a(tuple(AY['cream'][j] * (1 - mixk) + _UI_DEEP[j] * mixk for j in range(3)))
+        base = _ui_a((255, 255, 255), int(110 + 145 * clamp(fill_f)))
         d.rounded_rectangle([x, H2 / 2 - bh / 2, x + bw, H2 / 2 + bh / 2], int(bw / 2), fill=base)
     # timer
     tsec = min(secs, int(prog * secs + 1e-6)) if lt >= T_PLAY else 0
     ft = ay_font('hm', 31 * s * K)
-    d.text((W2 - 104 * s * K, H2 / 2 + 1), f'0:{tsec:02d}', font=ft, fill=_ui_a(AY['ink']), anchor='rm')
+    d.text((W2 - 104 * s * K, H2 / 2 + 1), f'0:{tsec:02d}', font=ft, fill=_ui_a((255, 255, 255)), anchor='rm')
     # send circle
     sc = 62 * s * K; scx = W2 - px0 - sc / 2
-    d.ellipse([scx - sc / 2, H2 / 2 - sc / 2, scx + sc / 2, H2 / 2 + sc / 2], fill=_ui_a(AY['lime']))
-    up = _ui_icon('up', sc * 0.5, AY['ink'], sw=sc * 0.5 * 0.11)
+    d.ellipse([scx - sc / 2, H2 / 2 - sc / 2, scx + sc / 2, H2 / 2 + sc / 2], fill=_ui_a(IG['dm']))
+    up = _ui_icon('up', sc * 0.5, IG['dm'], sw=sc * 0.5 * 0.11)
     im.alpha_composite(up, (int(scx - up.width / 2), int(H2 / 2 - up.height / 2)))
     pill = (_ui_shadow_np(ay_np(_ui_down(im)), 14 * s, 8 * s, 0.32))
     _ui_comp(c, pill, x0 + pw / 2, yc + dy, a)
@@ -597,7 +601,7 @@ def fx_ay_voice_note(c, e):
     ap = _ui_spring((lt - 0.08) / (T_IN * 1.6), 6.0, 9.0)
     _ui_comp(c, face, x0 + pw + gap + av / 2, yc + dy, a * clamp((lt - 0.08) / 0.15), scale=0.6 + 0.4 * ap)
     # caption chip
-    chip = cached(e, 'chip', lambda: (_ui_shadow_np(ay_np(_ui_chip(cap, 30 * s, AY['cream'], AY['ink'])), 8 * s, 4 * s, 0.25)))
+    chip = cached(e, 'chip', lambda: (_ui_shadow_np(ay_np(_ui_chip(cap, 30 * s, (255, 255, 255), (0, 0, 0))), 8 * s, 4 * s, 0.25)))
     cp = _ui_spring((lt - T_IN * 0.8) / 0.55, 6.5, 10.0)
     _ui_comp(c, chip, x0 + pw * 0.66, yc + dy + ph / 2 + 40 * s, a * clamp((lt - T_IN * 0.8) / 0.15), scale=0.7 + 0.3 * cp)
 
@@ -614,7 +618,7 @@ def _ui_chip(s_, size, bg, fg, kind='h'):
 # ================================================================ ay-comment-drop
 def _ui_avatar_you(size):
     K = 3; S = int(size * K); im = Image.new('RGBA', (S, S), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
-    d.ellipse([0, 0, S - 1, S - 1], fill=_ui_a(AY['green']))
+    d.ellipse([0, 0, S - 1, S - 1], fill=_ui_a(IG['avatar']))
     ic = _ui_icon('person', size * 0.56 * K, AY['cream'])
     im.alpha_composite(ic, ((S - ic.width) // 2, int(S * 0.2)))
     return im.resize((int(size), int(size)), Image.LANCZOS)
@@ -639,7 +643,7 @@ def _ui_comment_card(c, e, w, user, when, runs_spec, likes, liked, heart_pop, av
     lh = text_size * 1.18 * s * K
     h = pady * 2 + 32 * s * K + lh * len(lines)
     im = Image.new('RGBA', (int(w * K), int(h)), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
-    d.rounded_rectangle([0, 0, im.width - 1, im.height - 1], int(30 * s * K), fill=_ui_a(AY['cream']))
+    d.rounded_rectangle([0, 0, im.width - 1, im.height - 1], int(30 * s * K), fill=_ui_a(IG['card']))
     im.alpha_composite(avatar.resize((int(avs), int(avs)), Image.LANCZOS), (int(padx), int(pady)))
     y = pady + 14 * s * K
     d.text((tx0, y), user, font=fu, fill=_ui_a(AY['ink']), anchor='lm')
@@ -652,7 +656,7 @@ def _ui_comment_card(c, e, w, user, when, runs_spec, likes, liked, heart_pop, av
     # heart + count
     hs = 34 * s * K * (1 + 0.35 * math.sin(math.pi * clamp(heart_pop)))
     hk = 'heart_f' if liked else 'heart'
-    hcol = AY['pink_dk'] if liked else (90, 96, 80)
+    hcol = IG['heart'] if liked else IG['heart_off']
     hi = _ui_icon(hk, hs, hcol, sw=hs * 0.09)
     hx = im.width - padx - 34 * s * K / 2 - 4 * s * K
     im.alpha_composite(hi, (int(hx - hi.width / 2), int(pady + 18 * s * K - hi.height / 2)))
@@ -664,18 +668,18 @@ def _ui_comment_card(c, e, w, user, when, runs_spec, likes, liked, heart_pop, av
 def _ui_input_bar(c, e, w, h, typed, caret_on, post_state, avatar, s, placeholder):
     K = _UI_K
     im = Image.new('RGBA', (int(w * K), int(h * K)), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
-    d.rounded_rectangle([0, 0, im.width - 1, im.height - 1], int(h * 0.32 * K), fill=_ui_a(AY['cream']))
+    d.rounded_rectangle([0, 0, im.width - 1, im.height - 1], int(h * 0.32 * K), fill=_ui_a(IG['card']))
     avs = 60 * s * K; ax = 20 * s * K
     im.alpha_composite(avatar.resize((int(avs), int(avs)), Image.LANCZOS), (int(ax), int((im.height - avs) / 2)))
     tx = ax + avs + 20 * s * K; cy = im.height / 2
     if typed:
         f = ay_font('hx', 36 * s * K)
-        d.text((tx, cy + 2 * s * K), typed, font=f, fill=_ui_a(_UI_DEEP), anchor='lm'); cx_ = tx + f.getlength(typed) + 4 * s * K
+        d.text((tx, cy + 2 * s * K), typed, font=f, fill=_ui_a(IG['ink']), anchor='lm'); cx_ = tx + f.getlength(typed) + 4 * s * K
     else:
         f = ay_font('r', 31 * s * K)
         d.text((tx, cy + 2 * s * K), placeholder, font=f, fill=_ui_a(AY['ink'], 110), anchor='lm'); cx_ = tx - 2 * s * K
     if caret_on:
-        d.rounded_rectangle([cx_, cy - 22 * s * K, cx_ + 3 * s * K, cy + 22 * s * K], int(1.5 * s * K), fill=_ui_a(AY['green']))
+        d.rounded_rectangle([cx_, cy - 22 * s * K, cx_ + 3 * s * K, cy + 22 * s * K], int(1.5 * s * K), fill=_ui_a(IG['avatar']))
     # post button: disabled -> active -> pressed
     fb = ay_font('h', 25 * s * K); lab = 'Опублікувати'
     bw = fb.getlength(lab) + 34 * s * K; bh = 54 * s * K
@@ -684,9 +688,9 @@ def _ui_input_bar(c, e, w, h, typed, caret_on, post_state, avatar, s, placeholde
     bcx, bcy = (bx0 + bx1) / 2, cy
     bw2, bh2 = bw * sc / 2, bh * sc / 2
     act = post_state.get('active', 0.0)
-    bg = tuple(int(AY['ink'][i] * 0.06 * (1 - act) * 0 + (AY['cream'][i] * (1 - act) * 0.93 + _UI_DEEP[i] * act)) for i in range(3))
+    bg = IG['card']   # Instagram: «Опублікувати» is blue text, no pill
     d.rounded_rectangle([bcx - bw2, bcy - bh2, bcx + bw2, bcy + bh2], int(bh2), fill=_ui_a(bg))
-    tc = tuple(int(AY['ink'][i] * (1 - act) + AY['cream'][i] * act) for i in range(3))
+    tc = IG['blue']
     d.text((bcx, bcy + 1), lab, font=ay_font('h', 25 * s * K * sc), fill=_ui_a(tc, 110 + 145 * act), anchor='mm')
     return _ui_down(im)
 
@@ -740,7 +744,7 @@ def fx_ay_comment_drop(c, e):
     parts = comment.split('{w}')
     for i, p_ in enumerate(parts):
         if p_.strip(): runs.append((p_.strip(), 'hm', AY['ink']))
-        if i < len(parts) - 1: runs.append((word, 'hb', AY['green']))
+        if i < len(parts) - 1: runs.append((word, 'hb', IG['ink']))
     card1 = cached(e, 'card1', lambda: ay_np(_ui_comment_card(c, e, w, user, 'зараз', runs, likes, True, 0, avatar, s, text_size=31)))
     ch1 = card1.shape[0]
     cur_h = bar_h + (ch1 - bar_h) * m
@@ -749,7 +753,7 @@ def fx_ay_comment_drop(c, e):
         bar = ay_np(_ui_input_bar(c, e, w, bar_h, typed, caret and u < T_TAP, post, avatar, s, str(e.o.get('placeholder') or 'Додай коментар…')))
         # stretch the cream slab while morphing (simple: scale vertically, fade the content)
         if m > 0:
-            slab = cached(e, ('slab', int(cur_h)), lambda: ay_np(_ui_slab(w, cur_h, 30 * s, AY['cream'])))
+            slab = cached(e, ('slab', int(cur_h)), lambda: ay_np(_ui_slab(w, cur_h, 30 * s, IG['card'])))
             _ui_comp(c, (_ui_shadow_np(slab, 14 * s, 8 * s, 0.25)), x0 + w / 2, ycen, a_in)
             comp(c, bar, x0, y_top + dy_in, a_in * (1 - clamp(m * 2.2)))
         else:
@@ -771,7 +775,7 @@ def fx_ay_comment_drop(c, e):
         liked = hp > 0
         rw = w - 96 * s
         key = ('card2', liked, int(hp * 8))
-        card2 = cached(e, key, lambda: (_ui_shadow_np(ay_np(_ui_comment_card(c, e, rw, you, 'зараз', [(word, 'hb', AY['green'])],
+        card2 = cached(e, key, lambda: (_ui_shadow_np(ay_np(_ui_comment_card(c, e, rw, you, 'зараз', [(word, 'hb', IG['ink'])],
                                                                                  1 if liked else '', liked, hp, _ui_avatar_you(60 * s), s)), 12 * s, 7 * s, 0.25)))
         q = _ui_spring(rp * 0.9, 6.0, 9.0)
         cy2 = y_top + ch1 + 16 * s + card2.shape[0] / 2 - 26 * s + dy_in
@@ -844,27 +848,27 @@ def _ui_kb_base(KW, s, cyr, upper):
     K = _UI_K
     im = Image.new('RGBA', (int(KW * K), int(KH * K)), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
     fk = ay_font('hm', 34 * s * K); fs = ay_font('hm', 25 * s * K)
-    special = (78, 92, 60)
+    special = IOS['spec']
     for k_, (x, y, w, h) in keys.items():
         X0, Y0, X1, Y1 = x * K, y * K, (x + w) * K, (y + h) * K
         r = int(12 * s * K)
         spec = k_ in ('⇧', '⌫', '123')
         ret = k_ == 'ret'
-        bg = special if spec else (_UI_DEEP if False else (AY['green'] if ret else AY['cream']))
-        d.rounded_rectangle([X0, Y0 + 3 * s * K, X1, Y1 + 3 * s * K], r, fill=(5, 10, 6, 150))   # key shadow
+        bg = special if spec else (IOS['blue'] if ret else IOS['key'])
+        d.rounded_rectangle([X0, Y0 + 3 * s * K, X1, Y1 + 3 * s * K], r, fill=IOS['shadow'] + (255,))   # key shadow
         d.rounded_rectangle([X0, Y0, X1, Y1], r, fill=_ui_a(bg))
         cx_, cy_ = (X0 + X1) / 2, (Y0 + Y1) / 2
         if k_ == '⇧' or k_ == '⌫':
-            ic = _ui_icon('shift' if k_ == '⇧' else 'back', 30 * s * K, AY['cream'], sw=2.6 * s * K)
+            ic = _ui_icon('shift' if k_ == '⇧' else 'back', 30 * s * K, IOS['ink'], sw=2.6 * s * K)
             if k_ == '⇧' and upper:
-                ic = _ui_icon('shift', 30 * s * K, AY['lime'], sw=2.6 * s * K)
+                ic = _ui_icon('shift', 30 * s * K, IOS['ink'], sw=2.6 * s * K)
             im.alpha_composite(ic, (int(cx_ - ic.width / 2), int(cy_ - ic.height / 2)))
         elif k_ == '123':
-            d.text((cx_, cy_), '123', font=fs, fill=_ui_a(AY['cream']), anchor='mm')
+            d.text((cx_, cy_), '123', font=fs, fill=_ui_a(IOS['ink']), anchor='mm')
         elif k_ == 'ret':
-            d.text((cx_, cy_), 'готово' if cyr else 'return', font=fs, fill=_ui_a(AY['cream']), anchor='mm')
+            d.text((cx_, cy_), 'готово' if cyr else 'return', font=fs, fill=_ui_a((255, 255, 255)), anchor='mm')
         elif k_ == ' ':
-            d.text((cx_, cy_), 'пробіл' if cyr else 'space', font=fs, fill=_ui_a(AY['ink'], 200), anchor='mm')
+            d.text((cx_, cy_), 'пробіл' if cyr else 'space', font=fs, fill=_ui_a(IOS['ink']), anchor='mm')
         else:
             d.text((cx_, cy_ - 2 * s * K), k_.upper() if upper else k_, font=fk, fill=_ui_a(AY['ink']), anchor='mm')
     return ay_np(_ui_down(im)), keys, KH
@@ -954,7 +958,7 @@ def fx_ay_predict_keys(c, e):
     oy = (1 - pin) * 150 * s + (1 - pout) * 120 * s
     vel = (1 - pin) * 60 * s + (1 - pout) * 40 * s
     # glass body (dark green frosted)
-    _ui_glass(c, kx + KW / 2, ky + oy + KH / 2, KW, KH, 44 * s, blur=18, refr=12, tint=_UI_PANEL, amt=0.84, bright=1.0,
+    _ui_glass(c, kx + KW / 2, ky + oy + KH / 2, KW, KH, 44 * s, blur=18, refr=12, tint=IOS['kb'], amt=0.97, bright=1.0,
               rim=0.35, alpha=a, shadow=0.3, ca=0.0, glow=0.04)
     upper = typed == '' or typed.endswith('. ')
     layer = (base_up if upper else base_lo)[0].copy()
@@ -962,7 +966,7 @@ def fx_ay_predict_keys(c, e):
     im = Image.new('RGBA', (int(KW * K), int(KH * K)), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
     pad = 20 * s
     ib = (pad * K, pad * K, (KW - pad) * K, (pad + 92 * s) * K)
-    d.rounded_rectangle(ib, int(46 * s * K), fill=(36, 62, 42, 255), outline=_ui_a(AY['cream'], 40), width=max(2, int(1.2 * s * K)))
+    d.rounded_rectangle(ib, int(46 * s * K), fill=(255, 255, 255, 255), outline=_ui_a(IOS['spec'], 160), width=max(2, int(1.2 * s * K)))
     fi = ay_font('hm', 38 * s * K)
     words_now = typed.split(' ')
     tx0 = ib[0] + 32 * s * K; cy_ = (ib[1] + ib[3]) / 2 + 2 * s * K
@@ -974,7 +978,7 @@ def fx_ay_predict_keys(c, e):
     x = -shift_x; ty = cy_ - ib[1]
     accent_last = len([w for w in words_now if w]) >= 2 or (len(target_words) >= 2 and len(words_now) >= 2)
     for i, w in enumerate(words_now):
-        col = AY['lime'] if (accent_last and i == len(words_now) - 1 and w) else AY['tx']
+        col = IOS['ink']
         if w: dt.text((x, ty), w, font=fi, fill=_ui_a(col), anchor='lm')
         x += fi.getlength(w + ' ')
     if shift_x > 0:
@@ -983,15 +987,15 @@ def fx_ay_predict_keys(c, e):
         tl.putalpha(a_)
     im.alpha_composite(tl, (int(tx0), int(ib[1])))
     if not typed:
-        d.text((tx0, cy_), str(e.o.get('placeholder') or ('Повідомлення' if cyr else 'Message')), font=fi, fill=_ui_a(AY['tx'], 90), anchor='lm')
+        d.text((tx0, cy_), str(e.o.get('placeholder') or ('Повідомлення' if cyr else 'Message')), font=fi, fill=_ui_a(IOS['ph']), anchor='lm')
     caret_x = tx0 - shift_x + full_w + 3 * s * K
     if (int(lt * 2.5) % 2 == 0) or (t0 <= lt <= t1):
-        d.rounded_rectangle([caret_x, cy_ - 24 * s * K, caret_x + 3.2 * s * K, cy_ + 24 * s * K], int(1.6 * s * K), fill=_ui_a(AY['lime']))
+        d.rounded_rectangle([caret_x, cy_ - 24 * s * K, caret_x + 3.2 * s * K, cy_ + 24 * s * K], int(1.6 * s * K), fill=_ui_a(IOS['blue']))
     # send button
     sb = 64 * s * K * (1 + 0.18 * math.sin(math.pi * clamp((lt - t1 - 0.04) / 0.22)))
     sbx, sby = ib[2] - 14 * s * K - 64 * s * K / 2, (ib[1] + ib[3]) / 2
-    d.ellipse([sbx - sb / 2, sby - sb / 2, sbx + sb / 2, sby + sb / 2], fill=_ui_a(AY['lime'] if typed else (120, 128, 84)))
-    up = _ui_icon('up', sb * 0.5, AY['ink'], sw=sb * 0.5 * 0.12)
+    d.ellipse([sbx - sb / 2, sby - sb / 2, sbx + sb / 2, sby + sb / 2], fill=_ui_a(IOS['blue'] if typed else IOS['off']))
+    up = _ui_icon('up', sb * 0.5, (255, 255, 255), sw=sb * 0.5 * 0.12)
     im.alpha_composite(up, (int(sbx - up.width / 2), int(sby - up.height / 2)))
     # suggestions
     sugg, hi = _ui_kb_suggest(typed, target_words, cyr, picking)
@@ -1000,13 +1004,13 @@ def fx_ay_predict_keys(c, e):
     fsg = ay_font('hm', 29 * s * K); fsgb = ay_font('h', 29 * s * K)
     for i, sg in enumerate(sugg):
         cx0 = pad * K + i * cw
-        if i > 0: d.line([(cx0, sy0 + sh * 0.25), (cx0, sy0 + sh * 0.75)], fill=_ui_a(AY['cream'], 50), width=max(2, int(1.2 * s * K)))
+        if i > 0: d.line([(cx0, sy0 + sh * 0.25), (cx0, sy0 + sh * 0.75)], fill=_ui_a(IOS['ink'], 40), width=max(2, int(1.2 * s * K)))
         if i == hi:
-            d.rounded_rectangle([cx0 + 8 * s * K, sy0 + 4 * s * K, cx0 + cw - 8 * s * K, sy0 + sh - 4 * s * K], int(14 * s * K), fill=_ui_a(AY['lime']))
+            d.rounded_rectangle([cx0 + 8 * s * K, sy0 + 4 * s * K, cx0 + cw - 8 * s * K, sy0 + sh - 4 * s * K], int(14 * s * K), fill=_ui_a(IOS['key']))
         f = fsgb if i == 1 else fsg
         t = sg
         while f.getlength(t) > cw - 24 * s * K and len(t) > 3: t = t[:-2] + '…' if not t.endswith('…') else t[:-2] + '…'
-        d.text((cx0 + cw / 2, sy0 + sh / 2 + 1), t, font=f, fill=_ui_a(AY['ink'] if i == hi else AY['tx'], 255 if (i == 1 or i == hi) else 190), anchor='mm')
+        d.text((cx0 + cw / 2, sy0 + sh / 2 + 1), t, font=f, fill=_ui_a(IOS['ink'], 255 if (i == 1 or i == hi) else 200), anchor='mm')
     # pressed key + balloon
     pk_age = lt - press_t
     if press_key is not None and pk_age < 0.16:
@@ -1016,16 +1020,16 @@ def fx_ay_predict_keys(c, e):
             fl = 1 - pk_age / 0.16
             X0, Y0, X1, Y1 = x_ * K, y_ * K, (x_ + w_) * K, (y_ + h_) * K
             if kk == ' ':
-                d.rounded_rectangle([X0, Y0, X1, Y1], int(12 * s * K), fill=_ui_a(AY['lime'], int(255 * fl)))
-                d.text(((X0 + X1) / 2, (Y0 + Y1) / 2), 'пробіл' if cyr else 'space', font=ay_font('hm', 25 * s * K), fill=_ui_a(AY['ink'], int(200 * fl)), anchor='mm')
+                d.rounded_rectangle([X0, Y0, X1, Y1], int(12 * s * K), fill=_ui_a(IOS['spec'], int(255 * fl)))
+                d.text(((X0 + X1) / 2, (Y0 + Y1) / 2), 'пробіл' if cyr else 'space', font=ay_font('hm', 25 * s * K), fill=_ui_a(IOS['ink'], int(255 * fl)), anchor='mm')
             else:
-                # iOS key popup: a lime balloon grown out of the pressed key, letter enlarged
+                # iOS key popup: a white balloon grown out of the pressed key, letter enlarged
                 pa = int(255 * min(1.0, fl * 1.8))
                 pop_ = Image.new('RGBA', im.size, (0, 0, 0, 0)); dp = ImageDraw.Draw(pop_)
                 bw_, bh_ = w_ * 1.5 * K, h_ * 1.25 * K
                 bx = (X0 + X1) / 2; by1 = Y0 + 6 * s * K; by0 = by1 - bh_
                 bxa = clamp(bx - bw_ / 2, 4, im.width - 4 - bw_)
-                col_ = _ui_a(AY['lime'])
+                col_ = _ui_a(IOS['key'])
                 dp.rounded_rectangle([bxa, by0, bxa + bw_, by1 + 10 * s * K], int(18 * s * K), fill=col_)
                 dp.rectangle([X0, by1 - 4 * s * K, X1, Y1 - 12 * s * K], fill=col_)
                 dp.rounded_rectangle([X0, Y0, X1, Y1], int(12 * s * K), fill=col_)
@@ -1081,7 +1085,7 @@ def fx_ay_liquid_glass(c, e):
                 W2, H2 = int(nw1 * K), int(nh1 * K)
                 im = Image.new('RGBA', (W2, H2), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
                 av = 96 * s * K
-                f = _ui_face(c, e, int(av), ring=int(4 * s * K), ring_col=AY['lime'])
+                f = _ui_face(c, e, int(av), ring=int(4 * s * K), ring_col=IG['ring'])
                 im.alpha_composite(f, (int(36 * s * K), int((H2 - av) / 2)))
                 tx = 36 * s * K + av + 26 * s * K
                 fu = ay_font('h', 31 * s * K); fn = ay_font('hm', 30 * s * K)
@@ -1090,7 +1094,7 @@ def fx_ay_liquid_glass(c, e):
                 msg = note.replace(ay_handle(e) + ' ', '') if note.startswith(ay_handle(e)) else note
                 maxw = W2 - tx - 40 * s * K
                 while fn.getlength(msg) > maxw and len(msg) > 4: msg = msg[:-2] + '…'
-                d.text((tx, H2 / 2 + 24 * s * K), msg, font=fn, fill=_ui_a(AY['lime_hi']), anchor='lm')
+                d.text((tx, H2 / 2 + 24 * s * K), msg, font=fn, fill=_ui_a((255, 255, 255), 225), anchor='lm')
                 return ay_np(_ui_down(im))
             NL = cached(e, 'note', mk_note)
             _ui_comp(c, NL, ncx, ncy + (1 - ease_out(ca_)) * 10 * s, ca_ * na, scale=min(1.0, nw / nw1))

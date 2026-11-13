@@ -109,7 +109,7 @@ italic / Playfair / IBM Plex Mono, all Cyrillic), effects grouped in `ay/ay_ui.p
   Count them as the reel's 1-2 full-screen breaks.
 - **Over the video:** `ay-head-stack` («слово::підпис|…»), `ay-orbit-ring` (one word ≤8 letters), `ay-post-wall` (`to`, `label`
   their real count), `ay-clone-row`, `ay-blade-slice`, `ay-blow-away` (1.6 s with return), `ay-live-cursor`.
-- **Instagram / phone UI (native feel, tinted in the brand's greens):** `ay-predict-keys` (the phrase they type, 2.6-3.2 s, under the chin),
+- **Instagram / phone UI (native look: iOS keyboard, Instagram white / blue / red, DM violet, Figma blue; never repainted):** `ay-predict-keys` (the phrase they type, 2.6-3.2 s, under the chin),
   `ay-voice-note`, `ay-comment-drop` (CTA code word + `comment`), `ay-liquid-glass` (the CTA ending, last 4-4.6 s; `text` = the code
   word, `sub` = what they send).
 - **Captions stay** (build_reel `FX_KEEP_CAPS`): `ay-index` (long card over a list section: `text` = items, `now`, `at` = local

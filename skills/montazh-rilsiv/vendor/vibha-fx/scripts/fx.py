@@ -467,9 +467,9 @@ def fx_tap(c, e):
     x = clamp(float(e.o['x']) * c.W if 'x' in e.o else c.fx + c.fw * 1.9, bw / 2 + 30, c.W - bw / 2 - 30)
     y = clamp(float(e.o['y']) * c.H if 'y' in e.o else c.fy + c.fw * 1.6, bh + 30, c.H - bh - 30)
     on = c.lt >= at
-    col = rgb(e.o.get('color'), (124, 92, 255)) if on else (0, 149, 246)
+    col = (239, 239, 239) if on else (0, 149, 246)   # Instagram's own: grey «Відстежується», blue «Стежити» (2026-11-13: real UI, never repainted)
     im = rrect(bw, bh, bh * 0.28, col + (255,)); d = ImageDraw.Draw(im)
-    d.text((bw / 2, bh / 2), 'Following' if on else '+ Follow', font=font('ui', bh * 0.4), fill=(255, 255, 255, 255), anchor='mm')
+    d.text((bw / 2, bh / 2), e.o.get('on_label', 'Відстежується') if on else e.o.get('off_label', 'Стежити'), font=font('ui', bh * 0.4), fill=(0, 0, 0, 255) if on else (255, 255, 255, 255), anchor='mm')
     pop = ease_back(c.lt / 0.3)
     sq = 1.0
     if on: q = (c.lt - at) / 0.3; sq = 1 - 0.12 * math.sin(math.pi * clamp(q)) if q < 1 else 1
