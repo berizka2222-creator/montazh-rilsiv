@@ -2,17 +2,21 @@
 # One-time: fetch the animation library and make the sound effects. Re-run safely any time.
 set -euo pipefail
 E="$(cd "$(dirname "$0")/.." && pwd)/engine"; mkdir -p "$E/sfx"
+# sha-256 on a Mac (shasum) and on Windows Git Bash / Linux (sha256sum): Windows has no shasum (CI 2026-11-16)
+sha256() { if command -v shasum >/dev/null 2>&1; then shasum -a 256 "$1"; else sha256sum "$1"; fi | cut -d' ' -f1; }
+# curl.exe can't write into a folder with Cyrillic letters on an English Windows: download from inside it, by a plain name
+get() { (cd "$E" && curl -fsSL "$1" -o "$2"); }
 
 GSAP_SHA=96c01b81f44a3290e2b4532f55e2c9534b2adc43273a19f3756b2cb41f0fd0b6   # gsap 3.13.0: refuse a tampered download
 if [ ! -s "$E/gsap.min.js" ]; then
-  curl -fsSL https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js -o "$E/gsap.min.js.tmp"
-  [ "$(shasum -a 256 "$E/gsap.min.js.tmp" | cut -d' ' -f1)" = "$GSAP_SHA" ] || { rm -f "$E/gsap.min.js.tmp"; echo "gsap download failed its checksum - not installing it" >&2; exit 1; }
+  get https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js gsap.min.js.tmp
+  [ "$(sha256 "$E/gsap.min.js.tmp")" = "$GSAP_SHA" ] || { rm -f "$E/gsap.min.js.tmp"; echo "gsap download failed its checksum - not installing it" >&2; exit 1; }
   mv "$E/gsap.min.js.tmp" "$E/gsap.min.js"
 fi
 THREE_SHA=f34446bf875b5fb0dcd93819ffe1d9e182d46634ee855f5d904c6c4ac7cdbc95   # three.js 0.147.0 (MIT): the 3D motions rf-* load it
 if [ ! -s "$E/three.min.js" ]; then
-  curl -fsSL https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js -o "$E/three.min.js.tmp"
-  [ "$(shasum -a 256 "$E/three.min.js.tmp" | cut -d' ' -f1)" = "$THREE_SHA" ] || { rm -f "$E/three.min.js.tmp"; echo "three.js download failed its checksum - not installing it" >&2; exit 1; }
+  get https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js three.min.js.tmp
+  [ "$(sha256 "$E/three.min.js.tmp")" = "$THREE_SHA" ] || { rm -f "$E/three.min.js.tmp"; echo "three.js download failed its checksum - not installing it" >&2; exit 1; }
   mv "$E/three.min.js.tmp" "$E/three.min.js"
 fi
 
