@@ -41,9 +41,25 @@ if [ -n "${REEL_DRAFT:-}" ]; then   # fast review draft at 540x960 (build_reel.p
   # 30 s draft, but on a 90 s reel with many motions (8 GB) they timed out and redid 408 frames in one worker: 6m48 instead
   # of ~2 min (2026-10-24). 2 workers on 8 GB, 3 on bigger Macs. Fast capture can't help: glass cards use backdrop-filter.
   nice -n "$NI" npx -y hyperframes@0.8.145 render "$REEL/proj" --workers "${REEL_DRAFT_WORKERS:-$([ "$MEM_GB" -le 8 ] && echo 2 || echo 3)}" --no-low-memory-mode --gpu -o "$REEL/draft.mp4" --quality draft --quiet
-  stamp "render:end"; echo "draft: $REEL/draft.mp4"; exit 0
+  stamp "render:end"; echo "draft: $REEL/draft.mp4"
+  # while they watch the draft: build the full-size page and render its graphics in the background, so «фінал» only
+  # composes (~1-2 min). Quiet, low priority, one at a time; a newer draft or the final kills a stale one.
+  if [ -z "${REEL_NO_PRERENDER:-}" ]; then
+    [ -f "$REEL/.prerender.pid" ] && kill "$(cat "$REEL/.prerender.pid")" 2>/dev/null || true
+    ( unset REEL_DRAFT REEL_PREVIEW; export REEL_PROJ=proj_full REEL_OV_WORKERS=1   # a subshell, not env -u: on Windows python3 is a shell function
+      python3 "$S/build_reel.py" "$REEL" >/dev/null 2>&1 && python3 "$S/fast_final.py" "$REEL" --proj proj_full --overlay-only
+      rm -f "$REEL/.prerender.pid" ) > "$REEL/prerender.log" 2>&1 &
+    echo $! > "$REEL/.prerender.pid"; echo "graphics for the final: rendering in the background (prerender.log)"
+  fi
+  exit 0
 fi
-if ! nice -n "$NI" npx -y hyperframes@0.8.145 render "$REEL/proj" --workers "${REEL_WORKERS:-2}" --no-low-memory-mode -o "$REEL/final.mp4" --resolution "$RES" --quality delivery --video-frame-format png --crf "${REEL_CRF:-14}" --quiet; then   # 2 parallel workers from the start (2026-11-13: with PNG source frames the 1-worker capture stalled every time and lost ~4 min before the retry). CRF 14: graphics and skin stay clean through Instagram's own re-encode
+# Fast final (2026-11-16): Chrome draws only the graphics on a transparent page, ffmpeg lays the person's video, punch-ins and
+# glass blur under them (fast_final.py; 76 s after «фінал» instead of 40+ min on an 8 GB Mac). Exit 2 = this reel needs the full render.
+FAST=0
+# the draft's background pre-render still going? let it finish: its graphics are this final's (fast_final checks the key)
+if [ -f "$REEL/.prerender.pid" ]; then P="$(cat "$REEL/.prerender.pid")"; while kill -0 "$P" 2>/dev/null; do sleep 2; done; fi
+if [ -z "${REEL_SLOW:-}" ] && [ "$RES" = portrait ]; then python3 "$S/fast_final.py" "$REEL" && FAST=1 || true; fi
+if [ "$FAST" = 0 ] && !  nice -n "$NI" npx -y hyperframes@0.8.145 render "$REEL/proj" --workers "${REEL_WORKERS:-2}" --no-low-memory-mode -o "$REEL/final.mp4" --resolution "$RES" --quality delivery --video-frame-format png --crf "${REEL_CRF:-14}" --quiet; then   # 2 parallel workers from the start (2026-11-13: with PNG source frames the 1-worker capture stalled every time and lost ~4 min before the retry). CRF 14: graphics and skin stay clean through Instagram's own re-encode
   # 2026-10-26: on an 8 GB Mac the one-worker (low-memory, sequential) capture stalled at the same frames 8 times in a row;
   # two parallel workers got through (frames they miss are retried on one worker). Same path the drafts take.
   echo "final render failed: retrying with 2 parallel workers"
@@ -58,7 +74,8 @@ if [ -n "$MUSIC" ] && [ -f "$MUSIC" ]; then
     "[1:a]volume=-18dB,afade=t=in:d=0.5[m];[0:a]asplit[v][key];[m][key]sidechaincompress=threshold=0.02:ratio=6:attack=15:release=350[md];[v][md]amix=inputs=2:duration=first:normalize=0,loudnorm=I=-14:TP=-1.5:LRA=7[a]" \
     -map 0:v -map "[a]" -c:v copy -ar 48000 -c:a aac -b:a 256k "$REEL/final_ln.mp4"
 else
-  ffmpeg -v error -y -i "$REEL/final.mp4" -c:v copy -af "loudnorm=I=-14:TP=-1.5:LRA=7" -ar 48000 -c:a aac -b:a 256k "$REEL/final_ln.mp4"
+  LN="$(ffmpeg -hide_banner -nostats -i "$REEL/final.mp4" -vn -af "loudnorm=I=-14:TP=-1.5:LRA=7:print_format=json" -f null - 2>&1 | python3 -c "import sys,json,re;d=json.loads(re.findall(r'\{[^{}]*\}',sys.stdin.read())[-1]);print(f\"measured_I={d['input_i']}:measured_TP={d['input_tp']}:measured_LRA={d['input_lra']}:measured_thresh={d['input_thresh']}:offset={d['target_offset']}:linear=true\")")"
+  ffmpeg -v error -y -i "$REEL/final.mp4" -c:v copy -af "loudnorm=I=-14:TP=-1.5:LRA=7:$LN" -ar 48000 -c:a aac -b:a 256k "$REEL/final_ln.mp4"   # two passes: one pass landed at -15.8 (2026-11-16)
 fi
 mv "$REEL/final_ln.mp4" "$REEL/final.mp4"
 python3 "$S/timings.py" "$REEL"

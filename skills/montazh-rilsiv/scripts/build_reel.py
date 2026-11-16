@@ -265,7 +265,7 @@ def caption_patch(mt, groups, dur):
     return mt
 
 # ---- project folder: template files are copied, never installed -------------------------------------------------
-proj = reel / "proj"
+proj = reel / os.environ.get("REEL_PROJ", "proj")   # REEL_PROJ=proj_full: render.sh pre-builds the final page while the draft is watched
 if proj.exists(): shutil.rmtree(proj)
 (proj / "fonts").mkdir(parents=True); (proj / "sfx").mkdir(); (proj / "vendor").mkdir()
 shutil.copy(ENGINE / "gsap.min.js", proj / "vendor/gsap.min.js")
