@@ -1887,7 +1887,8 @@ def guided(I, p, r=8, eps=2e-3):
 
 
 class Tracker:
-    def __init__(self, aw, ah):
+    def __init__(self, aw, ah, vdir=None, fps=30.0):
+        self.vdir, self.fps = vdir, fps
         import mediapipe as mp
         from mediapipe.tasks.python import vision
         from mediapipe.tasks.python.core.base_options import BaseOptions
@@ -1899,13 +1900,23 @@ class Tracker:
         self.prev = None
 
     def __call__(self, rgb, ms):
-        img = self.mp.Image(image_format=self.mp.ImageFormat.SRGB, data=np.ascontiguousarray(rgb))
-        ms_ = self.seg.segment_for_video(img, ms).confidence_masks
-        m = ms_[-1].numpy_view().astype(np.float32); m = m.reshape(m.shape[0], m.shape[1])
-        if m.shape[:2] != rgb.shape[:2]: m = cv2.resize(m, (rgb.shape[1], rgb.shape[0]))
-        m = guided(cv2.cvtColor(rgb, cv2.COLOR_RGB2GRAY).astype(np.float32) / 255, m)
-        m = np.clip((m - 0.5) * 1.6 + 0.5, 0, 1)
-        if self.prev is not None: m = 0.65 * m + 0.35 * self.prev
+        vm = None
+        if self.vdir is not None:   # Apple Vision mask of this frame (accurate person segmentation: hair, hands, mic edges)
+            vp = os.path.join(self.vdir, '%05d.png' % (int(round(ms * self.fps / 1000)) + 1))
+            if os.path.exists(vp): vm = cv2.imread(vp, cv2.IMREAD_GRAYSCALE)
+        if vm is not None:
+            m = cv2.resize(vm, (rgb.shape[1], rgb.shape[0]), interpolation=cv2.INTER_AREA).astype(np.float32) / 255
+            m = guided(cv2.cvtColor(rgb, cv2.COLOR_RGB2GRAY).astype(np.float32) / 255, m)
+            m = np.clip((m - 0.5) * 1.25 + 0.5, 0, 1)
+            if self.prev is not None: m = 0.8 * m + 0.2 * self.prev
+        else:
+            img = self.mp.Image(image_format=self.mp.ImageFormat.SRGB, data=np.ascontiguousarray(rgb))
+            ms_ = self.seg.segment_for_video(img, ms).confidence_masks
+            m = ms_[-1].numpy_view().astype(np.float32); m = m.reshape(m.shape[0], m.shape[1])
+            if m.shape[:2] != rgb.shape[:2]: m = cv2.resize(m, (rgb.shape[1], rgb.shape[0]))
+            m = guided(cv2.cvtColor(rgb, cv2.COLOR_RGB2GRAY).astype(np.float32) / 255, m)
+            m = np.clip((m - 0.5) * 1.6 + 0.5, 0, 1)
+            if self.prev is not None: m = 0.65 * m + 0.35 * self.prev
         self.prev = m
         _, f = self.fd.detect(cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR))
         face = None
@@ -1982,11 +1993,22 @@ def main():
     for d in plan: d['end'] = min(float(d['end']), dur)
     if sw <= sh: W = a.width; H = int(round(a.width * sh / sw / 2)) * 2
     else: H = a.width; W = int(round(a.width * sw / sh / 2)) * 2
-    aw = 540 if sw <= sh else int(round(540 * sw / sh / 2)) * 2; ah = int(round(aw * sh / sw / 2)) * 2
+    _aw = int(os.environ.get('FX_ANALYSIS_W') or 540)   # mask size: 540 for drafts, the final passes its own width (1080) for clean edges
+    aw = _aw if sw <= sh else int(round(_aw * sw / sh / 2)) * 2; ah = int(round(aw * sh / sw / 2)) * 2
     fxs = [Fx(d, fps) for d in plan]
     inwin = lambda t: any(f.start - 0.5 <= t < f.end + 0.5 for f in fxs)
     print(f'Pass 1: tracking you ({len(fxs)} effect{"s" * (len(fxs) > 1)})...', flush=True)
-    trk = Tracker(aw, ah); masks, faces, thumbs = {}, [], []
+    vdir = None   # Mac: Apple Vision masks for the whole clip first (vendor/cutout/cutout_vision), MediaPipe elsewhere
+    vbin = os.path.join(ROOT, '..', 'cutout', 'cutout_vision')
+    vsrc = vbin + '.swift'   # built once from its source (vendor/cutout/cutout.sh does the same); no Xcode tools -> MediaPipe
+    if sys.platform == 'darwin' and os.path.exists(vsrc) and (not os.path.exists(vbin) or os.path.getmtime(vsrc) > os.path.getmtime(vbin)):
+        subprocess.run(['swiftc', '-O', vsrc, '-o', vbin], capture_output=True)
+    if os.environ.get('FX_VISION', '1') != '0' and sys.platform == 'darwin' and os.path.exists(vbin):
+        import tempfile; vdir = tempfile.mkdtemp(prefix='fxmask_')
+        r_ = subprocess.run([vbin, src, vdir], capture_output=True, text=True)
+        if r_.returncode: print('Vision masks failed, MediaPipe instead:', r_.stderr[-300:], flush=True); vdir = None
+        else: print('Vision masks:', r_.stdout.strip(), flush=True)
+    trk = Tracker(aw, ah, vdir, fps); masks, faces, thumbs = {}, [], []
     n_thumb = 10; thumb_at = {int(dur * fps * (j + 0.5) / n_thumb) for j in range(n_thumb)}
     for i, fr_ in enumerate(read_frames(src, aw, ah, fr)):
         t = i / fps

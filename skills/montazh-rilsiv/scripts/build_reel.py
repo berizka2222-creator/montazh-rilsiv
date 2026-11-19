@@ -864,17 +864,17 @@ for i, c in enumerate(edit.get("cards", [])):
         sfx("pop", a, -14)
         zone(cid, "tag", a, b, (tw(c["text"], 58)[0] - 42, c.get("y", 300), tw(c["text"], 58)[1] + 84, 100))
     elif kind == "cta" and LOOK.get("cta"):   # the CTA look picked on the page: same controls as the hook (lines, per-line font/colour/outline/box, size, align)
-        quiet.append((a, b))
-        LC = {"c1": MAIN, "bg": "line", "bc": brand.get("cta_bg", LIGHT), "bo": 100, "br": 40, "sh": 0, **LOOK["cta"]}
+        quiet.append((a, b))   # LT, not LC: LC is the captions' look (it used to be overwritten here, so every caption got the CTA pill)
+        LT = {"c1": MAIN, "bg": "line", "bc": brand.get("cta_bg", LIGHT), "bo": 100, "br": 40, "sh": 0, **LOOK["cta"]}
         lines = [x.strip() for x in c["text"].split("/") if x.strip()]
-        LJ = [{**LC, "font": "head", **(((LC.get("lines") or [])[j] if j < len(LC.get("lines") or []) else None) or {})} for j in range(len(lines))]
+        LJ = [{**LT, "font": "head", **(((LT.get("lines") or [])[j] if j < len(LT.get("lines") or []) else None) or {})} for j in range(len(lines))]
         for j, L in enumerate(LJ):   # a font picked for this CTA line on the page
             if (L.get("ff") or {}).get("file") and Path(L["ff"]["file"]).expanduser().exists(): L["font"] = line_font(L["ff"], f"ct{j}")
         roles = [L["font"] if L["font"] in FAM else "head" for L in LJ]
-        sizes = [int(min(fit(x, 200, 200 // 16 + float(L.get("sw") or 0), role=r), brand.get("cta_px", 78) * 1.5) * float(LC.get("scale") or 100) / 100) for x, r, L in zip(lines, roles, LJ)]
-        AL = LC.get("align") or "center"
+        sizes = [int(min(fit(x, 200, 200 // 16 + float(L.get("sw") or 0), role=r), brand.get("cta_px", 78) * 1.5) * float(LT.get("scale") or 100) / 100) for x, r, L in zip(lines, roles, LJ)]
+        AL = LT.get("align") or "center"
         y = c.get("y", 1360)
-        front.append(f'<div id="{cid}" class="title" style="{font("head", sizes[0])};top:{y}px;left:{c.get("x", 90) - 90}px;letter-spacing:-0.02em;text-shadow:none;line-height:{0.88 * float(LC.get("lh") or 100) / 100:.3f}">'
+        front.append(f'<div id="{cid}" class="title" style="{font("head", sizes[0])};top:{y}px;left:{c.get("x", 90) - 90}px;letter-spacing:-0.02em;text-shadow:none;line-height:{0.88 * float(LT.get("lh") or 100) / 100:.3f}">'
                      + "".join(f'<div class="tl" style="{font(r, px) if r != "head" else f"font-size:{px}px"};text-align:{(("left", "right")[j % 2] if len(lines) > 1 else "center") if AL == "zigzag" else AL}">'
                                f'<span style="{look_bg(LJ[j])}">{look_run(LJ[j], esc(x), "hk")}</span></div>' for j, (x, px, r) in enumerate(zip(lines, sizes, roles))) + "</div>")
         show(f"#{cid}", a, b)

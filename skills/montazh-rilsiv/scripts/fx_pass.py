@@ -238,7 +238,8 @@ def main():
         a, b = max(0.0, c["start"] - 0.4), min(D, c["end"] + 0.4)
         if groups and a <= groups[-1][1]: groups[-1][1] = max(groups[-1][1], b); groups[-1][2].append(c)
         else: groups.append([a, b, [c]])
-    bk = f"{base.stat().st_size}:{base.stat().st_mtime_ns}:{width}:{env['FX_FONTS']}:{env['FX_COLORS']}"
+    env["FX_ANALYSIS_W"] = str(width)   # person mask at the output width (Apple Vision on a Mac): clean edges in the final
+    bk = f"{base.stat().st_size}:{base.stat().st_mtime_ns}:{width}:{env['FX_FONTS']}:{env['FX_COLORS']}:vision2"
     cache = reel / ".cache" / "fx"; cache.mkdir(parents=True, exist_ok=True)
     segs = []
     for a, b, cs in groups:

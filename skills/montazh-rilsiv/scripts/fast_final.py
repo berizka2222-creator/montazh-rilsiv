@@ -96,7 +96,7 @@ except Exception: cur = 0   # Windows: no ps -o (and no nice: _win.py drops it)
 ni = max(0, min(15, 19 - cur))
 r = subprocess.CompletedProcess([], 0) if cached else subprocess.run(["nice", "-n", str(ni), "npx", "-y", "hyperframes@0.8.145", "render", str(ov), "--format", "mov",
                     "--resolution", "portrait", "--workers", os.environ.get("REEL_OV_WORKERS", "2"), "--no-low-memory-mode",
-                    "-o", str(mov), "--quiet"])
+                    "-o", str(mov), "--quiet", *os.environ.get("REEL_HF_ARGS", "").split()])   # e.g. REEL_HF_ARGS=--no-browser-gpu
 if r.returncode or not mov.exists(): no("the graphics pass failed")
 keyf.write_text(key)   # same graphics next time (a re-compose, a new encoder) -> no Chrome at all
 t1 = time.time(); print(f"fast final: graphics {t1 - t0:.0f}s" + (" (ready from the draft)" if cached else ""))
