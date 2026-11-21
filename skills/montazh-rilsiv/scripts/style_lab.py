@@ -23,7 +23,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 HOME = Path(os.environ.get("REELS_HOME", "~/reels")).expanduser()
 STYLES = HOME / "styles"
-LAB = STYLES / "_lab"
+LAB = Path(os.environ["STYLE_LAB_DIR"]).expanduser() if os.environ.get("STYLE_LAB_DIR") else STYLES / "_lab"   # ref_concepts.py: one per reel
 FRAG = LAB / "fragment"
 ROUNDS = LAB / "rounds"
 ELEMENT_UA = {"direction": "напрям", "captions": "субтитри", "hook": "хук", "lists": "списки", "numbers": "цифри",

@@ -62,6 +62,12 @@ MH="${MOTION_HOME:-$HOME/motion}"
 if [ -d "$MH/node_modules/@remotion/cli" ] && [ -f "$MH/scripts/sync-brand.py" ]; then ok "motion library (Remotion) in $MH"
 else warn "motion library (Remotion) not installed" "run: bash scripts/setup_motion.sh (brand elements and motion reels need it)"; fi
 
+# optional: their own videos as b-roll with the face check (own_footage.py) and product shots without strangers (brand_kit.py)
+if [ -x "$VENV/bin/python" ] && "$VENV/bin/python" -c "import cv2, numpy" 2>/dev/null; then ok "face check for own b-roll (OpenCV)"
+elif [ -x "$VENV/bin/pip" ] && "$VENV/bin/pip" install -q numpy opencv-python-headless >/dev/null 2>&1; then ok "face check for own b-roll (OpenCV) installed in $VENV"
+else warn "OpenCV not installed" "own b-roll search can't check faces; run: ~/reels/.venv/bin/pip install numpy opencv-python-headless"; fi
+command -v swiftc >/dev/null && ok "takes + gaze check (macOS Vision)" || warn "swiftc missing" "takes.py works from the words only (no gaze check); run: xcode-select --install"
+
 # optional: picture / GIF / meme search on the review page («Накладення → Знайти»); free keys, saved with scripts/set_key.sh
 ENVF="$HOME/.config/reels/.env"
 for K in PIXABAY_API_KEY GIPHY_API_KEY; do
