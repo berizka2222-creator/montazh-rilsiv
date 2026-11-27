@@ -71,6 +71,20 @@ def font(size):
 # ─────────────────────────────── человек: маска (rembg) ───────────────────────────────
 
 
+
+def _vision_mask(i):
+    """Apple Vision mask of frame i (run.py fills GV_VISION_DIR on a Mac): hair, hands and mic edges kept; None -> rembg."""
+    d = os.environ.get('GV_VISION_DIR')
+    if not d: return None
+    p = os.path.join(d, '%05d.png' % (i + 1))
+    if not os.path.exists(p): return None
+    v = cv2.imread(p, cv2.IMREAD_GRAYSCALE)
+    if v is None: return None
+    m = cv2.resize(v, (W, H), interpolation=cv2.INTER_CUBIC).astype(np.float32) / 255.
+    m = np.clip((m - .2) / .6, 0, 1)
+    return cv2.GaussianBlur(m * m * (3 - 2 * m), (0, 0), 1.0)
+
+
 class Person:
     """маска человека rembg на 640 px, сглажена по времени (без «призраков» фона)"""
 
@@ -93,6 +107,9 @@ class Person:
     def mask(self, rgb, i):
         if i in self.cache:
             return self.cache[i]
+        v = _vision_mask(i)
+        if v is not None:
+            self.cache = {i: v}; return v
         m = self.raw(rgb)
         if self.prev is not None and i - self.prev_i == 1:
             k = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (31, 31))
@@ -143,7 +160,9 @@ class Plate:
             fr = grab(self.src, dur * (k + .5) / n)
             if fr is None:
                 continue
-            m = self.person.raw(fr)
+            m = _vision_mask(int(dur * (k + .5) / n * FPS))   # Vision mask of that frame when run.py made them (2026-11-27)
+            if m is None:
+                m = self.person.raw(fr)
             m = cv2.dilate(cv2.resize(m, (hw, hh)), np.ones((21, 21), np.uint8))
             small = cv2.resize(fr, (hw, hh), interpolation=cv2.INTER_AREA).astype(np.float32)
             small[m > .05] = np.nan
@@ -301,7 +320,9 @@ def fx_clones(f, m, u, d, o, st, ctx):
         F = cv2.warpAffine(fp, M, (W, H), borderMode=cv2.BORDER_REFLECT)
         A = cv2.warpAffine(mp, M, (W, H)) * (1 - m) * (.92 if sc > .8 else .8)
         F = F * .9 + np.array([200, 215, 235], np.float32) * .1         # копия чуть прохладнее, как отражение
-        out = out * (1 - cv2.GaussianBlur(A, (0, 0), 30)[..., None] * .25)
+        # soft shadow: a 30 px blur at full size was ~0.1 s per copy per frame; at 1/4 size it looks the same (2026-11-27)
+        sh = cv2.resize(cv2.GaussianBlur(cv2.resize(A, (W // 4, H // 4), interpolation=cv2.INTER_AREA), (0, 0), 7.5), (W, H), interpolation=cv2.INTER_LINEAR)
+        out = out * (1 - sh[..., None] * .25)
         out = out * (1 - A[..., None]) + F * A[..., None]
     return out
 
@@ -531,6 +552,7 @@ class Engine:
         self.plate_ = Plate(plan['input'], plan['output'], self.person)
         self.state = {}
         self.hist = []                                   # прошлые кадры (для клонов): (i, кадр)
+        self.pmc = {}                                    # маски прошлых кадров (для клонов), 2026-11-27
 
     def active(self, t):
         return next((e for e in self.plan['effects'] if e['t0'] <= t < e['t1'] and (not self.only or e['fx'] in self.only)), None)
@@ -546,14 +568,22 @@ class Engine:
         f = fr.astype(np.float32)
         m = self.person.mask(fr, i) if e['fx'] in NEED_MASK else np.zeros((H, W), np.float32)
         st = self.state.setdefault(id(e), {})
-        pm = {}
+        pm = self.pmc                                    # masks of past frames, kept across frames: each one is cut out once
+        for k in [k for k in pm if k < i - 16]:
+            del pm[k]
 
         def past(lag):
             j = max(0, len(self.hist) - 1 - lag)
             k, img = self.hist[j]
             if k not in pm:
-                pm[k] = self.person.raw(img)
-                pm[k] = cv2.GaussianBlur(cv2.resize(pm[k], (W, H), interpolation=cv2.INTER_CUBIC), (0, 0), 1.4)
+                # 2026-11-27: the Vision mask of that frame is already on disk (run.py) - rembg here cost ~1-2 s a frame,
+                # which made «клони» 4 s of video take 3.5 min (draft) / 7 min (final). rembg only when there is no Vision mask.
+                v = _vision_mask(k)
+                if v is not None:
+                    pm[k] = v
+                else:
+                    pm[k] = self.person.raw(img)
+                    pm[k] = cv2.GaussianBlur(cv2.resize(pm[k], (W, H), interpolation=cv2.INTER_CUBIC), (0, 0), 1.4)
             return img.astype(np.float32), pm[k]
         ctx = dict(plate=self.plate_.get, past=past)
         out = FX[e['fx']](f, m, t - e['t0'], e['t1'] - e['t0'], e, st, ctx)

@@ -27,12 +27,17 @@ if [ "$FINAL" = 1 ] || [ -z "${REEL_DRAFT:-}" ]; then   # the real render needs 
   [ "$FINAL" = 1 ] || WANT=1920
   [ "${REEL_4K:-}" = 1 ] && WANT=3840
   HAVE="$(ffprobe -v error -select_streams v:0 -show_entries stream=height -of csv=p=0 "$REEL/master.mp4")"
+  # the master changes, so a background pre-render of the old one is useless: stop it instead of racing it (2026-11-27)
+  if [ "$HAVE" -lt "$WANT" ] && [ -f "$REEL/.prerender.pid" ]; then kill "$(cat "$REEL/.prerender.pid")" 2>/dev/null || true; pkill -f "fx_pass.py $REEL" 2>/dev/null || true; rm -f "$REEL/.prerender.pid"; fi
   if [ "$HAVE" -lt "$WANT" ]; then echo "master.mp4 is ${HAVE}p, re-cutting at ${WANT}p for the final"; env -u REEL_PREVIEW -u REEL_DRAFT python3 "$S/cut.py" "$REEL"; python3 "$S/precheck.py" "$REEL" | tail -3; fi
 fi
 
 [ -s "$S/../engine/gsap.min.js" ] || bash "$S/setup_engine.sh"
 # graphics checked on stills first (fx_check.py): a render is never how we find a wrong effect
 [ -n "${REEL_NO_CHECK:-}" ] || python3 "$S/fx_check.py" "$REEL" --verify || exit 3
+# a final while the draft's background pre-render still runs: wait for it here, before fx_pass, or both cut the same
+# effects at once and fight for memory (2026-11-27 test: 2 x 7 min instead of 1 x 7)
+if [ -z "${REEL_DRAFT:-}" ] && [ -f "$REEL/.prerender.pid" ]; then P="$(cat "$REEL/.prerender.pid")"; echo "waiting for the background pre-render…"; while kill -0 "$P" 2>/dev/null; do sleep 2; done; fi
 stamp "fx:start"; python3 "$S/fx_pass.py" "$REEL"; stamp "fx:end"   # Vibha's effects («fx» cards) into the cut first; nothing to do without them
 stamp "build:start"; python3 "$S/build_reel.py" "$REEL" ${ARGS[@]+"${ARGS[@]}"}; stamp "build:end"
 stamp "render:start"

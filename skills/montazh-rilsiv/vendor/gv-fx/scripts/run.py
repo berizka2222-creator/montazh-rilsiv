@@ -78,14 +78,22 @@ def main(a):
             p["fonts"] = {kk: fonts[v] for kk, v in (("display", "bold"), ("medium", "bold"), ("regular", "ui"), ("italic", "serif")) if fonts.get(v)}
         if eng == "e9" and fonts.get("ui"): p["font"] = fonts["ui"]
         pj = tmp / f"step{k}.json"; json.dump(p, open(pj, "w", encoding="utf-8"), ensure_ascii=False)
-        r = subprocess.run([sys.executable, str(ENG[eng]), str(pj)])
+        env = dict(os.environ)
+        vb = HERE.parent.parent / "cutout" / "cutout_vision"   # Mac: Apple Vision masks of this step's input (accurate edges); else rembg
+        if os.environ.get("FX_VISION", "1") != "0" and sys.platform == "darwin":
+            vs = vb.with_suffix(".swift")
+            if vs.exists() and (not vb.exists() or vs.stat().st_mtime > vb.stat().st_mtime):
+                subprocess.run(["swiftc", "-O", str(vs), "-o", str(vb)], capture_output=True)
+            if vb.exists():
+                vd = tmp / f"vmask{k}"
+                if subprocess.run([str(vb), str(cur), str(vd)], capture_output=True).returncode == 0: env["GV_VISION_DIR"] = str(vd)
+        r = subprocess.run([sys.executable, str(ENG[eng]), str(pj)], env=env)
         if r.returncode or not out.exists(): sys.exit(f"{ENG[eng].name} failed")
         cur = out
     h = width * 16 // 9 // 2 * 2
     subprocess.run(["ffmpeg", "-nostdin", "-v", "error", "-y", "-i", str(cur), "-vf", f"scale={width}:{h}", "-c:v", "libx264", "-preset", "veryfast",
                     "-crf", "14", "-pix_fmt", "yuv420p", "-c:a", "copy", str(dst)], check=True)
-    for f in tmp.iterdir(): f.unlink()
-    tmp.rmdir()
+    import shutil; shutil.rmtree(tmp, ignore_errors=True)
 
 
 if __name__ == "__main__":

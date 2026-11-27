@@ -116,6 +116,20 @@ def font(kind, size):
 # ─────────────────────────────── человек и лицо ───────────────────────────────
 
 
+
+def _vision_mask(i):
+    """Apple Vision mask of frame i (run.py fills GV_VISION_DIR on a Mac): hair, hands and mic edges kept; None -> rembg."""
+    d = os.environ.get('GV_VISION_DIR')
+    if not d: return None
+    p = os.path.join(d, '%05d.png' % (i + 1))
+    if not os.path.exists(p): return None
+    v = cv2.imread(p, cv2.IMREAD_GRAYSCALE)
+    if v is None: return None
+    m = cv2.resize(v, (W, H), interpolation=cv2.INTER_CUBIC).astype(np.float32) / 255.
+    m = np.clip((m - .2) / .6, 0, 1)
+    return cv2.GaussianBlur(m * m * (3 - 2 * m), (0, 0), 1.0)
+
+
 class Person:
     """маска человека (rembg) + рамка лица (OpenCV), сглажено по времени, считается только на кадрах с эффектами"""
 
@@ -130,6 +144,10 @@ class Person:
             self.cascade = None if c.empty() else c   # OpenCV 5 ships without the xml: face by silhouette then
 
     def mask(self, rgb, i):
+        v = _vision_mask(i)
+        if v is not None:
+            self.prev_m, self.prev_i = cv2.resize(v, (int(W * self.work / max(W, H)), int(H * self.work / max(W, H)))), i
+            return v
         if self.session is None:
             from rembg import new_session
             self.session = new_session(self.model)
